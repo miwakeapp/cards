@@ -1,7 +1,15 @@
+import * as path from "@std/path";
 import { extract as extractZip } from "@quentinadam/zip";
+import type { JMdict } from "@scriptin/jmdict-simplified-types";
 
 const jmdictReleasesURL = "https://api.github.com/repos/scriptin/jmdict-simplified/releases/latest";
-const jmdictFilename = "jmdict_eng.json";
+const jmdictFilename = path.resolve(import.meta.dirname!, "jmdict_eng.json");
+
+const testIds = new Set([
+  "2030540", // 狂喜乱舞, simple entry
+  "1414110", // 大小, one reading, multiple senses, per-sense tags
+  "1590470", // 画期的, multiple readings, one sense
+]);
 
 // Get the latest release metadata from GitHub API
 const releaseResponse = await fetch(jmdictReleasesURL);
@@ -37,3 +45,24 @@ if (unzipped.length !== 1) {
 
 await Deno.writeFile(jmdictFilename, unzipped[0].data);
 console.log(`Downloaded and saved as ${jmdictFilename}`);
+
+const jmdictText = new TextDecoder().decode(unzipped[0].data);
+const jmdict = JSON.parse(jmdictText) as JMdict;
+
+const promises = [];
+const foundIds = new Set<string>();
+for (const word of jmdict.words) {
+  if (testIds.has(word.id)) {
+    const filename = path.resolve(import.meta.dirname!, `../test/inputs/${word.id}.json`);
+    promises.push(Deno.writeTextFile(filename, JSON.stringify(word, undefined, 2)));
+    foundIds.add(word.id);
+  }
+}
+
+if (promises.length !== testIds.size) {
+  throw new Error(
+    "Some test IDs were not found in the downloaded JMdict:" +
+      [...testIds.difference(foundIds)].join(", "),
+  );
+}
+await Promise.all(promises);

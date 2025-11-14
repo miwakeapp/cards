@@ -1,0 +1,7 @@
+export const snapshot = {};
+
+snapshot[`1414110 1`] = `"<p>TODO</p>"`;
+
+snapshot[`1590470 1`] = `"<p>TODO</p>"`;
+
+snapshot[`2030540 1`] = `"<p>TODO</p>"`;
