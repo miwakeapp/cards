@@ -15,6 +15,7 @@
     "test:update": "deno test --allow-read --allow-write -- --update"
   },
   "fmt": {
-    "lineWidth": 100
+    "lineWidth": 100,
+    "proseWrap": "never"
   }
 }
