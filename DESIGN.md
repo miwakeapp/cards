@@ -690,7 +690,7 @@ TODO Discuss ✨ removal of en-GB redundancy
 
 ```html
 <ul class="part-of-speech">
-  <li class="vs-s"><span lang="ja">する</span> verb (special class)</li>
+  <li class="vs-s"><span lang="ja">する</span> verb</li>
 </ul>
 <ol class="senses">
   <li>
