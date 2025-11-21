@@ -1,20 +1,17 @@
 @font-face {
   font-family: "Noto Serif Japanese";
-  src: url("../fonts/_NotoSerifJP-VariableFont_wght.ttf");
+  src: url("../fonts/NotoSerifJP-VariableFont_wght.ttf");
   font-display: swap;
 }
 
 :where(.dictionary-entry) {
-  --margin-color: rgb(229 215 201);
   --background-color: rgb(255 255 255);
   --text-color: rgb(0 0 0);
   --info-color: color-mix(in srgb, var(--text-color), rgb(255 255 255) 40%);
+  --rarely-used-color: rgb(128 128 128);
   --default-font-size: 18px;
-  --context-font-size: 25px;
-  --word-font-size: 30px;
 
   &.night-mode {
-    --margin-color: rgb(47 47 49);
     --background-color: rgb(0 0 0);
     --text-color: rgb(255 255 255);
   }
@@ -25,11 +22,15 @@
     box-sizing: border-box;
   }
 
-  background-color: var(--margin-color);
-  padding: 1em;
+  background-color: var(--background-color);
+  padding: 1rem;
   margin: 0;
   color: var(--text-color);
   font-size: var(--default-font-size);
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: start;
+  row-gap: 1rem;
 
   :lang(ja) {
     font-family: "Noto Serif Japanese", serif;
@@ -39,46 +40,88 @@
     font-family: sans-serif;
   }
 
-  .word {
-    font-size: var(--word-font-size);
-    text-align: center;
-  }
-
-  .part-of-speech,
-  .misc,
-  .field {
-    display: none;
-  }
-
-  .senses {
+  > .senses {
     &:has(> li:only-of-type) {
       list-style-type: none;
       padding-left: 0;
     }
 
     &:has(> li:nth-of-type(2)) {
-      padding-left: 1.5em;
+      padding-left: 1.5rem;
 
       > li {
         margin: 0.5em 0;
       }
     }
+
+    grid-row: 2;
+    grid-column: 1 / -1;
+    order: 1;
+
+    margin: 0;
+    padding: 0;
+
+    .glosses {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+
+      > li {
+        display: inline;
+
+        &:not(:last-of-type)::after {
+          content: ", ";
+        }
+      }
+    }
   }
 
-  .glosses {
+  > .forms {
+    &:not(:last-of-type)::after {
+      content: "／";
+    }
+
+    grid-row: 1;
+    order: 0;
+
     list-style-type: none;
+    display: flex inline; /* to avoid inter-element whitespace issues */
+    flex-direction: row;
     margin: 0;
     padding: 0;
 
     > li {
       display: inline;
 
+      &.tag-rK, &.tag-rk, &.tag-sK, &.tag-sk {
+        color: var(--rarely-used-color);
+      }
+
       &:not(:last-of-type)::after {
-        content: ", ";
+        content: "・";
+        color: var(--text-color);
+      }
+
+      > .tags {
+        display: none;
       }
     }
   }
 
+  > :not(.forms, .senses) {
+    grid-column: 1 / -1;
+    order: 2;
+  }
+
+  /* These can appear either at top level or within a sense. */
+
+  .part-of-speech,
+  .misc,
+  .antonyms,
+  .language-source,
+  .dialect {
+    display: none;
+  }
   .related {
     list-style-type: none;
     margin: 0;
@@ -104,56 +147,5 @@
     padding: 0;
     font-style: italic;
     color: var(--info-color);
-
-    &:has(> li:first-of-type) {
-      margin-top: 1em;
-    }
-  }
-
-  .forms {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-
-    &:has(> li:only-of-type):has(> li.equals-input-form),
-    &:has(> li:only-of-type):has(> li.equals-displayed-reading),
-    &:has(> li:nth-of-type(1).equals-input-form):has(
-      > li:nth-of-type(2).equals-displayed-reading
-    ):not(:has(> li:nth-of-type(3))),
-    &:has(> li:nth-of-type(1).equals-displayed-reading):has(
-      > li:nth-of-type(2).equals-input-form
-    ):not(:has(> li:nth-of-type(3))) {
-      display: none;
-    }
-
-    &::before {
-      content: "Forms: ";
-    }
-
-    > li {
-      display: inline;
-
-      &:not(:last-of-type)::after {
-        content: ", ";
-      }
-
-      &.equals-input-form,
-      &.equals-displayed-reading {
-        display: none;
-      }
-
-      > .tags {
-        display: none;
-      }
-    }
-  }
-
-  .context {
-    text-align: center;
-    font-size: var(--context-font-size);
-
-    .input-form {
-      text-decoration: underline;
-    }
   }
 }
