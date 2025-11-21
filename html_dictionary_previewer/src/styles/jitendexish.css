@@ -1,0 +1,246 @@
+@font-face {
+  font-family: "Noto Serif Japanese";
+  src: url("../fonts/_NotoSerifJP-VariableFont_wght.ttf");
+  font-display: swap;
+}
+
+:where(.dictionary-entry) {
+  /* Color tokens */
+  --background-color: rgb(34 34 34);
+  --text-color: rgb(255 255 255);
+  --part-of-speech-background-color: rgb(86 86 86);
+  --part-of-speech-color: rgb(255 255 255);
+  --misc-background-color: rgb(165 42 42);
+  --misc-color: rgb(255 255 255);
+  --field-background-color: rgb(128 0 128);
+  --field-color: rgb(255 255 255);
+  --form-common-false-color: rgb(200 200 200);
+  --related-color: rgb(26 115 232);
+  --info-color: rgb(240 224 182);
+  --default-font-size: 16px;
+  --context-font-size: 25px;
+  --word-font-size: 30px;
+
+  /* Layout */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-size: var(--default-font-size);
+  padding: 1em;
+
+  :lang(ja) {
+    font-family: "Noto Serif Japanese", serif;
+  }
+
+  :lang(en) {
+    font-family: sans-serif;
+  }
+
+  .word {
+    font-size: var(--word-font-size);
+    text-align: center;
+  }
+
+  /* Back styling */
+  .senses {
+    &:has(> li:only-of-type) {
+      list-style-type: none;
+    }
+
+    &:has(> li:nth-of-type(2)) {
+      > li {
+        margin: 0.5em 0;
+      }
+    }
+  }
+
+  .part-of-speech,
+  .misc,
+  .field {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: inline;
+
+    > li {
+      display: inline;
+      border-radius: 0.3em;
+      padding: 0.1em 0.2em;
+      line-height: 1ic;
+
+      &.shared {
+        display: none;
+      }
+    }
+
+    .senses &.shared {
+      display: none;
+    }
+  }
+
+  .part-of-speech > li {
+    background-color: var(--part-of-speech-background-color);
+    color: var(--part-of-speech-color);
+  }
+
+  .misc > li {
+    background-color: var(--misc-background-color);
+    color: var(--misc-color);
+  }
+
+  .field > li {
+    background-color: var(--field-background-color);
+    color: var(--field-color);
+  }
+
+  .related {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+
+    :has(> li:first-of-type)&::before {
+      content: "Related: ";
+      font-style: italic;
+    }
+
+    > li {
+      display: inline;
+
+      &:not(:last-of-type)::after {
+        content: ", ";
+      }
+
+      > a {
+        color: var(--related-color);
+      }
+    }
+  }
+
+  .info {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    font-style: italic;
+    color: var(--info-color);
+
+    &:has(> li:first-of-type) {
+      margin-top: 1em;
+    }
+  }
+
+  .glosses {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+
+    > li {
+      display: inline;
+
+      &:not(:last-of-type)::after {
+        content: ", ";
+      }
+    }
+  }
+
+  .context {
+    text-align: center;
+    font-size: var(--context-font-size);
+
+    .input-form {
+      text-decoration: underline;
+    }
+  }
+
+  .forms {
+    list-style-type: none;
+    padding-left: 0;
+
+    &::before {
+      content: "Alternate forms: ";
+      font-style: italic;
+    }
+
+    &:has(> li:only-of-type):has(> li.equals-input-form),
+    &:has(> li:only-of-type):has(> li.equals-displayed-reading),
+    &:has(> li:nth-of-type(1).equals-input-form):has(
+      > li:nth-of-type(2).equals-displayed-reading
+    ):not(:has(> li:nth-of-type(3))),
+    &:has(> li:nth-of-type(1).equals-displayed-reading):has(
+      > li:nth-of-type(2).equals-input-form
+    ):not(:has(> li:nth-of-type(3))) {
+      display: none;
+    }
+
+    > li {
+      display: inline;
+
+      &:not(:last-of-type)::after {
+        content: ", ";
+      }
+
+      &.equals-input-form,
+      &.equals-displayed-reading {
+        display: none;
+      }
+
+      &.common-false {
+        color: var(--form-common-false-color);
+      }
+
+      > .tags {
+        list-style-type: none;
+        display: inline;
+        margin: 0;
+        padding: 0;
+
+        > li {
+          display: inline;
+
+          &:not(:last-of-type)::after {
+            content: ", ";
+          }
+
+          &::before {
+            content: "[";
+          }
+          &:first-of-type::before {
+            content: " [";
+          }
+
+          &::after {
+            content: "]";
+          }
+        }
+      }
+    }
+  }
+}
+/* Colors */
+:where(.dictionary-entry) {
+  --background-color: rgb(34 34 34);
+  --text-color: white;
+
+  --part-of-speech-background-color: rgb(86 86 86);
+  --part-of-speech-color: var(--text-color);
+
+  --misc-background-color: brown;
+  --misc-color: var(--text-color);
+
+  --field-background-color: purple;
+  --field-color: var(--text-color);
+
+  --form-common-false-color: rgb(200 200 200);
+
+  --related-color: rgb(26 115 232);
+
+  --info-color: rgb(240 224 182);
+
+  --default-font-size: 16px;
+  --context-font-size: 25px;
+  --word-font-size: 30px;
+}

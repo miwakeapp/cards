@@ -1,0 +1,390 @@
+export const snapshot = {};
+
+snapshot[`1000230 1`] = `
+'<ul class="part-of-speech">
+  <li class="exp">expression</li>
+</ul>
+<ul class="dialect">
+  <li class="ksb">Kansai-ben</li>
+</ul>
+<ul class="misc">
+  <li class="uk">usually kana</li>
+</ul>
+<ol class="senses">
+  <li>
+    <ul class="info">
+      <li>commonly used with i-adjective inflections, e.g. <span lang="ja">あかんかった</span>, <span lang="ja">あかんくない</span></li>
+    </ul>
+    <ul class="glosses">
+      <li>useless</li>
+      <li>no good</li>
+      <li>hopeless</li>
+    </ul>
+  </li>
+  <li>
+    <ul class="glosses">
+      <li>cannot</li>
+      <li>must not</li>
+      <li>not allowed</li>
+    </ul>
+  </li>
+</ol>
+<ul class="forms kanji">
+  <li class="tag-rK">
+    <span lang="ja">明かん</span>
+    <ul class="tags">
+      <li class="rK">rarely-used</li>
+    </ul>
+  </li>
+</ul>
+<ul class="forms kana">
+  <li><span lang="ja">あかん</span></li>
+  <li><span lang="ja">アカン</span></li>
+  <li class="tag-sk">
+    <span lang="ja">あかーん</span>
+    <ul class="tags">
+      <li class="sk">search-only</li>
+    </ul>
+  </li>
+</ul>'
+`;
+
+snapshot[`1014630 1`] = `
+'<ol class="senses">
+  <li>
+    <ul class="part-of-speech">
+      <li class="adj-f">prenoun modifier</li>
+    </ul>
+    <ul class="antonyms">
+      <li><span lang="ja">インナー</span> (sense 1)</li>
+    </ul>
+    <ul class="glosses">
+      <li>outer</li>
+    </ul>
+  </li>
+  <li>
+    <ul class="part-of-speech">
+      <li class="n">noun</li>
+    </ul>
+    <ul class="related">
+      <li><span lang="ja">アウターウエア</span></li>
+    </ul>
+    <ul class="misc">
+      <li class="abbr">abbreviation</li>
+    </ul>
+    <ul class="glosses">
+      <li>outerwear</li>
+      <li>overgarment</li>
+    </ul>
+  </li>
+</ol>
+<ul class="forms kana">
+  <li><span lang="ja">アウター</span></li>
+  <li><span lang="ja">アウタ</span></li>
+</ul>'
+`;
+
+snapshot[`1061000 1`] = `
+'<ul class="part-of-speech">
+  <li class="n">noun</li>
+</ul>
+<ol class="senses">
+  <li>
+    <ul class="field">
+      <li class="ling">linguistics</li>
+    </ul>
+    <ul class="related">
+      <li><span lang="ja">同義語</span></li>
+      <li><span lang="ja">アントニム</span></li>
+    </ul>
+    <ul class="glosses">
+      <li>synonym</li>
+    </ul>
+  </li>
+  <li>
+    <ul class="field">
+      <li class="biol">biology</li>
+    </ul>
+    <ul class="related">
+      <li><span lang="ja">異名</span> (sense 2)</li>
+    </ul>
+    <ul class="glosses">
+      <li>synonym</li>
+    </ul>
+  </li>
+</ol>
+<ul class="forms kana">
+  <li class="common"><span lang="ja">シノニム</span></li>
+</ul>'
+`;
+
+snapshot[`1122910 1`] = `
+'<ul class="part-of-speech">
+  <li class="n">noun</li>
+</ul>
+<ol class="senses">
+  <li>
+    <ul class="language-source">
+      <li class="lang-ger">German: <span lang="de">Hormon</span></li>
+    </ul>
+    <ul class="glosses">
+      <li>hormone</li>
+    </ul>
+  </li>
+  <li>
+    <ul class="field">
+      <li class="food">food, cooking</li>
+    </ul>
+    <ul class="dialect">
+      <li class="ksb">Kansai-ben</li>
+    </ul>
+    <ul class="related">
+      <li><span lang="ja">ホルモン焼き</span></li>
+    </ul>
+    <ul class="glosses">
+      <li>offal (esp. beef or pork)</li>
+      <li>entrails</li>
+    </ul>
+  </li>
+</ol>
+<ul class="forms kana">
+  <li class="common"><span lang="ja">ホルモン</span></li>
+</ul>'
+`;
+
+snapshot[`1158110 1`] = `
+'<ul class="part-of-speech">
+  <li class="n">noun</li>
+</ul>
+<ol class="senses">
+  <li>
+    <ul class="glosses">
+      <li>another name</li>
+      <li>nickname</li>
+      <li>alias</li>
+    </ul>
+  </li>
+  <li>
+    <ul class="applies-to kana">
+      <li><span lang="ja">いめい</span></li>
+    </ul>
+    <ul class="field">
+      <li class="biol">biology</li>
+    </ul>
+    <ul class="related">
+      <li><span lang="ja">シノニム</span> (sense 2)</li>
+    </ul>
+    <ul class="glosses">
+      <li>synonym</li>
+    </ul>
+  </li>
+</ol>
+<ul class="forms kanji">
+  <li class="common"><span lang="ja">異名</span></li>
+</ul>
+<ul class="forms kana">
+  <li class="common"><span lang="ja">いみょう</span></li>
+  <li><span lang="ja">いめい</span></li>
+</ul>'
+`;
+
+snapshot[`1414110 1`] = `
+'<ul class="part-of-speech">
+  <li class="n">noun</li>
+</ul>
+<ol class="senses">
+  <li>
+    <ul class="glosses">
+      <li>size</li>
+    </ul>
+  </li>
+  <li>
+    <ul class="part-of-speech">
+      <li class="adj-no"><span lang="ja">の</span>-adj</li>
+    </ul>
+    <ul class="glosses">
+      <li>large and small (sizes)</li>
+      <li>various sizes</li>
+    </ul>
+  </li>
+  <li>
+    <ul class="glosses">
+      <li>daishō (matched pair of long and short swords)</li>
+    </ul>
+  </li>
+  <li>
+    <ul class="glosses">
+      <li>large and small drums</li>
+    </ul>
+  </li>
+  <li>
+    <ul class="glosses">
+      <li>long months and short months</li>
+    </ul>
+  </li>
+  <li>
+    <ul class="glosses">
+      <li>sic bo (Macao dice game)</li>
+      <li>tai sai</li>
+      <li>dai siu</li>
+      <li>big and small</li>
+    </ul>
+  </li>
+</ol>
+<ul class="forms kanji">
+  <li class="common"><span lang="ja">大小</span></li>
+</ul>
+<ul class="forms kana">
+  <li class="common"><span lang="ja">だいしょう</span></li>
+</ul>'
+`;
+
+snapshot[`1590470 1`] = `
+'<ul class="part-of-speech">
+  <li class="adj-na"><span lang="ja">な</span>-adj</li>
+</ul>
+<ol class="senses">
+  <li>
+    <ul class="glosses">
+      <li>ground-breaking</li>
+      <li>revolutionary</li>
+      <li>unprecedented</li>
+      <li>epoch-making</li>
+    </ul>
+  </li>
+</ol>
+<ul class="forms kanji">
+  <li class="common"><span lang="ja">画期的</span></li>
+  <li class="tag-rK">
+    <span lang="ja">劃期的</span>
+    <ul class="tags">
+      <li class="rK">rarely-used</li>
+    </ul>
+  </li>
+</ul>
+<ul class="forms kana">
+  <li class="common"><span lang="ja">かっきてき</span></li>
+</ul>'
+`;
+
+snapshot[`1632080 1`] = `
+'<ul class="part-of-speech">
+  <li class="n">noun</li>
+</ul>
+<ol class="senses">
+  <li>
+    <ul class="glosses">
+      <li>torch (made of pine, bamboo, reed, etc.)</li>
+      <li>flambeau</li>
+      <li>torchlight</li>
+    </ul>
+  </li>
+</ol>
+<ul class="forms kanji">
+  <li><span lang="ja">松明</span></li>
+  <li class="tag-rK">
+    <span lang="ja">炬</span>
+    <ul class="tags">
+      <li class="rK">rarely-used</li>
+    </ul>
+  </li>
+</ul>
+<ul class="forms kana">
+  <li class="tag-gikun">
+    <span lang="ja">たいまつ</span>
+    <ul class="tags">
+      <li class="gikun"><span lang="ja">義訓・熟字訓</span></li>
+    </ul>
+  </li>
+  <li><span lang="ja">しょうめい</span></li>
+</ul>'
+`;
+
+snapshot[`2013080 1`] = `
+'<ul class="part-of-speech">
+  <li class="vs-s"><span lang="ja">する</span> verb</li>
+</ul>
+<ol class="senses">
+  <li>
+    <ul class="part-of-speech">
+      <li class="vi">intransitive</li>
+    </ul>
+    <ul class="applies-to kanji">
+      <li><span lang="ja">没する</span></li>
+    </ul>
+    <ul class="glosses">
+      <li>to sink</li>
+      <li>to go down</li>
+      <li>to set</li>
+    </ul>
+  </li>
+  <li>
+    <ul class="part-of-speech">
+      <li class="vi">intransitive</li>
+    </ul>
+    <ul class="glosses">
+      <li>to pass away</li>
+      <li>to die</li>
+    </ul>
+  </li>
+  <li>
+    <ul class="part-of-speech">
+      <li class="vi">intransitive</li>
+    </ul>
+    <ul class="applies-to kanji">
+      <li><span lang="ja">没する</span></li>
+    </ul>
+    <ul class="glosses">
+      <li>to disappear</li>
+      <li>to vanish</li>
+    </ul>
+  </li>
+  <li>
+    <ul class="part-of-speech">
+      <li class="vt">transitive</li>
+    </ul>
+    <ul class="applies-to kanji">
+      <li><span lang="ja">没する</span></li>
+    </ul>
+    <ul class="glosses">
+      <li>to confiscate</li>
+    </ul>
+  </li>
+</ol>
+<ul class="forms kanji">
+  <li><span lang="ja">没する</span></li>
+  <li class="tag-rK">
+    <span lang="ja">歿する</span>
+    <ul class="tags">
+      <li class="rK">rarely-used</li>
+    </ul>
+  </li>
+</ul>
+<ul class="forms kana">
+  <li><span lang="ja">ぼっする</span></li>
+</ul>'
+`;
+
+snapshot[`2030540 1`] = `
+'<ul class="part-of-speech">
+  <li class="n">noun</li>
+  <li class="vs"><span lang="ja">する</span> verb</li>
+</ul>
+<ol class="senses">
+  <li>
+    <ul class="misc">
+      <li class="yoji"><span lang="ja">四字熟語</span></li>
+    </ul>
+    <ul class="glosses">
+      <li>boisterous dance</li>
+      <li>dancing wildly</li>
+    </ul>
+  </li>
+</ol>
+<ul class="forms kanji">
+  <li><span lang="ja">狂喜乱舞</span></li>
+</ul>
+<ul class="forms kana">
+  <li><span lang="ja">きょうきらんぶ</span></li>
+</ul>'
+`;

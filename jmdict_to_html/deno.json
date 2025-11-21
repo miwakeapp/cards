@@ -1,0 +1,14 @@
+{
+  "name": "jmdict_to_html",
+  "exports": "./src/mod.mts",
+  "tasks": {
+    "download_jmdict": "deno run --allow-net --allow-write=./src/jmdict_eng.json scripts/download_jmdict.mts",
+    "extract_tests": "deno run --allow-read=./src/jmdict_eng.json --allow-write=./test/inputs scripts/extract_tests.mts",
+    "test:update": "deno test --allow-read --allow-write -- --update"
+  },
+  "test": {
+    "permissions": {
+      "read": ["./test/inputs", "./test/__snapshots__"]
+    }
+  }
+}

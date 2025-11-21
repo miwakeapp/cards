@@ -1,0 +1,84 @@
+{
+  "id": "1061000",
+  "kanji": [],
+  "kana": [
+    {
+      "common": true,
+      "text": "シノニム",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "同義語"
+        ],
+        [
+          "アントニム"
+        ]
+      ],
+      "antonym": [],
+      "field": [
+        "ling"
+      ],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "synonym"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "異名",
+          2
+        ]
+      ],
+      "antonym": [],
+      "field": [
+        "biol"
+      ],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "synonym"
+        }
+      ]
+    }
+  ]
+}
