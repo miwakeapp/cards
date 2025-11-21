@@ -24,7 +24,7 @@ The existing solution I am using is a combination of [ｯﾂ Reader](https://git
 
 Although in the fullness of time, a _fully_ integrated project might somehow replace all of these, the priority target for replacement is the Yomitan + Jitendex + Animecards template flow:
 
-- Yomitan is great software, but extremely configurable and requires lots of setup and maintenance (e.g. dictionary updates). Once set up, its flow is mostly-seamless, but can be rough around the edges in, e.g., the awkward clipboard-based context sentence extraction flow, or its treatment of multiple readings for the same word. Overall, it is somewhat too focused on being a generic popup dictionary, and not optimized enough for Japanese sentence mining.
+- Yomitan is great software, but extremely configurable and requires lots of setup and maintenance (e.g. dictionary updates). Once set up, its flow is mostly-seamless, but can be rough around the edges in, e.g., the awkward clipboard-based context extraction flow, or its treatment of multiple readings for the same word. Overall, it is somewhat too focused on being a generic popup dictionary, and not optimized enough for Japanese sentence mining.
 
 - Jitendex is not well-factored. For some reason they've encoded their dictionary entries as a kind of JSON serialization of HTML, with lots of inline styles, which makes customizing the dictionary entries displayed on cards difficult. They seem to have some logic for merging multiple JMDict entries into a single Jitendex entry, which can cause confusion. A cleaner JMDict → semantic HTML-for-Anki flow is a high priority.
 
@@ -60,15 +60,19 @@ After that setup is complete, the unobtrusive indicator changes color. From now 
 
 - If the word exists in the deck, but not the exact spelling or sense, there is additionally a "see existing cards" control.
 
-- If the word + spelling + sense already exists in the deck as a non-leech, then the previous context sentence is displayed, with the following controls: "replace context sentence", "mark as failed".
+- If the word + spelling + sense already exists in the deck as a non-leech, then the previous extracted context is displayed, with the following controls: "replace context", "mark as failed".
 
-- If the word + spelling + sense already exists in the deck but as a leech, then the previous context sentence is displayed, with the following controls: "replace context sentence", "reset to fresh". Some amount of previous review history is also displayed: at a minimum, the date added, and the date suspended.
+- If the word + spelling + sense already exists in the deck but as a leech, then the previous extracted context is displayed, with the following controls: "replace context", "reset to fresh". Some amount of previous review history is also displayed: at a minimum, the date added, and the date suspended.
 
 ### The created cards
 
 When a card is added, it appears in Anki in a maximally-useful way, with the following fields:
 
 - **Word**: the card's "scannable" primary field (for browsing through the deck in the Anki deck viewer); it contains just the spelling.
+
+  - For cases where the word is always used in a certain pattern, we can ✨ automatically add the appropriate prefix or suffix. Example: [うつつを抜かす](https://takoboto.jp/?w=2033950) can become 〜にうつつを抜かす in this field, as there is enough information in the dictionary entry to assemble this.
+
+  - What about cases that are "usu. with neg. sentence", e.g. [はかばかしい](https://takoboto.jp/?w=1600640)? Do we ✨ automatically change them to はかばかしくない? (Just doing that won't work because then the back side dictionary entry would be confusing...)
 
 - **Key**: the card's actual primary key (for disallowing duplicates); it consists of the JMDict ID + spelling + ✨ sense(s) identified as applicable for this card. (The latter are omitted if all senses apply, or if there is only one sense.)
 
@@ -81,17 +85,17 @@ When a card is added, it appears in Anki in a maximally-useful way, with the fol
 
   - Sample: for sense 2 of [飾り物](https://takoboto.jp/?q=%E9%A3%BE%E3%82%8A%E7%89%A9), a good hint would be "Xさんは飾り物だ": a minimal sentence/sentence fragment that makes it clear we're looking for the sense that applies to a person.
 
-- **Full context sentence**: the original full context sentence in which the term was encountered, no matter how long it was. Uses `<mark>` for the term in question.
+- **Full context**: the original full context sentence(s) in which the term was encountered, no matter how long it was. Uses `<mark>` for the term in question.
 
-  - This is extracted from the content being read ✨ automatically. It will at least be a single full sentence, but if the AI judges that more context is necessary, it can expand to two or three sentences. (Example: TODO concrete example, but something like a single-word response sentence in dialogue needing a preceding sentence.)
+  - This is extracted from the content being read ✨ automatically. It will at least be a single full sentence, but if the AI judges that more context is necessary, it can expand to two or three sentences. (See [context sentences which are not helpful](#context-sentences-which-are-not-helpful).)
 
-  - If the original context sentence included furigana, they are preserved (although translated to Anki's `[]`-suffix microsyntax).
+  - If the original context included furigana, they are preserved (although translated to Anki's `[]`-suffix microsyntax).
 
   - Sample: `これまでずっと<mark>殺伐</mark>とした最前線でのみ暮らし、ＳＡＯを──いや 全[すべ]てのＭＭＯＲＰＧをリソースの奪い合いとしか理解していなかった俺にとって、彼らのやり取りは 微[ほほ] 笑[え]ましく、そして 眩[まぶ]しいものに映った。`
 
-- **Minimized context sentence** (optional): a trimmed-by-AI ✨ version of the context sentence which preserves the context, but reduces redundant clauses or emphasis elements so as to make it easier to read when quickly doing flashcards. The result is still a well-formed full Japanese sentence, even if originally the word was located in, e.g., a descriptive clause.
+- **Minimized context** (optional): a trimmed-by-AI ✨ version of the context sentence(s) which preserves the context, but reduces redundant clauses or emphasis elements so as to make it easier to read when quickly doing flashcards. The result is still a well-formed full Japanese sentence, even if originally the word was located in, e.g., a descriptive clause.
 
-  If the original full context sentence was short enough as-is, this is omitted.
+  If the original full context was short enough as-is, this is omitted.
 
   - Sample: the above becomes `これまでずっと<mark>殺伐</mark>とした最前線でのみ暮らしていた。`
 
@@ -303,9 +307,6 @@ TODO Discuss ✨ removal of en-GB redundancy
 </details>
 
 ```html
-<ul class="reading" lang="ja">
-  <li></li>
-</ul>
 <ul class="part-of-speech">
   <li class="n">noun</li>
   <li class="vs"><span lang="ja">する</span> verb</li>
@@ -320,8 +321,10 @@ TODO Discuss ✨ removal of en-GB redundancy
     </ul>
   </li>
 </ol>
-<ul class="forms">
+<ul class="forms kanji">
   <li class="common"><span lang="ja">同情</span></li>
+</ul>
+<ul class="forms kana">
   <li class="common"><span lang="ja">どうじょう</span></li>
 </ul>
 ```
@@ -510,8 +513,10 @@ TODO Discuss ✨ removal of en-GB redundancy
     </ul>
   </li>
 </ol>
-<ul class="forms">
+<ul class="forms kanji">
   <li class="common"><span lang="ja">大小</span></li>
+</ul>
+<ul class="forms kana">
   <li class="common"><span lang="ja">だいしょう</span></li>
 </ul>
 ```
@@ -590,14 +595,165 @@ TODO Discuss ✨ removal of en-GB redundancy
     </ul>
   </li>
 </ol>
-<ul class="forms">
+<ul class="forms kanji">
   <li class="common"><span lang="ja">画期的</span></li>
-  <li class="common"><span lang="ja">かっきてき</span></li>
   <li class="tag-rK">
     <span lang="ja">劃期的</span><ul class="tags"><li class="rK">rarely-used</li></ul>
   </li>
 </ul>
+<ul class="forms kana">
+  <li class="common"><span lang="ja">かっきてき</span></li>
+</ul>
 ```
+
+### Example: multiple senses, multiple readings, only some readings apply to some senses
+
+<details>
+<summary>JSON JMDict entry</summary>
+
+```json
+{
+  "id": "2013080",
+  "kanji": [
+    { "common": false, "text": "没する", "tags": [] },
+    { "common": false, "text": "歿する", "tags": ["rK"] }
+  ],
+  "kana": [{ "common": false, "text": "ぼっする", "tags": [], "appliesToKanji": ["*"] }],
+  "sense": [
+    {
+      "partOfSpeech": ["vs-s", "vi"],
+      "appliesToKanji": ["没する"],
+      "appliesToKana": ["*"],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        { "lang": "eng", "gender": null, "type": null, "text": "to sink" },
+        { "lang": "eng", "gender": null, "type": null, "text": "to go down" },
+        { "lang": "eng", "gender": null, "type": null, "text": "to set" }
+      ]
+    },
+    {
+      "partOfSpeech": ["vs-s", "vi"],
+      "appliesToKanji": ["*"],
+      "appliesToKana": ["*"],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        { "lang": "eng", "gender": null, "type": null, "text": "to pass away" },
+        { "lang": "eng", "gender": null, "type": null, "text": "to die" }
+      ]
+    },
+    {
+      "partOfSpeech": ["vs-s", "vi"],
+      "appliesToKanji": ["没する"],
+      "appliesToKana": ["*"],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        { "lang": "eng", "gender": null, "type": null, "text": "to disappear" },
+        { "lang": "eng", "gender": null, "type": null, "text": "to vanish" }
+      ]
+    },
+    {
+      "partOfSpeech": ["vs-s", "vt"],
+      "appliesToKanji": ["没する"],
+      "appliesToKana": ["*"],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [{ "lang": "eng", "gender": null, "type": null, "text": "to confiscate" }]
+    }
+  ]
+}
+```
+
+</details>
+
+```html
+<ul class="part-of-speech">
+  <li class="vs-s"><span lang="ja">する</span> verb (special class)</li>
+</ul>
+<ol class="senses">
+  <li>
+    <ul class="part-of-speech">
+      <li class="vi">intransitive</li>
+    </ul>
+    <ul class="applies-to kanji">
+      <li><span lang="ja">没する</span></li>
+    </ul>
+    <ul class="glosses">
+      <li>to sink</li>
+      <li>to go down</li>
+      <li>to set</li>
+    </ul>
+  </li>
+  <li>
+    <ul class="part-of-speech">
+      <li class="vi">intransitive</li>
+    </ul>
+    <ul class="glosses">
+      <li>to pass away</li>
+      <li>to die</li>
+    </ul>
+  </li>
+  <li>
+    <ul class="part-of-speech">
+      <li class="vi">intransitive</li>
+    </ul>
+    <ul class="applies-to kanji">
+      <li><span lang="ja">没する</span></li>
+    </ul>
+    <ul class="glosses">
+      <li>to disappear</li>
+      <li>to vanish</li>
+    </ul>
+  </li>
+  <li>
+    <ul class="part-of-speech">
+      <li class="vt">transitive</li>
+    </ul>
+    <ul class="applies-to kanji">
+      <li><span lang="ja">没する</span></li>
+    </ul>
+    <ul class="glosses">
+      <li>to confiscate</li>
+    </ul>
+  </li>
+</ol>
+<ul class="forms kanji">
+  <li><span lang="ja">没する</span></li>
+  <li class="tag-rK">
+    <span lang="ja">歿する</span>
+    <ul class="tags">
+      <li class="rK">rarely-used</li>
+    </ul>
+  </li>
+</ul>
+<ul class="forms kana">
+  <li><span lang="ja">ぼっする</span></li>
+</ul>
+```
+
+TODO: Maybe also 雷.
 
 ### Anki templates
 
@@ -688,3 +844,11 @@ Takoboto lists sense 2 as "Meaning restricted to いめい". We should be sure t
 "works" with either sense 1, "hungrily, voraciously, ravenously, to eat hungrily, to devour", or sense 2, "greedily, avariciously, eagerly, ardently". We should not try to create a hint that pinpoints one sense or the other.
 
 That is, cases like these are clearly distinct from [wildly different senses](#words-with-wildly-different-senses) or [multiple dictionary entries](#words-with-multiple-dictionary-entries); just learning the association of がつがつ to the whole dictionary entry will suffice for the user.
+
+#### Context sentences which are not helpful
+
+[途方にくれる](https://takoboto.jp/?w=1854560) in the sentence
+
+> 途方にくれた。
+
+is not helpful. The context extractor will need to ✨ pull in a preceeding or following sentence. TODO try to find this in the books I've read and actually give the example.
