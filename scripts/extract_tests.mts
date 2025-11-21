@@ -8,6 +8,13 @@ const testIds = new Set([
   "2030540", // 狂喜乱舞, simple entry
   "1414110", // 大小, one reading, multiple senses, per-sense tags
   "1590470", // 画期的, multiple readings, one sense
+  "1000230", // あかん, dialect + misc/info
+  "1014630", // アウター, antonyms + abbr sense
+  "1061000", // シノニム, related sense references + fields
+  "1122910", // ホルモン, language source + dialect sense
+  "1158110", // 異名, reading restrictions + fields
+  "1632080", // 松明, gikun + kanji tags
+  "2013080", // 没する, applies-to restrictions + vt/vi mix
 ]);
 
 const jmdictText = await Deno.readTextFile(jmdictFilename);
