@@ -4,21 +4,15 @@ snapshot[`1000230 1`] = `
 '<ul class="part-of-speech">
   <li class="exp">expression</li>
 </ul>
-<ul class="dialect">
-  <li class="ksb">Kansai-ben</li>
-</ul>
-<ul class="misc">
-  <li class="uk">usually kana</li>
-</ul>
 <ol class="senses">
   <li>
-    <ul class="info">
-      <li>commonly used with i-adjective inflections, e.g. <span lang="ja">あかんかった</span>, <span lang="ja">あかんくない</span></li>
-    </ul>
     <ul class="glosses">
       <li>useless</li>
       <li>no good</li>
       <li>hopeless</li>
+    </ul>
+    <ul class="info">
+      <li>commonly used with i-adjective inflections, e.g. <span lang="ja">あかんかった</span>, <span lang="ja">あかんくない</span></li>
     </ul>
   </li>
   <li>
@@ -29,6 +23,12 @@ snapshot[`1000230 1`] = `
     </ul>
   </li>
 </ol>
+<ul class="dialect">
+  <li class="ksb">Kansai-ben</li>
+</ul>
+<ul class="misc">
+  <li class="uk">usually kana</li>
+</ul>
 <ul class="forms kanji">
   <li class="tag-rK">
     <span lang="ja">明かん</span>
@@ -55,26 +55,26 @@ snapshot[`1014630 1`] = `
     <ul class="part-of-speech">
       <li class="adj-f">prenoun modifier</li>
     </ul>
-    <ul class="antonyms">
-      <li><span lang="ja">インナー</span> (sense 1)</li>
-    </ul>
     <ul class="glosses">
       <li>outer</li>
+    </ul>
+    <ul class="antonyms">
+      <li><span lang="ja">インナー</span> (sense 1)</li>
     </ul>
   </li>
   <li>
     <ul class="part-of-speech">
       <li class="n">noun</li>
     </ul>
-    <ul class="related">
-      <li><span lang="ja">アウターウエア</span></li>
+    <ul class="glosses">
+      <li>outerwear</li>
+      <li>overgarment</li>
     </ul>
     <ul class="misc">
       <li class="abbr">abbreviation</li>
     </ul>
-    <ul class="glosses">
-      <li>outerwear</li>
-      <li>overgarment</li>
+    <ul class="related">
+      <li><span lang="ja">アウターウエア</span></li>
     </ul>
   </li>
 </ol>
@@ -90,6 +90,9 @@ snapshot[`1061000 1`] = `
 </ul>
 <ol class="senses">
   <li>
+    <ul class="glosses">
+      <li>synonym</li>
+    </ul>
     <ul class="field">
       <li class="ling">linguistics</li>
     </ul>
@@ -97,19 +100,16 @@ snapshot[`1061000 1`] = `
       <li><span lang="ja">同義語</span></li>
       <li><span lang="ja">アントニム</span></li>
     </ul>
+  </li>
+  <li>
     <ul class="glosses">
       <li>synonym</li>
     </ul>
-  </li>
-  <li>
     <ul class="field">
       <li class="biol">biology</li>
     </ul>
     <ul class="related">
       <li><span lang="ja">異名</span> (sense 2)</li>
-    </ul>
-    <ul class="glosses">
-      <li>synonym</li>
     </ul>
   </li>
 </ol>
@@ -124,14 +124,18 @@ snapshot[`1122910 1`] = `
 </ul>
 <ol class="senses">
   <li>
-    <ul class="language-source">
-      <li class="lang-ger">German: <span lang="de">Hormon</span></li>
-    </ul>
     <ul class="glosses">
       <li>hormone</li>
     </ul>
+    <ul class="language-source">
+      <li class="lang-ger">German: <span lang="de">Hormon</span></li>
+    </ul>
   </li>
   <li>
+    <ul class="glosses">
+      <li>offal (esp. beef or pork)</li>
+      <li>entrails</li>
+    </ul>
     <ul class="field">
       <li class="food">food, cooking</li>
     </ul>
@@ -140,10 +144,6 @@ snapshot[`1122910 1`] = `
     </ul>
     <ul class="related">
       <li><span lang="ja">ホルモン焼き</span></li>
-    </ul>
-    <ul class="glosses">
-      <li>offal (esp. beef or pork)</li>
-      <li>entrails</li>
     </ul>
   </li>
 </ol>
@@ -165,6 +165,9 @@ snapshot[`1158110 1`] = `
     </ul>
   </li>
   <li>
+    <ul class="glosses">
+      <li>synonym</li>
+    </ul>
     <ul class="applies-to kana">
       <li><span lang="ja">いめい</span></li>
     </ul>
@@ -174,9 +177,6 @@ snapshot[`1158110 1`] = `
     <ul class="related">
       <li><span lang="ja">シノニム</span> (sense 2)</li>
     </ul>
-    <ul class="glosses">
-      <li>synonym</li>
-    </ul>
   </li>
 </ol>
 <ul class="forms kanji">
@@ -185,6 +185,78 @@ snapshot[`1158110 1`] = `
 <ul class="forms kana">
   <li class="common"><span lang="ja">いみょう</span></li>
   <li><span lang="ja">いめい</span></li>
+</ul>'
+`;
+
+snapshot[`1178920 1`] = `
+'<ul class="part-of-speech">
+  <li class="exp">expression</li>
+</ul>
+<ol class="senses">
+  <li>
+    <ul class="glosses">
+      <li>at (a time or place)</li>
+      <li>in</li>
+      <li>on</li>
+    </ul>
+    <ul class="related">
+      <li><span lang="ja">において</span> (sense 1)</li>
+    </ul>
+  </li>
+  <li>
+    <ul class="glosses">
+      <li>in (a situation, matter, etc.)</li>
+      <li>on (a point)</li>
+      <li>when it comes to</li>
+      <li>regarding</li>
+      <li>with respect to</li>
+      <li>in (terms of)</li>
+      <li>as to</li>
+      <li>as for</li>
+    </ul>
+    <ul class="related">
+      <li><span lang="ja">において</span> (sense 2)</li>
+    </ul>
+  </li>
+  <li>
+    <ul class="glosses">
+      <li>on the part of</li>
+      <li>under the authority of</li>
+      <li>in the name of</li>
+    </ul>
+    <ul class="related">
+      <li><span lang="ja">において</span> (sense 3)</li>
+    </ul>
+  </li>
+</ol>
+<ul class="misc">
+  <li class="uk">usually kana</li>
+</ul>
+<ul class="info">
+  <li>as ...<span lang="ja">において</span></li>
+</ul>
+<ul class="forms kanji">
+  <li class="tag-rK">
+    <span lang="ja">於いて</span>
+    <ul class="tags">
+      <li class="rK">rarely-used</li>
+    </ul>
+  </li>
+  <li class="tag-rK">
+    <span lang="ja">於て</span>
+    <ul class="tags">
+      <li class="rK">rarely-used</li>
+    </ul>
+  </li>
+  <li class="tag-sK">
+    <span lang="ja">於</span>
+    <ul class="tags">
+      <li class="sK">search-only</li>
+    </ul>
+  </li>
+</ul>
+<ul class="forms kana">
+  <li><span lang="ja">おいて</span></li>
 </ul>'
 `;
 
@@ -309,13 +381,13 @@ snapshot[`2013080 1`] = `
     <ul class="part-of-speech">
       <li class="vi">intransitive</li>
     </ul>
-    <ul class="applies-to kanji">
-      <li><span lang="ja">没する</span></li>
-    </ul>
     <ul class="glosses">
       <li>to sink</li>
       <li>to go down</li>
       <li>to set</li>
+    </ul>
+    <ul class="applies-to kanji">
+      <li><span lang="ja">没する</span></li>
     </ul>
   </li>
   <li>
@@ -331,23 +403,23 @@ snapshot[`2013080 1`] = `
     <ul class="part-of-speech">
       <li class="vi">intransitive</li>
     </ul>
-    <ul class="applies-to kanji">
-      <li><span lang="ja">没する</span></li>
-    </ul>
     <ul class="glosses">
       <li>to disappear</li>
       <li>to vanish</li>
+    </ul>
+    <ul class="applies-to kanji">
+      <li><span lang="ja">没する</span></li>
     </ul>
   </li>
   <li>
     <ul class="part-of-speech">
       <li class="vt">transitive</li>
     </ul>
-    <ul class="applies-to kanji">
-      <li><span lang="ja">没する</span></li>
-    </ul>
     <ul class="glosses">
       <li>to confiscate</li>
+    </ul>
+    <ul class="applies-to kanji">
+      <li><span lang="ja">没する</span></li>
     </ul>
   </li>
 </ol>
@@ -372,12 +444,12 @@ snapshot[`2030540 1`] = `
 </ul>
 <ol class="senses">
   <li>
-    <ul class="misc">
-      <li class="yoji"><span lang="ja">四字熟語</span></li>
-    </ul>
     <ul class="glosses">
       <li>boisterous dance</li>
       <li>dancing wildly</li>
+    </ul>
+    <ul class="misc">
+      <li class="yoji"><span lang="ja">四字熟語</span></li>
     </ul>
   </li>
 </ol>
@@ -386,5 +458,68 @@ snapshot[`2030540 1`] = `
 </ul>
 <ul class="forms kana">
   <li><span lang="ja">きょうきらんぶ</span></li>
+</ul>'
+`;
+
+snapshot[`2228700 1`] = `
+'<ul class="part-of-speech">
+  <li class="n">noun</li>
+</ul>
+<ol class="senses">
+  <li>
+    <ul class="glosses">
+      <li>higan cherry (species of weeping cherry tree, Prunus subhirtella)</li>
+      <li>early-flowering cherry (around the spring equinox)</li>
+    </ul>
+    <ul class="misc">
+      <li class="uk">usually kana</li>
+    </ul>
+  </li>
+  <li>
+    <ul class="glosses">
+      <li>double weeping rosebud cherry (Prunus pendula)</li>
+    </ul>
+    <ul class="misc">
+      <li class="col">colloquial</li>
+    </ul>
+  </li>
+</ol>
+<ul class="related">
+  <li><span lang="ja">江戸彼岸</span></li>
+</ul>
+<ul class="forms kanji">
+  <li><span lang="ja">彼岸桜</span></li>
+</ul>
+<ul class="forms kana">
+  <li><span lang="ja">ひがんざくら</span></li>
+  <li><span lang="ja">ヒガンザクラ</span></li>
+</ul>'
+`;
+
+snapshot[`2861582 1`] = `
+'<ul class="part-of-speech">
+  <li class="n">noun</li>
+</ul>
+<ol class="senses">
+  <li>
+    <ul class="glosses">
+      <li>introducing a customer or lead to other employees or departments</li>
+    </ul>
+  </li>
+  <li>
+    <ul class="glosses">
+      <li>creating a conversation flow that facilitates getting to the main topic</li>
+    </ul>
+  </li>
+</ol>
+<ul class="field">
+  <li class="bus">business</li>
+</ul>
+<ul class="language-source">
+  <li class="lang-eng">English (wasei): <span lang="en">toss up</span></li>
+</ul>
+<ul class="forms kana">
+  <li><span lang="ja">トスアップ</span></li>
+  <li><span lang="ja">トス・アップ</span></li>
 </ul>'
 `;

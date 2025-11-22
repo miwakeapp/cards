@@ -45,9 +45,20 @@ const SECTION_DESCRIPTORS: SectionDescriptor[] = [
       sense.field.map((tag) => `<li class="${tag}">${escape(expandField(tag as Tag))}</li>`),
   },
   {
+    className: "language-source",
+    getItems: (sense) => sense.languageSource.map((source) => renderLanguageSource(source)),
+  },
+  {
     className: "dialect",
     getItems: (sense) =>
       sense.dialect.map((tag) => `<li class="${tag}">${escape(expandTag(tag as Tag))}</li>`),
+  },
+  {
+    className: "misc",
+    getItems: (sense) =>
+      sense.misc.map((tag) =>
+        `<li class="${tag}">${wrapJapaneseText(expandMisc(tag as Tag))}</li>`
+      ),
   },
   {
     className: "related",
@@ -58,20 +69,9 @@ const SECTION_DESCRIPTORS: SectionDescriptor[] = [
     getItems: (sense) => sense.antonym.map((entry) => renderReference(entry)),
   },
   {
-    className: "misc",
-    getItems: (sense) =>
-      sense.misc.map((tag) =>
-        `<li class="${tag}">${wrapJapaneseText(expandMisc(tag as Tag))}</li>`
-      ),
-  },
-  {
     className: "info",
     getItems: (sense) =>
       sense.info.filter(Boolean).map((text) => `<li>${wrapJapaneseText(text)}</li>`),
-  },
-  {
-    className: "language-source",
-    getItems: (sense) => sense.languageSource.map((source) => renderLanguageSource(source)),
   },
 ];
 
@@ -85,6 +85,11 @@ export function renderEntry(word: JMdictWord): string {
   const senses = word.sense;
   const sharedParts = computeSharedPartOfSpeech(senses);
   const sharedSet = new Set(sharedParts);
+  const sectionComputations = computeSectionComputations(senses);
+  const senseItems = senses.map((sense, index) =>
+    renderSense(sense, sharedSet, sectionComputations, index)
+  );
+
   const sections: string[] = [];
 
   if (sharedParts.length > 0) {
@@ -92,7 +97,9 @@ export function renderEntry(word: JMdictWord): string {
     sections.push(renderList("ul", "part-of-speech", items));
   }
 
-  const sectionComputations = computeSectionComputations(senses);
+  if (senseItems.length > 0) {
+    sections.push(renderList("ol", "senses", senseItems));
+  }
 
   for (const result of sectionComputations) {
     if (result.shared && result.perSenseItems[0]?.length) {
@@ -104,13 +111,6 @@ export function renderEntry(word: JMdictWord): string {
         ),
       );
     }
-  }
-
-  const senseItems = senses.map((sense, index) =>
-    renderSense(sense, sharedSet, sectionComputations, index)
-  );
-  if (senseItems.length > 0) {
-    sections.push(renderList("ol", "senses", senseItems));
   }
 
   const kanjiSection = renderForms(word.kanji, "kanji");
@@ -164,6 +164,12 @@ function renderSense(
     blocks.push(renderList("ul", "part-of-speech", items));
   }
 
+  const glosses = sense.gloss;
+  if (glosses.length > 0) {
+    const items = glosses.map((gloss) => `<li>${escape(gloss.text)}</li>`);
+    blocks.push(renderList("ul", "glosses", items));
+  }
+
   for (const computation of sectionComputations) {
     if (computation.shared) {
       continue;
@@ -174,12 +180,6 @@ function renderSense(
         renderList(computation.descriptor.tag ?? "ul", computation.descriptor.className, items),
       );
     }
-  }
-
-  const glosses = sense.gloss;
-  if (glosses.length > 0) {
-    const items = glosses.map((gloss) => `<li>${escape(gloss.text)}</li>`);
-    blocks.push(renderList("ul", "glosses", items));
   }
 
   const content = blocks.map((block) => indentBlock(block, 1)).join("\n");

@@ -15,6 +15,9 @@ const testIds = new Set([
   "1158110", // 異名, reading restrictions + fields
   "1632080", // 松明, gikun + kanji tags
   "2013080", // 没する, applies-to restrictions + vt/vi mix
+  "1178920", // 於いて, shared info + related sense references
+  "2228700", // 彼岸桜, shared related tags + mixed misc
+  "2861582", // トスアップ, shared field + language source
 ]);
 
 const jmdictText = await Deno.readTextFile(jmdictFilename);
