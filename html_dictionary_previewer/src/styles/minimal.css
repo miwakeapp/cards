@@ -148,4 +148,11 @@
     font-style: italic;
     color: var(--info-color);
   }
+
+  .field {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    color: var(--info-color);
+  }
 }
