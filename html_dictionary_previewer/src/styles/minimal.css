@@ -7,13 +7,15 @@
 :where(.dictionary-entry) {
   --background-color: rgb(255 255 255);
   --text-color: rgb(0 0 0);
-  --info-color: color-mix(in srgb, var(--text-color), rgb(255 255 255) 40%);
+  --secondary-text-color: color-mix(in srgb, var(--text-color), rgb(255 255 255) 40%);
   --rarely-used-color: rgb(128 128 128);
   --default-font-size: 18px;
+  --link-color: rgb(29 78 137);
 
   &.night-mode {
     --background-color: rgb(0 0 0);
     --text-color: rgb(255 255 255);
+    --link-color: rgb(138 180 248);
   }
 
   *,
@@ -31,6 +33,11 @@
   grid-template-columns: max-content minmax(0, 1fr);
   align-items: start;
   row-gap: 1rem;
+
+  a {
+    color: var(--link-color);
+    text-decoration-color: color-mix(in srgb, var(--link-color), transparent 30%);
+  }
 
   :lang(ja) {
     font-family: "Noto Serif Japanese", serif;
@@ -77,8 +84,8 @@
   }
 
   > .forms {
-    &:not(:last-of-type)::after {
-      content: "／";
+    &.kanji:has(+ .kana)::after {
+      content: "\A0／\A0";
     }
 
     grid-row: 1;
@@ -91,14 +98,18 @@
     padding: 0;
 
     > li {
-      display: inline;
+      /* Hide inter-element whitespace */
+      font-size: 0;
+      > *, &::after {
+        font-size: var(--default-font-size);
+      }
 
       &.tag-rK, &.tag-rk, &.tag-sK, &.tag-sk {
         color: var(--rarely-used-color);
       }
 
       &:not(:last-of-type)::after {
-        content: "・";
+        content: ",\A0";
         color: var(--text-color);
       }
 
@@ -117,18 +128,17 @@
 
   .part-of-speech,
   .misc,
-  .antonyms,
-  .language-source,
-  .dialect {
+  .antonyms {
     display: none;
   }
-  .related {
+
+  .related, .applies-to, .dialect, .language-source, .dialect {
     list-style-type: none;
     margin: 0;
     padding: 0;
+    color: var(--secondary-text-color);
 
-    :has(> li:first-of-type)&::before {
-      content: "Related: ";
+    &::before {
       font-style: italic;
     }
 
@@ -141,18 +151,25 @@
     }
   }
 
+  .related::before {
+    content: "Related: ";
+  }
+  .applies-to::before {
+    content: "Only ";
+  }
+
   .info {
     list-style-type: none;
     margin: 0;
     padding: 0;
     font-style: italic;
-    color: var(--info-color);
+    color: var(--secondary-text-color);
   }
 
   .field {
     list-style-type: none;
     margin: 0;
     padding: 0;
-    color: var(--info-color);
+    color: var(--secondary-text-color);
   }
 }

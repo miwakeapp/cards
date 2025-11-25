@@ -46,6 +46,7 @@
     "npm:@scriptin/jmdict-simplified-types@*": "3.6.1",
     "npm:@scriptin/jmdict-simplified-types@^3.6.1": "3.6.1",
     "npm:@types/node@*": "24.2.0",
+    "npm:iso-639-2@*": "3.0.2",
     "npm:lightningcss-wasm@1.30.2": "1.30.2",
     "npm:markdown-it-attrs@4.1.6": "4.1.6_markdown-it@14.0.0",
     "npm:markdown-it-attrs@4.3.1": "4.3.1_markdown-it@14.0.0",
@@ -437,6 +438,9 @@
     },
     "fast-content-type-parse@3.0.0": {
       "integrity": "sha512-ZvLdcY8P+N8mGQJahJV5G4U88CSvT1rP8ApL6uETe88MBXrBHAkZlSEySdUlyztF7ccb+Znos3TFqaepHxdhBg=="
+    },
+    "iso-639-2@3.0.2": {
+      "integrity": "sha512-tna50aWwcGTIn81S9MzD1NSovHYTpFgmPVszHiLF5Vg/xmXAJ9XAkMOB9a8TH9Vi7qwf/x/8NJy2F+lM5OEwAw=="
     },
     "jsbi@4.3.2": {
       "integrity": "sha512-9fqMSQbhJykSeii05nxKl4m6Eqn2P6rOlYiS+C5Dr/HPIU/7yZxu5qzbs40tgaFORiw2Amd0mirjxatXYMkIew=="
@@ -1374,7 +1378,8 @@
       "jsr:@std/html@^1.0.5",
       "jsr:@std/path@^1.1.2",
       "jsr:@std/testing@^1.0.16",
-      "npm:@scriptin/jmdict-simplified-types@^3.6.1"
+      "npm:@scriptin/jmdict-simplified-types@^3.6.1",
+      "npm:iso-639-2@*"
     ]
   }
 }

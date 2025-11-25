@@ -1,28 +1,29 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>JMdict HTML Previewer</title>
-<link rel="stylesheet" href="/styles/site.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JMdict HTML Previewer</title>
+  <link rel="stylesheet" href="/styles/site.css">
 
-<header>
-  <h1>JMdict HTML Previewer</h1>
+  <header>
+    <h1>JMdict HTML Previewer</h1>
 
-  <section id="controls" aria-label="Preview controls">
-    <label>
-      Style sheet
-      <select id="style">
-        <option value="/styles/minimal.css">Minimal</option>
-        <option value="/styles/jitendexish.css">Jitendex-ish</option>
-      </select>
-    </label>
-    <label>
-      <input type="checkbox" id="night-mode">
-      Night mode
-    </label>
-  </section>
-</header>
+    <section id="controls" aria-label="Preview controls">
+      <label>
+        Style sheet
+        <select id="style">
+          <option value="/styles/minimal.css">Minimal</option>
+          <option value="/styles/jitendexish.css">Jitendex-ish</option>
+        </select>
+      </label>
+      <label>
+        <input type="checkbox" id="night-mode">
+        Night mode
+      </label>
+    </section>
+  </header>
 
-<main id="entries" aria-live="polite"></main>
+  <main id="entries" aria-live="polite"></main>
 
-<script type="module" src="/main.js"></script>
+  <script type="module" src="/main.js"></script>
+</html>

@@ -26,5 +26,12 @@
         "no-import-prefix"
       ]
     }
+  },
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "deno.ns"
+    ]
   }
 }

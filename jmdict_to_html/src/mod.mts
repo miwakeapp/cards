@@ -5,7 +5,9 @@ import type {
   JMdictSense,
   JMdictWord,
   Tag,
+  Xref,
 } from "@scriptin/jmdict-simplified-types";
+import { iso6392BTo1 } from "iso-639-2";
 import { escape } from "@std/html";
 import { equal } from "@std/assert";
 
@@ -92,6 +94,16 @@ export function renderEntry(word: JMdictWord): string {
 
   const sections: string[] = [];
 
+  const kanjiSection = renderForms(word.kanji, "kanji");
+  if (kanjiSection) {
+    sections.push(kanjiSection);
+  }
+
+  const kanaSection = renderForms(word.kana, "kana");
+  if (kanaSection) {
+    sections.push(kanaSection);
+  }
+
   if (sharedParts.length > 0) {
     const items = sharedParts.map((tag) => renderPartOfSpeechItem(tag));
     sections.push(renderList("ul", "part-of-speech", items));
@@ -111,16 +123,6 @@ export function renderEntry(word: JMdictWord): string {
         ),
       );
     }
-  }
-
-  const kanjiSection = renderForms(word.kanji, "kanji");
-  if (kanjiSection) {
-    sections.push(kanjiSection);
-  }
-
-  const kanaSection = renderForms(word.kana, "kana");
-  if (kanaSection) {
-    sections.push(kanaSection);
   }
 
   return sections.filter(Boolean).join("\n");
@@ -233,14 +235,32 @@ function renderLanguageSource(source: JMdictLanguageSource): string {
   }
   // We intentionally drop the "full" flag to keep the rendered text concise.
   const qualifierText = qualifiers.length > 0 ? ` (${qualifiers.join(", ")})` : "";
-  const languageTag = normalizeLanguageTag(source.lang);
+  const languageTag = iso6392BTo1[source.lang]!;
   const suffix = source.text ? `: ${renderLanguageSpan(source.text, languageTag)}` : "";
   return `<li class="lang-${source.lang}">${base}${qualifierText}${suffix}</li>`;
 }
 
-function renderReference(entry: (string | number)[]): string {
-  const [target, sense] = entry;
-  let label = renderJapaneseSpan(String(target));
+function renderReference(entry: Xref): string {
+  const [target] = entry;
+  let hrefTarget = target;
+  let sense: number | undefined;
+
+  if (entry.length === 3) {
+    const [, reading, index] = entry;
+    hrefTarget = reading;
+    sense = index;
+  } else if (entry.length === 2) {
+    const [, second] = entry;
+    if (typeof second === "string") {
+      hrefTarget = second;
+    } else {
+      sense = second;
+    }
+  }
+
+  let label = `<a href="https://takoboto.jp/?q=${encodeURIComponent(hrefTarget)}" lang="ja">${
+    escape(target)
+  }</a>`;
   if (typeof sense === "number") {
     label += ` (sense ${sense})`;
   }
@@ -290,32 +310,9 @@ function renderJapaneseSpan(text: string): string {
   return renderLanguageSpan(text, "ja");
 }
 
-/**
- * Mapping of JMdict language codes to a display name and BCP 47 tag.
- * Tuple format: [displayName, bcp47Tag].
- */
-const LANGUAGE_METADATA: Record<string, [string, string]> = {
-  ara: ["Arabic", "ar"],
-  deu: ["German", "de"],
-  eng: ["English", "en"],
-  fre: ["French", "fr"],
-  fra: ["French", "fr"],
-  ger: ["German", "de"],
-  ita: ["Italian", "it"],
-  kor: ["Korean", "ko"],
-  lat: ["Latin", "la"],
-  por: ["Portuguese", "pt"],
-  rus: ["Russian", "ru"],
-  spa: ["Spanish", "es"],
-  zho: ["Chinese", "zh"],
-};
-
 function describeLanguage(code: string): string {
-  return (LANGUAGE_METADATA[code]?.[0]) ?? code;
-}
-
-function normalizeLanguageTag(code: string): string {
-  return (LANGUAGE_METADATA[code]?.[1]) ?? code;
+  const formatter = new Intl.DisplayNames(["en"], { type: "language" });
+  return formatter.of(iso6392BTo1[code])!;
 }
 
 function wrapJapaneseText(text: string): string {
