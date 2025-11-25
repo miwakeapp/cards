@@ -8,12 +8,6 @@ const site = lume({
   },
 });
 
-site.add("index.html");
-site.add("styles/");
-site.add("fonts/");
-site.add("data/");
-site.add("main.ts");
-
 site.use(esbuild({
   extensions: [".ts"],
   options: {
@@ -22,5 +16,11 @@ site.use(esbuild({
     keepNames: false,
   },
 }));
+
+site.add("index.html");
+site.add("styles/");
+site.add("fonts/");
+site.add("data/");
+site.add("main.ts");
 
 export default site;

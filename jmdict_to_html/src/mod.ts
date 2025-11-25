@@ -216,8 +216,7 @@ function renderFormItem(form: JMdictKanji | JMdictKana): string {
 
   const items = tags.map((tag) => {
     const description = expandTag(tag as Tag);
-    const label = description.includes("<") ? description : escape(description);
-    return `<li class="${tag}">${label}</li>`;
+    return `<li class="${tag}">${wrapJapaneseText(description)}</li>`;
   });
   const tagList = renderList("ul", "tags", items);
   return `<li${classAttr}>\n  ${renderJapaneseSpan(form.text)}\n${indentBlock(tagList, 1)}\n</li>`;

@@ -5,7 +5,7 @@ snapshot[`1000230 1`] = `
   <li class="tag-rK">
     <span lang="ja">明かん</span>
     <ul class="tags">
-      <li class="rK">rarely-used</li>
+      <li class="rK">rare</li>
     </ul>
   </li>
 </ul>
@@ -57,7 +57,7 @@ snapshot[`1014630 1`] = `
 <ol class="senses">
   <li>
     <ul class="part-of-speech">
-      <li class="adj-f">prenoun modifier</li>
+      <li class="adj-f">prenominal</li>
     </ul>
     <ul class="glosses">
       <li>outer</li>
@@ -193,13 +193,13 @@ snapshot[`1178920 1`] = `
   <li class="tag-rK">
     <span lang="ja">於いて</span>
     <ul class="tags">
-      <li class="rK">rarely-used</li>
+      <li class="rK">rare</li>
     </ul>
   </li>
   <li class="tag-rK">
     <span lang="ja">於て</span>
     <ul class="tags">
-      <li class="rK">rarely-used</li>
+      <li class="rK">rare</li>
     </ul>
   </li>
   <li class="tag-sK">
@@ -317,7 +317,7 @@ snapshot[`1590470 1`] = `
   <li class="tag-rK">
     <span lang="ja">劃期的</span>
     <ul class="tags">
-      <li class="rK">rarely-used</li>
+      <li class="rK">rare</li>
     </ul>
   </li>
 </ul>
@@ -345,7 +345,7 @@ snapshot[`1632080 1`] = `
   <li class="tag-rK">
     <span lang="ja">炬</span>
     <ul class="tags">
-      <li class="rK">rarely-used</li>
+      <li class="rK">rare</li>
     </ul>
   </li>
 </ul>
@@ -378,7 +378,7 @@ snapshot[`2013080 1`] = `
   <li class="tag-rK">
     <span lang="ja">歿する</span>
     <ul class="tags">
-      <li class="rK">rarely-used</li>
+      <li class="rK">rare</li>
     </ul>
   </li>
 </ul>
