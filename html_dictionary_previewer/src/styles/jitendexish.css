@@ -5,23 +5,35 @@
 }
 
 :where(.dictionary-entry) {
-  /* Color tokens */
-  --background-color: rgb(34 34 34);
-  --text-color: rgb(255 255 255);
-  --link-color: rgb(26 115 232);
+  --default-font-size: 16px;
+  --pill-horizontal-padding: 0.2rem;
+  --pill-vertical-padding: 0.1rem;
+
+  /* Default colors */
+  --background-color: rgb(255 255 255);
+  --text-color: rgb(0 0 0);
+  --link-color: rgb(29 78 137);
+  --info-color: rgb(140 115 60);
+  --language-source-color: rgb(60 80 160);
+
+  /* Pill colors (same in both modes) */
   --part-of-speech-background-color: rgb(86 86 86);
   --part-of-speech-color: rgb(255 255 255);
   --misc-background-color: rgb(165 42 42);
   --misc-color: rgb(255 255 255);
   --field-background-color: rgb(128 0 128);
   --field-color: rgb(255 255 255);
-  --info-color: rgb(240 224 182);
   --dialect-color: rgb(255 255 255);
   --dialect-background-color: green;
-  --language-source-color: rgb(182 196 240);
-  --default-font-size: 16px;
-  --pill-horizontal-padding: 0.2rem;
-  --pill-vertical-padding: 0.1rem;
+
+  /* Night mode colors */
+  &.night-mode {
+    --background-color: rgb(34 34 34);
+    --text-color: rgb(255 255 255);
+    --link-color: rgb(119 200 216);
+    --info-color: rgb(240 224 182);
+    --language-source-color: rgb(182 196 240);
+  }
 
   /* Layout */
   *,
@@ -37,7 +49,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: start;
-  row-gap: 0.5em;
+  row-gap: 0.5rem;
 
   a {
     color: var(--link-color);
@@ -52,7 +64,6 @@
     font-family: sans-serif;
   }
 
-  /* Back styling */
   > .senses {
     &:has(> li:only-of-type) {
       list-style-type: none;
@@ -60,7 +71,7 @@
 
     &:has(> li:nth-of-type(2)) {
       > li {
-        margin: 0.5em 0;
+        margin: 0.5rem 0;
       }
     }
 
@@ -163,7 +174,7 @@
       border-radius: 0.3rem;
       padding: var(--pill-vertical-padding) var(--pill-horizontal-padding);
       margin: 0 0.2rem 0 0;
-      line-height: 1rem;
+      line-height: 1;
     }
   }
 

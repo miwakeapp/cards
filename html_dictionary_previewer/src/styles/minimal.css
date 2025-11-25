@@ -28,10 +28,10 @@
   padding: 1rem;
   color: var(--text-color);
   font-size: var(--default-font-size);
-  display: grid;
-  grid-template-columns: max-content minmax(0, 1fr);
+  display: flex;
+  flex-wrap: wrap;
   align-items: start;
-  row-gap: 1rem;
+  row-gap: 0.5rem;
 
   a {
     color: var(--link-color);
@@ -56,13 +56,11 @@
       padding-left: 1.5rem;
 
       > li {
-        margin: 0.5em 0;
+        margin: 0.5rem 0;
       }
     }
 
-    grid-row: 2;
-    grid-column: 1 / -1;
-    order: 1;
+    flex-basis: 100%;
 
     margin: 0;
     padding: 0;
@@ -86,9 +84,6 @@
     &.kanji:has(+ .kana)::after {
       content: "\A0／\A0";
     }
-
-    grid-row: 1;
-    order: 0;
 
     list-style-type: none;
     display: flex inline; /* to avoid inter-element whitespace issues */
@@ -118,20 +113,23 @@
     }
   }
 
-  > :not(.forms, .senses) {
-    grid-column: 1 / -1;
-    order: 2;
+  > :not(.forms, .senses, .part-of-speech) {
+    flex-basis: 100%;
+  }
+
+  > .part-of-speech {
+    flex-grow: 1;
+    text-align: right;
   }
 
   /* These can appear either at top level or within a sense. */
 
-  .part-of-speech,
   .misc,
   .antonyms {
     display: none;
   }
 
-  .applies-to, .field, .language-source, .dialect, .related, .info {
+  .part-of-speech, .applies-to, .field, .language-source, .dialect, .related, .info {
     list-style-type: none;
     margin: 0;
     padding: 0;
@@ -159,6 +157,5 @@
 
   .info {
     font-style: italic;
-    color: var(--secondary-text-color);
   }
 }
