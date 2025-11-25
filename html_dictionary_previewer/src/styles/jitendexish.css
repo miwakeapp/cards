@@ -1,6 +1,6 @@
 @font-face {
   font-family: "Noto Serif Japanese";
-  src: url("../fonts/_NotoSerifJP-VariableFont_wght.ttf");
+  src: url("../fonts/NotoSerifJP-VariableFont_wght.ttf");
   font-display: swap;
 }
 
@@ -8,15 +8,20 @@
   /* Color tokens */
   --background-color: rgb(34 34 34);
   --text-color: rgb(255 255 255);
+  --link-color: rgb(26 115 232);
   --part-of-speech-background-color: rgb(86 86 86);
   --part-of-speech-color: rgb(255 255 255);
   --misc-background-color: rgb(165 42 42);
   --misc-color: rgb(255 255 255);
   --field-background-color: rgb(128 0 128);
   --field-color: rgb(255 255 255);
-  --related-color: rgb(26 115 232);
   --info-color: rgb(240 224 182);
+  --dialect-color: rgb(255 255 255);
+  --dialect-background-color: green;
+  --language-source-color: rgb(182 196 240);
   --default-font-size: 16px;
+  --pill-horizontal-padding: 0.2rem;
+  --pill-vertical-padding: 0.1rem;
 
   /* Layout */
   *,
@@ -28,7 +33,16 @@
   background-color: var(--background-color);
   color: var(--text-color);
   font-size: var(--default-font-size);
-  padding: 1em;
+  padding: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+  row-gap: 0.5em;
+
+  a {
+    color: var(--link-color);
+    text-decoration-color: color-mix(in srgb, var(--link-color), transparent 30%);
+  }
 
   :lang(ja) {
     font-family: "Noto Serif Japanese", serif;
@@ -39,7 +53,7 @@
   }
 
   /* Back styling */
-  .senses {
+  > .senses {
     &:has(> li:only-of-type) {
       list-style-type: none;
     }
@@ -49,102 +63,46 @@
         margin: 0.5em 0;
       }
     }
-  }
 
-  .part-of-speech,
-  .misc,
-  .field {
-    list-style-type: none;
     margin: 0;
-    padding: 0;
-    display: inline;
+    flex-basis: 100%;
 
-    > li {
-      display: inline;
-      border-radius: 0.3em;
-      padding: 0.1em 0.2em;
-      line-height: 1ic;
-    }
-  }
+    .glosses {
+      list-style-type: none;
+      margin: 0 0 0.2rem 0;
+      padding: 0 0 0 var(--pill-horizontal-padding);
 
-  .part-of-speech > li {
-    background-color: var(--part-of-speech-background-color);
-    color: var(--part-of-speech-color);
-  }
+      > li {
+        display: inline;
 
-  .misc > li {
-    background-color: var(--misc-background-color);
-    color: var(--misc-color);
-  }
-
-  .field > li {
-    background-color: var(--field-background-color);
-    color: var(--field-color);
-  }
-
-  .related {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-
-    :has(> li:first-of-type)&::before {
-      content: "Related: ";
-      font-style: italic;
-    }
-
-    > li {
-      display: inline;
-
-      &:not(:last-of-type)::after {
-        content: ", ";
-      }
-
-      > a {
-        color: var(--related-color);
+        &:not(:last-of-type)::after {
+          content: ", ";
+        }
       }
     }
   }
 
-  .info {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    font-style: italic;
-    color: var(--info-color);
-
-    &:has(> li:first-of-type) {
-      margin-top: 1em;
+  > .forms {
+    &.kanji:has(+ .kana)::after {
+      content: "\A0／\A0";
     }
-  }
 
-  .glosses {
     list-style-type: none;
+    display: flex inline; /* to avoid inter-element whitespace issues */
+    flex-direction: row;
     margin: 0;
     padding: 0;
 
     > li {
-      display: inline;
-
-      &:not(:last-of-type)::after {
-        content: ", ";
+      /* Hide inter-element whitespace */
+      font-size: 0;
+      > *, &::after {
+        font-size: var(--default-font-size);
       }
-    }
-  }
-
-  .forms {
-    list-style-type: none;
-    padding-left: 0;
-
-    &::before {
-      content: "Alternate forms: ";
-      font-style: italic;
-    }
-
-    > li {
-      display: inline;
 
       &:not(:last-of-type)::after {
-        content: ", ";
+        content: ",\A0";
+        color: var(--text-color);
       }
 
       > .tags {
@@ -152,8 +110,10 @@
         display: inline;
         margin: 0;
         padding: 0;
+        font-size: 0;
 
         > li {
+          font-size: var(--default-font-size);
           display: inline;
 
           &:not(:last-of-type)::after {
@@ -164,7 +124,7 @@
             content: "[";
           }
           &:first-of-type::before {
-            content: " [";
+            content: "\A0[";
           }
 
           &::after {
@@ -174,24 +134,83 @@
       }
     }
   }
-}
-/* Colors */
-:where(.dictionary-entry) {
-  --background-color: rgb(34 34 34);
-  --text-color: white;
 
-  --part-of-speech-background-color: rgb(86 86 86);
-  --part-of-speech-color: var(--text-color);
+  > .part-of-speech {
+    flex-basis: 100%;
+  }
 
-  --misc-background-color: brown;
-  --misc-color: var(--text-color);
+  .part-of-speech,
+  .applies-to,
+  .field,
+  .language-source,
+  .dialect,
+  .misc,
+  .related,
+  .antonyms,
+  .info {
+    list-style-type: none;
+    margin: 0.2rem;
+    padding: 0;
+    display: inline;
 
-  --field-background-color: purple;
-  --field-color: var(--text-color);
+    font-size: 0;
+    > *, &::before, &::after {
+      font-size: var(--default-font-size);
+    }
 
-  --related-color: rgb(26 115 232);
+    > li {
+      display: inline;
+      border-radius: 0.3rem;
+      padding: var(--pill-vertical-padding) var(--pill-horizontal-padding);
+      margin: 0 0.2rem 0 0;
+      line-height: 1rem;
+    }
+  }
 
-  --info-color: rgb(240 224 182);
+  .part-of-speech > li {
+    background-color: var(--part-of-speech-background-color);
+    color: var(--part-of-speech-color);
+  }
 
-  --default-font-size: 16px;
+  .applies-to::before {
+    content: "〔";
+  }
+  .applies-to::after {
+    content: "only〕";
+  }
+
+  .field > li {
+    background-color: var(--field-background-color);
+    color: var(--field-color);
+  }
+
+  .language-source > li {
+    color: var(--language-source-color);
+    font-style: italic;
+  }
+
+  .dialect > li {
+    background-color: var(--dialect-background-color);
+    color: var(--dialect-color);
+  }
+
+  .misc > li {
+    background-color: var(--misc-background-color);
+    color: var(--misc-color);
+  }
+
+  .related::before {
+    content: "Related: ";
+    font-style: italic;
+  }
+
+  .antonyms::before {
+    content: "Antonyms: ";
+    font-style: italic;
+  }
+
+  .info > li {
+    font-style: italic;
+    color: var(--info-color);
+  }
 }
