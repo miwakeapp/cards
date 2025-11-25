@@ -1,5 +1,5 @@
-import { renderEntry } from "jmdict_to_html";
-import type { JMdictWord } from "jmdict_to_html";
+import { renderEntry } from "../../jmdict_to_html/src/mod.ts";
+import type { JMdictWord } from "../../jmdict_to_html/src/mod.ts";
 
 const entriesContainer = document.getElementById("entries") as HTMLElement;
 const styleSelect = document.getElementById("style") as HTMLSelectElement;

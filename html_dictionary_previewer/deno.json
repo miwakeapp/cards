@@ -7,7 +7,7 @@
       "description": "Run Lume command",
       "command": "deno run -A lume/cli.ts"
     },
-    "prepare_data": "deno run --allow-read=../jmdict_to_html --allow-write=./src/data scripts/build_entries.mts",
+    "prepare_data": "deno run --allow-read=../jmdict_to_html --allow-write=./src/data scripts/build_entries.ts",
     "build": {
       "description": "Build the site for production",
       "command": "deno task lume"

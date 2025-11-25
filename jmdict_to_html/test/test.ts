@@ -2,7 +2,7 @@ import * as path from "@std/path";
 import { assertSnapshot } from "@std/testing/snapshot";
 import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
 
-import { renderEntry } from "../src/mod.mts";
+import { renderEntry } from "../src/mod.ts";
 
 for await (const dirEntry of Deno.readDir(path.resolve(import.meta.dirname!, "inputs"))) {
   const json = await Deno.readTextFile(path.resolve(import.meta.dirname!, "inputs", dirEntry.name));

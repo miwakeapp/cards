@@ -1,9 +1,9 @@
 {
   "name": "jmdict_to_html",
-  "exports": "./src/mod.mts",
+  "exports": "./src/mod.ts",
   "tasks": {
-    "download_jmdict": "deno run --allow-net --allow-write=./src/jmdict_eng.json scripts/download_jmdict.mts",
-    "extract_tests": "deno run --allow-read=./src/jmdict_eng.json --allow-write=./test/inputs scripts/extract_tests.mts",
+    "download_jmdict": "deno run --allow-net --allow-write=./src/jmdict_eng.json scripts/download_jmdict.ts",
+    "extract_tests": "deno run --allow-read=./src/jmdict_eng.json --allow-write=./test/inputs scripts/extract_tests.ts",
     "test:update": "deno test --allow-read --allow-write -- --update"
   },
   "test": {

@@ -16,7 +16,7 @@ import {
   misc as expandMisc,
   partOfSpeech as expandPartOfSpeech,
   tag as expandTag,
-} from "./jmdict_tag_expansions.mts";
+} from "./jmdict_tag_expansions.ts";
 
 export type { JMdictWord };
 

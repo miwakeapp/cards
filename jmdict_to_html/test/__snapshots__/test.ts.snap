@@ -63,7 +63,7 @@ snapshot[`1014630 1`] = `
       <li>outer</li>
     </ul>
     <ul class="antonyms">
-      <li><a href="https://takoboto.jp/?w=%E3%82%A4%E3%83%B3%E3%83%8A%E3%83%BC" lang="ja">インナー</a> (sense 1)</li>
+      <li><a href="https://takoboto.jp/?q=%E3%82%A4%E3%83%B3%E3%83%8A%E3%83%BC" lang="ja">インナー</a> (sense 1)</li>
     </ul>
   </li>
   <li>
@@ -78,7 +78,7 @@ snapshot[`1014630 1`] = `
       <li class="abbr">abbreviation</li>
     </ul>
     <ul class="related">
-      <li><a href="https://takoboto.jp/?w=%E3%82%A2%E3%82%A6%E3%82%BF%E3%83%BC%E3%82%A6%E3%82%A8%E3%82%A2" lang="ja">アウターウエア</a></li>
+      <li><a href="https://takoboto.jp/?q=%E3%82%A2%E3%82%A6%E3%82%BF%E3%83%BC%E3%82%A6%E3%82%A8%E3%82%A2" lang="ja">アウターウエア</a></li>
     </ul>
   </li>
 </ol>'
@@ -100,8 +100,8 @@ snapshot[`1061000 1`] = `
       <li class="ling">linguistics</li>
     </ul>
     <ul class="related">
-      <li><a href="https://takoboto.jp/?w=%E5%90%8C%E7%BE%A9%E8%AA%9E" lang="ja">同義語</a></li>
-      <li><a href="https://takoboto.jp/?w=%E3%82%A2%E3%83%B3%E3%83%88%E3%83%8B%E3%83%A0" lang="ja">アントニム</a></li>
+      <li><a href="https://takoboto.jp/?q=%E5%90%8C%E7%BE%A9%E8%AA%9E" lang="ja">同義語</a></li>
+      <li><a href="https://takoboto.jp/?q=%E3%82%A2%E3%83%B3%E3%83%88%E3%83%8B%E3%83%A0" lang="ja">アントニム</a></li>
     </ul>
   </li>
   <li>
@@ -112,7 +112,7 @@ snapshot[`1061000 1`] = `
       <li class="biol">biology</li>
     </ul>
     <ul class="related">
-      <li><a href="https://takoboto.jp/?w=%E7%95%B0%E5%90%8D" lang="ja">異名</a> (sense 2)</li>
+      <li><a href="https://takoboto.jp/?q=%E7%95%B0%E5%90%8D" lang="ja">異名</a> (sense 2)</li>
     </ul>
   </li>
 </ol>'
@@ -146,7 +146,7 @@ snapshot[`1122910 1`] = `
       <li class="ksb">Kansai-ben</li>
     </ul>
     <ul class="related">
-      <li><a href="https://takoboto.jp/?w=%E3%83%9B%E3%83%AB%E3%83%A2%E3%83%B3%E7%84%BC%E3%81%8D" lang="ja">ホルモン焼き</a></li>
+      <li><a href="https://takoboto.jp/?q=%E3%83%9B%E3%83%AB%E3%83%A2%E3%83%B3%E7%84%BC%E3%81%8D" lang="ja">ホルモン焼き</a></li>
     </ul>
   </li>
 </ol>'
@@ -182,7 +182,7 @@ snapshot[`1158110 1`] = `
       <li class="biol">biology</li>
     </ul>
     <ul class="related">
-      <li><a href="https://takoboto.jp/?w=%E3%82%B7%E3%83%8E%E3%83%8B%E3%83%A0" lang="ja">シノニム</a> (sense 2)</li>
+      <li><a href="https://takoboto.jp/?q=%E3%82%B7%E3%83%8E%E3%83%8B%E3%83%A0" lang="ja">シノニム</a> (sense 2)</li>
     </ul>
   </li>
 </ol>'
@@ -223,7 +223,7 @@ snapshot[`1178920 1`] = `
       <li>on</li>
     </ul>
     <ul class="related">
-      <li><a href="https://takoboto.jp/?w=%E3%81%AB%E3%81%8A%E3%81%84%E3%81%A6" lang="ja">において</a> (sense 1)</li>
+      <li><a href="https://takoboto.jp/?q=%E3%81%AB%E3%81%8A%E3%81%84%E3%81%A6" lang="ja">において</a> (sense 1)</li>
     </ul>
   </li>
   <li>
@@ -238,7 +238,7 @@ snapshot[`1178920 1`] = `
       <li>as for</li>
     </ul>
     <ul class="related">
-      <li><a href="https://takoboto.jp/?w=%E3%81%AB%E3%81%8A%E3%81%84%E3%81%A6" lang="ja">において</a> (sense 2)</li>
+      <li><a href="https://takoboto.jp/?q=%E3%81%AB%E3%81%8A%E3%81%84%E3%81%A6" lang="ja">において</a> (sense 2)</li>
     </ul>
   </li>
   <li>
@@ -248,7 +248,7 @@ snapshot[`1178920 1`] = `
       <li>in the name of</li>
     </ul>
     <ul class="related">
-      <li><a href="https://takoboto.jp/?w=%E3%81%AB%E3%81%8A%E3%81%84%E3%81%A6" lang="ja">において</a> (sense 3)</li>
+      <li><a href="https://takoboto.jp/?q=%E3%81%AB%E3%81%8A%E3%81%84%E3%81%A6" lang="ja">において</a> (sense 3)</li>
     </ul>
   </li>
 </ol>
@@ -492,7 +492,7 @@ snapshot[`2228700 1`] = `
   </li>
 </ol>
 <ul class="related">
-  <li><a href="https://takoboto.jp/?w=%E6%B1%9F%E6%88%B8%E5%BD%BC%E5%B2%B8" lang="ja">江戸彼岸</a></li>
+  <li><a href="https://takoboto.jp/?q=%E6%B1%9F%E6%88%B8%E5%BD%BC%E5%B2%B8" lang="ja">江戸彼岸</a></li>
 </ul>'
 `;
 

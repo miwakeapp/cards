@@ -1,5 +1,5 @@
 import * as path from "@std/path";
-import type { JMdictWord } from "jmdict_to_html";
+import type { JMdictWord } from "../../jmdict_to_html/src/mod.ts";
 
 const packageRoot = path.resolve(import.meta.dirname!, "../../jmdict_to_html");
 const inputsDir = path.resolve(packageRoot, "test/inputs");
