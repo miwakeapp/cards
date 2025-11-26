@@ -36,7 +36,7 @@ function render() {
     wrapper.className = "entry-wrapper";
 
     const article = document.createElement("article");
-    article.className = "dictionary-entry";
+    article.className = "miwake-dictionary-entry";
     article.dataset.entryId = entry.id;
     if (nightMode) {
       article.classList.add("night-mode", "nightMode", "night_mode");

@@ -4,7 +4,7 @@
   font-display: swap;
 }
 
-:where(.dictionary-entry) {
+:where(.miwake-dictionary-entry) {
   --background-color: rgb(255 255 255);
   --text-color: rgb(0 0 0);
   --secondary-text-color: color-mix(in srgb, var(--text-color), rgb(255 255 255) 40%);

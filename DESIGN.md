@@ -1,16 +1,16 @@
-# Japanese Flashcard Tools Design Doc
+# Miwake Design Doc
 
 ## Problem and motivation
 
 At a sufficiently-advanced stage, learning Japanese vocabulary is best done via **vocabulary mining**: encountering unknown (or forgotten) words in context, then creating flashcards for them.
 
-Tools for this exist. However, they are clunky to wire together, and the end product (the vocabulary flashcards produced) are not ideal. I want to create a software suite that streamlines the vocabulary mining process, creating an optimal flashcard corpus which can be updated and customized over time.
+Tools for this exist. However, they are clunky to wire together, and the end product (the vocabulary flashcards produced) are not ideal. Miwake is a software suite that streamlines the vocabulary mining process, creating an optimal corpus of "miwake card" flashcards which can be updated and customized over time.
 
 ### Principles
 
 - **Anki-centric**: The produced flashcards must be Anki cards. Anki is the best SRS software, which will accompany the user through the entire language-learning journey.
 
-- **Recognition focused**: The produced flashcards are designed to quickly test whether the user recognizes the Japanese word, with no or minimal context. They are not meant to serve double-duty as sentence reading practice; they are not testing recall. This design decision also leads to the possibility of creating multiple cards for the same word, with different spellings on the front side. (E.g., if the user wants to recognize both ハサミ and 鋏 as meaning scissors, the user can easily generate two cards for the same word.)
+- **Recognition focused**: Miwake cards are designed to quickly test whether the user recognizes the Japanese word, with no or minimal context. They are not meant to serve double-duty as sentence reading practice; they are not testing recall. This design decision also leads to the possibility of creating multiple cards for the same word, with different spellings on the front side. (E.g., if the user wants to recognize both ハサミ and 鋏 as meaning scissors, the user can easily generate two cards for the same word.)
 
 - **Integrated and opinionated**: Unlike [existing solutions](#existing-solutions), this software will be designed as a end-to-end experience, not a series of composable tools. It will be Japanese-specific, which allows it to have custom features that don't make sense in all languages. It will pick winners in terms of dictionaries, flashcard formats, etc.
 
@@ -34,7 +34,7 @@ Although in the fullness of time, a _fully_ integrated project might somehow rep
 
 - Beginner-focused features. This setup is meant for learners approaching N1-level, who are working to be able to understand arbitrary Japanese content without furigana. It's not clear exactly what features this excludes right now, but, for example, this pushes back against modes where the front of the generated card contains furigana.
 
-- Audio pronunciations on the flashcards. Although my existing setup has these, they are sometimes inaccurate. It'd be nice to fast-follow with this, including possibly AI-generated audio for the context sentences, but the complexity added via these sidecar files in Anki makes it a later feature.
+- Audio pronunciations on the flashcards. Although my existing setup has these, they are sometimes inaccurate. It'd be nice to fast-follow with this, including possibly ✨ AI-generated audio for the context sentences, but the complexity added via these sidecar files in Anki makes it a later feature.
 
 - Pitch accent information. Including this is a good idea for a followup. But, since the information is not bundled with JMDict, it will take extra work to integrate. The exact format in which to store and display this is also unclear; I've seen different flashcard templates use wildly different presentations. I would also need to deal with cases where it isn't available.
 
@@ -44,11 +44,11 @@ Although in the fullness of time, a _fully_ integrated project might somehow rep
 
 - Recall, or reverse cards. This seems likely to require a very different product, focused around a smaller core set of vocabulary that will come up in speaking or writing, with less emphasis on spellings, and more emphasis on context. I currently believe that attempting to create reverse cards inside a single Anki note is a bad idea, for these reasons.
 
-## A vision of the finished product
+## Product requirements
 
 ### Installation and usage
 
-You install "Domenic's Japanese Mining Add-On" (better name TBD) into your browser, via the browser's add-on store. Out of the box, you get a Yomitan-like experience of a popup dictionary, but there is an unobtrusive indicator guiding you to do the Anki setup as well.
+You install the Miwake browser add-on, via your browser's add-on store. Out of the box, you get a Yomitan-like experience of a popup dictionary, but there is an unobtrusive indicator guiding you to do the Anki setup as well.
 
 The popup dictionary is slightly ✨ smarter than Yomitan in how it prioritizes larger phrases. For example, TODO insert example.
 
@@ -64,15 +64,17 @@ After that setup is complete, the unobtrusive indicator changes color. From now 
 
 - If the word + spelling + sense already exists in the deck but as a leech, then the previous extracted context is displayed, with the following controls: "replace context", "reset to fresh". Some amount of previous review history is also displayed: at a minimum, the date added, and the date suspended.
 
-### The created cards
+### Miwake Cards
 
-When a card is added, it appears in Anki in a maximally-useful way, with the following fields:
+"Miwake Cards" are an evolution of the [Animecards](https://animecards.site/) Anki note type, aligned with this project's [principles](#principles).
+
+#### Card fields
 
 - **Word**: the card's "scannable" primary field (for browsing through the deck in the Anki deck viewer); it contains just the spelling.
 
   - For cases where the word is always used in a certain pattern, we can ✨ automatically add the appropriate prefix or suffix. Example: [うつつを抜かす](https://takoboto.jp/?w=2033950) can become 〜にうつつを抜かす in this field, as there is enough information in the dictionary entry to assemble this.
 
-  - What about cases that are "usu. with neg. sentence", e.g. [はかばかしい](https://takoboto.jp/?w=1600640)? Do we ✨ automatically change them to はかばかしくない? (Just doing that won't work because then the back side dictionary entry would be confusing...)
+  - This generally never contains furigana, even for cases where the originally mined text used furigana and the word is highly ambigious. (Such as 番 being either ばん or つがい.) Instead, the hint field can contain appropriate context, including furigana if necessary.
 
 - **Key**: the card's actual primary key (for disallowing duplicates); it consists of the JMDict ID + spelling + ✨ sense(s) identified as applicable for this card. (The latter are omitted if all senses apply, or if there is only one sense.)
 
@@ -84,6 +86,8 @@ When a card is added, it appears in Anki in a maximally-useful way, with the fol
 - **Hint** (optional): a sparingly-used disambiguation field for when multiple senses or JMDict entries match the same spelling, such that it would be roughly impossible to tell which was intended without the hint. AI-generated initially ✨, but users can edit this and the software should not interfere with that.
 
   - Sample: for sense 2 of [飾り物](https://takoboto.jp/?q=%E9%A3%BE%E3%82%8A%E7%89%A9), a good hint would be "Xさんは飾り物だ": a minimal sentence/sentence fragment that makes it clear we're looking for the sense that applies to a person.
+
+  - Sample: a hint for 番 meaning ["pair (esp. of mated animals), brace, couple"](https://takoboto.jp/?w=2199920) instead of ["number (in a series)"](https://takoboto.jp/?w=2022640) could be "魂の番".
 
 - **Full context**: the original full context sentence(s) in which the term was encountered, no matter how long it was. Uses `<mark>` for the term in question.
 
@@ -115,15 +119,13 @@ When a card is added, it appears in Anki in a maximally-useful way, with the fol
 
 - **Tags**: Tags are probably a reasonable place to store metadata. For example, it might be useful to store the JMDict version, or the version of this software, used to create the card.
 
-## The displayed cards
+#### The displayed cards
 
-The core data model discussed above forms the foundation for displaying the cards with some amount of flexibility and customizability. A default display will be provided, but it might evolve over time as my opinions on the best flashcard format change, or it can be customized by advanced users.
+The core data model discussed above forms the foundation for displaying miwake cards with some amount of flexibility and customizability. A default display will be provided, but it might evolve over time as my opinions on the best flashcard format change, or it can be customized by advanced users.
 
 The default display uses the [Anki templating language](https://docs.ankiweb.net/templates/intro.html) to display a simple front side with the **Word** field, and the **Hint** field if present. The back side contains the **Reading** (or a repeat of the **Word** if there is no **Reading** field), the **Dictionary entry**, and the **Minimized context sentence**. The **Full context sentence** and **Source** (linked to its **Source URL**, if present) are hidden by default—either not included in the default template, or in a `<details>`; I haven't yet decided.
 
 The HTML used for displaying these will be highly semantic, allowing customization with CSS. The default styling will work with both dark and light modes.
-
-CSS (and/or JS?) will be used in somewhat novel ways, e.g., to add prefix `～` characters on the front side of cards whose dictionary entries identify them as counters or suffixes.
 
 The back-side HTML will contain additional JavaScript which customizes the card display in ways that cannot be achieved easily with Anki templates or CSS. Most notably, it will dim (or perhaps hide) non-applicable senses shown in the dictionary entry.
 
@@ -131,21 +133,21 @@ See [below](#anki-templates) for the specific template HTML.
 
 TODO: the given setup doesn't seem to work well if we want slightly more hints on the front, e.g., the part of speech. Is that an issue?
 
-## Maintenance
+### Maintenance
 
 In addition to providing tools for creating cards, this project distinguishes itself by also helping with card management and maintenance.
 
-### Keeping JMDict updated
+#### Keeping JMDict updated
 
 The [JMDict](https://www.edrdg.org/jmdict/j_jmdict.html) project sees almost-daily updates, and in the course of my studies I've found these to be significant. For example, when first encountering the word [つんつん](https://takoboto.jp/?w=1008230), the three-month-old copy of JMDict/Jitendex that I had last downloaded through the Yomitan UI was missing the sense currently defined as "spiky (esp. of a hairstyle), sticking up straight (e.g. of plant stems)"—which is how the word was being used in the novel I was reading. Checking the online dictionary found that it had been recently added.
 
 As such, we want to ensure that the tooling is always using the freshest copy of JMDict it can. The download of this dictionary should happen automatically, probably via an independently-run process, but perhaps via the browser add-on update cycle. Of course, such updates need to be seamless so that the new dictionary is only swapped in once ready. The JMDict release currently in use will be identified clearly in the settings UI.
 
-### Updating existing cards for JMDict updates
+#### Updating existing cards for JMDict updates
 
 The trickier part of maintenance is updating existing cards in light of JMDict updates which could make the more accurate.
 
-Our [card data model](#the-created-cards) helps with this somewhat, by locating the dictionary entry separately from the rest of the card. But the fact that our cards highlight particular senses, and include hints conditionally depending on the contents of the dictionary entry, make such updates nontrivial. We'll need to use ✨ AI.
+Our [card data model](#card-fields) helps with this somewhat, by locating the dictionary entry separately from the rest of the card. But the fact that our cards highlight particular senses, and include hints conditionally depending on the contents of the dictionary entry, make such updates nontrivial. We'll need to use ✨ AI.
 
 By default, this update process will be manual. A button from within the add-on UI will:
 
@@ -162,7 +164,7 @@ By default, this update process will be manual. A button from within the add-on 
 
 The UI for reviewing and accepting these updates needs to be highly optimized ease-of-use and for scannability (e.g., vertical space use).
 
-### Leech management
+#### Leech management
 
 An important part of long-term vocabulary deck curation, which Anki provides no real help with, is leech management.
 
@@ -220,7 +222,7 @@ In terms of inspiration for what types of styling should be possible, popular JM
 
 Some specific design decisions in our output:
 
-- Pull out shared annotations to the top level. For example, all senses of [大小](#example-multiple-senses-one-reading) below are nouns, so we create a top-level `<ul class="part-of-speech"><li>noun</li></ul>` and omit that information from each sense's `<li>`.
+- Pull out shared annotations to the top level. For example, all senses of [大小](https://takoboto.jp/?w=1414110) are nouns, so we create a top-level `<ul class="part-of-speech"><li>noun</li></ul>` and omit that information from each sense's `<li>`.
 
 - Omit empty information. For example, most of the words below do not have any values for JMDict's per-sense fields like `"antonym"`, `"field"`, `"dialect"`, `"misc"`, etc. We do not emit empty `<ul>`s for those since doing so clutters up the output unnecessarily.
 
@@ -228,9 +230,11 @@ Some specific design decisions in our output:
 
 - Always mark up Japanese with `lang="ja"`. This includes inside tags like `<span lang="ja">の</span>-adj`. This allows custom Japanese fonts separate from the rest of the dictionary entry, and is generally good hygeine.
 
-- Include human-readable text content (e.g. "する verb", "intransitive", "rarely used"), but annotate the containing elements with their raw JMDict data (e.g. `vs`, `vi`, `rK`) using the `class=""` attribute. This allows CSS to selectively hide certain tags. For example, I find the `uk` ("usually kana") tag to be useless information for the sorts of flashcards we are creating, which are focused on a specific spelling on the front side.
+- Include human-readable text content (e.g. "する verb", "intransitive", "rare"), but annotate the containing elements with their raw JMDict data (e.g. `vs`, `vi`, `rK`) using the `class=""` attribute. This allows CSS to selectively hide certain tags. For example, I find the `uk` ("usually kana") tag to be useless information for the sorts of flashcards we are creating, which are focused on a specific spelling on the front side.
 
 - Use lists for things that are lists in the JMDict data. The case where this is a bit controversial is the glosses within a sense. Most dictionary displays output each gloss as one string, with senses delimited by semicolons or commas. We intend to reproduce this display using CSS generated content, e.g., `.glosses > li::after { content: "; " }`. However, this has the notable drawback that CSS generated content is not selectable, so copying and pasting from the back side of these Anki cards will give unhelpful results.
+
+- Nicely indent and format the HTML. This makes writing the CSS a bit trickier, as it introduces inter-element whitespace. But, it helps avoid the feeling that one's Anki deck contains unintelligible blobs. (This might be revisited in the future, as the dictionary entry field is intended to be read-only anyway...)
 
 TODO Discuss ✨ removal of en-GB redundancy
 
@@ -255,7 +259,7 @@ TODO: Maybe also 雷.
 ```html
 <p id="reading">{{Reading}}{{^Reading}}{{furigana:Word}}{{/Reading}}</p>
 
-<div id="dictionary-entry">
+<div id="dictionary-entry" class="miwake-dictionary-entry">
   {{Dictionary entry}}
 </div>
 
@@ -282,11 +286,11 @@ TODO: discuss MVP to vision of finished product. Discuss what, if anything, I'll
 
 - A good dictionary entry generator might be a good first separable MVP. I could drop-in replace my existing mining cards that way.
 
-### Tricky cases
+## Tricky cases
 
 The following are cases that go beyond the single-dictionary entry, single-sense mapping and will necessitate the program doing something smart.
 
-#### Words with wildly different senses
+### Words with wildly different senses
 
 [ひたと](https://takoboto.jp/?w=1430680) in the sentence "ヒースクリフはひたとこちらを見据えた". What is meant is likely sense 2, "directly (e.g. staring)". Sense 3, "suddenly (e.g. stopping)", is possibly related, but distant enough that it would benefit from its own card if the user saw it used in such a way. Sense 1, "close to", is _not_ correct.
 
@@ -294,7 +298,7 @@ The program should, in this context, ✨ pick out sense 2 as the applicable sens
 
 Other examples: [介す](https://takoboto.jp/?w=2410320), ...
 
-#### Words with multiple dictionary entries
+### Words with multiple dictionary entries
 
 (Not the best example since JMDict doesn't have overlapping spellings? But Jitendex lumps them together.)
 
@@ -302,7 +306,7 @@ Other examples: [介す](https://takoboto.jp/?w=2410320), ...
 
 [はさみ](https://takoboto.jp/?w=2029540) ("pincers (of a crab, scorpion, etc.), claws, forceps") vs. [はさみ](https://takoboto.jp/?w=1573820) ("1. scissors, shears, clippers; 2. hole punch") may be a better example. Here Jitendex seems to have the opposite problem, with 5 separate dictionary entries!
 
-#### Words with multiple acceptable readings
+### Words with multiple acceptable readings
 
 TODO Not sure on the solution here.
 
@@ -318,7 +322,7 @@ Takoboto lists sense 2 as "Meaning restricted to いめい". We should be sure t
 
 (Or is this incorrect? Just because sense is restricted to いめい, that doesn't meant いめい is necessarily restricted to sense 2...)
 
-#### Words where all senses work in context
+### Words where all senses work in context
 
 [がつがつ](https://takoboto.jp/?w=1003240) in the sentence
 
@@ -328,7 +332,7 @@ Takoboto lists sense 2 as "Meaning restricted to いめい". We should be sure t
 
 That is, cases like these are clearly distinct from [wildly different senses](#words-with-wildly-different-senses) or [multiple dictionary entries](#words-with-multiple-dictionary-entries); just learning the association of がつがつ to the whole dictionary entry will suffice for the user.
 
-#### Context sentences which are not helpful
+### Context sentences which are not helpful
 
 [途方にくれる](https://takoboto.jp/?w=1854560) in the sentence
 

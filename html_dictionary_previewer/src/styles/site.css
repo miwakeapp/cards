@@ -33,7 +33,7 @@ body > header {
   flex-direction: column;
 }
 
-.dictionary-entry {
+.miwake-dictionary-entry {
   border: 1px solid rgb(255 255 255 / 0.1);
 }
 
