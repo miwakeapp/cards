@@ -286,11 +286,9 @@ function computeSectionComputations(senses: JMdictSense[]): SectionComputation[]
   if (senses.length === 0) {
     return [];
   }
-  const hasMultipleSenses = senses.length > 1;
   return SECTION_DESCRIPTORS.map((descriptor) => {
     const perSenseItems = senses.map((sense) => descriptor.getItems(sense));
-    const shared = hasMultipleSenses &&
-      perSenseItems[0].length > 0 &&
+    const shared = perSenseItems[0].length > 0 &&
       perSenseItems.every((items) => equal(items, perSenseItems[0]));
     return { descriptor, perSenseItems, shared };
   });

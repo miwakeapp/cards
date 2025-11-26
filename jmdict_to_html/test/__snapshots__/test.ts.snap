@@ -454,11 +454,11 @@ snapshot[`2030540 1`] = `
       <li>boisterous dance</li>
       <li>dancing wildly</li>
     </ul>
-    <ul class="misc">
-      <li class="yoji"><span lang="ja">四字熟語</span></li>
-    </ul>
   </li>
-</ol>'
+</ol>
+<ul class="misc">
+  <li class="yoji"><span lang="ja">四字熟語</span></li>
+</ul>'
 `;
 
 snapshot[`2228700 1`] = `
