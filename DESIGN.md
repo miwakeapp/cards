@@ -83,7 +83,7 @@ After that setup is complete, the unobtrusive indicator changes color. From now 
 
 - **Reading** (optional): if the spelling in question contains any Kanji, this field exists and contains the same spelling, but with precisely-placed ✨ furigana (using Anki's `[]`-suffix microsyntax).
 
-- **Hint** (optional): a sparingly-used disambiguation field for when multiple senses or JMDict entries match the same spelling, such that it would be roughly impossible to tell which was intended without the hint. The hint is a Japanese phrase or fragment that uses the word in extremely-minimal context. AI-generated initially ✨, but users can edit this and the software should not interfere with that.
+- **Hint** (optional): a sparingly-used disambiguation field for when multiple senses or JMDict entries match the same spelling, such that it would be roughly impossible to tell which was intended without the hint. (This is not used by default for cards with only one sense, or cards where all senses are applicable.) The hint is a Japanese phrase or fragment that uses the word in extremely-minimal context. AI-generated initially ✨, but users can edit this and the software should not interfere with that.
 
   - Sample: for sense 2 of [飾り物](https://takoboto.jp/?q=%E9%A3%BE%E3%82%8A%E7%89%A9), a good hint would be "Xさんは飾り物だ": a minimal sentence/sentence fragment that makes it clear we're looking for the sense that applies to a person.
 

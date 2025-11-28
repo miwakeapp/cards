@@ -23,6 +23,17 @@ const FIELDS = [
   "Source",
   "Source URL",
 ];
+const FIELD_FONT_TARGETS = [
+  "Key",
+  "Recognition target",
+  "Reading",
+  "Hint",
+  "Full context",
+  "Minimized context",
+  "Dictionary entry",
+  "Source",
+];
+const FIELD_FONT_FAMILY = "Noto Serif JP";
 
 const front = `<p id="recognition-target" lang="ja">{{Recognition target}}</p>
 
@@ -30,7 +41,8 @@ const front = `<p id="recognition-target" lang="ja">{{Recognition target}}</p>
 <p id="hint" lang="ja">{{Hint}}</p>
 {{/Hint}}`;
 
-const back = `<p id="reading" lang="ja">{{furigana:Reading}}{{^Reading}}{{furigana:Recognition target}}{{/Reading}}</p>
+const back =
+  `<p id="reading" lang="ja">{{furigana:Reading}}{{^Reading}}{{furigana:Recognition target}}{{/Reading}}</p>
 
 <div id="dictionary-entry" class="miwake-dictionary-entry">
 {{Dictionary entry}}
@@ -40,47 +52,62 @@ const back = `<p id="reading" lang="ja">{{furigana:Reading}}{{^Reading}}{{furiga
 
 // Card-level styling: font-face for Anki media font, layout for word/reading/context,
 // then append the shared dictionary minimal CSS from disk.
-const minimalCssPath = new URL("../html_dictionary_previewer/src/styles/minimal.css", import.meta.url);
+const minimalCssPath = new URL(
+  "../html_dictionary_previewer/src/styles/minimal.css",
+  import.meta.url,
+);
 const minimalCss = await Deno.readTextFile(minimalCssPath);
 const cardChromeCss = String.raw`
 @font-face {
-  font-family: "Noto Serif Japanese";
+  font-family: "Noto Serif JP";
   src: url("_NotoSerifJP-VariableFont_wght.ttf");
   font-display: swap;
 }
 
 :lang(ja) {
-  font-family: "Noto Serif Japanese", serif;
+  font-family: "Noto Serif JP", serif;
 }
 
 :lang(en) {
   font-family: sans-serif;
 }
 
+:root {
+  --hint-color: rgb(100 100 100);
+
+  &.night-mode {
+    --hint-color: rgb(200 200 200);
+  }
+}
+
 body {
-  margin: 0;
+  margin: 0.5rem 0 0 0;
   padding: 0;
+}
+
+/* Avoid vertical shifting when furigana shows up */
+#recognition-target,
+#reading {
+  line-height: 2;
 }
 
 #recognition-target {
   font-size: 2.2rem;
   text-align: center;
   margin: 0;
-  margin-top: 0.5rem;
 }
 
 #hint {
   margin-top: 0.5rem;
   text-align: center;
-  color: gray;
+  color: var(--hint-color);
+	font-size: 1.3rem;
 }
 
 #reading {
   font-size: 2.2rem;
   text-align: center;
   margin: 0;
-  margin-top: 0.75rem;
-  margin-bottom: 0.6rem;
 }
 
 #dictionary-entry {
@@ -163,4 +190,15 @@ if (!exists) {
 // Optional: ensure deck exists
 await ac("createDeck", { deck: DECK_NAME });
 
-console.log("Done. Note: if Anki still sorts on a different field, set the sort field to Key in Anki's 'Manage Note Types' UI.");
+// Ensure browser/editor font is set for core fields.
+for (const field of FIELD_FONT_TARGETS) {
+  await ac("modelFieldSetFont", {
+    modelName: MODEL_NAME,
+    fieldName: field,
+    font: FIELD_FONT_FAMILY,
+  });
+}
+
+console.log(
+  "Done. Note: if Anki still sorts on a different field, set the sort field to Key in Anki's 'Manage Note Types' UI.",
+);
