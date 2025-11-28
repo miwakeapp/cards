@@ -70,20 +70,20 @@ After that setup is complete, the unobtrusive indicator changes color. From now 
 
 #### Card fields
 
+- **Key**: the card's actual primary key (for disallowing duplicates); it consists of the spelling + JMDict ID + ✨ sense(s) identified as applicable for this card. (The latter are omitted if all senses apply, or if there is only one sense.) This is the first field in the model so Anki gives it precedence.
+
+  - Sample: `ひたと | 1430680 | 2,3`
+  - Sample: `相性 | 1586070`
+
 - **Word**: the card's "scannable" primary field (for browsing through the deck in the Anki deck viewer); it contains just the spelling.
 
   - For cases where the word is always used in a certain pattern, we can ✨ automatically add the appropriate prefix or suffix. Example: [うつつを抜かす](https://takoboto.jp/?w=2033950) can become 〜にうつつを抜かす in this field, as there is enough information in the dictionary entry to assemble this.
 
   - This generally never contains furigana, even for cases where the originally mined text used furigana and the word is highly ambigious. (Such as 番 being either ばん or つがい.) Instead, the hint field can contain appropriate context, including furigana if necessary.
 
-- **Key**: the card's actual primary key (for disallowing duplicates); it consists of the JMDict ID + spelling + ✨ sense(s) identified as applicable for this card. (The latter are omitted if all senses apply, or if there is only one sense.)
-
-  - Sample: `1430680 | ひたと | 2,3`
-  - Sample: `1586070 | 相性`
-
 - **Reading** (optional): if the spelling in question contains any Kanji, this field exists and contains the same spelling, but with precisely-placed ✨ furigana (using Anki's `[]`-suffix microsyntax).
 
-- **Hint** (optional): a sparingly-used disambiguation field for when multiple senses or JMDict entries match the same spelling, such that it would be roughly impossible to tell which was intended without the hint. AI-generated initially ✨, but users can edit this and the software should not interfere with that.
+- **Hint** (optional): a sparingly-used disambiguation field for when multiple senses or JMDict entries match the same spelling, such that it would be roughly impossible to tell which was intended without the hint. The hint is a Japanese phrase or fragment that uses the word in extremely-minimal context. AI-generated initially ✨, but users can edit this and the software should not interfere with that.
 
   - Sample: for sense 2 of [飾り物](https://takoboto.jp/?q=%E9%A3%BE%E3%82%8A%E7%89%A9), a good hint would be "Xさんは飾り物だ": a minimal sentence/sentence fragment that makes it clear we're looking for the sense that applies to a person.
 
@@ -247,23 +247,23 @@ TODO: Maybe also 雷.
 #### Front
 
 ```html
-<p id="word">{{Word}}</p>
+<p id="word" lang="ja">{{Word}}</p>
 
 {{#Hint}}
-<p id="hint">{{Hint}}</p>
+<p id="hint" lang="ja">{{Hint}}</p>
 {{/Hint}}
 ```
 
 #### Back
 
 ```html
-<p id="reading">{{Reading}}{{^Reading}}{{furigana:Word}}{{/Reading}}</p>
+<p id="reading" lang="ja">{{furigana:Reading}}{{^Reading}}{{furigana:Word}}{{/Reading}}</p>
 
 <div id="dictionary-entry" class="miwake-dictionary-entry">
   {{Dictionary entry}}
 </div>
 
-<p id="context-sentence">
+<p id="context-sentence" lang="ja">
   {{furigana:Minimized context sentence}}{{^Minimized context sentence}}{{furigana:Full context
   sentence}}{{/Minimized context sentence}}
 </p>

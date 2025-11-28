@@ -29,6 +29,7 @@ function bindControls() {
 function render() {
   ensureDictionaryStylesheet(styleSelect.value);
   const nightMode = nightModeInput.checked;
+  document.documentElement.classList.toggle("night-mode", nightMode);
   const fragment = document.createDocumentFragment();
 
   for (const entry of state.entries) {
@@ -38,9 +39,6 @@ function render() {
     const article = document.createElement("article");
     article.className = "miwake-dictionary-entry";
     article.dataset.entryId = entry.id;
-    if (nightMode) {
-      article.classList.add("night-mode", "nightMode", "night_mode");
-    }
     article.innerHTML = renderEntry(entry);
     wrapper.appendChild(article);
 

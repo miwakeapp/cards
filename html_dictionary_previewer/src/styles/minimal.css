@@ -12,7 +12,7 @@
   --default-font-size: 18px;
   --link-color: rgb(29 78 137);
 
-  &.night-mode {
+  :root.night-mode & {
     --background-color: rgb(0 0 0);
     --text-color: rgb(255 255 255);
     --link-color: rgb(138 180 248);
