@@ -123,15 +123,15 @@ After that setup is complete, the unobtrusive indicator changes color. From now 
 
 The core data model discussed above forms the foundation for displaying miwake cards with some amount of flexibility and customizability. A default display will be provided, but it might evolve over time as my opinions on the best flashcard format change, or it can be customized by advanced users.
 
-The default display uses the [Anki templating language](https://docs.ankiweb.net/templates/intro.html) to display a simple front side with the **Word** field, and the **Hint** field if present. The back side contains the **Reading** (or a repeat of the **Word** if there is no **Reading** field), the **Dictionary entry**, and the **Minimized context sentence**. The **Full context sentence** and **Source** (linked to its **Source URL**, if present) are hidden by default—either not included in the default template, or in a `<details>`; I haven't yet decided.
+The default display uses the [Anki templating language](https://docs.ankiweb.net/templates/intro.html) to display a simple front side with the **Word** field, and the **Hint** field if present. The back side contains the **Reading** (or a repeat of the **Word** if there is no **Reading** field), the **Dictionary entry**, and the **Minimized context sentence**. The **Full context sentence** is hidden by default but can be shown with a disclosure button. The **Source** (linked to its **Source URL**, if present) is not currently included in the template, but TODO maybe we should.
 
-The HTML used for displaying these will be highly semantic, allowing customization with CSS. The default styling will work with both dark and light modes.
+The HTML used for displaying these will be highly semantic, allowing customization with CSS. The default styling will work with both dark and light modes, keying off of Anki's `.night-mode` selector. (TODO or should we use `@media`? What are the tradeoffs, in modern Anki?)
 
 The back-side HTML will contain additional JavaScript which customizes the card display in ways that cannot be achieved easily with Anki templates or CSS. Most notably, it will dim (or perhaps hide) non-applicable senses shown in the dictionary entry.
 
-See [below](#anki-templates) for the specific template HTML.
+See [below](#anki-templates) for implementation discussions.
 
-TODO: the given setup doesn't seem to work well if we want slightly more hints on the front, e.g., the part of speech. Is that an issue?
+TODO: the given setup doesn't seem to work well if we want slightly more hints on the front, e.g., the part of speech. Is that an issue? They might be especially useful for leeches.
 
 ### Maintenance
 
@@ -242,42 +242,22 @@ For examples, including tricky cases like multiple readings, multiple senses, et
 
 TODO: Maybe also 雷.
 
-### Anki templates
-
-#### Front
-
-```html
-<p id="recognition-target" lang="ja">{{Recognition target}}</p>
-
-{{#Hint}}
-<p id="hint" lang="ja">{{Hint}}</p>
-{{/Hint}}
-```
-
-#### Back
-
-<!-- deno-fmt-ignore-start -->
-```html
-<p id="reading" lang="ja">{{furigana:Reading}}{{^Reading}}{{furigana:Recognition target}}{{/Reading}}</p>
-
-<div id="dictionary-entry" class="miwake-dictionary-entry">
-{{Dictionary entry}}
-</div>
-
-<p id="context" lang="ja">{{furigana:Minimized context}}{{^Minimized context}}{{furigana:Full context}}{{/Minimized context}}</p>
-
-<script>
-  {
-    let key = "{{Key}}";
-    // ... more code here, see discussion ...
-  }
-</script>
-```
-<!-- deno-fmt-ignore-end -->
-
-#### Scripting
+### Furigana placement
 
 TODO
+
+### Anki templates
+
+See [`anki_updater_prototype/`](./anki_updater_prototype/)'s HTML and CSS files.
+
+The JavaScript on the back side of the card is responsible for:
+
+- Handling the disclosure button for showing the full context in place of the minimized context.
+- Adding the `relevant` CSS class to sense `<li>`s that are relevant (which is all of them, by default).
+
+The CSS in [`styles_prefix.css`](./anki_updater_prototype/styles_prefix.css) is meant to be combined with one of the CSS files for the semantic HTML JMDict entries, as a prefix that handles the rest of the card.
+
+For now, we inline the JavaScript onto the back side of the card, and the styles into the styles part of the card. It appears that [dividing up code into external files is quite intricate](https://forums.ankiweb.net/t/how-to-include-external-files-in-your-template-js-css-etc-guide/11719), so we avoid that.
 
 ## Roadmap and checkpoints
 

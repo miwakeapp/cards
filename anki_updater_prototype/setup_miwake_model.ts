@@ -11,7 +11,6 @@
  */
 
 const MODEL_NAME = "Miwake";
-const DECK_NAME = "Mining"; // existing target deck
 const FIELDS = [
   "Key",
   "Recognition target",
@@ -35,100 +34,24 @@ const FIELD_FONT_TARGETS = [
 ];
 const FIELD_FONT_FAMILY = "Noto Serif JP";
 
-const front = `<p id="recognition-target" lang="ja">{{Recognition target}}</p>
+const frontPath = new URL("./front.html", import.meta.url);
+const backPath = new URL("./back.html", import.meta.url);
+const stylesPrefixPath = new URL("./styles_prefix.css", import.meta.url);
 
-{{#Hint}}
-<p id="hint" lang="ja">{{Hint}}</p>
-{{/Hint}}`;
+const [front, back, stylesPrefix] = await Promise.all([
+  Deno.readTextFile(frontPath),
+  Deno.readTextFile(backPath),
+  Deno.readTextFile(stylesPrefixPath),
+]);
 
-const back =
-  `<p id="reading" lang="ja">{{furigana:Reading}}{{^Reading}}{{furigana:Recognition target}}{{/Reading}}</p>
-
-<div id="dictionary-entry" class="miwake-dictionary-entry">
-{{Dictionary entry}}
-</div>
-
-<p id="context" lang="ja">{{furigana:Minimized context}}{{^Minimized context}}{{furigana:Full context}}{{/Minimized context}}</p>`;
-
-// Card-level styling: font-face for Anki media font, layout for word/reading/context,
-// then append the shared dictionary minimal CSS from disk.
-const minimalCssPath = new URL(
+// Card-level styling: prefix for card chrome, then append shared minimal.css from disk.
+const minimalCSSPath = new URL(
   "../html_dictionary_previewer/src/styles/minimal.css",
   import.meta.url,
 );
-const minimalCss = await Deno.readTextFile(minimalCssPath);
-const cardChromeCss = String.raw`
-@font-face {
-  font-family: "Noto Serif JP";
-  src: url("_NotoSerifJP-VariableFont_wght.ttf");
-  font-display: swap;
-}
+const minimalCSS = await Deno.readTextFile(minimalCSSPath);
 
-:lang(ja) {
-  font-family: "Noto Serif JP", serif;
-}
-
-:lang(en) {
-  font-family: sans-serif;
-}
-
-:root {
-  --hint-color: rgb(100 100 100);
-
-  &.night-mode {
-    --hint-color: rgb(200 200 200);
-  }
-}
-
-body {
-  margin: 0.5rem 0 0 0;
-  padding: 0;
-}
-
-/* Avoid vertical shifting when furigana shows up */
-#recognition-target,
-#reading {
-  line-height: 2;
-}
-
-#recognition-target {
-  font-size: 2.2rem;
-  text-align: center;
-  margin: 0;
-}
-
-#hint {
-  margin-top: 0.5rem;
-  text-align: center;
-  color: var(--hint-color);
-	font-size: 1.3rem;
-}
-
-#reading {
-  font-size: 2.2rem;
-  text-align: center;
-  margin: 0;
-}
-
-#dictionary-entry {
-  margin-top: 0.5rem;
-}
-
-#context {
-  margin-top: 1rem;
-  line-height: 1.6;
-  text-align: center;
-  font-size: 1.4rem;
-
-  mark {
-    background: none;
-    font-weight: 700;
-    color: inherit;
-  }
-}
-`;
-
-const combinedCss = `${cardChromeCss}\n${minimalCss}`;
+const combinedCSS = `${stylesPrefix}\n${minimalCSS}`;
 
 type ACParams = Record<string, unknown>;
 async function ac(action: string, params: ACParams = {}) {
@@ -148,47 +71,25 @@ async function ac(action: string, params: ACParams = {}) {
 const models: string[] = await ac("modelNames");
 const exists = models.includes(MODEL_NAME);
 
-if (!exists) {
-  console.log(`Creating model ${MODEL_NAME}...`);
-  await ac("createModel", {
-    modelName: MODEL_NAME,
-    inOrderFields: FIELDS,
-    css: combinedCss,
-    cardTemplates: [
-      {
-        Name: "Miwake Card",
-        Front: front,
-        Back: back,
-      },
-    ],
-  });
-} else {
-  console.log(`Updating existing model ${MODEL_NAME}...`);
-  // Update templates
-  await ac("updateModelTemplates", {
-    model: {
-      name: MODEL_NAME,
-      templates: {
-        "Miwake Card": { Front: front, Back: back },
-      },
-    },
-  });
-  // Update styling
-  await ac("updateModelStyling", {
-    model: { name: MODEL_NAME, css: combinedCss },
-  });
-  // Reorder fields to ensure Key is first, etc.
-  for (let i = 0; i < FIELDS.length; i++) {
-    await ac("modelFieldReposition", {
-      modelName: MODEL_NAME,
-      fieldName: FIELDS[i],
-      index: i,
-    });
-  }
+if (exists) {
+  throw new Error(
+    `Model ${MODEL_NAME} already exists. Delete or rename it before running this script.`,
+  );
 }
 
-// Optional: ensure deck exists
-await ac("createDeck", { deck: DECK_NAME });
+console.log(`Creating model ${MODEL_NAME}...`);
+await ac("createModel", {
+  modelName: MODEL_NAME,
+  inOrderFields: FIELDS,
+  css: combinedCSS,
+  cardTemplates: [
+    {
+      Name: "Miwake Card",
+      Front: front,
+      Back: back,
+    },
+  ],
+});
 
 // Ensure browser/editor font is set for core fields.
 for (const field of FIELD_FONT_TARGETS) {
@@ -199,6 +100,4 @@ for (const field of FIELD_FONT_TARGETS) {
   });
 }
 
-console.log(
-  "Done. Note: if Anki still sorts on a different field, set the sort field to Key in Anki's 'Manage Note Types' UI.",
-);
+console.log("Done.");

@@ -1,0 +1,48 @@
+<p id="reading" lang="ja">{{furigana:Reading}}{{^Reading}}{{furigana:Recognition target}}{{/Reading}}</p>
+
+<div id="dictionary-entry" class="miwake-dictionary-entry">
+{{Dictionary entry}}
+</div>
+
+<div id="context" lang="ja">
+  {{#Minimized context}}
+  <p id="minimized-context">{{furigana:Minimized context}}</p>
+  <p id="full-context" hidden>{{furigana:Full context}}</p>
+  <button id="toggle-context" aria-expanded="false" aria-label="Show full context">
+    <svg viewBox="0 0 16 16" aria-hidden="true">
+      <path d="M4 6l4 4 4-4" />
+    </svg>
+  </button>
+  {{/Minimized context}}
+  {{^Minimized context}}
+  <p>{{furigana:Full context}}</p>
+  {{/Minimized context}}
+</div>
+
+<script type="module">
+const key = "{{Key}}";
+const sensesForThisCard = key.split("|")[2]?.trim().split(",").map(Number);
+
+const senseEls = document.querySelectorAll(".senses > li");
+if (!sensesForThisCard) {
+  for (const senseEl of senseEls) {
+    senseEl.classList.add("relevant");
+  }
+} else {
+  for (const relevantSense of sensesForThisCard) {
+    const senseElIndex = relevantSense - 1;
+    senseEls[senseElIndex].classList.add("relevant");
+  }
+}
+
+const toggleContextEl = document.querySelector("#toggle-context");
+const minimizedContextEl = document.querySelector("#minimized-context");
+const fullContextEl = document.querySelector("#full-context");
+toggleContextEl?.addEventListener("click", () => {
+  const newExpanded = toggleContextEl.getAttribute("aria-expanded") === "false";
+
+  toggleContextEl.setAttribute("aria-expanded", newExpanded);
+  minimizedContextEl.hidden = newExpanded;
+  fullContextEl.hidden = !newExpanded;
+});
+</script>
