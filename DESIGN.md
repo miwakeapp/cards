@@ -70,12 +70,12 @@ After that setup is complete, the unobtrusive indicator changes color. From now 
 
 #### Card fields
 
-- **Key**: the card's actual primary key (for disallowing duplicates); it consists of the spelling + JMDict ID + ✨ sense(s) identified as applicable for this card. (The latter are omitted if all senses apply, or if there is only one sense.) This is the first field in the model so Anki gives it precedence.
+- **Key**: the card's actual primary key (for disallowing duplicates); it consists of the spelling targeted for recognition + JMDict ID + ✨ sense(s) identified as applicable for this card. (The latter are omitted if all senses apply, or if there is only one sense.) This is the first field in the model so Anki gives it precedence, and the spelling is first so that it's more visible in the card browser.
 
   - Sample: `ひたと | 1430680 | 2,3`
   - Sample: `相性 | 1586070`
 
-- **Word**: the card's "scannable" primary field (for browsing through the deck in the Anki deck viewer); it contains just the spelling.
+- **Recognition target**: what is shown on the front of the card, containing just the spelling targeted for recognition.
 
   - For cases where the word is always used in a certain pattern, we can ✨ automatically add the appropriate prefix or suffix. Example: [うつつを抜かす](https://takoboto.jp/?w=2033950) can become 〜にうつつを抜かす in this field, as there is enough information in the dictionary entry to assemble this.
 
@@ -247,7 +247,7 @@ TODO: Maybe also 雷.
 #### Front
 
 ```html
-<p id="word" lang="ja">{{Word}}</p>
+<p id="recognition-target" lang="ja">{{Recognition target}}</p>
 
 {{#Hint}}
 <p id="hint" lang="ja">{{Hint}}</p>
@@ -256,17 +256,15 @@ TODO: Maybe also 雷.
 
 #### Back
 
+<!-- deno-fmt-ignore-start -->
 ```html
-<p id="reading" lang="ja">{{furigana:Reading}}{{^Reading}}{{furigana:Word}}{{/Reading}}</p>
+<p id="reading" lang="ja">{{furigana:Reading}}{{^Reading}}{{furigana:Recognition target}}{{/Reading}}</p>
 
 <div id="dictionary-entry" class="miwake-dictionary-entry">
-  {{Dictionary entry}}
+{{Dictionary entry}}
 </div>
 
-<p id="context-sentence" lang="ja">
-  {{furigana:Minimized context sentence}}{{^Minimized context sentence}}{{furigana:Full context
-  sentence}}{{/Minimized context sentence}}
-</p>
+<p id="context" lang="ja">{{furigana:Minimized context}}{{^Minimized context}}{{furigana:Full context}}{{/Minimized context}}</p>
 
 <script>
   {
@@ -275,6 +273,7 @@ TODO: Maybe also 雷.
   }
 </script>
 ```
+<!-- deno-fmt-ignore-end -->
 
 #### Scripting
 
