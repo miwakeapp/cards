@@ -1,9 +1,22 @@
+@font-face {
+  font-family: "Noto Serif Japanese";
+  src: url("../fonts/NotoSerifJP-VariableFont_wght.ttf");
+  font-display: swap;
+}
+
 :root {
-  font-family: Arial, sans-serif;
   background-color: rgb(245 245 245);
   color: rgb(51 51 51);
   margin: 0;
   padding: 0;
+}
+
+:lang(ja) {
+  font-family: "Noto Serif Japanese", serif;
+}
+
+:lang(en) {
+  font-family: sans-serif;
 }
 
 body {

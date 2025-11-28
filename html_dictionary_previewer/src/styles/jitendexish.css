@@ -1,9 +1,3 @@
-@font-face {
-  font-family: "Noto Serif Japanese";
-  src: url("../fonts/NotoSerifJP-VariableFont_wght.ttf");
-  font-display: swap;
-}
-
 :where(.miwake-dictionary-entry) {
   --default-font-size: 16px;
   --pill-horizontal-padding: 0.2rem;
@@ -27,7 +21,7 @@
   --dialect-background-color: green;
 
   /* Night mode colors */
-  &.night-mode {
+  :root.night-mode & {
     --background-color: rgb(34 34 34);
     --text-color: rgb(255 255 255);
     --link-color: rgb(119 200 216);
@@ -54,14 +48,6 @@
   a {
     color: var(--link-color);
     text-decoration-color: color-mix(in srgb, var(--link-color), transparent 30%);
-  }
-
-  :lang(ja) {
-    font-family: "Noto Serif Japanese", serif;
-  }
-
-  :lang(en) {
-    font-family: sans-serif;
   }
 
   > .senses {
