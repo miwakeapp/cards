@@ -9,6 +9,7 @@
   :root.night-mode & {
     --background-color: rgb(0 0 0);
     --text-color: rgb(255 255 255);
+    --secondary-text-color: color-mix(in srgb, var(--text-color), rgb(0 0 0) 40%);
     --link-color: rgb(138 180 248);
   }
 
@@ -66,29 +67,30 @@
     }
   }
 
+  /* Make the `.forms` `display: contents` so that individual `<li>`s can be styled as `inline`. */
   > .forms {
-    &.kanji:has(+ .kana)::after {
-      content: "\A0／\A0";
-    }
-
-    list-style-type: none;
-    display: flex inline; /* to avoid inter-element whitespace issues */
-    flex-direction: row;
-    margin: 0;
-    padding: 0;
+    display: contents;
 
     > li {
+      display: inline;
+      white-space: nowrap;
+      order: 1; /* relocate to the end of the outer `.miwake-dictionary-entry` container */
+
       /* Hide inter-element whitespace */
       font-size: 0;
-      > *, &::after {
+      > *, &::before, &::after {
         font-size: var(--default-font-size);
       }
 
-      &.tag-rK, &.tag-rk, &.tag-sK, &.tag-sk {
+      &.tag-rK, &.tag-rk, &.tag-ik, &.tag-iK, &.tag-ok, &.tag-oK, &.tag-io {
         color: var(--rarely-used-color);
       }
 
-      &:not(:last-of-type)::after {
+      &.tag-sK, &.tag-sk {
+        display: none;
+      }
+
+      &:not(.tag-sK, .tag-sk):has(~ :not(.tag-sK, .tag-sk))::after {
         content: ",\A0";
         color: var(--text-color);
       }
@@ -99,13 +101,13 @@
     }
   }
 
-  > :not(.forms, .senses, .part-of-speech) {
-    flex-basis: 100%;
+  /* Separator goes on the `<li>` because of the `display: contents` trick. */
+  > .forms.kanji + .forms.kana > li:first-child::before {
+    content: "\A0／\A0";
   }
 
-  > .part-of-speech {
-    flex-grow: 1;
-    text-align: right;
+  > :not(.forms, .senses, .part-of-speech) {
+    flex-basis: 100%;
   }
 
   /* These can appear either at top level or within a sense. */
@@ -131,6 +133,15 @@
       &:not(:last-of-type)::after {
         content: ", ";
       }
+    }
+  }
+
+  /* Add margin bottom to the last visible child; `.misc` and `.antonyms` are hidden. */
+  > :not(.misc, .antonyms) {
+    margin-bottom: 1rem;
+
+    &:has(~ :not(.misc, .antonyms)) {
+      margin-bottom: 0;
     }
   }
 

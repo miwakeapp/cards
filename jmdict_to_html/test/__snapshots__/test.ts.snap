@@ -339,6 +339,47 @@ snapshot[`1590470 1`] = `
 </ol>'
 `;
 
+snapshot[`1604990 1`] = `
+'<ul class="forms kanji">
+  <li><span lang="ja">目にあう</span></li>
+  <li><span lang="ja">目に遭う</span></li>
+  <li class="tag-iK">
+    <span lang="ja">目に会う</span>
+    <ul class="tags">
+      <li class="iK">irregular</li>
+    </ul>
+  </li>
+  <li class="tag-sK">
+    <span lang="ja">めに遭う</span>
+    <ul class="tags">
+      <li class="sK">search-only</li>
+    </ul>
+  </li>
+  <li class="tag-sK">
+    <span lang="ja">めに会う</span>
+    <ul class="tags">
+      <li class="sK">search-only</li>
+    </ul>
+  </li>
+</ul>
+<ul class="forms kana">
+  <li><span lang="ja">めにあう</span></li>
+</ul>
+<ul class="part-of-speech">
+  <li class="exp">expression</li>
+  <li class="v5u"><span lang="ja">5段</span> verb</li>
+</ul>
+<ol class="senses">
+  <li>
+    <ul class="glosses">
+      <li>to experience (something unpleasant)</li>
+      <li>to go through</li>
+      <li>to suffer</li>
+    </ul>
+  </li>
+</ol>'
+`;
+
 snapshot[`1632080 1`] = `
 '<ul class="forms kanji">
   <li><span lang="ja">松明</span></li>

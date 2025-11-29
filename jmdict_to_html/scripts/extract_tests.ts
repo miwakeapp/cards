@@ -18,6 +18,7 @@ const testIds = new Set([
   "1178920", // 於いて, shared info + related sense references
   "2228700", // 彼岸桜, shared related tags + mixed misc
   "2861582", // トスアップ, shared field + language source
+  "1604990", // 目にあう, lots of forms
 ]);
 
 const jmdictText = await Deno.readTextFile(jmdictFilename);
