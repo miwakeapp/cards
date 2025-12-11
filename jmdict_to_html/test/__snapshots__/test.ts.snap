@@ -1,6 +1,6 @@
 export const snapshot = {};
 
-snapshot[`1000230 1`] = `
+snapshot[`renderEntry: 1000230 1`] = `
 '<ul class="forms kanji">
   <li class="tag-rK">
     <span lang="ja">明かん</span>
@@ -49,7 +49,7 @@ snapshot[`1000230 1`] = `
 </ul>'
 `;
 
-snapshot[`1014630 1`] = `
+snapshot[`renderEntry: 1014630 1`] = `
 '<ul class="forms kana">
   <li><span lang="ja">アウター</span></li>
   <li><span lang="ja">アウタ</span></li>
@@ -84,7 +84,7 @@ snapshot[`1014630 1`] = `
 </ol>'
 `;
 
-snapshot[`1061000 1`] = `
+snapshot[`renderEntry: 1061000 1`] = `
 '<ul class="forms kana">
   <li class="common"><span lang="ja">シノニム</span></li>
 </ul>
@@ -118,7 +118,7 @@ snapshot[`1061000 1`] = `
 </ol>'
 `;
 
-snapshot[`1122910 1`] = `
+snapshot[`renderEntry: 1122910 1`] = `
 '<ul class="forms kana">
   <li class="common"><span lang="ja">ホルモン</span></li>
 </ul>
@@ -152,7 +152,7 @@ snapshot[`1122910 1`] = `
 </ol>'
 `;
 
-snapshot[`1158110 1`] = `
+snapshot[`renderEntry: 1158110 1`] = `
 '<ul class="forms kanji">
   <li class="common"><span lang="ja">異名</span></li>
 </ul>
@@ -188,7 +188,7 @@ snapshot[`1158110 1`] = `
 </ol>'
 `;
 
-snapshot[`1178920 1`] = `
+snapshot[`renderEntry: 1178920 1`] = `
 '<ul class="forms kanji">
   <li class="tag-rK">
     <span lang="ja">於いて</span>
@@ -260,7 +260,7 @@ snapshot[`1178920 1`] = `
 </ul>'
 `;
 
-snapshot[`1414110 1`] = `
+snapshot[`renderEntry: 1414110 1`] = `
 '<ul class="forms kanji">
   <li class="common"><span lang="ja">大小</span></li>
 </ul>
@@ -311,7 +311,7 @@ snapshot[`1414110 1`] = `
 </ol>'
 `;
 
-snapshot[`1590470 1`] = `
+snapshot[`renderEntry: 1590470 1`] = `
 '<ul class="forms kanji">
   <li class="common"><span lang="ja">画期的</span></li>
   <li class="tag-rK">
@@ -339,7 +339,7 @@ snapshot[`1590470 1`] = `
 </ol>'
 `;
 
-snapshot[`1604990 1`] = `
+snapshot[`renderEntry: 1604990 1`] = `
 '<ul class="forms kanji">
   <li><span lang="ja">目にあう</span></li>
   <li><span lang="ja">目に遭う</span></li>
@@ -380,7 +380,7 @@ snapshot[`1604990 1`] = `
 </ol>'
 `;
 
-snapshot[`1632080 1`] = `
+snapshot[`renderEntry: 1632080 1`] = `
 '<ul class="forms kanji">
   <li><span lang="ja">松明</span></li>
   <li class="tag-rK">
@@ -413,7 +413,7 @@ snapshot[`1632080 1`] = `
 </ol>'
 `;
 
-snapshot[`2013080 1`] = `
+snapshot[`renderEntry: 2013080 1`] = `
 '<ul class="forms kanji">
   <li><span lang="ja">没する</span></li>
   <li class="tag-rK">
@@ -478,7 +478,7 @@ snapshot[`2013080 1`] = `
 </ol>'
 `;
 
-snapshot[`2030540 1`] = `
+snapshot[`renderEntry: 2030540 1`] = `
 '<ul class="forms kanji">
   <li><span lang="ja">狂喜乱舞</span></li>
 </ul>
@@ -502,7 +502,7 @@ snapshot[`2030540 1`] = `
 </ul>'
 `;
 
-snapshot[`2228700 1`] = `
+snapshot[`renderEntry: 2228700 1`] = `
 '<ul class="forms kanji">
   <li><span lang="ja">彼岸桜</span></li>
 </ul>
@@ -537,7 +537,7 @@ snapshot[`2228700 1`] = `
 </ul>'
 `;
 
-snapshot[`2861582 1`] = `
+snapshot[`renderEntry: 2861582 1`] = `
 '<ul class="forms kana">
   <li><span lang="ja">トスアップ</span></li>
   <li><span lang="ja">トス・アップ</span></li>
@@ -573,7 +573,7 @@ snapshot[`formatReadingForAnki: 食べる 1`] = `"食[た]べる"`;
 
 snapshot[`formatReadingForAnki: 走る 1`] = `"走[はし]る"`;
 
-snapshot[`formatReadingForAnki: 日本語 1`] = `"日本[にほん] 語[ご]"`;
+snapshot[`formatReadingForAnki: 日本語 1`] = `"日[に] 本[ほん] 語[ご]"`;
 
 snapshot[`formatReadingForAnki: 東京 1`] = `"東[とう] 京[きょう]"`;
 
@@ -584,3 +584,7 @@ snapshot[`formatReadingForAnki: 新幹線 1`] = `"新[しん] 幹[かん] 線[�
 snapshot[`formatReadingForAnki: 図書館 1`] = `"図[と] 書[しょ] 館[かん]"`;
 
 snapshot[`formatReadingForAnki: 大学生 1`] = `"大[だい] 学[がく] 生[せい]"`;
+
+snapshot[`formatReadingForAnki (non-kanji): ＡＢＣ順 1`] = `"Ａ[エー] Ｂ[ビー] Ｃ[シー] 順[じゅん]"`;
+
+snapshot[`formatReadingForAnki (non-kanji): ＣＤプレーヤー 1`] = `"Ｃ[シー] Ｄ[ディー]プレーヤー"`;

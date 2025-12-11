@@ -1,40 +1,98 @@
 import * as path from "@std/path";
-import { extract as extractZip } from "@quentinadam/zip";
 
-const jmdictFuriganaReleasesURL =
-  "https://api.github.com/repos/Doublevil/JmdictFurigana/releases/latest";
-const jmdictFuriganaFilename = path.resolve(import.meta.dirname!, "../src/jmdict_furigana.json");
+const furiganaURL = "https://jisho.hlorenzi.com/furigana.txt";
+const outputFilename = path.resolve(import.meta.dirname!, "../src/jmdict_furigana.json");
 
-// Get the latest release metadata from GitHub API
-const releaseResponse = await fetch(jmdictFuriganaReleasesURL);
-if (!releaseResponse.ok) {
-  throw new Error(`Failed to fetch release info: ${releaseResponse.statusText}`);
+console.log(`Downloading from: ${furiganaURL}`);
+
+const response = await fetch(furiganaURL);
+if (!response.ok) {
+  throw new Error(`Failed to download: ${response.statusText}`);
 }
 
-const releaseData = await releaseResponse.json();
+// Stream the response to handle large file
+let text = "";
+let charactersRead = 0;
 
-const targetAsset = releaseData.assets.find((asset: { name: string }) =>
-  asset.name === "JmdictFurigana.json.zip"
-);
-if (!targetAsset) {
-  throw new Error("Could not find the JmdictFurigana.json.zip asset in the latest release.");
+let lastLogTime = Date.now();
+for await (const chunk of response.body!.pipeThrough(new TextDecoderStream())) {
+  charactersRead += chunk.length;
+  text += chunk;
+  if (Date.now() - lastLogTime > 1000) {
+    lastLogTime = Date.now();
+    console.log(`Downloaded ${charactersRead} characters...`);
+  }
 }
 
-const downloadURL = targetAsset.browser_download_url;
-console.log(`Found asset: ${targetAsset.name}`);
-console.log(`Downloading from: ${downloadURL}`);
+const lines = text.split("\n");
+console.log(`Downloaded ${charactersRead} characters, ${lines.length} lines. Processing...`);
 
-const fileResponse = await fetch(downloadURL);
-if (!fileResponse.ok) {
-  throw new Error(`Failed to download the asset: ${fileResponse.statusText}`);
+function toAnkiFormat(wordDotted: string, readingDotted: string): string {
+  const wordParts = wordDotted.split(".");
+  const readingParts = readingDotted.split(".");
+
+  if (wordParts.length !== readingParts.length) {
+    throw new Error(
+      `Mismatched parts: ${wordDotted} (${wordParts.length}) vs ${readingDotted} (${readingParts.length})`,
+    );
+  }
+
+  let result = "";
+  for (let i = 0; i < wordParts.length; i++) {
+    const wordPart = wordParts[i];
+    const readingPart = readingParts[i];
+
+    if (wordPart !== readingPart) {
+      // Needs furigana - add space before if not at the start
+      if (result.length > 0) {
+        result += " ";
+      }
+      result += `${wordPart}[${readingPart}]`;
+    } else {
+      // Same text - append directly without brackets
+      result += wordPart;
+    }
+  }
+
+  return result;
 }
-const fileData = await fileResponse.bytes();
 
-console.log("Downloaded the asset. Extracting...");
-const unzipped = await extractZip(fileData);
-if (unzipped.length !== 1) {
-  throw new Error("Expected the zip file to contain exactly one file.");
+// Build the lookup object
+const furiganaData: Record<string, string> = {};
+let processedCount = 0;
+let skippedCount = 0;
+
+for (const line of lines) {
+  if (!line.trim()) continue;
+
+  const parts = line.split(";");
+  if (parts.length !== 3) {
+    console.log(`Skipping line because it doesn't have 3 parts: ${line}`);
+    skippedCount++;
+    continue;
+  }
+
+  const [id, wordDotted, readingDotted] = parts;
+
+  // Remove dots to get the actual word and reading
+  const word = wordDotted.replace(/\./g, "");
+  const reading = readingDotted.replace(/\./g, "");
+
+  try {
+    const ankiFormat = toAnkiFormat(wordDotted, readingDotted);
+    const key = `${id}|${word}|${reading}`;
+    furiganaData[key] = ankiFormat;
+    processedCount++;
+  } catch (e) {
+    console.error(`Error processing line: ${line}`);
+    console.error(e);
+    skippedCount++;
+  }
 }
 
-await Deno.writeFile(jmdictFuriganaFilename, unzipped[0].data);
-console.log(`Downloaded and saved as ${jmdictFuriganaFilename}`);
+console.log(`Processed ${processedCount} entries, skipped ${skippedCount}`);
+
+const json = JSON.stringify(furiganaData);
+await Deno.writeTextFile(outputFilename, json);
+
+console.log(`Saved to ${outputFilename} (${(json.length / 1024 / 1024).toFixed(2)} MB)`);

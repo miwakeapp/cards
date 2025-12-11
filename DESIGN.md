@@ -246,7 +246,11 @@ The **Reading** field of the card contains the specific reading the user is bein
 
 In some cases, the reading will come directly from the context sentence: for example, rare kanji often get their reading spelled out in the source book. But in most cases, we need to pick a reading from the JMDict entry. This will be done by feeding the full JSON JMDict entry into AI ✨ and asking it to pick the correct reading. This allows it to use various hints, e.g. the `appliesToKanji` field on individual senses, to identify the correct reading.
 
-Once we have the front recognition target and a reading, precise furigana placement is done using the [JmdictFurigana project](https://github.com/Doublevil/JmdictFurigana) files. The resulting association of furigana over the correct kanji helps the user reinforce kanji readings organically, over the course of many reviews.
+Once we have the front recognition target and a reading, precise furigana placement is done using the [Lorenzi's Jisho](https://jisho.hlorenzi.com/) furigana file. The resulting association of furigana over the correct kanji helps the user reinforce kanji readings organically, over the course of many reviews.
+
+Using the [JmdictFurigana project](https://github.com/Doublevil/JmdictFurigana) was considered, but some quick smoke-testing revealed [it's missing at least one obvious case](https://github.com/Doublevil/JmdictFurigana/issues/25), so I lost confidence in the project.
+
+Furigana placement involves lookups in large data tables. The current design pre-computes a ~60 MiB JSON file and loads it into memory on startup, for fast lookups, at the cost of ~1 second startup time. This is not terrible, but not ideal either. If I want to optimize this in the future, we can consider strategies like sharding by JMDict ID prefix or similar.
 
 ### Anki templates
 
@@ -286,7 +290,7 @@ This allows field-testing the Miwake Card format, both in the Anki previewer and
 
 ### Reading generation
 
-While doing the semi-manual workflow, I noticed that precisely placing furigana using an LLM was error-prone. Since we want to do this [using JmdictFurigana](#reading-field-and-furigana-placement) anyway, I'll code up a subroutine for generating Anki-style readings from (kanji, reading) pairs.
+While doing the semi-manual workflow, I noticed that precisely placing furigana using an LLM was error-prone. Since we want to do this [using a non-AI workflow](#reading-field-and-furigana-placement) anyway, I'll code up a subroutine for generating Anki-style readings from (kanji, reading) pairs.
 
 ### Semi-automated card regeneration
 
