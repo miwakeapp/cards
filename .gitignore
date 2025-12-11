@@ -1,4 +1,11 @@
 jmdict_to_html/src/jmdict_eng.json
+jmdict_to_html/src/jmdict_furigana.json
 jmdict_to_html/src/jmdict_tags.json
+
 html_dictionary_previewer/_site
 html_dictionary_previewer/src/data/entries.json
+
+card_creator/evals/runs/
+card_creator/.env
+
+anki_updater_prototype/

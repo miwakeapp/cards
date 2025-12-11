@@ -1,0 +1,14 @@
+export const snapshot = {};
+
+snapshot[`createCard: full card structure snapshot 1`] = `
+{
+  fullContext: "この箱の<mark>大小</mark>によって値段が変わるのは当然のことだ。",
+  hint: "サイズの大小",
+  key: "大小 | 1414110 | 1",
+  minimizedContext: "箱の大小で値段が変わる。",
+  reading: "大[だい] 小[しょう]",
+  recognitionTarget: "大小",
+  source: "Test Book",
+  sourceURL: null,
+}
+`;
