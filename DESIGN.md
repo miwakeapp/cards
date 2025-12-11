@@ -240,11 +240,13 @@ TODO Discuss ✨ removal of en-GB redundancy
 
 For examples, including tricky cases like multiple readings, multiple senses, etc., see [the test cases `inputs/` directory](./jmdict_to_html/test/inputs/) and [resulting HTML snapshot](./jmdict_to_html/test/__snapshots__/test.ts.snap).
 
-TODO: Maybe also 雷.
+### Reading field and furigana placement
 
-### Furigana placement
+The **Reading** field of the card contains the specific reading the user is being tested on, in response to the recognition target and optional context hint.
 
-TODO
+In some cases, the reading will come directly from the context sentence: for example, rare kanji often get their reading spelled out in the source book. But in most cases, we need to pick a reading from the JMDict entry. This will be done by feeding the full JSON JMDict entry into AI ✨ and asking it to pick the correct reading. This allows it to use various hints, e.g. the `appliesToKanji` field on individual senses, to identify the correct reading.
+
+Once we have the front recognition target and a reading, precise furigana placement is done using the [JmdictFurigana project](https://github.com/Doublevil/JmdictFurigana) files. The resulting association of furigana over the correct kanji helps the user reinforce kanji readings organically, over the course of many reviews.
 
 ### Anki templates
 
@@ -261,9 +263,55 @@ For now, we inline the JavaScript onto the back side of the card, and the styles
 
 ## Roadmap and checkpoints
 
-TODO: discuss MVP to vision of finished product. Discuss what, if anything, I'll build that's actually throwaway, e.g. command-line based tools for dealing with my existing collections.
+I'll build this software in checkpoints, allowing some user testing along the way.
 
-- A good dictionary entry generator might be a good first separable MVP. I could drop-in replace my existing mining cards that way.
+### JMDict to HTML
+
+The JMDict to HTML project takes as input a JMDict dictionary entry, in JSON format, and produces semantic HTML. It also comes bundled with a few CSS files and a small previewer app to validate that the produced dictionary entries are fit to purpose.
+
+### Semi-manual card regeneration
+
+Using my existing corpus of Animecards, I can use manual AI ✨ prompting (e.g. in Claude Code) to convert some of my existing leech cards into new Miwake Cards.
+
+The Animecards contain word, reading, dictionary entry, sentence, and hint. These can be converted into the [target fields](#card-fields) with some ✨ smarts; the tricky parts are:
+
+- identifying which dictionary sense is applicable in the sentence;
+- adding a disambiguating hint if necessary;
+- adding precisely-placed furigana to the reading field;
+- trimming down the existing context into minimal context.
+
+The AI can create these new cards using the AnkiConnect API.
+
+This allows field-testing the Miwake Card format, both in the Anki previewer and in real reviews.
+
+### Reading generation
+
+While doing the semi-manual workflow, I noticed that precisely placing furigana using an LLM was error-prone. Since we want to do this [using JmdictFurigana](#reading-field-and-furigana-placement) anyway, I'll code up a subroutine for generating Anki-style readings from (kanji, reading) pairs.
+
+### Semi-automated card regeneration
+
+The next step is to improve the automation of the above process, in a way that generates code which will be useful in the long term.
+
+The key insight here is in the final Miwake product, the card-generation process's input will be:
+
+- Context
+  - This will generally be larger than a sentence (e.g., a page of text?) in the final product, since the final product needs to intelligently determine the appropriate amount of context and minimal context.
+  - The format will be HTML.
+  - It will include furigana (as `<ruby>`), sometimes even over the recognition target.
+- The recognition target
+  - This will be identified as a JMDict entry that the user picks out from the Miwake popover interface.
+- Source and source URL
+
+My existing Animecards contain at least the context and recognition target, and so if we build a tool that takes these inputs as part of the eventual full Miwake pipeline, it can be repurposed to automate the leech regeneration process.
+
+There's a small wrinkle here where my OCD would be best satisfied by some tweaks:
+
+- The existing Animecards contain, in many cases, truncated context, as I was trying to reproduce the minimized context experience within that workflow. It'd be ideal to search out the original full context.
+- Relatedly, the existing Animecards do not contain source information.
+
+Subsequent revisions of this semi-automated card generation tool could work to trawl through epub files and fix these deficiencies. The full-context extraction might even provide good testing for the eventual Miwake experience of identifying the correct full context. (E.g. in cases where it's more than a single sentence.) However, that code would largely be throwaway, since it would not contribute to the final Miwake product.
+
+TODO: continue roadmap.
 
 ## Tricky cases
 
