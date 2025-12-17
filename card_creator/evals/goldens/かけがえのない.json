@@ -1,13 +1,11 @@
 {
   "inputId": "かけがえのない",
-  "card": {
-    "key": "かけがえのない | 1207650",
-    "recognitionTarget": "かけがえのない",
-    "reading": null,
+  "aiFields": {
+    "applicableSenses": [],
+    "reading": "かけがえのない",
     "hint": null,
-    "fullContext": "彼女の優しさのお蔭で、わたしは失いかけていた社会性をもう一度取り戻せたし、<mark>かけがえのない</mark>ものを知った。",
     "minimizedContext": "わたしは失いかけていた社会性をもう一度取り戻せたし、<mark>かけがえのない</mark>ものを知った。",
-    "source": null,
-    "sourceURL": null
+    "cleanedSource": null,
+    "sourceURLIsPublic": false
   }
 }

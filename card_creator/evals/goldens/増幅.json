@@ -1,13 +1,11 @@
 {
   "inputId": "増幅",
-  "card": {
-    "key": "増幅 | 1403360 | 2",
-    "recognitionTarget": "増幅",
-    "reading": "増[ぞう] 幅[ふく]",
+  "aiFields": {
+    "applicableSenses": [2],
+    "reading": "ぞうふく",
     "hint": "気持ちを増幅する",
-    "fullContext": "不採用の連絡を受けるたびに、やっぱりわたしなんかが社会に出て働くのは無理なんだと自分を見限る気持ちが膨れ、目減りしていく通帳の残額がそれを<mark>増幅</mark>させる。",
     "minimizedContext": "気持ちが膨れ、目減りしていく通帳の残額がそれを<mark>増幅</mark>させる。",
-    "source": null,
-    "sourceURL": null
+    "cleanedSource": null,
+    "sourceURLIsPublic": false
   }
 }

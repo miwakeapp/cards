@@ -1,13 +1,11 @@
 {
   "inputId": "外泊",
-  "card": {
-    "key": "外泊 | 1204030",
-    "recognitionTarget": "外泊",
-    "reading": "外[がい] 泊[はく]",
+  "aiFields": {
+    "applicableSenses": [],
+    "reading": "がいはく",
     "hint": null,
-    "fullContext": "そんな美音子ちゃんがこれだけは厳守しろと言ったルールは、男女関係なく決して他人を泊まらせないこと、<mark>外泊</mark>禁止のふたつだった。",
     "minimizedContext": "美音子ちゃんのルールは<mark>外泊</mark>禁止だった。",
-    "source": null,
-    "sourceURL": null
+    "cleanedSource": null,
+    "sourceURLIsPublic": false
   }
 }

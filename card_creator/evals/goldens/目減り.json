@@ -1,13 +1,11 @@
 {
   "inputId": "目減り",
-  "card": {
-    "key": "目減り | 1641190 | 2",
-    "recognitionTarget": "目減り",
-    "reading": "目[め] 減[べ]り",
+  "aiFields": {
+    "applicableSenses": [2],
+    "reading": "めべり",
     "hint": "残額が目減りする",
-    "fullContext": "不採用の連絡を受けるたびに、やっぱりわたしなんかが社会に出て働くのは無理なんだと自分を見限る気持ちが膨れ、<mark>目減り</mark>していく通帳の残額がそれを増幅させる。",
     "minimizedContext": "気持ちが膨れ、<mark>目減り</mark>していく通帳の残額がそれを増幅させる。",
-    "source": null,
-    "sourceURL": null
+    "cleanedSource": null,
+    "sourceURLIsPublic": false
   }
 }

@@ -1,13 +1,11 @@
 {
   "inputId": "無垢",
-  "card": {
-    "key": "無垢 | 1529950 | 1",
-    "recognitionTarget": "無垢",
-    "reading": "無[む] 垢[く]",
+  "aiFields": {
+    "applicableSenses": [1],
+    "reading": "むく",
     "hint": "無垢な顔",
-    "fullContext": "その<mark>無垢</mark>な顔に、「夜、眠れなかったの」と言う。",
     "minimizedContext": null,
-    "source": null,
-    "sourceURL": null
+    "cleanedSource": null,
+    "sourceURLIsPublic": false
   }
 }

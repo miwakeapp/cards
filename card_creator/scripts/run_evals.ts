@@ -9,12 +9,16 @@
 import { parseArgs } from "@std/cli/parse-args";
 import * as path from "@std/path";
 import { preextractedJMDictEntry } from "data";
-import { createCard } from "../src/create_card.ts";
-import { generateCardFields, MODEL_IDS, type ModelId } from "../src/ai_provider.ts";
+import {
+  generateCardFields,
+  MODEL_IDS,
+  type ModelId,
+} from "../src/ai_provider.ts";
+import type { AIGeneratedFields } from "../src/types.ts";
 
 const EVALS_DIR = path.resolve(import.meta.dirname!, "../evals");
 const INPUTS_DIR = path.join(EVALS_DIR, "inputs");
-const BASELINES_DIR = path.join(EVALS_DIR, "baselines");
+const GOLDENS_DIR = path.join(EVALS_DIR, "goldens");
 const RUNS_DIR = path.join(EVALS_DIR, "runs");
 
 interface EvalInput {
@@ -22,28 +26,26 @@ interface EvalInput {
   context: string;
   jmdictId: string;
   recognitionTarget: string;
+  source?: string;
+  sourceURL?: string;
 }
 
 interface EvalOutput {
   inputId: string;
   model: string;
   timestamp: string;
-  card: {
-    key: string;
-    recognitionTarget: string;
-    reading: string | null;
-    hint: string | null;
-    fullContext: string;
-    minimizedContext: string | null;
-    source: string | null;
-    sourceURL: string | null;
-  };
+  aiFields: AIGeneratedFields;
+}
+
+interface Golden {
+  inputId: string;
+  aiFields: AIGeneratedFields;
 }
 
 interface DiffResult {
   inputId: string;
   field: string;
-  baseline: unknown;
+  golden: unknown;
   current: unknown;
 }
 
@@ -78,11 +80,11 @@ async function loadInputs(): Promise<EvalInput[]> {
   return inputs;
 }
 
-async function loadBaseline(modelId: ModelId, inputId: string): Promise<EvalOutput | null> {
-  const baselinePath = path.join(BASELINES_DIR, modelId, `${inputId}.json`);
+async function loadGolden(inputId: string): Promise<Golden | null> {
+  const goldenPath = path.join(GOLDENS_DIR, `${inputId}.json`);
   try {
-    const content = await Deno.readTextFile(baselinePath);
-    return JSON.parse(content) as EvalOutput;
+    const content = await Deno.readTextFile(goldenPath);
+    return JSON.parse(content) as Golden;
   } catch (e) {
     if (e instanceof Deno.errors.NotFound) {
       return null;
@@ -91,28 +93,30 @@ async function loadBaseline(modelId: ModelId, inputId: string): Promise<EvalOutp
   }
 }
 
-function computeDiffs(baseline: EvalOutput | null, current: EvalOutput): DiffResult[] {
-  if (!baseline) {
-    return [{ inputId: current.inputId, field: "(new)", baseline: null, current: "new eval" }];
+function computeDiffs(golden: Golden | null, current: EvalOutput): DiffResult[] {
+  if (!golden) {
+    return [{ inputId: current.inputId, field: "(new)", golden: null, current: "new eval" }];
   }
 
   const diffs: DiffResult[] = [];
-  const fieldsToCompare = [
-    "key",
+  const fieldsToCompare: (keyof AIGeneratedFields)[] = [
+    "applicableSenses",
+    "reading",
     "hint",
     "minimizedContext",
-    "reading",
-  ] as const;
+    "cleanedSource",
+    "sourceURLIsPublic",
+  ];
 
   for (const field of fieldsToCompare) {
-    const baselineVal = baseline.card[field];
-    const currentVal = current.card[field];
+    const goldenVal = golden.aiFields[field];
+    const currentVal = current.aiFields[field];
 
-    if (JSON.stringify(baselineVal) !== JSON.stringify(currentVal)) {
+    if (JSON.stringify(goldenVal) !== JSON.stringify(currentVal)) {
       diffs.push({
         inputId: current.inputId,
         field,
-        baseline: baselineVal,
+        golden: goldenVal,
         current: currentVal,
       });
     }
@@ -127,7 +131,7 @@ console.log(`Running evals for models: ${models.join(", ")}\n`);
 const inputs = await loadInputs();
 
 if (inputs.length === 0) {
-  console.error("No eval inputs found. Run 'deno task fetch-samples' first.");
+  console.error("No eval inputs found.");
   Deno.exit(1);
 }
 
@@ -152,46 +156,37 @@ for (const modelId of models) {
     const jmdictEntry = await preextractedJMDictEntry(input.jmdictId);
 
     try {
-      const card = await createCard({
-        input: {
+      const aiFields = await generateCardFields(
+        {
           context: input.context,
-          jmdictId: input.jmdictId,
           recognitionTarget: input.recognitionTarget,
+          jmdictEntry,
+          source: input.source,
+          sourceURL: input.sourceURL,
         },
-        jmdictEntry,
-        modelId: modelId,
-        generateFields: generateCardFields,
-      });
+        modelId,
+      );
 
       const output: EvalOutput = {
         inputId: input.id,
         model: modelId,
         timestamp,
-        card: {
-          key: card.key,
-          recognitionTarget: card.recognitionTarget,
-          reading: card.reading,
-          hint: card.hint,
-          fullContext: card.fullContext,
-          minimizedContext: card.minimizedContext,
-          source: card.source,
-          sourceURL: card.sourceURL,
-        },
+        aiFields,
       };
 
       // Save output
       const outputPath = path.join(runDir, `${input.id}.json`);
       await Deno.writeTextFile(outputPath, JSON.stringify(output, null, 2) + "\n");
 
-      // Compare to baseline
-      const baseline = await loadBaseline(modelId, input.id);
-      const diffs = computeDiffs(baseline, output);
+      // Compare to golden
+      const golden = await loadGolden(input.id);
+      const diffs = computeDiffs(golden, output);
       allDiffs.push(...diffs);
 
       if (diffs.length > 0) {
-        console.log(`    ${diffs.length} diff(s) from baseline`);
+        console.log(`    ${diffs.length} diff(s) from golden`);
       } else {
-        console.log(`    No changes from baseline`);
+        console.log(`    Matches golden`);
       }
     } catch (e) {
       errorCount++;
@@ -209,19 +204,16 @@ for (const modelId of models) {
   }
 
   if (allDiffs.length === 0) {
-    console.log("  No differences from baseline.");
+    console.log("  No differences from golden.");
   } else {
     console.log(`  ${allDiffs.length} total difference(s):\n`);
     for (const diff of allDiffs) {
       console.log(`  [${diff.inputId}] ${diff.field}:`);
-      console.log(`    baseline: ${JSON.stringify(diff.baseline)}`);
-      console.log(`    current:  ${JSON.stringify(diff.current)}`);
+      console.log(`    golden:  ${JSON.stringify(diff.golden)}`);
+      console.log(`    current: ${JSON.stringify(diff.current)}`);
       console.log();
     }
   }
 
   console.log(`\nOutputs saved to: ${runDir}`);
 }
-
-console.log("\n\nTo accept these results as the new baseline, run:");
-console.log(`  deno task eval:accept --run ${timestamp}`);
