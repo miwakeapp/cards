@@ -1,0 +1,11 @@
+{
+  "inputId": "取捨選択",
+  "aiFields": {
+    "applicableSenses": [],
+    "reading": "しゅしゃせんたく",
+    "hint": null,
+    "minimizedContext": "休日ともなると<mark>取捨選択</mark>を迫られることもあった。",
+    "cleanedSource": null,
+    "sourceURLIsPublic": false
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "inputId": "酒代",
+  "aiFields": {
+    "applicableSenses": [
+      1
+    ],
+    "reading": "さかだい",
+    "hint": "酒代が嵩む",
+    "minimizedContext": "キナコと暮らすと<mark>酒代</mark>が嵩んでしょう。",
+    "cleanedSource": null,
+    "sourceURLIsPublic": false
+  }
+}

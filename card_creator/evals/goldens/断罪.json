@@ -1,0 +1,13 @@
+{
+  "inputId": "断罪",
+  "aiFields": {
+    "applicableSenses": [
+      1
+    ],
+    "reading": "だんざい",
+    "hint": "罪を断罪",
+    "minimizedContext": "<mark>断罪</mark>という言葉がちらりと頭をよぎった。",
+    "cleanedSource": null,
+    "sourceURLIsPublic": false
+  }
+}

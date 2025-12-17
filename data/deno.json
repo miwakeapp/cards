@@ -5,6 +5,6 @@
     "download_jmdict": "deno run --allow-net --allow-write=./jmdict_eng.json scripts/download_jmdict.ts",
     "download_jmdictfurigana": "deno run --allow-net --allow-write=./jmdict_furigana.json scripts/download_jmdictfurigana.ts",
     "extract_tags": "deno run --allow-read=./jmdict_eng.json --allow-write=./jmdict_tags.json scripts/extract_tags.ts",
-    "extract_entries": "deno run --allow-read=./jmdict_eng.json --allow-write=./entries scripts/extract_entries.ts"
+    "extract_entries": "deno run --allow-read=./jmdict_eng.json,../card_creator/evals/inputs --allow-write=./entries scripts/extract_entries.ts"
   }
 }

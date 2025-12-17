@@ -1,0 +1,13 @@
+{
+  "inputId": "ザル",
+  "aiFields": {
+    "applicableSenses": [
+      4
+    ],
+    "reading": "ザル",
+    "hint": "酒にザル",
+    "minimizedContext": "「こんなに<mark>ザル</mark>だとは思わなかったよね」",
+    "cleanedSource": null,
+    "sourceURLIsPublic": false
+  }
+}

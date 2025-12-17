@@ -1,9 +1,11 @@
 import * as path from "@std/path";
 import type { JMdict } from "@scriptin/jmdict-simplified-types";
 
-const jmdictFilename = path.resolve(import.meta.dirname!, "../jmdict_eng.json");
-const entriesDir = path.resolve(import.meta.dirname!, "../entries");
+const dataDir = path.resolve(import.meta.dirname!, "..");
+const jmdictFilename = path.join(dataDir, "jmdict_eng.json");
+const entriesDir = path.join(dataDir, "entries");
 
+// IDs used by jmdict_to_html tests
 const JMDICT_TO_HTML_TEST_IDS = new Set([
   "2030540", // 狂喜乱舞, simple entry
   "1414110", // 大小, one reading, multiple senses, per-sense tags
@@ -21,22 +23,72 @@ const JMDICT_TO_HTML_TEST_IDS = new Set([
   "1604990", // 目にあう, lots of forms
 ]);
 
-const CARD_CREATOR_EVAL_IDS = new Set([
-  "2116100", // 土いじり
+// IDs used by jmdict_to_html formatReadingForAnki tests
+const FURIGANA_TEST_IDS = new Set([
+  "2252350", // 大人買い
+  "1217700", // 頑張る
+  "1358280", // 食べる
+  "1402540", // 走る
+  "1464530", // 日本語
+  "1447690", // 東京
+  "1485470", // 飛行機
+  "1361590", // 新幹線
+  "1370420", // 図書館
+  "1413260", // 大学生
+  "1591900", // きれい
+  "1374550", // すごい
+  "1049180", // コーヒー
+  "1080510", // テレビ
+  "1000100", // ＡＢＣ順
+  "1000110", // ＣＤプレーヤー
+]);
+
+// IDs used by card_creator few-shot examples
+const FEW_SHOT_IDS = new Set([
   "1497700", // 父方
-  "2177740", // 願わくば
-  "1207650", // かけがえのない
-  "2258260", // ハンダ付け
   "1529950", // 無垢
   "1512230", // 返上
   "1403360", // 増幅
-  "1204030", // 外泊
-  "1641190", // 目減り
+  "2258260", // ハンダ付け
 ]);
 
-const allTestIds = new Set([...JMDICT_TO_HTML_TEST_IDS, ...CARD_CREATOR_EVAL_IDS]);
+// Dynamically load IDs from card_creator eval inputs
+async function loadEvalInputIds(): Promise<Set<string>> {
+  const evalInputsDir = path.resolve(dataDir, "../card_creator/evals/inputs");
+  const ids = new Set<string>();
+
+  try {
+    for await (const entry of Deno.readDir(evalInputsDir)) {
+      if (entry.isFile && entry.name.endsWith(".json")) {
+        const content = await Deno.readTextFile(path.join(evalInputsDir, entry.name));
+        const input = JSON.parse(content) as { jmdictId: string };
+        ids.add(input.jmdictId);
+      }
+    }
+  } catch (e) {
+    if (!(e instanceof Deno.errors.NotFound)) {
+      throw e;
+    }
+    console.warn("No eval inputs directory found, skipping eval input IDs");
+  }
+
+  return ids;
+}
+
+const evalInputIds = await loadEvalInputIds();
+
+const allTestIds = new Set([
+  ...JMDICT_TO_HTML_TEST_IDS,
+  ...FURIGANA_TEST_IDS,
+  ...FEW_SHOT_IDS,
+  ...evalInputIds,
+]);
 
 console.log(`Looking for ${allTestIds.size} entries...`);
+console.log(`  - jmdict_to_html tests: ${JMDICT_TO_HTML_TEST_IDS.size}`);
+console.log(`  - furigana tests: ${FURIGANA_TEST_IDS.size}`);
+console.log(`  - few-shot examples: ${FEW_SHOT_IDS.size}`);
+console.log(`  - eval inputs: ${evalInputIds.size}`);
 
 const jmdictText = await Deno.readTextFile(jmdictFilename);
 const jmdict = JSON.parse(jmdictText) as JMdict;

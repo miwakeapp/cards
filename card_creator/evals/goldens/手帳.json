@@ -1,0 +1,13 @@
+{
+  "inputId": "手帳",
+  "aiFields": {
+    "applicableSenses": [
+      1
+    ],
+    "reading": "てちょう",
+    "hint": "予定手帳",
+    "minimizedContext": "<mark>手帳</mark>は先の予定で埋まる。",
+    "cleanedSource": null,
+    "sourceURLIsPublic": false
+  }
+}
