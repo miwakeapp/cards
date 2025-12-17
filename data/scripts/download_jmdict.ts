@@ -2,7 +2,7 @@ import * as path from "@std/path";
 import { extract as extractZip } from "@quentinadam/zip";
 
 const jmdictReleasesURL = "https://api.github.com/repos/scriptin/jmdict-simplified/releases/latest";
-const jmdictFilename = path.resolve(import.meta.dirname!, "../src/jmdict_eng.json");
+const jmdictFilename = path.resolve(import.meta.dirname!, "../jmdict_eng.json");
 
 // Get the latest release metadata from GitHub API
 const releaseResponse = await fetch(jmdictReleasesURL);

@@ -1,4 +1,6 @@
-import furiganaData from "./jmdict_furigana.json" with { type: "json" };
+import { jmdictFurigana } from "data";
+
+const furigana = await jmdictFurigana();
 
 /**
  * Formats a (jmdictId, word, reading) triple into Anki-style furigana format.
@@ -25,5 +27,5 @@ export function formatReadingForAnki(
   }
 
   const key = `${jmdictId}|${word}|${reading}`;
-  return (furiganaData as Record<string, string>)[key] ?? null;
+  return furigana[key] ?? null;
 }

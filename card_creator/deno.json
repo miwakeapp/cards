@@ -18,7 +18,7 @@
   },
   "test": {
     "permissions": {
-      "read": ["./test", "../jmdict_to_html/src"]
+      "read": ["./test/__snapshots__", "../data"]
     }
   }
 }

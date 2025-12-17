@@ -8,7 +8,7 @@
 
 import { parseArgs } from "@std/cli/parse-args";
 import * as path from "@std/path";
-import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
+import { preextractedJMDictEntry } from "data";
 import { createCard } from "../src/create_card.ts";
 import { generateCardFields, MODEL_IDS, type ModelId } from "../src/ai_provider.ts";
 
@@ -16,12 +16,6 @@ const EVALS_DIR = path.resolve(import.meta.dirname!, "../evals");
 const INPUTS_DIR = path.join(EVALS_DIR, "inputs");
 const BASELINES_DIR = path.join(EVALS_DIR, "baselines");
 const RUNS_DIR = path.join(EVALS_DIR, "runs");
-
-// Path to JMDict for looking up entries
-const JMDICT_PATH = path.resolve(
-  import.meta.dirname!,
-  "../../jmdict_to_html/src/jmdict_eng.json",
-);
 
 interface EvalInput {
   id: string;
@@ -69,19 +63,6 @@ function getModelsFromArgs(): ModelId[] {
   }
 
   return [...MODEL_IDS];
-}
-
-async function loadJMdict(): Promise<Map<string, JMdictWord>> {
-  console.log("Loading JMDict...");
-  const text = await Deno.readTextFile(JMDICT_PATH);
-  const data = JSON.parse(text) as { words: JMdictWord[] };
-
-  const map = new Map<string, JMdictWord>();
-  for (const word of data.words) {
-    map.set(word.id, word);
-  }
-  console.log(`Loaded ${map.size} entries.`);
-  return map;
 }
 
 async function loadInputs(): Promise<EvalInput[]> {
@@ -143,7 +124,6 @@ function computeDiffs(baseline: EvalOutput | null, current: EvalOutput): DiffRes
 const models = getModelsFromArgs();
 console.log(`Running evals for models: ${models.join(", ")}\n`);
 
-const jmdict = await loadJMdict();
 const inputs = await loadInputs();
 
 if (inputs.length === 0) {
@@ -169,11 +149,7 @@ for (const modelId of models) {
   for (const input of inputs) {
     console.log(`  Processing: ${input.recognitionTarget} (${input.id})...`);
 
-    const jmdictEntry = jmdict.get(input.jmdictId);
-    if (!jmdictEntry) {
-      console.warn(`    WARNING: JMDict entry ${input.jmdictId} not found, skipping.`);
-      continue;
-    }
+    const jmdictEntry = await preextractedJMDictEntry(input.jmdictId);
 
     try {
       const card = await createCard({

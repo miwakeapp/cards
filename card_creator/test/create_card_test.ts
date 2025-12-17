@@ -1,20 +1,9 @@
-import * as path from "@std/path";
 import { assertEquals } from "@std/assert";
 import { assertSnapshot } from "@std/testing/snapshot";
-import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
+import { preextractedJMDictEntry } from "data";
 import { createCard } from "../src/create_card.ts";
 import type { ModelId } from "../src/ai_provider.ts";
 import type { AIGeneratedFields, CardCreationInput } from "../src/types.ts";
-
-// Load a real JMDict entry from jmdict_to_html test inputs
-async function loadJMdictEntry(id: string): Promise<JMdictWord> {
-  const inputPath = path.resolve(
-    import.meta.dirname!,
-    `../../jmdict_to_html/test/inputs/${id}.json`,
-  );
-  const json = await Deno.readTextFile(inputPath);
-  return JSON.parse(json) as JMdictWord;
-}
 
 // Mock AI generator that returns a fixed response
 function createMockGenerator(response: AIGeneratedFields) {
@@ -23,11 +12,11 @@ function createMockGenerator(response: AIGeneratedFields) {
   };
 }
 
-const TEST_MODEL_ID: ModelId = "claude-opus-4-5-20250514";
+const TEST_MODEL_ID: ModelId = "claude-opus-4-5";
 
 Deno.test("createCard: generates correct key with specific senses", async () => {
   // 大小 has 6 senses - we'll pretend only sense 1 (size) applies
-  const jmdictEntry = await loadJMdictEntry("1414110");
+  const jmdictEntry = await preextractedJMDictEntry("1414110");
 
   const mockAIFields: AIGeneratedFields = {
     applicableSenses: [1],
@@ -59,7 +48,7 @@ Deno.test("createCard: generates correct key with specific senses", async () => 
 });
 
 Deno.test("createCard: key omits senses when all apply", async () => {
-  const jmdictEntry = await loadJMdictEntry("1414110");
+  const jmdictEntry = await preextractedJMDictEntry("1414110");
 
   const mockAIFields: AIGeneratedFields = {
     applicableSenses: [], // Empty means all senses apply
@@ -88,7 +77,7 @@ Deno.test("createCard: key omits senses when all apply", async () => {
 });
 
 Deno.test("createCard: reading has furigana for kanji words", async () => {
-  const jmdictEntry = await loadJMdictEntry("1414110");
+  const jmdictEntry = await preextractedJMDictEntry("1414110");
 
   const mockAIFields: AIGeneratedFields = {
     applicableSenses: [1],
@@ -116,7 +105,7 @@ Deno.test("createCard: reading has furigana for kanji words", async () => {
 });
 
 Deno.test("createCard: sourceURL excluded when not public", async () => {
-  const jmdictEntry = await loadJMdictEntry("1414110");
+  const jmdictEntry = await preextractedJMDictEntry("1414110");
 
   const mockAIFields: AIGeneratedFields = {
     applicableSenses: [1],
@@ -145,7 +134,7 @@ Deno.test("createCard: sourceURL excluded when not public", async () => {
 });
 
 Deno.test("createCard: sourceURL included when public", async () => {
-  const jmdictEntry = await loadJMdictEntry("1414110");
+  const jmdictEntry = await preextractedJMDictEntry("1414110");
 
   const mockAIFields: AIGeneratedFields = {
     applicableSenses: [1],
@@ -175,7 +164,7 @@ Deno.test("createCard: sourceURL included when public", async () => {
 
 // Snapshot test for full card structure
 Deno.test("createCard: full card structure snapshot", async (t) => {
-  const jmdictEntry = await loadJMdictEntry("1414110");
+  const jmdictEntry = await preextractedJMDictEntry("1414110");
 
   const mockAIFields: AIGeneratedFields = {
     applicableSenses: [1],

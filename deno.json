@@ -1,5 +1,5 @@
 {
-  "workspace": ["./jmdict_to_html", "./html_dictionary_previewer", "./card_creator"],
+  "workspace": ["./data", "./jmdict_to_html", "./html_dictionary_previewer", "./card_creator"],
   "imports": {
     "@quentinadam/zip": "jsr:@quentinadam/zip@^0.1.3",
     "@scriptin/jmdict-simplified-types": "npm:@scriptin/jmdict-simplified-types@^3.6.1",

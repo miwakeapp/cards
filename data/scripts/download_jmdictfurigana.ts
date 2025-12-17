@@ -1,7 +1,7 @@
 import * as path from "@std/path";
 
 const furiganaURL = "https://jisho.hlorenzi.com/furigana.txt";
-const outputFilename = path.resolve(import.meta.dirname!, "../src/jmdict_furigana.json");
+const outputFilename = path.resolve(import.meta.dirname!, "../jmdict_furigana.json");
 
 console.log(`Downloading from: ${furiganaURL}`);
 

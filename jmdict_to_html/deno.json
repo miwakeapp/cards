@@ -2,14 +2,11 @@
   "name": "jmdict_to_html",
   "exports": "./src/mod.ts",
   "tasks": {
-    "download_jmdict": "deno run --allow-net --allow-write=./src/jmdict_eng.json scripts/download_jmdict.ts",
-    "download_jmdictfurigana": "deno run --allow-net --allow-write=./src/jmdict_furigana.json scripts/download_jmdictfurigana.ts",
-    "extract_tests": "deno run --allow-read=./src/jmdict_eng.json --allow-write=./test/inputs scripts/extract_tests.ts",
     "test:update": "deno test --allow-read --allow-write -- --update"
   },
   "test": {
     "permissions": {
-      "read": ["./test/inputs", "./test/__snapshots__"]
+      "read": ["./test/__snapshots__", "../data"]
     }
   }
 }

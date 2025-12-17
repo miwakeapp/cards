@@ -1,10 +1,10 @@
 import * as path from "@std/path";
 import type { JMdict } from "@scriptin/jmdict-simplified-types";
 
-const jmdictFilename = path.resolve(import.meta.dirname!, "../src/jmdict_eng.json");
-const testInputsDir = path.resolve(import.meta.dirname!, "../test/inputs");
+const jmdictFilename = path.resolve(import.meta.dirname!, "../jmdict_eng.json");
+const entriesDir = path.resolve(import.meta.dirname!, "../entries");
 
-const testIds = new Set([
+const JMDICT_TO_HTML_TEST_IDS = new Set([
   "2030540", // 狂喜乱舞, simple entry
   "1414110", // 大小, one reading, multiple senses, per-sense tags
   "1590470", // 画期的, multiple readings, one sense
@@ -21,26 +21,47 @@ const testIds = new Set([
   "1604990", // 目にあう, lots of forms
 ]);
 
+const CARD_CREATOR_EVAL_IDS = new Set([
+  "2116100", // 土いじり
+  "1497700", // 父方
+  "2177740", // 願わくば
+  "1207650", // かけがえのない
+  "2258260", // ハンダ付け
+  "1529950", // 無垢
+  "1512230", // 返上
+  "1403360", // 増幅
+  "1204030", // 外泊
+  "1641190", // 目減り
+]);
+
+const allTestIds = new Set([...JMDICT_TO_HTML_TEST_IDS, ...CARD_CREATOR_EVAL_IDS]);
+
+console.log(`Looking for ${allTestIds.size} entries...`);
+
 const jmdictText = await Deno.readTextFile(jmdictFilename);
 const jmdict = JSON.parse(jmdictText) as JMdict;
 
+// Ensure output directory exists
+await Deno.mkdir(entriesDir, { recursive: true });
+
 const promises: Promise<void>[] = [];
 const foundIds = new Set<string>();
+
 for (const word of jmdict.words) {
-  if (testIds.has(word.id)) {
-    const filename = path.resolve(testInputsDir, `${word.id}.json`);
+  if (allTestIds.has(word.id)) {
+    const filename = path.resolve(entriesDir, `${word.id}.json`);
     const contents = JSON.stringify(word, undefined, 2) + "\n";
     promises.push(Deno.writeTextFile(filename, contents));
     foundIds.add(word.id);
   }
 }
 
-if (promises.length !== testIds.size) {
-  throw new Error(
-    "Some test IDs were not found in the downloaded JMdict:" +
-      [...testIds.difference(foundIds)].join(", "),
-  );
-}
 await Promise.all(promises);
 
-console.log(`Extracted ${promises.length} test entries to ${testInputsDir}`);
+if (foundIds.size !== allTestIds.size) {
+  const missing = [...allTestIds].filter((id) => !foundIds.has(id));
+  console.error(`Some IDs were not found in JMdict: ${missing.join(", ")}`);
+  Deno.exit(1);
+}
+
+console.log(`Extracted ${foundIds.size} entries to ${entriesDir}`);

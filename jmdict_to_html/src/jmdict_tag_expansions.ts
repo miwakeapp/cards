@@ -1,9 +1,9 @@
 // Expand various JMdict tags into human-readable form.
 import type { Tag } from "@scriptin/jmdict-simplified-types";
 import { assert } from "@std/assert";
-import rawTags from "./jmdict_tags.json" with { type: "json" };
+import { jmdictTags } from "data";
 
-const tags = rawTags as Record<string, string>;
+const tags = await jmdictTags();
 
 // The partOfSpeech property of a JMdictSense.
 export function partOfSpeech(partOfSpeech: Tag): string {

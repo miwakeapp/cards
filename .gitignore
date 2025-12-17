@@ -1,6 +1,8 @@
-jmdict_to_html/src/jmdict_eng.json
-jmdict_to_html/src/jmdict_furigana.json
-jmdict_to_html/src/jmdict_tags.json
+# Data package - all generated from scripts
+data/jmdict_eng.json
+data/jmdict_furigana.json
+data/jmdict_tags.json
+data/entries/
 
 html_dictionary_previewer/_site
 html_dictionary_previewer/src/data/entries.json

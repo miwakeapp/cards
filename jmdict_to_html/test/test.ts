@@ -1,13 +1,29 @@
-import * as path from "@std/path";
 import { assertEquals } from "@std/assert";
 import { assertSnapshot } from "@std/testing/snapshot";
-import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
+import { preextractedJMDictEntry } from "data";
 
 import { formatReadingForAnki, renderEntry } from "../src/mod.ts";
 
-for await (const dirEntry of Deno.readDir(path.resolve(import.meta.dirname!, "inputs"))) {
-  const json = await Deno.readTextFile(path.resolve(import.meta.dirname!, "inputs", dirEntry.name));
-  const word = JSON.parse(json) as JMdictWord;
+// Entry IDs to test renderEntry with
+const RENDER_ENTRY_TEST_IDS = [
+  "2030540", // 狂喜乱舞, simple entry
+  "1414110", // 大小, one reading, multiple senses, per-sense tags
+  "1590470", // 画期的, multiple readings, one sense
+  "1000230", // あかん, dialect + misc/info
+  "1014630", // アウター, antonyms + abbr sense
+  "1061000", // シノニム, related sense references + fields
+  "1122910", // ホルモン, language source + dialect sense
+  "1158110", // 異名, reading restrictions + fields
+  "1632080", // 松明, gikun + kanji tags
+  "2013080", // 没する, applies-to restrictions + vt/vi mix
+  "1178920", // 於いて, shared info + related sense references
+  "2228700", // 彼岸桜, shared related tags + mixed misc
+  "2861582", // トスアップ, shared field + language source
+  "1604990", // 目にあう, lots of forms
+];
+
+for (const id of RENDER_ENTRY_TEST_IDS) {
+  const word = await preextractedJMDictEntry(id);
 
   Deno.test(`renderEntry: ${word.id}`, async (t) => {
     const html = renderEntry(word);
