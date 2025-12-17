@@ -1,0 +1,13 @@
+{
+  "inputId": "返上",
+  "card": {
+    "key": "返上 | 1512230",
+    "recognitionTarget": "返上",
+    "reading": "返[へん] 上[じょう]",
+    "hint": null,
+    "fullContext": "ふたりはわたしの為に休日を<mark>返上</mark>して、方々を駆けまわって生活を整えてくれた。",
+    "minimizedContext": "ふたりはわたしの為に休日を<mark>返上</mark>した。",
+    "source": null,
+    "sourceURL": null
+  }
+}

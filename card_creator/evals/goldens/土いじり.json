@@ -1,0 +1,13 @@
+{
+  "inputId": "土いじり",
+  "card": {
+    "key": "土いじり | 2116100 | 2",
+    "recognitionTarget": "土いじり",
+    "reading": "土[つち]いじり",
+    "hint": "庭で土いじり",
+    "fullContext": "庭先で<mark>土いじり</mark>をしていた52がびくりとして室内に駆けこんでくる。",
+    "minimizedContext": "庭先で<mark>土いじり</mark>をしていた。",
+    "source": null,
+    "sourceURL": null
+  }
+}

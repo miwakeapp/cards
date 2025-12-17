@@ -1,0 +1,13 @@
+{
+  "inputId": "ハンダ付け",
+  "card": {
+    "key": "ハンダ付け | 2258260",
+    "recognitionTarget": "ハンダ付け",
+    "reading": "ハンダ 付[づ]け",
+    "hint": null,
+    "fullContext": "電子機器の部品を<mark>ハンダ付け</mark>する工場の工員で、初出勤の日の夜は美晴とアンさんが焼肉をおごってくれた。",
+    "minimizedContext": "電子機器の部品を<mark>ハンダ付け</mark>する。",
+    "source": null,
+    "sourceURL": null
+  }
+}
