@@ -7,6 +7,7 @@
     "@ai-sdk/openai": "npm:@ai-sdk/openai@^2.0.80",
     "@std/cli": "jsr:@std/cli@^1.0.24",
     "ai": "npm:ai@^5.0.109",
+    "lume/": "https://cdn.jsdelivr.net/gh/lumeland/lume@3.1.2/",
     "yanki-connect": "npm:yanki-connect@^3.2.2",
     "zod": "npm:zod@^4.1.13"
   },
@@ -14,11 +15,20 @@
     "fetch-samples": "deno run --allow-net --allow-write=./evals/inputs scripts/fetch_samples.ts",
     "eval": "deno run --env-file=.env --allow-net --allow-read --allow-write=./evals/runs --allow-env scripts/run_evals.ts",
     "eval:accept": "deno run --allow-read=./evals --allow-write=./evals/baselines scripts/accept_evals.ts",
+    "eval:serve": "cd evals && deno run -A lume/cli.ts -s --config lume_config.ts",
+    "eval:build": "cd evals && deno run -A lume/cli.ts --config lume_config.ts",
     "test:update": "deno test --allow-read --allow-write -- --update"
   },
   "test": {
     "permissions": {
       "read": ["./test/__snapshots__", "../data"]
     }
+  },
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "deno.ns"
+    ]
   }
 }

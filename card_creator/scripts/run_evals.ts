@@ -9,45 +9,19 @@
 import { parseArgs } from "@std/cli/parse-args";
 import * as path from "@std/path";
 import { preextractedJMDictEntry } from "data";
-import {
-  generateCardFields,
-  MODEL_IDS,
-  type ModelId,
-} from "../src/ai_provider.ts";
-import type { AIGeneratedFields } from "../src/types.ts";
+import { generateCardFields, MODEL_IDS, type ModelId } from "../src/ai_provider.ts";
+import type {
+  AIGeneratedFields,
+  EvalDiff,
+  EvalGolden,
+  EvalInput,
+  EvalOutput,
+} from "../src/eval_types.ts";
 
 const EVALS_DIR = path.resolve(import.meta.dirname!, "../evals");
 const INPUTS_DIR = path.join(EVALS_DIR, "inputs");
 const GOLDENS_DIR = path.join(EVALS_DIR, "goldens");
 const RUNS_DIR = path.join(EVALS_DIR, "runs");
-
-interface EvalInput {
-  id: string;
-  context: string;
-  jmdictId: string;
-  recognitionTarget: string;
-  source?: string;
-  sourceURL?: string;
-}
-
-interface EvalOutput {
-  inputId: string;
-  model: string;
-  timestamp: string;
-  aiFields: AIGeneratedFields;
-}
-
-interface Golden {
-  inputId: string;
-  aiFields: AIGeneratedFields;
-}
-
-interface DiffResult {
-  inputId: string;
-  field: string;
-  golden: unknown;
-  current: unknown;
-}
 
 function getModelsFromArgs(): ModelId[] {
   const args = parseArgs(Deno.args, {
@@ -80,11 +54,11 @@ async function loadInputs(): Promise<EvalInput[]> {
   return inputs;
 }
 
-async function loadGolden(inputId: string): Promise<Golden | null> {
+async function loadGolden(inputId: string): Promise<EvalGolden | null> {
   const goldenPath = path.join(GOLDENS_DIR, `${inputId}.json`);
   try {
     const content = await Deno.readTextFile(goldenPath);
-    return JSON.parse(content) as Golden;
+    return JSON.parse(content) as EvalGolden;
   } catch (e) {
     if (e instanceof Deno.errors.NotFound) {
       return null;
@@ -93,12 +67,12 @@ async function loadGolden(inputId: string): Promise<Golden | null> {
   }
 }
 
-function computeDiffs(golden: Golden | null, current: EvalOutput): DiffResult[] {
+function computeDiffs(golden: EvalGolden | null, current: EvalOutput): EvalDiff[] {
   if (!golden) {
     return [{ inputId: current.inputId, field: "(new)", golden: null, current: "new eval" }];
   }
 
-  const diffs: DiffResult[] = [];
+  const diffs: EvalDiff[] = [];
   const fieldsToCompare: (keyof AIGeneratedFields)[] = [
     "applicableSenses",
     "reading",
@@ -147,7 +121,7 @@ for (const modelId of models) {
   const runDir = path.join(RUNS_DIR, `${timestamp}_${modelId}`);
   await Deno.mkdir(runDir, { recursive: true });
 
-  const allDiffs: DiffResult[] = [];
+  const allDiffs: EvalDiff[] = [];
   let errorCount = 0;
 
   for (const input of inputs) {

@@ -1,0 +1,140 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+  padding: 1rem;
+  background: #f5f5f5;
+}
+
+header {
+  margin-bottom: 1.5rem;
+}
+
+header h1 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+#controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+#controls label {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+#controls select {
+  padding: 0.25rem 0.5rem;
+  font-size: 14px;
+}
+
+#examples {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.example-card {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.example-card header {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #eee;
+  background: #fafafa;
+  margin-bottom: 0;
+}
+
+.example-card h2 {
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+
+.example-card .context {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.comparison-grid {
+  display: grid;
+  grid-template-columns: 140px repeat(4, 1fr);
+  font-size: 0.85rem;
+}
+
+.grid-row {
+  display: contents;
+}
+
+.grid-row > div {
+  padding: 0.5rem;
+  border-bottom: 1px solid #eee;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.grid-row:last-child > div {
+  border-bottom: none;
+}
+
+.header-row > div {
+  font-weight: 600;
+  background: #f0f0f0;
+  text-align: center;
+}
+
+.header-row .field-name {
+  text-align: left;
+}
+
+.field-name {
+  font-weight: 500;
+  color: #555;
+  background: #fafafa;
+}
+
+.field-value {
+  word-break: break-word;
+}
+
+.field-value.golden {
+  background: #f8f8f8;
+  font-weight: 500;
+}
+
+.field-value.match {
+  background: #e6ffe6;
+}
+
+.field-value.diff {
+  background: #fff3e0;
+}
+
+.field-value.missing {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.field-value.no-data {
+  background: #f5f5f5;
+  color: #999;
+  text-align: center;
+}
+
+/* Highlight marks in context */
+mark {
+  background: #fff59d;
+  padding: 0 2px;
+}

@@ -95,15 +95,26 @@ Your task is to analyze a Japanese word usage in context and generate appropriat
 
 3. hint format:
    - MUST contain the recognition target exactly as written
-   - Should be a minimal Japanese phrase (ideally 3-6 characters + target)
-   - Prefer drawing from or adapting the input context
-   - Example: "無垢な顔" to distinguish the "innocent" sense from "pure material" or "kimono"
+   - Add EXACTLY 1 word (or compound) that clarifies the sense
+   - Use compound style without の: 旅行鞄 (not 旅行の鞄)
+   - WRONG: 本当に頭が切れる (too many words) → CORRECT: 頭が切れる
+   - For verbs/する-nouns, include the verb: 値段が上がる (not 値段が上がり)
+   - Maximum: 8 characters total
 
 4. minimizedContext:
    - Return null if context is already ≤50 characters
-   - If >50 characters, shorten to essential clause containing the target word
+   - If >50 characters, create a SHORT, self-contained sentence
+   - CUT trailing clauses after the core point:
+     * "〜だったのに、結局うまくいかなかった" → "〜だった。"
+     * "〜になってきて、最近は..." → "〜になった。"
+   - RESTRUCTURE lists to isolate the target item:
+     * "条件は、Xすること、Yすることの二つだ" → "条件はYすることだ。"
+   - Keep LEADING context when it establishes the situation:
+     * "疲れが溜まって、体調を崩した" (keep 疲れが溜まって - it explains why)
+     * "努力が実って、合格できた" (keep both - they're connected)
+   - Change conjugations to end naturally: "していて" → "していた"
    - MUST wrap recognition target in <mark></mark> tags
-   - Keep as a complete, natural Japanese sentence
+   - Keep 「」 when target is in dialogue
 
 5. reading: The kana reading for this context. Preserve the script (hiragana/katakana) of any kana already in the recognition target. For example, if the target is "ハンダ付け", return "ハンダづけ" (keeping ハンダ as katakana), not "はんだづけ".
 
