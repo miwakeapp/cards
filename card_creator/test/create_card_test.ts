@@ -2,17 +2,14 @@ import { assertEquals } from "@std/assert";
 import { assertSnapshot } from "@std/testing/snapshot";
 import { preextractedJMDictEntry } from "data";
 import { createCard } from "../src/create_card.ts";
-import type { ModelId } from "../src/ai_provider.ts";
 import type { AIGeneratedFields, CardCreationInput } from "../src/types.ts";
 
 // Mock AI generator that returns a fixed response
 function createMockGenerator(response: AIGeneratedFields) {
-  return (_input: unknown, _modelId: ModelId): Promise<AIGeneratedFields> => {
+  return (): Promise<AIGeneratedFields> => {
     return Promise.resolve(response);
   };
 }
-
-const TEST_MODEL_ID: ModelId = "claude-opus-4-5";
 
 Deno.test("createCard: generates correct key with specific senses", async () => {
   // 大小 has 6 senses - we'll pretend only sense 1 (size) applies
@@ -38,7 +35,6 @@ Deno.test("createCard: generates correct key with specific senses", async () => 
   const card = await createCard({
     input,
     jmdictEntry,
-    modelId: TEST_MODEL_ID,
     generateFields: createMockGenerator(mockAIFields),
   });
 
@@ -68,7 +64,6 @@ Deno.test("createCard: key omits senses when all apply", async () => {
   const card = await createCard({
     input,
     jmdictEntry,
-    modelId: TEST_MODEL_ID,
     generateFields: createMockGenerator(mockAIFields),
   });
 
@@ -97,7 +92,6 @@ Deno.test("createCard: reading has furigana for kanji words", async () => {
   const card = await createCard({
     input,
     jmdictEntry,
-    modelId: TEST_MODEL_ID,
     generateFields: createMockGenerator(mockAIFields),
   });
 
@@ -126,7 +120,6 @@ Deno.test("createCard: sourceURL excluded when not public", async () => {
   const card = await createCard({
     input,
     jmdictEntry,
-    modelId: TEST_MODEL_ID,
     generateFields: createMockGenerator(mockAIFields),
   });
 
@@ -155,7 +148,6 @@ Deno.test("createCard: sourceURL included when public", async () => {
   const card = await createCard({
     input,
     jmdictEntry,
-    modelId: TEST_MODEL_ID,
     generateFields: createMockGenerator(mockAIFields),
   });
 
@@ -186,7 +178,6 @@ Deno.test("createCard: full card structure snapshot", async (t) => {
   const card = await createCard({
     input,
     jmdictEntry,
-    modelId: TEST_MODEL_ID,
     generateFields: createMockGenerator(mockAIFields),
   });
 

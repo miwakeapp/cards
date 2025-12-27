@@ -5,7 +5,7 @@
 
 import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
 import { formatReadingForAnki, renderEntry } from "jmdict_to_html";
-import type { GenerateFieldsInput, ModelId } from "./ai_provider.ts";
+import type { GenerateFieldsInput } from "./ai_provider.ts";
 import type { AIGeneratedFields, CardCreationInput, MiwakeCard } from "./types.ts";
 
 /**
@@ -18,14 +18,11 @@ export interface CreateCardOptions {
   /** The JMDict entry for the word. */
   jmdictEntry: JMdictWord;
 
-  /** AI model ID to use. */
-  modelId: ModelId;
-
   /**
    * Function to generate AI fields.
-   * Inject this to allow mocking in tests.
+   * Inject this to allow mocking in tests or to select different AI models.
    */
-  generateFields: (input: GenerateFieldsInput, modelId: ModelId) => Promise<AIGeneratedFields>;
+  generateFields: (input: GenerateFieldsInput) => Promise<AIGeneratedFields>;
 }
 
 /**
@@ -98,7 +95,7 @@ function containsKanji(text: string): boolean {
  * Creates a complete MiwakeCard from the given input.
  */
 export async function createCard(options: CreateCardOptions): Promise<MiwakeCard> {
-  const { input, jmdictEntry, modelId: modelId, generateFields } = options;
+  const { input, jmdictEntry, generateFields } = options;
 
   // Process the context HTML
   const { processedContext, contextReading } = processContext(
@@ -107,16 +104,13 @@ export async function createCard(options: CreateCardOptions): Promise<MiwakeCard
   );
 
   // Generate AI fields
-  const aiFields = await generateFields(
-    {
-      context: input.context,
-      recognitionTarget: input.recognitionTarget,
-      jmdictEntry,
-      source: input.source,
-      sourceURL: input.sourceURL,
-    },
-    modelId,
-  );
+  const aiFields = await generateFields({
+    context: input.context,
+    recognitionTarget: input.recognitionTarget,
+    jmdictEntry,
+    source: input.source,
+    sourceURL: input.sourceURL,
+  });
 
   // Post-process hints
   let hint = aiFields.hint;
