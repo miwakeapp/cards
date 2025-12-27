@@ -6,21 +6,11 @@
 
 import * as path from "@std/path";
 import { YankiConnect } from "yanki-connect";
+import type { EvalInput } from "../src/types.ts";
 
 const DECK_NAME = "Mining";
 const SAMPLE_COUNT = 10;
-const OUTPUT_DIR = path.resolve(import.meta.dirname!, "../evals/inputs");
-
-interface EvalInput {
-  /** Unique identifier for this eval case. */
-  id: string;
-  /** The context HTML from the Sentence field. */
-  context: string;
-  /** The JMDict entry ID. */
-  jmdictId: string;
-  /** The recognition target (word being studied). */
-  recognitionTarget: string;
-}
+const OUTPUT_DIR = path.resolve(import.meta.dirname!, "../inputs");
 
 /**
  * Extracts the JMDict ID from an Animecards Glossary field.

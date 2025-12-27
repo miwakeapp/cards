@@ -1,0 +1,18 @@
+{
+  "imports": {
+    "@std/cli": "jsr:@std/cli@^1.0.24",
+    "card_creator": "../card_creator/src/mod.ts",
+    "lume/": "https://cdn.jsdelivr.net/gh/lumeland/lume@3.1.2/",
+    "yanki-connect": "npm:yanki-connect@^3.2.2"
+  },
+  "tasks": {
+    "fetch-samples": "deno run --allow-net --allow-write=./inputs scripts/fetch_samples.ts",
+    "run": "deno run --env-file=../.env --allow-net --allow-read --allow-write=./runs --allow-env scripts/run_evals.ts",
+    "accept": "deno run --allow-read --allow-write=./goldens scripts/accept_evals.ts",
+    "serve": "deno run -A lume/cli.ts -s",
+    "build": "deno run -A lume/cli.ts"
+  },
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "deno.ns"]
+  }
+}

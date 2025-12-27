@@ -1,18 +1,18 @@
 /**
- * Promotes eval run outputs to baselines.
+ * Promotes eval run outputs to goldens.
  *
  * Usage:
- *   deno task eval:accept --run 2025-12-11T10-30-00             # Accept all models from a run
- *   deno task eval:accept --run 2025-12-11T10-30-00 --model gemini-3-pro-preview  # Accept specific model
+ *   deno task accept --run 2025-12-11T10-30-00             # Accept all models from a run
+ *   deno task accept --run 2025-12-11T10-30-00 --model gemini-3-pro-preview  # Accept specific model
  */
 
 import { parseArgs } from "@std/cli/parse-args";
 import * as path from "@std/path";
-import { MODEL_IDS, type ModelId } from "../src/ai_provider.ts";
+import { MODEL_IDS, type ModelId } from "card_creator";
 
-const EVALS_DIR = path.resolve(import.meta.dirname!, "../evals");
-const BASELINES_DIR = path.join(EVALS_DIR, "baselines");
-const RUNS_DIR = path.join(EVALS_DIR, "runs");
+const BASE_DIR = path.resolve(import.meta.dirname!, "..");
+const GOLDENS_DIR = path.join(BASE_DIR, "goldens");
+const RUNS_DIR = path.join(BASE_DIR, "runs");
 
 async function getArgsFromCLI(): Promise<{ runTimestamp: string; model: ModelId | null }> {
   const args = parseArgs(Deno.args, {
@@ -20,7 +20,7 @@ async function getArgsFromCLI(): Promise<{ runTimestamp: string; model: ModelId 
   });
 
   if (!args.run) {
-    console.error("Usage: deno task eval:accept --run <timestamp> [--model <name>]");
+    console.error("Usage: deno task accept --run <timestamp> [--model <name>]");
     console.error("\nAvailable runs:");
     await listRuns();
     Deno.exit(1);
@@ -102,22 +102,22 @@ for (const runDir of runDirs) {
 
   console.log(`Processing: ${dirName}`);
 
-  const baselineDir = path.join(BASELINES_DIR, modelName);
-  await Deno.mkdir(baselineDir, { recursive: true });
+  // Copy files directly to goldens (no model subdirectory - goldens are model-agnostic)
+  await Deno.mkdir(GOLDENS_DIR, { recursive: true });
 
   let fileCount = 0;
 
   for await (const entry of Deno.readDir(runDir)) {
     if (entry.isFile && entry.name.endsWith(".json")) {
       const srcPath = path.join(runDir, entry.name);
-      const destPath = path.join(baselineDir, entry.name);
+      const destPath = path.join(GOLDENS_DIR, entry.name);
 
       await Deno.copyFile(srcPath, destPath);
       fileCount++;
     }
   }
 
-  console.log(`  Copied ${fileCount} file(s) to baselines/${modelName}/`);
+  console.log(`  Copied ${fileCount} file(s) to goldens/ from ${modelName}`);
 }
 
-console.log("\nDone! New baselines are ready for commit.");
+console.log("\nDone! New goldens are ready for commit.");

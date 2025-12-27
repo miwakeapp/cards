@@ -1,8 +1,8 @@
 /**
- * Types used by the eval system - shared between run_evals.ts and the evals viewer.
+ * Types used by the eval system - shared between scripts and the viewer.
  */
 
-import type { AIGeneratedFields } from "./types.ts";
+import type { AIGeneratedFields } from "card_creator";
 
 export type { AIGeneratedFields };
 
@@ -45,14 +45,3 @@ export interface EvalDiff {
   golden: unknown;
   current: unknown;
 }
-
-/**
- * The model IDs we support for evals.
- */
-export const EVAL_MODEL_IDS = [
-  "claude-opus-4-5",
-  "gemini-3-pro-preview",
-  "gpt-5.1",
-] as const;
-
-export type EvalModelId = typeof EVAL_MODEL_IDS[number];

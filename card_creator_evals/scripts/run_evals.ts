@@ -2,26 +2,26 @@
  * Runs AI evals against test inputs and saves outputs for review.
  *
  * Usage:
- *   deno task eval                               # Run all models
- *   deno task eval --model gemini-3-pro-preview  # Run specific model
+ *   deno task run                               # Run all models
+ *   deno task run --model gemini-3-pro-preview  # Run specific model
  */
 
 import { parseArgs } from "@std/cli/parse-args";
 import * as path from "@std/path";
 import { preextractedJMDictEntry } from "data";
-import { generateCardFields, MODEL_IDS, type ModelId } from "../src/ai_provider.ts";
+import { generateCardFields, MODEL_IDS, type ModelId } from "card_creator";
 import type {
   AIGeneratedFields,
   EvalDiff,
   EvalGolden,
   EvalInput,
   EvalOutput,
-} from "../src/eval_types.ts";
+} from "../src/types.ts";
 
-const EVALS_DIR = path.resolve(import.meta.dirname!, "../evals");
-const INPUTS_DIR = path.join(EVALS_DIR, "inputs");
-const GOLDENS_DIR = path.join(EVALS_DIR, "goldens");
-const RUNS_DIR = path.join(EVALS_DIR, "runs");
+const BASE_DIR = path.resolve(import.meta.dirname!, "..");
+const INPUTS_DIR = path.join(BASE_DIR, "inputs");
+const GOLDENS_DIR = path.join(BASE_DIR, "goldens");
+const RUNS_DIR = path.join(BASE_DIR, "runs");
 
 function getModelsFromArgs(): ModelId[] {
   const args = parseArgs(Deno.args, {

@@ -1,13 +1,14 @@
-# Data package - all generated from scripts
-data/jmdict_eng.json
-data/jmdict_furigana.json
-data/jmdict_tags.json
-data/entries/
+/.env
 
-html_dictionary_previewer/_site
-html_dictionary_previewer/src/data/entries.json
+/anki_updater_prototype/
 
-card_creator/evals/runs/
-card_creator/.env
+/card_creator_evals/_site/
+/card_creator_evals/runs/
 
-anki_updater_prototype/
+/data/jmdict_eng.json
+/data/jmdict_furigana.json
+/data/jmdict_tags.json
+/data/entries/
+
+/html_dictionary_previewer/_site/
+/html_dictionary_previewer/src/data/entries.json

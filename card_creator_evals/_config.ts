@@ -31,6 +31,6 @@ site.copy("runs");
 // Ignore files we don't want to copy
 site.ignore("_config.ts");
 site.ignore("deno.json");
-site.ignore("comparison.html");
+site.ignore("scripts");
 
 export default site;
