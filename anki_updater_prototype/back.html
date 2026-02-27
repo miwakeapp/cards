@@ -6,8 +6,8 @@
 
 <div id="context" lang="ja">
   {{#Minimized context}}
-  <p id="minimized-context">{{furigana:Minimized context}}</p>
-  <p id="full-context" hidden>{{furigana:Full context}}</p>
+  <div id="minimized-context">{{furigana:Minimized context}}</div>
+  <div id="full-context" hidden>{{furigana:Full context}}</div>
   <button id="toggle-context" aria-expanded="false" aria-label="Show full context">
     <svg viewBox="0 0 16 16" aria-hidden="true">
       <path d="M4 6l4 4 4-4" />
@@ -15,9 +15,13 @@
   </button>
   {{/Minimized context}}
   {{^Minimized context}}
-  <p>{{furigana:Full context}}</p>
+  <div>{{furigana:Full context}}</div>
   {{/Minimized context}}
 </div>
+
+{{#Source}}
+<p id="source" lang="ja">{{#Source URL}}<a href="{{Source URL}}">{{Source}}</a>{{/Source URL}}{{^Source URL}}{{Source}}{{/Source URL}}</p>
+{{/Source}}
 
 <script type="module">
 const key = "{{Key}}";
