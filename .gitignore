@@ -1,6 +1,7 @@
 /.env
 
-/anki_updater_prototype/
+/anki_updater_prototype/epub_texts/
+/anki_updater_prototype/batch_*.json
 
 /card_creator_evals/_site/
 /card_creator_evals/runs/

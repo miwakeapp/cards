@@ -77,7 +77,8 @@ function getModel(modelId: ModelId) {
 /**
  * The system prompt for card field generation.
  */
-const SYSTEM_PROMPT = `You are an expert Japanese language learning assistant helping create Anki flashcards.
+const SYSTEM_PROMPT =
+  `You are an expert Japanese language learning assistant helping create Anki flashcards.
 
 Your task is to analyze a Japanese word usage in context and generate appropriate flashcard fields.
 
@@ -121,7 +122,6 @@ Your task is to analyze a Japanese word usage in context and generate appropriat
 6. cleanedSource: Extract book/work title from messy page titles. Remove site names, reader app cruft.
 
 7. sourceURLIsPublic: false for reader apps, temporary URLs, auth-required; true for permanent public URLs.`;
-
 
 /**
  * Input for AI field generation - CardCreationInput with jmdictId replaced by the full entry.
