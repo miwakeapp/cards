@@ -5,8 +5,9 @@
       1
     ],
     "reading": "さかだい",
+    "targetInContext": "酒代",
     "hint": "酒代が嵩む",
-    "minimizedContext": "キナコと暮らすと<mark>酒代</mark>が嵩んでしょう。",
+    "minimizedContext": null,
     "cleanedSource": null,
     "sourceURLIsPublic": false
   }

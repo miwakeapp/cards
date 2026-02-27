@@ -73,6 +73,12 @@ export interface AIGeneratedFields {
   /** The correct reading for this context (kana only, no furigana formatting). */
   reading: string;
 
+  /**
+   * The exact substring from the context that corresponds to the recognition target.
+   * May be a conjugated or inflected form (e.g. "後ろめたさ" for target "後ろめたい").
+   */
+  targetInContext: string;
+
   /** Optional disambiguation hint. Null if not needed. */
   hint: string | null;
 

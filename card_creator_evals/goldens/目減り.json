@@ -1,10 +1,13 @@
 {
   "inputId": "目減り",
   "aiFields": {
-    "applicableSenses": [2],
+    "applicableSenses": [
+      2
+    ],
     "reading": "めべり",
-    "hint": "残額が目減りする",
-    "minimizedContext": "気持ちが膨れ、<mark>目減り</mark>していく通帳の残額がそれを増幅させる。",
+    "targetInContext": "目減り",
+    "hint": "残額が目減り",
+    "minimizedContext": "<mark>目減り</mark>していく通帳の残額がそれを増幅させる。",
     "cleanedSource": null,
     "sourceURLIsPublic": false
   }

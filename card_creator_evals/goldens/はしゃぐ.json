@@ -1,0 +1,12 @@
+{
+  "inputId": "はしゃぐ",
+  "aiFields": {
+    "applicableSenses": [],
+    "reading": "はしゃぐ",
+    "targetInContext": "はしゃいで",
+    "hint": null,
+    "minimizedContext": "アロハが猫と転げまわって<mark>はしゃいで</mark>いる。",
+    "cleanedSource": "世界から猫が消えたなら",
+    "sourceURLIsPublic": false
+  }
+}

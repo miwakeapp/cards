@@ -1,0 +1,12 @@
+{
+  "inputId": "脳裏に浮かぶ",
+  "aiFields": {
+    "applicableSenses": [],
+    "reading": "のうりにうかぶ",
+    "targetInContext": "脳裏に浮かんだ",
+    "hint": null,
+    "minimizedContext": null,
+    "cleanedSource": "世界から猫が消えたなら",
+    "sourceURLIsPublic": false
+  }
+}

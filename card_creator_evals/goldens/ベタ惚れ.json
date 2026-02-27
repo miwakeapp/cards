@@ -3,8 +3,9 @@
   "aiFields": {
     "applicableSenses": [],
     "reading": "ベタぼれ",
+    "targetInContext": "ベタ惚れ",
     "hint": null,
-    "minimizedContext": "マルチーズみたいな雰囲気の可愛らしい子だった。そして、美晴に<mark>ベタ惚れ</mark>だった。",
+    "minimizedContext": "そして、美晴に<mark>ベタ惚れ</mark>だった。",
     "cleanedSource": null,
     "sourceURLIsPublic": false
   }

@@ -50,11 +50,12 @@ const FEW_SHOT_IDS = new Set([
   "1512230", // 返上
   "1403360", // 増幅
   "2258260", // ハンダ付け
+  "2007360", // 後ろめたい
 ]);
 
 // Dynamically load IDs from card_creator eval inputs
 async function loadEvalInputIds(): Promise<Set<string>> {
-  const evalInputsDir = path.resolve(dataDir, "../card_creator/evals/inputs");
+  const evalInputsDir = path.resolve(dataDir, "../card_creator_evals/inputs");
   const ids = new Set<string>();
 
   try {

@@ -8,7 +8,7 @@
   "tasks": {
     "fetch-samples": "deno run --allow-net --allow-write=./inputs scripts/fetch_samples.ts",
     "run": "deno run --env-file=../.env --allow-net --allow-read --allow-write=./runs --allow-env scripts/run_evals.ts",
-    "accept": "deno run --allow-read --allow-write=./goldens scripts/accept_evals.ts",
+    "accept": "deno run --env-file=../.env --allow-read --allow-write=./goldens --allow-env scripts/accept_evals.ts",
     "serve": "deno run -A lume/cli.ts -s",
     "build": "deno run -A lume/cli.ts"
   },

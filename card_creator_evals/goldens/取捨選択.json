@@ -3,8 +3,9 @@
   "aiFields": {
     "applicableSenses": [],
     "reading": "しゅしゃせんたく",
+    "targetInContext": "取捨選択",
     "hint": null,
-    "minimizedContext": "休日ともなると<mark>取捨選択</mark>を迫られることもあった。",
+    "minimizedContext": "休日は<mark>取捨選択</mark>を迫られることもあった。",
     "cleanedSource": null,
     "sourceURLIsPublic": false
   }

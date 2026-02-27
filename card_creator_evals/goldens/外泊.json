@@ -3,8 +3,9 @@
   "aiFields": {
     "applicableSenses": [],
     "reading": "がいはく",
+    "targetInContext": "外泊",
     "hint": null,
-    "minimizedContext": "美音子ちゃんのルールは<mark>外泊</mark>禁止だった。",
+    "minimizedContext": "ルールは<mark>外泊</mark>禁止だった。",
     "cleanedSource": null,
     "sourceURLIsPublic": false
   }

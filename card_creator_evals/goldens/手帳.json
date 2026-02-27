@@ -5,8 +5,9 @@
       1
     ],
     "reading": "てちょう",
-    "hint": "予定手帳",
-    "minimizedContext": "<mark>手帳</mark>は先の予定で埋まる。",
+    "targetInContext": "手帳",
+    "hint": "予定の手帳",
+    "minimizedContext": "<mark>手帳</mark>は先の予定で埋まるようになった。",
     "cleanedSource": null,
     "sourceURLIsPublic": false
   }

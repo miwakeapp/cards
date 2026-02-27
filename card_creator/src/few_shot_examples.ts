@@ -26,6 +26,7 @@ export interface FewShotExample {
  * 3. 返上: no hint, has minimizedContext (long context, single sense)
  * 4. 増幅: has hint, has minimizedContext (long context, specific sense)
  * 5. ハンダ付け: demonstrates preserving katakana in reading
+ * 6. 後ろめたい: demonstrates targetInContext for conjugated/inflected forms
  */
 export const FEW_SHOT_EXAMPLES: FewShotExample[] = [
   // Example 1: 父方 - no hint, no minimizedContext
@@ -40,6 +41,7 @@ export const FEW_SHOT_EXAMPLES: FewShotExample[] = [
     output: {
       applicableSenses: [],
       reading: "ちちかた",
+      targetInContext: "父方",
       hint: null,
       minimizedContext: null,
       cleanedSource: null,
@@ -58,6 +60,7 @@ export const FEW_SHOT_EXAMPLES: FewShotExample[] = [
     output: {
       applicableSenses: [1],
       reading: "むく",
+      targetInContext: "無垢",
       hint: "無垢な顔",
       minimizedContext: null,
       cleanedSource: null,
@@ -76,6 +79,7 @@ export const FEW_SHOT_EXAMPLES: FewShotExample[] = [
     output: {
       applicableSenses: [],
       reading: "へんじょう",
+      targetInContext: "返上",
       hint: null,
       minimizedContext: "ふたりはわたしの為に休日を<mark>返上</mark>した。",
       cleanedSource: null,
@@ -95,6 +99,7 @@ export const FEW_SHOT_EXAMPLES: FewShotExample[] = [
     output: {
       applicableSenses: [2],
       reading: "ぞうふく",
+      targetInContext: "増幅",
       hint: "気持ちを増幅する",
       minimizedContext: "気持ちが膨れ、目減りしていく通帳の残額がそれを<mark>増幅</mark>させる。",
       cleanedSource: null,
@@ -114,9 +119,30 @@ export const FEW_SHOT_EXAMPLES: FewShotExample[] = [
     output: {
       applicableSenses: [],
       reading: "ハンダづけ",
+      targetInContext: "ハンダ付け",
       hint: null,
       minimizedContext: "電子機器の部品を<mark>ハンダ付け</mark>する。",
       cleanedSource: null,
+      sourceURLIsPublic: false,
+    },
+  },
+
+  // Example 6: 後ろめたい - targetInContext differs from recognitionTarget
+  // Demonstrates: when the word appears in a nominalized form (後ろめたさ), targetInContext captures that
+  {
+    input: {
+      recognitionTarget: "後ろめたい",
+      context: "父に対する多少の後ろめたさ以外には、なんの痛みも苦悩もない。",
+      jmdictEntry: await preextractedJMDictEntry("2007360"),
+      source: "世界から猫が消えたなら",
+    },
+    output: {
+      applicableSenses: [],
+      reading: "うしろめたい",
+      targetInContext: "後ろめたさ",
+      hint: null,
+      minimizedContext: null,
+      cleanedSource: "世界から猫が消えたなら",
       sourceURLIsPublic: false,
     },
   },

@@ -3,8 +3,9 @@
   "aiFields": {
     "applicableSenses": [],
     "reading": "かけがえのない",
+    "targetInContext": "かけがえのない",
     "hint": null,
-    "minimizedContext": "わたしは失いかけていた社会性をもう一度取り戻せたし、<mark>かけがえのない</mark>ものを知った。",
+    "minimizedContext": "<mark>かけがえのない</mark>ものを知った。",
     "cleanedSource": null,
     "sourceURLIsPublic": false
   }

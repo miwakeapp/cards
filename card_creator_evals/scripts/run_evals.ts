@@ -76,6 +76,7 @@ function computeDiffs(golden: EvalGolden | null, current: EvalOutput): EvalDiff[
   const fieldsToCompare: (keyof AIGeneratedFields)[] = [
     "applicableSenses",
     "reading",
+    "targetInContext",
     "hint",
     "minimizedContext",
     "cleanedSource",

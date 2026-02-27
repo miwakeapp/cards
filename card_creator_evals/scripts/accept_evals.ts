@@ -9,6 +9,7 @@
 import { parseArgs } from "@std/cli/parse-args";
 import * as path from "@std/path";
 import { MODEL_IDS, type ModelId } from "card_creator";
+import type { EvalGolden, EvalOutput } from "../src/types.ts";
 
 const BASE_DIR = path.resolve(import.meta.dirname!, "..");
 const GOLDENS_DIR = path.join(BASE_DIR, "goldens");
@@ -112,7 +113,10 @@ for (const runDir of runDirs) {
       const srcPath = path.join(runDir, entry.name);
       const destPath = path.join(GOLDENS_DIR, entry.name);
 
-      await Deno.copyFile(srcPath, destPath);
+      // Strip run-specific fields (model, timestamp) to produce a golden
+      const output = JSON.parse(await Deno.readTextFile(srcPath)) as EvalOutput;
+      const golden: EvalGolden = { inputId: output.inputId, aiFields: output.aiFields };
+      await Deno.writeTextFile(destPath, JSON.stringify(golden, undefined, 2) + "\n");
       fileCount++;
     }
   }

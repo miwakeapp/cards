@@ -1,8 +1,11 @@
 {
   "inputId": "土いじり",
   "aiFields": {
-    "applicableSenses": [2],
+    "applicableSenses": [
+      2
+    ],
     "reading": "つちいじり",
+    "targetInContext": "土いじり",
     "hint": "庭で土いじり",
     "minimizedContext": "庭先で<mark>土いじり</mark>をしていた。",
     "cleanedSource": null,

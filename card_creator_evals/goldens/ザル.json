@@ -5,7 +5,8 @@
       4
     ],
     "reading": "ザル",
-    "hint": "酒にザル",
+    "targetInContext": "ザル",
+    "hint": "酒がザル",
     "minimizedContext": "「こんなに<mark>ザル</mark>だとは思わなかったよね」",
     "cleanedSource": null,
     "sourceURLIsPublic": false

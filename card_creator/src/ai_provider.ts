@@ -37,6 +37,11 @@ const aiFieldsSchema = z.object({
     .describe(
       "The correct kana reading for the recognition target in this context. Just the kana, no kanji.",
     ),
+  targetInContext: z
+    .string()
+    .describe(
+      "The exact substring from the context that corresponds to the recognition target. May be a conjugated, nominalized, or otherwise inflected form (e.g. '後ろめたさ' for target '後ろめたい'). Must be a literal substring of the context.",
+    ),
   hint: z
     .string()
     .nullable()
@@ -121,7 +126,15 @@ Your task is to analyze a Japanese word usage in context and generate appropriat
 
 6. cleanedSource: Extract book/work title from messy page titles. Remove site names, reader app cruft.
 
-7. sourceURLIsPublic: false for reader apps, temporary URLs, auth-required; true for permanent public URLs.`;
+7. sourceURLIsPublic: false for reader apps, temporary URLs, auth-required; true for permanent public URLs.
+
+8. targetInContext: The exact substring of the context that corresponds to the recognition target.
+   - If the target appears literally in the context, return it unchanged: "増幅" → "増幅"
+   - If the target is conjugated/inflected, return the inflected form: "後ろめたい" → "後ろめたさ", "浮かぶ" → "浮かんだ"
+   - Return ONLY the word itself, not auxiliary verbs or grammatical attachments:
+     * "はしゃぐ" in "はしゃいでいる" → "はしゃいで" (not "はしゃいでいる" — いる is a separate element)
+     * "噛み締める" in "噛み締められる" → "噛み締められる" (potential is part of the verb)
+   - Must be a literal substring of the context`;
 
 /**
  * Input for AI field generation - CardCreationInput with jmdictId replaced by the full entry.

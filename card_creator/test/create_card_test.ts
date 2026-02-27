@@ -19,6 +19,7 @@ Deno.test("createCard: generates correct key with specific senses", async () => 
     applicableSenses: [1],
     reading: "だいしょう",
     hint: null,
+    targetInContext: "大小",
     minimizedContext: null,
     cleanedSource: "Test Book",
     sourceURLIsPublic: false,
@@ -50,6 +51,7 @@ Deno.test("createCard: key omits senses when all apply", async () => {
     applicableSenses: [], // Empty means all senses apply
     reading: "だいしょう",
     hint: null,
+    targetInContext: "大小",
     minimizedContext: null,
     cleanedSource: null,
     sourceURLIsPublic: false,
@@ -78,6 +80,7 @@ Deno.test("createCard: reading has furigana for kanji words", async () => {
     applicableSenses: [1],
     reading: "だいしょう",
     hint: null,
+    targetInContext: "大小",
     minimizedContext: null,
     cleanedSource: null,
     sourceURLIsPublic: false,
@@ -105,6 +108,7 @@ Deno.test("createCard: sourceURL excluded when not public", async () => {
     applicableSenses: [1],
     reading: "だいしょう",
     hint: null,
+    targetInContext: "大小",
     minimizedContext: null,
     cleanedSource: null,
     sourceURLIsPublic: false,
@@ -133,6 +137,7 @@ Deno.test("createCard: sourceURL included when public", async () => {
     applicableSenses: [1],
     reading: "だいしょう",
     hint: null,
+    targetInContext: "大小",
     minimizedContext: null,
     cleanedSource: null,
     sourceURLIsPublic: true,
@@ -162,6 +167,7 @@ Deno.test("createCard: full card structure snapshot", async (t) => {
     applicableSenses: [1],
     reading: "だいしょう",
     hint: "サイズの大小",
+    targetInContext: "大小",
     minimizedContext: "箱の大小で値段が変わる。",
     cleanedSource: "Test Book",
     sourceURLIsPublic: false,
@@ -184,4 +190,35 @@ Deno.test("createCard: full card structure snapshot", async (t) => {
   // Snapshot everything except the dictionary entry (which is tested separately in jmdict_to_html)
   const { dictionaryEntry: _, ...cardWithoutDict } = card;
   await assertSnapshot(t, cardWithoutDict);
+});
+
+Deno.test("createCard: marks conjugated form using targetInContext", async () => {
+  // Use any pre-extracted entry; AI fields are mocked so the specific entry doesn't matter
+  const jmdictEntry = await preextractedJMDictEntry("1414110");
+
+  const mockAIFields: AIGeneratedFields = {
+    applicableSenses: [],
+    reading: "うしろめたい",
+    targetInContext: "後ろめたさ",
+    hint: null,
+    minimizedContext: null,
+    cleanedSource: null,
+    sourceURLIsPublic: false,
+  };
+
+  const input: CardCreationInput = {
+    context: "父に対する多少の後ろめたさ以外には、なんの痛みも苦悩もない。",
+    jmdictId: "1414110",
+    recognitionTarget: "後ろめたい",
+  };
+
+  const card = await createCard({
+    input,
+    jmdictEntry,
+    generateFields: createMockGenerator(mockAIFields),
+  });
+
+  // The conjugated form should be marked, not the dictionary form
+  assertEquals(card.fullContext.includes("<mark>後ろめたさ</mark>"), true);
+  assertEquals(card.fullContext.includes("後ろめたい"), false);
 });

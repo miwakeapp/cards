@@ -49,6 +49,7 @@ function formatKey(
 function processContext(
   context: string,
   recognitionTarget: string,
+  targetInContext: string,
 ): { processedContext: string; contextReading: string | null } {
   // First, try to find if the recognition target has ruby annotation in context
   // Pattern: <ruby>認識対象<rt>reading</rt></ruby>
@@ -68,14 +69,16 @@ function processContext(
     " $1[$2]",
   );
 
-  // Wrap the recognition target in <mark> if not already
-  if (!processed.includes(`<mark>${recognitionTarget}</mark>`)) {
-    // Try to mark the target, handling the case where it might have furigana
+  // Wrap the target in <mark>. Try targetInContext first (handles conjugated forms),
+  // then fall back to exact recognitionTarget match.
+  const markTarget = processed.includes(targetInContext) ? targetInContext : recognitionTarget;
+
+  if (!processed.includes(`<mark>${markTarget}</mark>`)) {
     const ankiFuriganaPattern = new RegExp(
-      `(\\s?)${RegExp.escape(recognitionTarget)}(\\[[^\\]]+\\])?`,
+      `(\\s?)${RegExp.escape(markTarget)}(\\[[^\\]]+\\])?`,
       "g",
     );
-    processed = processed.replace(ankiFuriganaPattern, `$1<mark>${recognitionTarget}$2</mark>`);
+    processed = processed.replace(ankiFuriganaPattern, `$1<mark>${markTarget}$2</mark>`);
   }
 
   // Clean up any leading space before first character
@@ -97,12 +100,6 @@ function containsKanji(text: string): boolean {
 export async function createCard(options: CreateCardOptions): Promise<MiwakeCard> {
   const { input, jmdictEntry, generateFields } = options;
 
-  // Process the context HTML
-  const { processedContext, contextReading } = processContext(
-    input.context,
-    input.recognitionTarget,
-  );
-
   // Generate AI fields
   const aiFields = await generateFields({
     context: input.context,
@@ -111,6 +108,13 @@ export async function createCard(options: CreateCardOptions): Promise<MiwakeCard
     source: input.source,
     sourceURL: input.sourceURL,
   });
+
+  // Process the context HTML (needs targetInContext from AI fields)
+  const { processedContext, contextReading } = processContext(
+    input.context,
+    input.recognitionTarget,
+    aiFields.targetInContext,
+  );
 
   // Post-process hints
   let hint = aiFields.hint;
