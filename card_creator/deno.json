@@ -2,10 +2,6 @@
   "name": "card_creator",
   "exports": "./src/mod.ts",
   "imports": {
-    "@ai-sdk/anthropic": "npm:@ai-sdk/anthropic@^2.0.54",
-    "@ai-sdk/google": "npm:@ai-sdk/google@^2.0.45",
-    "@ai-sdk/openai": "npm:@ai-sdk/openai@^2.0.80",
-    "ai": "npm:ai@^5.0.109",
     "zod": "npm:zod@^4.1.13"
   },
   "tasks": {

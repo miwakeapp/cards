@@ -1499,16 +1499,16 @@
       "jsr:@std/html@^1.0.5",
       "jsr:@std/path@^1.1.2",
       "jsr:@std/testing@^1.0.16",
+      "npm:@ai-sdk/anthropic@^2.0.54",
+      "npm:@ai-sdk/google@^2.0.45",
+      "npm:@ai-sdk/openai@^2.0.80",
       "npm:@scriptin/jmdict-simplified-types@^3.6.1",
+      "npm:ai@^5.0.109",
       "npm:iso-639-2@*"
     ],
     "members": {
       "card_creator": {
         "dependencies": [
-          "npm:@ai-sdk/anthropic@^2.0.54",
-          "npm:@ai-sdk/google@^2.0.45",
-          "npm:@ai-sdk/openai@^2.0.80",
-          "npm:ai@^5.0.109",
           "npm:zod@^4.1.13"
         ]
       },

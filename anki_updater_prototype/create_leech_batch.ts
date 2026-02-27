@@ -2,20 +2,20 @@
  * Creates Miwake cards from a reviewed batch JSON file and pushes them to Anki.
  *
  * Run with:
- *   deno task create-leech-batch <batch-file.json> [--model=gemini-3-pro-preview] [--dry-run]
+ *   deno task create-leech-batch <batch-file.json> [--model=claude-opus-4-6] [--dry-run]
  */
 
 import { createCard } from "../card_creator/src/mod.ts";
 import { generateCardFields } from "../card_creator/src/ai_provider.ts";
 import type { ModelId } from "../card_creator/src/ai_provider.ts";
-import { MODEL_IDS } from "../card_creator/src/ai_provider.ts";
+import { DEFAULT_MODEL_ID, MODEL_IDS } from "../card_creator/src/ai_provider.ts";
 import type { MiwakeCard } from "../card_creator/src/types.ts";
 import { allJMDictEntries } from "../data/mod.ts";
 
 // --- CLI args ---
 
 let batchFile: string | undefined;
-let modelId: ModelId = "gemini-3-pro-preview";
+let modelId: ModelId = DEFAULT_MODEL_ID;
 let dryRun = false;
 
 for (const arg of Deno.args) {

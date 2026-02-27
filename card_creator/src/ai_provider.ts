@@ -16,12 +16,14 @@ import { FEW_SHOT_EXAMPLES } from "./few_shot_examples.ts";
  * Supported AI model IDs.
  */
 export const MODEL_IDS = [
-  "gemini-3-pro-preview",
-  "claude-opus-4-5",
-  "gpt-5.1",
+  "gemini-3.1-pro-preview",
+  "claude-opus-4-6",
+  "gpt-5.2",
 ] as const;
 
 export type ModelId = (typeof MODEL_IDS)[number];
+
+export const DEFAULT_MODEL_ID: ModelId = "claude-opus-4-6";
 
 /**
  * Schema for AI-generated card fields.
@@ -66,7 +68,7 @@ const aiFieldsSchema = z.object({
 /**
  * Gets the appropriate model instance for the given model ID.
  */
-function getModel(modelId: ModelId) {
+export function getModel(modelId: ModelId) {
   if (modelId.startsWith("gemini-")) {
     return google(modelId);
   }

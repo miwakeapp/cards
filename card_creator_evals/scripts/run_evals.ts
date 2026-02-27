@@ -3,7 +3,7 @@
  *
  * Usage:
  *   deno task run                               # Run all models
- *   deno task run --model gemini-3-pro-preview  # Run specific model
+ *   deno task run --model gemini-3.1-pro-preview  # Run specific model
  */
 
 import { parseArgs } from "@std/cli/parse-args";

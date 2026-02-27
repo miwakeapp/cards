@@ -6,21 +6,17 @@
  * a JSON file for human review.
  *
  * Run with:
- *   deno task prepare-leech-batch [--count=20] [--model=gemini-3-pro-preview]
+ *   deno task prepare-leech-batch [--count=20] [--model=claude-opus-4-6]
  */
 
-import { generateText } from "npm:ai@^5";
-import { anthropic } from "npm:@ai-sdk/anthropic@^2";
-import { google } from "npm:@ai-sdk/google@^2";
-import { openai } from "npm:@ai-sdk/openai@^2";
+import { generateText } from "ai";
+import { DEFAULT_MODEL_ID, getModel, MODEL_IDS } from "../card_creator/src/ai_provider.ts";
+import type { ModelId } from "../card_creator/src/ai_provider.ts";
 
 // --- CLI args ---
 
-const MODEL_IDS = ["gemini-3-pro-preview", "claude-opus-4-5", "gpt-5.1"] as const;
-type ModelId = (typeof MODEL_IDS)[number];
-
 let count = 20;
-let modelId: ModelId = "gemini-3-pro-preview";
+let modelId: ModelId = DEFAULT_MODEL_ID;
 
 for (const arg of Deno.args) {
   if (arg.startsWith("--count=")) {
@@ -224,13 +220,6 @@ function searchEpubIndex(index: EpubFile[], query: string): SearchResult[] {
 }
 
 // --- LLM context extraction ---
-
-function getModel(id: ModelId) {
-  if (id.startsWith("gemini-")) return google(id);
-  if (id.startsWith("claude-")) return anthropic(id);
-  if (id.startsWith("gpt-")) return openai(id);
-  throw new Error(`Unknown model: ${id}`);
-}
 
 async function extractFullContext(
   windowHtml: string[],

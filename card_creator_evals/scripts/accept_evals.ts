@@ -3,7 +3,7 @@
  *
  * Usage:
  *   deno task accept --run 2025-12-11T10-30-00             # Accept all models from a run
- *   deno task accept --run 2025-12-11T10-30-00 --model gemini-3-pro-preview  # Accept specific model
+ *   deno task accept --run 2025-12-11T10-30-00 --model gemini-3.1-pro-preview  # Accept specific model
  */
 
 import { parseArgs } from "@std/cli/parse-args";

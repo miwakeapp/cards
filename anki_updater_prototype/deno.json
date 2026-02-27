@@ -1,0 +1,9 @@
+{
+  "tasks": {
+    "prepare-leech-batch": "deno run --env-file=../.env --allow-net --allow-read --allow-env prepare_leech_batch.ts",
+    "create-leech-batch": "deno run --env-file=../.env --allow-net --allow-read --allow-env create_leech_batch.ts"
+  },
+  "fmt": {
+    "exclude": ["*.html"]
+  }
+}
