@@ -8,7 +8,7 @@
   {{#Minimized context}}
   <div id="minimized-context">{{furigana:Minimized context}}</div>
   <div id="full-context" hidden>{{furigana:Full context}}</div>
-  <button id="toggle-context" aria-expanded="false" aria-label="Show full context">
+  <button id="toggle-context" class="expando" aria-expanded="false" aria-label="Show full context">
     <svg viewBox="0 0 16 16" aria-hidden="true">
       <path d="M4 6l4 4 4-4" />
     </svg>
@@ -37,6 +37,26 @@ if (!sensesForThisCard) {
     const senseElIndex = relevantSense - 1;
     senseEls[senseElIndex].classList.add("relevant");
   }
+}
+
+const dictEntryEl = document.querySelector("#dictionary-entry");
+const hiddenReadings = dictEntryEl.querySelectorAll(".tag-sK, .tag-sk");
+if (hiddenReadings.length > 0) {
+  const toggleBtn = document.createElement("button");
+  toggleBtn.id = "toggle-hidden-readings";
+  toggleBtn.className = "expando";
+  toggleBtn.setAttribute("aria-expanded", "false");
+  toggleBtn.setAttribute("aria-label", "Show hidden readings");
+  toggleBtn.innerHTML =
+    `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4l4 4-4 4" /></svg>`;
+  dictEntryEl.append(toggleBtn);
+
+  toggleBtn.addEventListener("click", () => {
+    const newExpanded = toggleBtn.getAttribute("aria-expanded") === "false";
+
+    toggleBtn.setAttribute("aria-expanded", newExpanded);
+    dictEntryEl.classList.toggle("show-hidden-readings", newExpanded);
+  });
 }
 
 const toggleContextEl = document.querySelector("#toggle-context");

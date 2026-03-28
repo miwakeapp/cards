@@ -42,12 +42,17 @@ rt {
 #recognition-target,
 #reading {
   line-height: 2;
-}
-
-#recognition-target {
-  font-size: 2.2rem;
+  font-size: 3rem;
   text-align: center;
   margin: 0;
+
+  /*
+    Our base font-size is large enough we can reduce from 50% to 33%. This reduces horizontal shifting to cases where
+    the rt contains ≥4 characters, which is much rarer than 3.
+  */
+  rt {
+    font-size: 33%;
+  }
 }
 
 #hint {
@@ -55,12 +60,6 @@ rt {
   text-align: center;
   color: var(--hint-color);
   font-size: 1.3rem;
-}
-
-#reading {
-  font-size: 2.2rem;
-  text-align: center;
-  margin: 0;
 }
 
 #dictionary-entry {
@@ -89,37 +88,61 @@ rt {
   }
 }
 
-#toggle-context {
+/* need to beat Anki's webview.css specificity on `.fancy button` */
+button.expando {
+  --transition: opacity 120ms ease, background-color 120ms ease, transform 120ms ease;
   display: inline flex;
   align-items: center;
   justify-content: center;
-  width: 1.6rem;
-  height: 1.6rem;
   padding: 0;
   margin: 0;
-  border: none;
+  border: 1px solid currentColor;
   border-radius: 999px;
   background: none;
   cursor: pointer;
   opacity: 0.5;
-  transition: opacity 120ms ease, background-color 120ms ease, transform 120ms ease;
+  width: 1.6rem;
+  height: 1.6rem;
+  transition: var(--transition);
+  box-shadow: none;
 
   > svg {
-    width: 0.9rem;
-    height: 0.9rem;
     stroke: currentColor;
     stroke-width: 1.6;
+    width: 0.9rem;
+    height: 0.9rem;
     fill: none;
+  }
+
+  &[aria-expanded="true"] {
+    transform: rotate(0.5turn);
   }
 
   &:hover, &:focus-visible {
     opacity: 0.9;
     background-color: rgba(0 0 0 / 0.06);
-    outline: none;
+
+    /* beat Anki's webview.css */
+    transition: var(--transition);
+    box-shadow: none;
+  }
+}
+
+#toggle-hidden-readings {
+  order: 1;
+  flex-basis: auto;
+  margin-left: 0.5rem;
+}
+
+/* Override minimal.css's `display: none` on search-only forms */
+#dictionary-entry.show-hidden-readings {
+  :is(.tag-sK, .tag-sk) {
+    display: inline;
   }
 
-  &[aria-expanded="true"] {
-    transform: rotate(180deg);
+  .forms > li:has(~ li)::after {
+    content: ",\A0";
+    color: var(--text-color);
   }
 }
 
