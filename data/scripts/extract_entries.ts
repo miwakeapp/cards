@@ -43,6 +43,12 @@ const FURIGANA_TEST_IDS = new Set([
   "1000110", // ＣＤプレーヤー
 ]);
 
+// IDs used by card_creator tests
+const CARD_CREATOR_TEST_IDS = new Set([
+  "1414110", // 大小
+  "1209590", // 瓦解
+]);
+
 // IDs used by card_creator few-shot examples
 const FEW_SHOT_IDS = new Set([
   "1497700", // 父方
@@ -81,6 +87,7 @@ const evalInputIds = await loadEvalInputIds();
 const allTestIds = new Set([
   ...JMDICT_TO_HTML_TEST_IDS,
   ...FURIGANA_TEST_IDS,
+  ...CARD_CREATOR_TEST_IDS,
   ...FEW_SHOT_IDS,
   ...evalInputIds,
 ]);
@@ -88,6 +95,7 @@ const allTestIds = new Set([
 console.log(`Looking for ${allTestIds.size} entries...`);
 console.log(`  - jmdict_to_html tests: ${JMDICT_TO_HTML_TEST_IDS.size}`);
 console.log(`  - furigana tests: ${FURIGANA_TEST_IDS.size}`);
+console.log(`  - card_creator tests: ${CARD_CREATOR_TEST_IDS.size}`);
 console.log(`  - few-shot examples: ${FEW_SHOT_IDS.size}`);
 console.log(`  - eval inputs: ${evalInputIds.size}`);
 

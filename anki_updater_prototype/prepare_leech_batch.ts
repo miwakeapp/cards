@@ -9,6 +9,7 @@
  *   deno task prepare-leech-batch [--count=20] [--model=claude-opus-4-6]
  */
 
+import { join } from "@std/path";
 import { generateText } from "ai";
 import { DEFAULT_MODEL_ID, getModel, MODEL_IDS } from "../card_creator/src/ai_provider.ts";
 import type { ModelId } from "../card_creator/src/ai_provider.ts";
@@ -105,8 +106,6 @@ interface EpubFile {
   file: string;
   paragraphs: EpubParagraph[];
 }
-
-import { join } from "@std/path";
 
 const EPUB_TEXTS_DIR = join(import.meta.dirname!, "epub_texts");
 
@@ -261,7 +260,12 @@ type BatchEntry = {
   context: string | null;
   status: "matched" | "multiple_matches" | "not_found";
   candidates?: Array<{ source: string; context: string }>;
+  warning?: string;
 };
+
+function wordInSentence(word: string, sentence: string): boolean {
+  return stripHtml(sentence).includes(stripHtml(word));
+}
 
 const noteIds = await ac<number[]>("findNotes", {
   query: "deck:Mining tag:leech -tag:miwake-prototype -tag:converted-to-miwake",
@@ -345,14 +349,22 @@ for (const note of notes) {
       status: "not_found",
     });
   }
+
+  if (!wordInSentence(word, sentence)) {
+    results[results.length - 1].warning = "word_not_in_sentence";
+    console.error(`  ⚠ Word "${stripHtml(word)}" not found in sentence`);
+  }
 }
 
 const dateStr = new Date().toISOString().slice(0, 10);
-const outputPath = `anki_updater_prototype/batch_${dateStr}.json`;
+const outputPath = join(import.meta.dirname!, `batch_${dateStr}.json`);
 await Deno.writeTextFile(outputPath, JSON.stringify(results, undefined, 2));
 console.error(`\nWrote ${results.length} entries to ${outputPath}`);
 
 const matched = results.filter((r) => r.status === "matched").length;
 const multiple = results.filter((r) => r.status === "multiple_matches").length;
 const notFound = results.filter((r) => r.status === "not_found").length;
-console.error(`  ${matched} matched, ${multiple} multiple matches, ${notFound} not found`);
+const warnings = results.filter((r) => r.warning).length;
+console.error(
+  `  ${matched} matched, ${multiple} multiple matches, ${notFound} not found, ${warnings} warnings`,
+);

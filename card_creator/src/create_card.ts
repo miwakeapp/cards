@@ -45,40 +45,47 @@ function formatKey(
 /**
  * Converts HTML <ruby> tags to Anki furigana format and wraps target in <mark>.
  * Also extracts furigana from context if present over the target word.
+ *
+ * Handles both single-reading ruby (`<ruby>瓦解<rt>がかい</rt></ruby>`)
+ * and per-kanji ruby (`<ruby>瓦<rt>が</rt>解<rt>かい</rt></ruby>`).
  */
 function processContext(
   context: string,
   recognitionTarget: string,
   targetInContext: string,
 ): { processedContext: string; contextReading: string | null } {
-  // First, try to find if the recognition target has ruby annotation in context
-  // Pattern: <ruby>認識対象<rt>reading</rt></ruby>
-  const rubyPattern = new RegExp(
-    `<ruby>${RegExp.escape(recognitionTarget)}<rt>([^<]+)</rt></ruby>`,
-    "g",
-  );
   let contextReading: string | null = null;
-  const rubyMatch = rubyPattern.exec(context);
-  if (rubyMatch) {
-    contextReading = rubyMatch[1];
+
+  // Extract reading for recognition target from ruby annotations.
+  const rubyTagPattern = /<ruby>((?:[^<]+<rt>[^<]+<\/rt>)+)<\/ruby>/g;
+  for (const match of context.matchAll(rubyTagPattern)) {
+    const inner = match[1];
+    const baseText = inner.replace(/<rt>[^<]+<\/rt>/g, "");
+    if (baseText === recognitionTarget) {
+      contextReading = [...inner.matchAll(/<rt>([^<]+)<\/rt>/g)]
+        .map((m) => m[1])
+        .join("");
+      break;
+    }
   }
 
-  // Convert all <ruby>X<rt>Y</rt></ruby> to Anki format X[Y]
+  // Convert all <ruby> tags to Anki bracket format: " X[Y]"
   let processed = context.replace(
-    /<ruby>([^<]+)<rt>([^<]+)<\/rt><\/ruby>/g,
-    " $1[$2]",
+    rubyTagPattern,
+    (_match, inner: string) => inner.replace(/([^<]+)<rt>([^<]+)<\/rt>/g, " $1[$2]"),
   );
 
-  // Wrap the target in <mark>. Try targetInContext first (handles conjugated forms),
-  // then fall back to exact recognitionTarget match.
+  // Wrap target in <mark>. Use a furigana-aware pattern that matches the target
+  // even when bracket annotations are interspersed (e.g. "瓦解" → " 瓦[が] 解[かい]").
   const markTarget = processed.includes(targetInContext) ? targetInContext : recognitionTarget;
 
-  if (!processed.includes(`<mark>${markTarget}</mark>`)) {
-    const ankiFuriganaPattern = new RegExp(
-      `(\\s?)${RegExp.escape(markTarget)}(\\[[^\\]]+\\])?`,
-      "g",
-    );
-    processed = processed.replace(ankiFuriganaPattern, `$1<mark>${markTarget}$2</mark>`);
+  if (!processed.includes("<mark>")) {
+    const chars = [...markTarget];
+    const furiganaAwarePattern = chars
+      .map((c) => `${RegExp.escape(c)}(?:\\[[^\\]]+\\])?`)
+      .join("\\s?");
+    const pattern = new RegExp(`(\\s?)(${furiganaAwarePattern})`, "g");
+    processed = processed.replace(pattern, "<mark>$2</mark>");
   }
 
   // Clean up any leading space before first character
