@@ -1,0 +1,23 @@
+# Anki Updater Prototype
+
+This package contains workflows for creating Miwake notes in Anki.
+
+## Layout
+
+- `shared/` contains reusable AnkiConnect, Miwake note-model, and JMDict resolution code.
+- `leech/` contains the Mining-deck leech-card conversion workflow.
+- `jlpt/` contains the JLPT CSV import workflow and its source CSV data.
+
+## Common Tasks
+
+Run from `anki_updater_prototype/`.
+
+```sh
+deno task setup-miwake-model
+deno task prepare-leech-batch
+deno task create-leech-batch leech/batch_YYYY-MM-DD.json
+deno task create-from-csv jlpt/jlpt-moji-goi/N1_2025-12_moji-goi.csv
+deno task report-unresolved-csv jlpt/jlpt-moji-goi jlpt/jlpt-moji-goi/unresolved-report.csv
+```
+
+`shared/jmdict_resolution/recognition_target_lookup.ts` handles tokenizer-backed recognition-target normalization, including common deinflection cases. This is intended to be reusable by the eventual browser extension.

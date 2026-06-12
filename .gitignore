@@ -1,7 +1,16 @@
 /.env
+/.claude/
+/.vscode/
+/STATUS.md
 
 /anki_updater_prototype/epub_texts/
 /anki_updater_prototype/batch_*.json
+/anki_updater_prototype/leech/batch_*.json
+/anki_updater_prototype/jlpt/jlpt-moji-goi/logs/
+/anki_updater_prototype/jlpt/jlpt-moji-goi/recovered-*.csv
+/anki_updater_prototype/jlpt/jlpt-moji-goi/remaining-unresolved-after-*.csv
+/anki_updater_prototype/jlpt/jlpt-moji-goi/ambiguous-candidates.txt
+/anki_updater_prototype/jlpt/jlpt-moji-goi/jmdict-id-suggestions.csv
 
 /card_creator_evals/_site/
 /card_creator_evals/runs/

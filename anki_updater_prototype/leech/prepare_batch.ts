@@ -11,8 +11,9 @@
 
 import { join } from "@std/path";
 import { generateText } from "ai";
-import { DEFAULT_MODEL_ID, getModel, MODEL_IDS } from "../card_creator/src/ai_provider.ts";
-import type { ModelId } from "../card_creator/src/ai_provider.ts";
+import { DEFAULT_MODEL_ID, getModel, MODEL_IDS } from "../../card_creator/src/ai_provider.ts";
+import type { ModelId } from "../../card_creator/src/ai_provider.ts";
+import { ac } from "../shared/anki_connect.ts";
 
 // --- CLI args ---
 
@@ -30,22 +31,6 @@ for (const arg of Deno.args) {
     }
     modelId = m as ModelId;
   }
-}
-
-// --- AnkiConnect ---
-
-type ACParams = Record<string, unknown>;
-
-async function ac<T = unknown>(action: string, params: ACParams = {}): Promise<T> {
-  const body = { action, version: 6, params };
-  const resp = await fetch("http://127.0.0.1:8765", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  const json = await resp.json();
-  if (json.error) throw new Error(`AnkiConnect error for ${action}: ${json.error}`);
-  return json.result as T;
 }
 
 function extractJmdictId(glossary: string): string | null {
@@ -107,7 +92,7 @@ interface EpubFile {
   paragraphs: EpubParagraph[];
 }
 
-const EPUB_TEXTS_DIR = join(import.meta.dirname!, "epub_texts");
+const EPUB_TEXTS_DIR = join(import.meta.dirname!, "..", "epub_texts");
 
 async function buildEpubIndex(): Promise<EpubFile[]> {
   const files: EpubFile[] = [];

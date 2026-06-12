@@ -1,7 +1,11 @@
 {
   "tasks": {
-    "prepare-leech-batch": "deno run --env-file=../.env --allow-net --allow-read --allow-write=. --allow-env prepare_leech_batch.ts",
-    "create-leech-batch": "deno run --env-file=../.env --allow-net --allow-read --allow-env create_leech_batch.ts"
+    "setup-miwake-model": "deno run --allow-net --allow-read shared/miwake_model/setup_miwake_model.ts",
+    "prepare-leech-batch": "deno run --env-file=../.env --allow-net --allow-read --allow-write=leech --allow-env leech/prepare_batch.ts",
+    "create-leech-batch": "deno run --env-file=../.env --allow-net --allow-read --allow-env leech/create_batch.ts",
+    "create-from-csv": "deno run --env-file=../.env --allow-net --allow-read --allow-env jlpt/create_from_csv.ts",
+    "report-unresolved-csv": "deno run --allow-read --allow-write jlpt/report_unresolved_csv.ts",
+    "recover-resolved-from-report": "deno run --allow-read --allow-write jlpt/recover_resolved_from_report.ts"
   },
   "fmt": {
     "exclude": ["*.html"]

@@ -261,7 +261,7 @@ The JavaScript on the back side of the card is responsible for:
 - Handling the disclosure button for showing the full context in place of the minimized context.
 - Adding the `relevant` CSS class to sense `<li>`s that are relevant (which is all of them, by default).
 
-The CSS in [`styles_prefix.css`](./anki_updater_prototype/styles_prefix.css) is meant to be combined with one of the CSS files for the semantic HTML JMDict entries, as a prefix that handles the rest of the card.
+The CSS in [`styles_prefix.css`](./anki_updater_prototype/shared/miwake_model/styles_prefix.css) is meant to be combined with one of the CSS files for the semantic HTML JMDict entries, as a prefix that handles the rest of the card.
 
 For now, we inline the JavaScript onto the back side of the card, and the styles into the styles part of the card. It appears that [dividing up code into external files is quite intricate](https://forums.ankiweb.net/t/how-to-include-external-files-in-your-template-js-css-etc-guide/11719), so we avoid that.
 

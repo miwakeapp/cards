@@ -5,12 +5,13 @@
  *   deno task create-leech-batch <batch-file.json> [--model=claude-opus-4-6] [--dry-run]
  */
 
-import { createCard } from "../card_creator/src/mod.ts";
-import { generateCardFields } from "../card_creator/src/ai_provider.ts";
-import type { ModelId } from "../card_creator/src/ai_provider.ts";
-import { DEFAULT_MODEL_ID, MODEL_IDS } from "../card_creator/src/ai_provider.ts";
-import type { MiwakeCard } from "../card_creator/src/types.ts";
-import { allJMDictEntries } from "../data/mod.ts";
+import { createCard } from "../../card_creator/src/mod.ts";
+import { generateCardFields } from "../../card_creator/src/ai_provider.ts";
+import type { ModelId } from "../../card_creator/src/ai_provider.ts";
+import { DEFAULT_MODEL_ID, MODEL_IDS } from "../../card_creator/src/ai_provider.ts";
+import type { MiwakeCard } from "../../card_creator/src/types.ts";
+import { allJMDictEntries } from "../../data/mod.ts";
+import { ac } from "../shared/anki_connect.ts";
 
 // --- CLI args ---
 
@@ -34,24 +35,8 @@ for (const arg of Deno.args) {
 }
 
 if (!batchFile) {
-  console.error("Usage: create_leech_batch.ts <batch-file.json> [--model=...] [--dry-run]");
+  console.error("Usage: create_batch.ts <batch-file.json> [--model=...] [--dry-run]");
   Deno.exit(1);
-}
-
-// --- AnkiConnect ---
-
-type ACParams = Record<string, unknown>;
-
-async function ac<T = unknown>(action: string, params: ACParams = {}): Promise<T> {
-  const body = { action, version: 6, params };
-  const resp = await fetch("http://127.0.0.1:8765", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  const json = await resp.json();
-  if (json.error) throw new Error(`AnkiConnect error for ${action}: ${json.error}`);
-  return json.result as T;
 }
 
 // --- Load data ---

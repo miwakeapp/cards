@@ -7,8 +7,10 @@
  * - Templates match the current Anki model (furigana:Reading fallback).
  * - CSS = card chrome + current minimal.css (night-mode aware).
  *
- * Run with: deno run --allow-read --allow-net anki_updater_prototype/setup_miwake_model.ts
+ * Run with: deno task setup-miwake-model
  */
+
+import { ac } from "../anki_connect.ts";
 
 const MODEL_NAME = "Miwake";
 const FIELDS = [
@@ -46,27 +48,12 @@ const [front, back, stylesPrefix] = await Promise.all([
 
 // Card-level styling: prefix for card chrome, then append shared minimal.css from disk.
 const minimalCSSPath = new URL(
-  "../html_dictionary_previewer/src/styles/minimal.css",
+  "../../../html_dictionary_previewer/src/styles/minimal.css",
   import.meta.url,
 );
 const minimalCSS = await Deno.readTextFile(minimalCSSPath);
 
 const combinedCSS = `${stylesPrefix}\n${minimalCSS}`;
-
-type ACParams = Record<string, unknown>;
-async function ac(action: string, params: ACParams = {}) {
-  const body = { action, version: 6, params };
-  const resp = await fetch("http://127.0.0.1:8765", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  const json = await resp.json();
-  if (json.error) {
-    throw new Error(`AnkiConnect error for ${action}: ${json.error}`);
-  }
-  return json.result;
-}
 
 const models: string[] = await ac("modelNames");
 const exists = models.includes(MODEL_NAME);
