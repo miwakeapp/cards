@@ -48,6 +48,15 @@ Deno.test("deriveLookupSpellings resolves inflected verbs", async () => {
   assertEquals(candidates, ["潤う"]);
 });
 
+Deno.test("deriveLookupSpellings does not surface-trim verb te-forms", async () => {
+  const candidates = await deriveLookupSpellings(
+    "葉書が届いたが、雨でインクが少しにじんで、読みにくかった。",
+    "にじんで",
+  );
+
+  assertEquals(candidates, ["にじむ"]);
+});
+
 Deno.test("deriveLookupSpellings resolves passive verb suffixes", async () => {
   const candidates = await deriveLookupSpellings(
     "開発のために、古いビルが次々と壊されている。",
@@ -100,6 +109,105 @@ Deno.test("deriveLookupSpellings resolves noun ni-suru forms", async () => {
   );
 
   assertEquals(candidates, ["無駄にする"]);
+});
+
+Deno.test("deriveLookupSpellings resolves noun targets with adnominal particles", async () => {
+  const candidates = await deriveLookupSpellings(
+    "あれは不慮の事故だったとしか言いようがない。",
+    "不慮の",
+  );
+
+  assertEquals(candidates, ["不慮"]);
+});
+
+Deno.test("deriveLookupSpellings preserves expression stems before adnominal particles", async () => {
+  const candidates = await deriveLookupSpellings(
+    "山田氏は著書で、これまでの経営戦略について意見を述べている。",
+    "これまでの",
+  );
+
+  assertEquals(candidates, ["これまで", "これ"]);
+});
+
+Deno.test("deriveLookupSpellings resolves noun targets with adverbial particles", async () => {
+  const candidates = await deriveLookupSpellings(
+    "調査データは、地球の温暖化を如実に示した。",
+    "如実に",
+  );
+
+  assertEquals(candidates, ["如実"]);
+});
+
+Deno.test("deriveLookupSpellings resolves noun targets with copular wrappers", async () => {
+  const candidates = await deriveLookupSpellings(
+    "衣装はいつも自前である。",
+    "自前である",
+  );
+
+  assertEquals(candidates, ["自前"]);
+});
+
+Deno.test("deriveLookupSpellings resolves adverb targets with light suru wrappers", async () => {
+  const candidates = await deriveLookupSpellings(
+    "彼は今ごろ、ゆっくりしているだろう。",
+    "ゆっくりして",
+  );
+
+  assertEquals(candidates, ["ゆっくり"]);
+});
+
+Deno.test("deriveLookupSpellings resolves adverbial noun modifiers before verbs", async () => {
+  const candidates = await deriveLookupSpellings(
+    "最近、仕事が順調に進んでいる。",
+    "順調に進んでいる",
+  );
+
+  assertEquals(candidates, ["順調"]);
+});
+
+Deno.test("deriveLookupSpellings resolves to-adverb suru wrappers", async () => {
+  const candidates = await deriveLookupSpellings(
+    "高橋さんの主張は漠然としていた。",
+    "漠然としていた",
+  );
+
+  assertEquals(candidates, ["漠然と", "漠然"]);
+});
+
+Deno.test("deriveLookupSpellings resolves verb yasui suffixes", async () => {
+  const candidates = await deriveLookupSpellings(
+    "崩れやすいので、運ぶときは気をつけてください。",
+    "崩れやすい",
+  );
+
+  assertEquals(candidates, ["崩れる"]);
+});
+
+Deno.test("deriveLookupSpellings resolves adjective adverbial forms with tokenizer stems", async () => {
+  const candidates = await deriveLookupSpellings(
+    "憧れの歌手に会った時、緊張して動作がぎこちなくなってしまった。",
+    "ぎこちなく",
+  );
+
+  assertEquals(candidates, ["ぎこち", "ぎこちない"]);
+});
+
+Deno.test("deriveLookupSpellings resolves adjective naru wrappers", async () => {
+  const candidates = await deriveLookupSpellings(
+    "この様子だと、新薬の発売はかなり遅くなりそうだそうだ。",
+    "遅くなりそうだ",
+  );
+
+  assertEquals(candidates, ["遅い"]);
+});
+
+Deno.test("deriveLookupSpellings resolves verb souda wrappers", async () => {
+  const candidates = await deriveLookupSpellings(
+    "この様子だと、新薬の発売はかなりずれ込みそうだ。",
+    "ずれ込みそうだ",
+  );
+
+  assertEquals(candidates, ["ずれ込む"]);
 });
 
 Deno.test("deriveLookupSpellings resolves na-adjective forms", async () => {

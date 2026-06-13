@@ -48,16 +48,57 @@ function isSuruVerb(token: KuromojiToken): boolean {
   return token.pos === "動詞" && token.basic_form === "する";
 }
 
+function isAruVerb(token: KuromojiToken): boolean {
+  return token.pos === "動詞" && token.basic_form === "ある";
+}
+
 function isFunctionToken(token: KuromojiToken): boolean {
   if (token.pos === "助詞" || token.pos === "助動詞" || token.pos === "記号") {
     return true;
   }
   return token.pos === "動詞" &&
-    (token.pos_detail_1 === "非自立" || isAuxiliaryVerbSuffix(token));
+    (token.pos_detail_1 === "非自立" || isAruVerb(token) || isAuxiliaryVerbSuffix(token));
 }
 
 function unique<T>(values: Iterable<T>): T[] {
   return [...new Set(values)];
+}
+
+function surfaceSuffixCandidates(surface: string): string[] {
+  return [
+    "である",
+    "だった",
+    "でした",
+    "ない",
+    "だ",
+    "で",
+    "の",
+    "に",
+  ]
+    .filter((suffix) => surface.endsWith(suffix) && surface.length > suffix.length)
+    .map((suffix) => surface.slice(0, -suffix.length));
+}
+
+function tokenBasicCandidates(token: KuromojiToken): string[] {
+  if (token.basic_form === "*") {
+    return [];
+  }
+
+  const candidates = [token.basic_form];
+
+  if (token.pos === "動詞" && token.basic_form.endsWith("する")) {
+    candidates.push(token.basic_form.slice(0, -"する".length));
+  }
+
+  if (token.pos === "副詞" && token.basic_form.endsWith("と")) {
+    candidates.push(token.basic_form.slice(0, -"と".length));
+  }
+
+  if (token.surface_form.endsWith("く")) {
+    candidates.push(`${token.surface_form.slice(0, -"く".length)}い`);
+  }
+
+  return unique(candidates).filter((candidate) => candidate.length > 0);
 }
 
 function findMatchingTokenSpans(tokens: KuromojiToken[], target: string): KuromojiToken[][] {
@@ -83,7 +124,39 @@ function findMatchingTokenSpans(tokens: KuromojiToken[], target: string): Kuromo
   return spans;
 }
 
+function deriveLeadingModifierCandidates(
+  span: KuromojiToken[],
+  lexicalTokens: KuromojiToken[],
+): string[] {
+  if (lexicalTokens.length < 2) {
+    return [];
+  }
+
+  const [first, second] = lexicalTokens;
+  const firstIndex = span.indexOf(first);
+  const tokenAfterFirst = span[firstIndex + 1];
+
+  if (first.pos === "副詞") {
+    return tokenBasicCandidates(first);
+  }
+
+  if (first.pos === "形容詞" && second.pos === "動詞" && second.basic_form === "なる") {
+    return tokenBasicCandidates(first);
+  }
+
+  if (
+    first.pos === "名詞" &&
+    tokenAfterFirst?.pos === "助詞" &&
+    tokenAfterFirst.surface_form === "に"
+  ) {
+    return tokenBasicCandidates(first);
+  }
+
+  return [];
+}
+
 function deriveCandidatesFromSpan(span: KuromojiToken[]): string[] {
+  const spanSurface = span.map((token) => token.surface_form).join("");
   const suruIndex = span.findIndex(isSuruVerb);
   if (suruIndex > 0) {
     const precedingSpan = span.slice(0, suruIndex);
@@ -97,27 +170,50 @@ function deriveCandidatesFromSpan(span: KuromojiToken[]): string[] {
     ) {
       return [`${precedingLexicalTokens[0].basic_form}にする`];
     }
+
+    if (
+      precedingLexicalTokens.length === 1 &&
+      ["副詞", "形容詞"].includes(precedingLexicalTokens[0].pos) &&
+      precedingLexicalTokens[0].basic_form !== "*"
+    ) {
+      return tokenBasicCandidates(precedingLexicalTokens[0]);
+    }
   }
 
   const lexicalTokens = span.filter((token) => !isFunctionToken(token));
+  const directSurfaceCandidates = lexicalTokens.length === 1 && lexicalTokens[0].pos !== "動詞"
+    ? surfaceSuffixCandidates(spanSurface)
+    : [];
 
   if (lexicalTokens.length === 1) {
     const [token] = lexicalTokens;
-
-    if (token.basic_form === "*") {
-      return [];
-    }
 
     if (
       token.pos === "動詞" ||
       token.pos === "形容詞" ||
       token.pos === "副詞" ||
+      token.pos === "名詞" ||
       (token.pos === "名詞" && token.pos_detail_1 === "形容動詞語幹")
     ) {
-      return [token.basic_form];
+      const candidates = tokenBasicCandidates(token);
+
+      if (spanSurface.endsWith("なく") && !token.basic_form.endsWith("ない")) {
+        candidates.push(`${token.basic_form}ない`);
+      }
+
+      return unique([...directSurfaceCandidates, ...candidates]);
     }
 
-    return [];
+    return directSurfaceCandidates;
+  }
+
+  if (
+    lexicalTokens.length === 2 &&
+    lexicalTokens[0].pos === "動詞" &&
+    lexicalTokens[1].pos === "形容詞" &&
+    lexicalTokens[1].basic_form === "やすい"
+  ) {
+    return tokenBasicCandidates(lexicalTokens[0]);
   }
 
   if (
@@ -127,6 +223,18 @@ function deriveCandidatesFromSpan(span: KuromojiToken[]): string[] {
   ) {
     const noun = lexicalTokens[0].basic_form;
     return [`${noun}${lexicalTokens[1].basic_form}`, noun];
+  }
+
+  const leadingModifierCandidates = deriveLeadingModifierCandidates(span, lexicalTokens);
+  if (leadingModifierCandidates.length > 0) {
+    return leadingModifierCandidates;
+  }
+
+  if (spanSurface.endsWith("そうだ")) {
+    const verb = lexicalTokens.find((token) => token.pos === "動詞");
+    if (verb) {
+      return tokenBasicCandidates(verb);
+    }
   }
 
   return [];
