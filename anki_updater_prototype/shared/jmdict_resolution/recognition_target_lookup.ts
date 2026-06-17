@@ -19,6 +19,11 @@ interface KuromojiTokenizer {
   tokenize(text: string): KuromojiToken[];
 }
 
+interface MatchingTokenSpan {
+  tokens: KuromojiToken[];
+  endExclusive: number;
+}
+
 const require = createRequire(import.meta.url);
 const kuromojiMainPath = require.resolve("kuromoji");
 const kuromojiDictPath = path.join(path.dirname(kuromojiMainPath), "..", "dict");
@@ -79,6 +84,19 @@ function surfaceSuffixCandidates(surface: string): string[] {
     .map((suffix) => surface.slice(0, -suffix.length));
 }
 
+function surfaceTrailingSuruCandidates(sentence: string, recognitionTarget: string): string[] {
+  const candidates: string[] = [];
+
+  for (const suffix of ["する", "にする"]) {
+    const candidate = `${recognitionTarget}${suffix}`;
+    if (sentence.includes(candidate)) {
+      candidates.push(candidate);
+    }
+  }
+
+  return candidates;
+}
+
 function tokenBasicCandidates(token: KuromojiToken): string[] {
   if (token.basic_form === "*") {
     return [];
@@ -101,8 +119,8 @@ function tokenBasicCandidates(token: KuromojiToken): string[] {
   return unique(candidates).filter((candidate) => candidate.length > 0);
 }
 
-function findMatchingTokenSpans(tokens: KuromojiToken[], target: string): KuromojiToken[][] {
-  const spans: KuromojiToken[][] = [];
+function findMatchingTokenSpans(tokens: KuromojiToken[], target: string): MatchingTokenSpan[] {
+  const spans: MatchingTokenSpan[] = [];
 
   for (let start = 0; start < tokens.length; ++start) {
     let combined = "";
@@ -111,7 +129,10 @@ function findMatchingTokenSpans(tokens: KuromojiToken[], target: string): Kuromo
       combined += tokens[end].surface_form;
 
       if (combined === target) {
-        spans.push(tokens.slice(start, end + 1));
+        spans.push({
+          tokens: tokens.slice(start, end + 1),
+          endExclusive: end + 1,
+        });
         break;
       }
 
@@ -122,6 +143,39 @@ function findMatchingTokenSpans(tokens: KuromojiToken[], target: string): Kuromo
   }
 
   return spans;
+}
+
+function deriveTrailingSuruCandidates(tokens: KuromojiToken[], span: MatchingTokenSpan): string[] {
+  if (span.tokens.some(isSuruVerb)) {
+    return [];
+  }
+
+  const lexicalTokens = span.tokens.filter((token) => !isFunctionToken(token));
+  if (lexicalTokens.length !== 1) {
+    return [];
+  }
+
+  const [token] = lexicalTokens;
+  if (!["名詞", "副詞", "形容詞"].includes(token.pos)) {
+    return [];
+  }
+
+  const nextToken = tokens[span.endExclusive];
+  if (nextToken && isSuruVerb(nextToken)) {
+    return tokenBasicCandidates(token).map((candidate) => `${candidate}する`);
+  }
+
+  const nextNextToken = tokens[span.endExclusive + 1];
+  if (
+    nextToken?.pos === "助詞" &&
+    nextToken.surface_form === "に" &&
+    nextNextToken &&
+    isSuruVerb(nextNextToken)
+  ) {
+    return tokenBasicCandidates(token).map((candidate) => `${candidate}にする`);
+  }
+
+  return [];
 }
 
 function deriveLeadingModifierCandidates(
@@ -292,8 +346,15 @@ export async function deriveLookupSpellings(
   }
 
   const tokenizer = await kuromojiTokenizer();
-  const tokenSpans = findMatchingTokenSpans(tokenizer.tokenize(sentence), recognitionTarget);
-  const candidates = tokenSpans.flatMap((span) => deriveCandidatesFromSpan(span));
+  const tokens = tokenizer.tokenize(sentence);
+  const tokenSpans = findMatchingTokenSpans(tokens, recognitionTarget);
+  const candidates = [
+    ...surfaceTrailingSuruCandidates(sentence, recognitionTarget),
+    ...tokenSpans.flatMap((span) => [
+      ...deriveCandidatesFromSpan(span.tokens),
+      ...deriveTrailingSuruCandidates(tokens, span),
+    ]),
+  ];
 
   return unique(candidates).filter((candidate) => candidate !== recognitionTarget);
 }

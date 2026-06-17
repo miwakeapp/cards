@@ -5,7 +5,8 @@
     "create-leech-batch": "deno run --env-file=../.env --allow-net --allow-read --allow-env leech/create_batch.ts",
     "create-from-csv": "deno run --env-file=../.env --allow-net --allow-read --allow-env jlpt/create_from_csv.ts",
     "report-unresolved-csv": "deno run --allow-read --allow-write jlpt/report_unresolved_csv.ts",
-    "recover-resolved-from-report": "deno run --allow-read --allow-write jlpt/recover_resolved_from_report.ts"
+    "recover-resolved-from-report": "deno run --allow-read --allow-write jlpt/recover_resolved_from_report.ts",
+    "report-vocab-appearances": "deno run --allow-read --allow-write jlpt/report_vocab_appearances.ts"
   },
   "fmt": {
     "exclude": ["*.html"]

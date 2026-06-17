@@ -111,6 +111,15 @@ Deno.test("deriveLookupSpellings resolves noun ni-suru forms", async () => {
   assertEquals(candidates, ["無駄にする"]);
 });
 
+Deno.test("deriveLookupSpellings extends stem targets followed by suru", async () => {
+  const candidates = await deriveLookupSpellings(
+    "どんな厳しい状況でも任務をまっとうする覚悟がある。",
+    "まっとう",
+  );
+
+  assertEquals(candidates, ["まっとうする"]);
+});
+
 Deno.test("deriveLookupSpellings resolves noun targets with adnominal particles", async () => {
   const candidates = await deriveLookupSpellings(
     "あれは不慮の事故だったとしか言いようがない。",
@@ -280,5 +289,82 @@ Deno.test("resolveCSVRows prefers suru-capable entries for noun suru deinflectio
       recognitionTarget,
     })),
     [{ id: "loss", recognitionTarget: "ロス" }],
+  );
+});
+
+Deno.test("resolveCSVRows uses contextual suru candidates to break exact ambiguity", async () => {
+  const { resolved, issues } = await resolveCSVRows(
+    [{
+      sentence: "どんな厳しい状況でも任務をまっとうする覚悟がある。",
+      source: "",
+      recognitionTarget: "まっとう",
+    }],
+    new Map([
+      [
+        "proper",
+        jmdictWord([{ text: "全う" }], [{ text: "まっとう" }], {
+          id: "proper",
+          partOfSpeech: ["adj-na", "adv"],
+        }),
+      ],
+      [
+        "fulfill",
+        jmdictWord([{ text: "全うする" }], [{ text: "まっとうする" }], {
+          id: "fulfill",
+          partOfSpeech: ["exp", "vs-i", "vt"],
+        }),
+      ],
+      [
+        "last-place",
+        jmdictWord([{ text: "末等" }], [{ text: "まっとう" }], {
+          id: "last-place",
+          partOfSpeech: ["n"],
+        }),
+      ],
+    ]),
+  );
+
+  assertEquals(issues, []);
+  assertEquals(
+    resolved.map(({ entry, recognitionTarget }) => ({
+      id: entry.id,
+      recognitionTarget,
+    })),
+    [{ id: "fulfill", recognitionTarget: "まっとうする" }],
+  );
+});
+
+Deno.test("resolveCSVRows prefers contextual suru candidates over non-suru exact matches", async () => {
+  const { resolved, issues } = await resolveCSVRows(
+    [{
+      sentence: "どんな厳しい状況でも任務を全うする覚悟がある。",
+      source: "",
+      recognitionTarget: "全う",
+    }],
+    new Map([
+      [
+        "proper",
+        jmdictWord([{ text: "全う" }], [{ text: "まっとう" }], {
+          id: "proper",
+          partOfSpeech: ["adj-na", "adv"],
+        }),
+      ],
+      [
+        "fulfill",
+        jmdictWord([{ text: "全うする" }], [{ text: "まっとうする" }], {
+          id: "fulfill",
+          partOfSpeech: ["exp", "vs-i", "vt"],
+        }),
+      ],
+    ]),
+  );
+
+  assertEquals(issues, []);
+  assertEquals(
+    resolved.map(({ entry, recognitionTarget }) => ({
+      id: entry.id,
+      recognitionTarget,
+    })),
+    [{ id: "fulfill", recognitionTarget: "全うする" }],
   );
 });

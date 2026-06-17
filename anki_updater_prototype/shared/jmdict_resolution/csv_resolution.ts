@@ -60,6 +60,18 @@ function shouldPreferSuruEntry(spelling: string, derivedSpellings: string[]): bo
     derivedSpellings.includes(`${spelling}にする`);
 }
 
+function isSuruDerivedFromTarget(spelling: string, recognitionTarget: string): boolean {
+  return spelling === `${recognitionTarget}する` ||
+    spelling === `${recognitionTarget}にする`;
+}
+
+function hasPotentialTrailingSuruContext(sentence: string, recognitionTarget: string): boolean {
+  return sentence.includes(`${recognitionTarget}する`) ||
+    sentence.includes(`${recognitionTarget}し`) ||
+    sentence.includes(`${recognitionTarget}にする`) ||
+    sentence.includes(`${recognitionTarget}にし`);
+}
+
 function entrySpellings(entry: JMdictWord): string[] {
   return [
     ...entry.kanji.map((item) => item.text),
@@ -136,15 +148,9 @@ async function resolveRow(
 
   const exactMatches = findEntriesBySpelling(spellingIndex, row.recognitionTarget);
   if (exactMatches.length === 1) {
-    return { row, entry: exactMatches[0], recognitionTarget: row.recognitionTarget };
-  }
-  if (exactMatches.length > 1) {
-    return {
-      row,
-      reason: "ambiguous-exact",
-      candidateSpellings: [row.recognitionTarget],
-      candidateMatches: [{ spelling: row.recognitionTarget, entries: exactMatches }],
-    };
+    if (!hasPotentialTrailingSuruContext(row.sentence, row.recognitionTarget)) {
+      return { row, entry: exactMatches[0], recognitionTarget: row.recognitionTarget };
+    }
   }
 
   const derivedSpellings = await deriveLookupSpellings(row.sentence, row.recognitionTarget);
@@ -165,6 +171,21 @@ async function resolveRow(
         ambiguousDerived.push({ spelling, entries: matches });
       }
     }
+  }
+
+  if (exactMatches.length === 1) {
+    const contextualSuruMatches = [...uniqueResolved.values()].filter(({ spelling, entry }) =>
+      isSuruDerivedFromTarget(spelling, row.recognitionTarget) &&
+      entryCanTakeSuru(entry) &&
+      !entryCanTakeSuru(exactMatches[0])
+    );
+
+    if (contextualSuruMatches.length === 1) {
+      const [{ spelling, entry }] = contextualSuruMatches;
+      return { row, entry, recognitionTarget: spelling };
+    }
+
+    return { row, entry: exactMatches[0], recognitionTarget: row.recognitionTarget };
   }
 
   if (uniqueResolved.size === 1) {
@@ -190,6 +211,15 @@ async function resolveRow(
       reason: "ambiguous-derived",
       candidateSpellings: derivedSpellings,
       candidateMatches: ambiguousDerived,
+    };
+  }
+
+  if (exactMatches.length > 1) {
+    return {
+      row,
+      reason: "ambiguous-exact",
+      candidateSpellings: [row.recognitionTarget],
+      candidateMatches: [{ spelling: row.recognitionTarget, entries: exactMatches }],
     };
   }
 
