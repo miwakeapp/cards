@@ -333,7 +333,6 @@ recognitionTarget,appearances
 コントロール,1
 コンパクト,1
 サイクル,1
-さえる,1
 さかのぼる,1
 さきごろ,1
 ささい,1
@@ -392,7 +391,6 @@ recognitionTarget,appearances
 ぜいたく,1
 せめて,1
 センサー,1
-そそる,1
 そぶり,1
 ぞんざい,1
 だいたい,1
@@ -403,7 +401,7 @@ recognitionTarget,appearances
 たしかに,1
 たたえた,1
 ただで,1
-たどり,1
+たどる,1
 だます,1
 たまたま,1
 だらだら,1
@@ -468,7 +466,7 @@ recognitionTarget,appearances
 ひっそり,1
 ピッチ,1
 ひやひや,1
-ピント,1
+ピントを合わせる,1
 ひんやり,1
 ふいに,1
 フォロー,1
@@ -628,7 +626,7 @@ recognitionTarget,appearances
 果たす,1
 架空,1
 稼働,1
-荷,1
+荷が重い,1
 華々しい,1
 華やか,1
 過程,1
@@ -694,6 +692,7 @@ recognitionTarget,appearances
 寄与,1
 帰結,1
 気がかり,1
+気に障る,1
 気まま,1
 気掛かり,1
 気軽,1
@@ -877,6 +876,7 @@ recognitionTarget,appearances
 催促,1
 再び,1
 最近ではめずらしい,1
+最善を尽くす,1
 最大,1
 最低限,1
 採集,1
@@ -907,7 +907,7 @@ recognitionTarget,appearances
 思い返す,1
 指示,1
 指導を受けて,1
-支障,1
+支障を来す,1
 支払う,1
 施錠,1
 糸口,1
@@ -939,7 +939,7 @@ recognitionTarget,appearances
 失脚,1
 質問,1
 実,1
-実に,1
+実によく,1
 実況,1
 実権,1
 実行,1
@@ -1018,7 +1018,6 @@ recognitionTarget,appearances
 焦る,1
 照会,1
 証言,1
-障る,1
 上,1
 上品な,1
 乗り込む,1
@@ -1031,12 +1030,13 @@ recognitionTarget,appearances
 職,1
 食い込む,1
 食い止める,1
+食欲をそそる,1
 信頼,1
 心遣い,1
 心構え,1
 心細い,1
-心地,1
-心当たり,1
+心地よい,1
+心当たりがない,1
 心無い,1
 慎重,1
 振りまく,1
@@ -1056,7 +1056,6 @@ recognitionTarget,appearances
 人手,1
 人柄,1
 甚大,1
-尽くす,1
 推理,1
 衰退,1
 遂げる,1
@@ -1081,7 +1080,6 @@ recognitionTarget,appearances
 責任を持って,1
 責任者,1
 跡地,1
-切り出す,1
 切実,1
 切望,1
 摂取,1
@@ -1300,7 +1298,7 @@ recognitionTarget,appearances
 表明,1
 評価が高まっている,1
 評価を受けて,1
-貧富,1
+貧富の差,1
 頻繁,1
 不安そうな,1
 不安なところ,1
@@ -1419,6 +1417,7 @@ recognitionTarget,appearances
 面白み,1
 猛,1
 猛烈,1
+目がさえる,1
 目まくるしい,1
 目まぐるしい,1
 目を閉じて,1
@@ -1446,7 +1445,7 @@ recognitionTarget,appearances
 予想外に遅れている,1
 予想通りおもしろい,1
 予想通りつまらない,1
-予断,1
+予断を許さない,1
 予約,1
 余計,1
 余波,1
@@ -1483,6 +1482,7 @@ recognitionTarget,appearances
 露出,1
 朗らか,1
 朗報,1
+話を切り出す,1
 話題,1
 賄う,1
 腕前,1

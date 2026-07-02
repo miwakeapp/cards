@@ -55,6 +55,23 @@ function entryCanTakeSuru(entry: JMdictWord): boolean {
   );
 }
 
+function entryIsExpression(entry: JMdictWord): boolean {
+  return entry.sense.some((sense) => sense.partOfSpeech.includes("exp"));
+}
+
+function isNonSuruVerbPartOfSpeech(partOfSpeech: string): boolean {
+  return partOfSpeech.startsWith("v") &&
+    partOfSpeech !== "vi" &&
+    partOfSpeech !== "vt" &&
+    !partOfSpeech.startsWith("vs");
+}
+
+function entryHasNonSuruVerb(entry: JMdictWord): boolean {
+  return entry.sense.some((sense) =>
+    sense.partOfSpeech.some((partOfSpeech) => isNonSuruVerbPartOfSpeech(partOfSpeech))
+  );
+}
+
 function shouldPreferSuruEntry(spelling: string, derivedSpellings: string[]): boolean {
   return derivedSpellings.includes(`${spelling}する`) ||
     derivedSpellings.includes(`${spelling}にする`);
@@ -65,11 +82,88 @@ function isSuruDerivedFromTarget(spelling: string, recognitionTarget: string): b
     spelling === `${recognitionTarget}にする`;
 }
 
-function hasPotentialTrailingSuruContext(sentence: string, recognitionTarget: string): boolean {
-  return sentence.includes(`${recognitionTarget}する`) ||
-    sentence.includes(`${recognitionTarget}し`) ||
-    sentence.includes(`${recognitionTarget}にする`) ||
-    sentence.includes(`${recognitionTarget}にし`);
+function hasContextBeyondTarget(row: CSVRow): boolean {
+  return row.sentence !== row.recognitionTarget;
+}
+
+function isJapaneseTextCharacter(text: string): boolean {
+  return /^[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}ー々ヶ]$/u.test(text);
+}
+
+function isHiragana(text: string): boolean {
+  return /^\p{Script=Hiragana}$/u.test(text);
+}
+
+function isExpressionLeftBoundary(previousCharacter: string, spelling: string): boolean {
+  const firstCharacter = spelling[0];
+
+  return !isJapaneseTextCharacter(previousCharacter) ||
+    ["は", "が", "を", "に", "で", "と", "へ", "も", "や", "の"].includes(previousCharacter) ||
+    previousCharacter === "お" ||
+    previousCharacter === "ご" ||
+    (isHiragana(previousCharacter) && !isHiragana(firstCharacter));
+}
+
+function sentenceContainsExpressionSpelling(sentence: string, spelling: string): boolean {
+  let startIndex = sentence.indexOf(spelling);
+  while (startIndex !== -1) {
+    if (startIndex === 0) {
+      return true;
+    }
+
+    const previousCharacter = sentence[startIndex - 1];
+    if (isExpressionLeftBoundary(previousCharacter, spelling)) {
+      return true;
+    }
+
+    startIndex = sentence.indexOf(spelling, startIndex + 1);
+  }
+
+  return false;
+}
+
+function findContextualExpressionCandidates(
+  row: CSVRow,
+  spellingIndex: SpellingIndex,
+  lookupSpellings: string[],
+): Array<{ spelling: string; entry: JMdictWord }> {
+  if (!hasContextBeyondTarget(row)) {
+    return [];
+  }
+
+  const candidates = new Map<string, { spelling: string; entry: JMdictWord }>();
+  for (const index of [spellingIndex.kanji, spellingIndex.kana]) {
+    for (const [spelling, entries] of index) {
+      const matchingLookupSpelling = lookupSpellings.find((lookupSpelling) => {
+        if (spelling.length <= lookupSpelling.length || !spelling.includes(lookupSpelling)) {
+          return false;
+        }
+
+        const surfaceSpelling = spelling.replace(lookupSpelling, row.recognitionTarget);
+        return sentenceContainsExpressionSpelling(row.sentence, surfaceSpelling);
+      });
+
+      if (!matchingLookupSpelling) continue;
+
+      for (const entry of entries) {
+        if (entryIsExpression(entry)) {
+          candidates.set(`${entry.id}\0${spelling}`, { spelling, entry });
+        }
+      }
+    }
+  }
+
+  return [...candidates.values()];
+}
+
+function uniqueLongestCandidate(
+  candidates: Array<{ spelling: string; entry: JMdictWord }>,
+): { spelling: string; entry: JMdictWord } | undefined {
+  const longestLength = Math.max(...candidates.map(({ spelling }) => spelling.length));
+  const longest = candidates.filter(({ spelling }) => spelling.length === longestLength);
+  const uniqueEntries = new Map(longest.map((candidate) => [candidate.entry.id, candidate]));
+
+  return uniqueEntries.size === 1 ? [...uniqueEntries.values()][0] : undefined;
 }
 
 function entrySpellings(entry: JMdictWord): string[] {
@@ -147,13 +241,25 @@ async function resolveRow(
   }
 
   const exactMatches = findEntriesBySpelling(spellingIndex, row.recognitionTarget);
-  if (exactMatches.length === 1) {
-    if (!hasPotentialTrailingSuruContext(row.sentence, row.recognitionTarget)) {
-      return { row, entry: exactMatches[0], recognitionTarget: row.recognitionTarget };
-    }
+  const derivedSpellings = await deriveLookupSpellings(row.sentence, row.recognitionTarget);
+  const contextualExpressionCandidate = uniqueLongestCandidate(
+    findContextualExpressionCandidates(row, spellingIndex, [
+      row.recognitionTarget,
+      ...derivedSpellings,
+    ]),
+  );
+
+  if (
+    contextualExpressionCandidate &&
+    (exactMatches.length !== 1 || contextualExpressionCandidate.entry.id !== exactMatches[0].id)
+  ) {
+    return {
+      row,
+      entry: contextualExpressionCandidate.entry,
+      recognitionTarget: contextualExpressionCandidate.spelling,
+    };
   }
 
-  const derivedSpellings = await deriveLookupSpellings(row.sentence, row.recognitionTarget);
   const uniqueResolved = new Map<string, { spelling: string; entry: JMdictWord }>();
   const ambiguousDerived: CandidateMatch[] = [];
 
@@ -174,6 +280,18 @@ async function resolveRow(
   }
 
   if (exactMatches.length === 1) {
+    const contextualVerbMatches = hasContextBeyondTarget(row)
+      ? [...uniqueResolved.values()].filter(({ entry }) =>
+        entryHasNonSuruVerb(entry) &&
+        !entryHasNonSuruVerb(exactMatches[0])
+      )
+      : [];
+
+    if (contextualVerbMatches.length === 1) {
+      const [{ spelling, entry }] = contextualVerbMatches;
+      return { row, entry, recognitionTarget: spelling };
+    }
+
     const contextualSuruMatches = [...uniqueResolved.values()].filter(({ spelling, entry }) =>
       isSuruDerivedFromTarget(spelling, row.recognitionTarget) &&
       entryCanTakeSuru(entry) &&
