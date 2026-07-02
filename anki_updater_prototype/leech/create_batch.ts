@@ -139,13 +139,11 @@ for (const { entry, card } of cards) {
     deckName: "Mining",
     modelName: "Miwake",
     fields,
-    tags: ["miwake-prototype"],
   };
 
   await ac("addNote", { note });
   console.error(`  Added: ${card.recognitionTarget} (${card.key})`);
 
-  // Tag the original leech note as converted
   await ac("addTags", {
     notes: [entry.noteId],
     tags: "converted-to-miwake",

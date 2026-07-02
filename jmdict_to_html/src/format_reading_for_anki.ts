@@ -1,6 +1,66 @@
 import { jmdictFurigana } from "data";
 
 const furigana = await jmdictFurigana();
+let kanaNormalizedFurigana: Map<string, string> | null = null;
+
+function normalizeKanaScript(text: string): string {
+  return [...text].map((char) => {
+    const codePoint = char.codePointAt(0)!;
+    if (codePoint >= 0x30A1 && codePoint <= 0x30F6) {
+      return String.fromCodePoint(codePoint - 0x60);
+    }
+    return char;
+  }).join("");
+}
+
+function getKanaNormalizedFurigana(): Map<string, string> {
+  if (kanaNormalizedFurigana === null) {
+    kanaNormalizedFurigana = new Map();
+    for (const [key, value] of Object.entries(furigana)) {
+      const [jmdictId, word, reading] = key.split("|");
+      const normalizedKey = [
+        jmdictId,
+        normalizeKanaScript(word),
+        normalizeKanaScript(reading),
+      ].join("|");
+      kanaNormalizedFurigana.set(normalizedKey, value);
+    }
+  }
+  return kanaNormalizedFurigana;
+}
+
+function applyKanaScriptFromWord(formattedReading: string, word: string): string {
+  const wordChars = [...word];
+  let wordIndex = 0;
+  let inReading = false;
+  let result = "";
+
+  for (const char of formattedReading) {
+    if (char === "[") {
+      inReading = true;
+      result += char;
+      continue;
+    }
+    if (char === "]") {
+      inReading = false;
+      result += char;
+      continue;
+    }
+    if (inReading || char === " ") {
+      result += char;
+      continue;
+    }
+
+    const wordChar = wordChars[wordIndex++];
+    if (wordChar && normalizeKanaScript(char) === normalizeKanaScript(wordChar)) {
+      result += wordChar;
+    } else {
+      result += char;
+    }
+  }
+
+  return result;
+}
 
 /**
  * Formats a (jmdictId, word, reading) triple into Anki-style furigana format.
@@ -27,5 +87,20 @@ export function formatReadingForAnki(
   }
 
   const key = `${jmdictId}|${word}|${reading}`;
-  return furigana[key] ?? null;
+  const exact = furigana[key];
+  if (exact !== undefined) {
+    return exact;
+  }
+
+  const normalizedKey = [
+    jmdictId,
+    normalizeKanaScript(word),
+    normalizeKanaScript(reading),
+  ].join("|");
+  const kanaSwapped = getKanaNormalizedFurigana().get(normalizedKey);
+  if (kanaSwapped !== undefined) {
+    return applyKanaScriptFromWord(kanaSwapped, word);
+  }
+
+  return null;
 }

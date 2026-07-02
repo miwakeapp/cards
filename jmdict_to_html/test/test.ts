@@ -80,3 +80,8 @@ for (const [id, word, reading] of nonKanjiTestCases) {
     await assertSnapshot(t, result);
   });
 }
+
+Deno.test("formatReadingForAnki: handles hiragana-katakana swapped surface forms", () => {
+  assertEquals(formatReadingForAnki("2643730", "エンジ色", "えんじいろ"), "エンジ 色[いろ]");
+  assertEquals(formatReadingForAnki("2643730", "エンジ色", "エンジいろ"), "エンジ 色[いろ]");
+});

@@ -253,7 +253,7 @@ function wordInSentence(word: string, sentence: string): boolean {
 }
 
 const noteIds = await ac<number[]>("findNotes", {
-  query: "deck:Mining tag:leech -tag:miwake-prototype -tag:converted-to-miwake",
+  query: "deck:Mining tag:leech -tag:converted-to-miwake",
 });
 
 console.error(
@@ -271,7 +271,7 @@ const results: BatchEntry[] = [];
 
 for (const note of notes) {
   const fields = note.fields;
-  const word: string = fields.Word?.value ?? "";
+  const word: string = fields.Word?.value ?? fields["Recognition target"]?.value ?? "";
   const sentence: string = fields.Sentence?.value ?? "";
   const jmdictId = extractJmdictId(fields.Glossary?.value ?? "");
 

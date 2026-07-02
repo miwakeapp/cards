@@ -1,6 +1,6 @@
 import { assertEquals } from "@std/assert";
 import { assertSnapshot } from "@std/testing/snapshot";
-import { preextractedJMDictEntry } from "data";
+import { allJMDictEntries, preextractedJMDictEntry } from "data";
 import { createCard } from "../src/create_card.ts";
 import type { AIGeneratedFields, CardCreationInput } from "../src/types.ts";
 
@@ -323,4 +323,38 @@ Deno.test("createCard: marks plain target when no ruby present", async () => {
   });
 
   assertEquals(card.fullContext, "<mark>瓦解</mark>していく。");
+});
+
+Deno.test("createCard: uses kana-swapped context spelling as recognition target", async () => {
+  const entries = await allJMDictEntries();
+  const jmdictEntry = entries.get("2643730");
+  if (!jmdictEntry) {
+    throw new Error("JMDict entry 2643730 not found");
+  }
+
+  const card = await createCard({
+    input: {
+      context: "埃をかぶった段ボール箱の中には、エンジ色のアルバムがあった。",
+      jmdictId: "2643730",
+      recognitionTarget: "えんじ色",
+    },
+    jmdictEntry,
+    generateFields: createMockGenerator({
+      applicableSenses: [],
+      reading: "えんじいろ",
+      targetInContext: "エンジ色",
+      hint: null,
+      minimizedContext: null,
+      cleanedSource: null,
+      sourceURLIsPublic: false,
+    }),
+  });
+
+  assertEquals(card.key, "エンジ色 | 2643730");
+  assertEquals(card.recognitionTarget, "エンジ色");
+  assertEquals(card.reading, "エンジ 色[いろ]");
+  assertEquals(
+    card.fullContext,
+    "埃をかぶった段ボール箱の中には、<mark>エンジ色</mark>のアルバムがあった。",
+  );
 });

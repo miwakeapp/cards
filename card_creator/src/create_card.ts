@@ -101,6 +101,20 @@ function containsKanji(text: string): boolean {
   return /\p{Script=Han}/v.test(text);
 }
 
+function normalizeKanaScript(text: string): string {
+  return [...text].map((char) => {
+    const codePoint = char.codePointAt(0)!;
+    if (codePoint >= 0x30A1 && codePoint <= 0x30F6) {
+      return String.fromCodePoint(codePoint - 0x60);
+    }
+    return char;
+  }).join("");
+}
+
+function differsOnlyByKanaScript(left: string, right: string): boolean {
+  return left !== right && normalizeKanaScript(left) === normalizeKanaScript(right);
+}
+
 /**
  * Creates a complete MiwakeCard from the given input.
  */
@@ -116,10 +130,17 @@ export async function createCard(options: CreateCardOptions): Promise<MiwakeCard
     sourceURL: input.sourceURL,
   });
 
+  const recognitionTarget = differsOnlyByKanaScript(
+      input.recognitionTarget,
+      aiFields.targetInContext,
+    )
+    ? aiFields.targetInContext
+    : input.recognitionTarget;
+
   // Process the context HTML (needs targetInContext from AI fields)
   const { processedContext, contextReading } = processContext(
     input.context,
-    input.recognitionTarget,
+    recognitionTarget,
     aiFields.targetInContext,
   );
 
@@ -131,8 +152,10 @@ export async function createCard(options: CreateCardOptions): Promise<MiwakeCard
   if (allSensesApply) {
     hint = null;
   }
-  // Strip hint if it doesn't contain the recognition target (invalid hint)
-  if (hint !== null && !hint.includes(input.recognitionTarget)) {
+  // Strip hint if it doesn't contain either recognition target spelling (invalid hint)
+  if (
+    hint !== null && !hint.includes(recognitionTarget) && !hint.includes(input.recognitionTarget)
+  ) {
     hint = null;
   }
 
@@ -142,12 +165,12 @@ export async function createCard(options: CreateCardOptions): Promise<MiwakeCard
 
   // Format reading with precise furigana placement
   let reading: string | null = null;
-  if (containsKanji(input.recognitionTarget)) {
-    reading = formatReadingForAnki(jmdictEntry.id, input.recognitionTarget, readingKana);
+  if (containsKanji(recognitionTarget)) {
+    reading = formatReadingForAnki(jmdictEntry.id, recognitionTarget, readingKana);
     // Fallback if formatReadingForAnki returns null (not in furigana database)
     if (reading === null) {
       // Simple fallback: just append reading in brackets
-      reading = `${input.recognitionTarget}[${readingKana}]`;
+      reading = `${recognitionTarget}[${readingKana}]`;
     }
   }
 
@@ -156,7 +179,7 @@ export async function createCard(options: CreateCardOptions): Promise<MiwakeCard
 
   // Build the key
   const key = formatKey(
-    input.recognitionTarget,
+    recognitionTarget,
     input.jmdictId,
     aiFields.applicableSenses,
     jmdictEntry.sense.length,
@@ -168,7 +191,7 @@ export async function createCard(options: CreateCardOptions): Promise<MiwakeCard
 
   return {
     key,
-    recognitionTarget: input.recognitionTarget,
+    recognitionTarget,
     reading,
     hint,
     fullContext: processedContext,
