@@ -222,6 +222,7 @@ Rules:
 - Always include a complete sentence (ending with 。or closing quotation marks or other natural terminal punctuation)
 - If the sentence is very short (under ~15 characters) or unclear on its own, include adjacent sentence(s) to clarify
 - If the sentence is part of one- or two-sentence dialogue, include the whole dialogue exchange including 「」
+- Never return unmatched Japanese quote brackets: if the selected text ends with 」, include the corresponding opening 「
 - Do NOT include more context than necessary — usually one sentence is enough
 - Preserve all HTML tags exactly as they appear (especially <ruby>, <rt>)
 - Return ONLY the selected HTML context, no explanation or wrapping`,

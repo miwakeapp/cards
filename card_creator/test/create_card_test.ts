@@ -358,3 +358,29 @@ Deno.test("createCard: uses kana-swapped context spelling as recognition target"
     "埃をかぶった段ボール箱の中には、<mark>エンジ色</mark>のアルバムがあった。",
   );
 });
+
+Deno.test("createCard: drops minimized context equivalent to full context without furigana", async () => {
+  const jmdictEntry = await preextractedJMDictEntry("1209590");
+
+  const card = await createCard({
+    input: {
+      context:
+        "いろいろな人間のルールが自分のなかで<ruby>瓦<rt>が</rt>解<rt>かい</rt></ruby>していくように思えて、何度考えても同じ結論に戻ってしまった。",
+      jmdictId: "1209590",
+      recognitionTarget: "瓦解",
+    },
+    jmdictEntry,
+    generateFields: createMockGenerator({
+      applicableSenses: [],
+      reading: "がかい",
+      targetInContext: "瓦解",
+      hint: null,
+      minimizedContext:
+        "いろいろな人間のルールが自分のなかで<mark>瓦解</mark>していくように思えて、何度考えても同じ結論に戻ってしまった。",
+      cleanedSource: null,
+      sourceURLIsPublic: false,
+    }),
+  });
+
+  assertEquals(card.minimizedContext, null);
+});

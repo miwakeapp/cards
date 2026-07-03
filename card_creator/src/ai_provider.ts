@@ -112,6 +112,8 @@ Your task is to analyze a Japanese word usage in context and generate appropriat
 4. minimizedContext:
    - Return null if context is already ≤50 characters
    - If >50 characters, create a SHORT, self-contained sentence
+   - Return null if the result would be substantially the same as the full context
+   - Return null if the only difference would be removing furigana, ruby, or other markup
    - CUT trailing clauses after the core point:
      * "〜だったのに、結局うまくいかなかった" → "〜だった。"
      * "〜になってきて、最近は..." → "〜になった。"
@@ -122,7 +124,7 @@ Your task is to analyze a Japanese word usage in context and generate appropriat
      * "努力が実って、合格できた" (keep both - they're connected)
    - Change conjugations to end naturally: "していて" → "していた"
    - MUST wrap recognition target in <mark></mark> tags
-   - Keep 「」 when target is in dialogue
+   - Keep balanced 「」 when target is in dialogue; never return unmatched quote brackets
 
 5. reading: The kana reading for this context. Preserve the script (hiragana/katakana) of any kana already in the recognition target. For example, if the target is "ハンダ付け", return "ハンダづけ" (keeping ハンダ as katakana), not "はんだづけ".
 

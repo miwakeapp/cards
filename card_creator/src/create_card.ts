@@ -115,6 +115,32 @@ function differsOnlyByKanaScript(left: string, right: string): boolean {
   return left !== right && normalizeKanaScript(left) === normalizeKanaScript(right);
 }
 
+function normalizeContextForComparison(context: string): string {
+  return context
+    .replace(/<[^>]+>/g, "")
+    .replace(/\[[^\]]+\]/g, "")
+    .replace(/\s+/g, "")
+    .trim();
+}
+
+function postProcessMinimizedContext(
+  fullContext: string,
+  minimizedContext: string | null,
+): string | null {
+  if (minimizedContext === null) {
+    return null;
+  }
+
+  const normalizedFull = normalizeContextForComparison(fullContext);
+  const normalizedMinimized = normalizeContextForComparison(minimizedContext);
+
+  if (normalizedMinimized === "" || normalizedMinimized === normalizedFull) {
+    return null;
+  }
+
+  return minimizedContext;
+}
+
 /**
  * Creates a complete MiwakeCard from the given input.
  */
@@ -188,6 +214,10 @@ export async function createCard(options: CreateCardOptions): Promise<MiwakeCard
   // Determine source and URL
   const source = aiFields.cleanedSource ?? input.source ?? null;
   const sourceURL = aiFields.sourceURLIsPublic ? (input.sourceURL ?? null) : null;
+  const minimizedContext = postProcessMinimizedContext(
+    processedContext,
+    aiFields.minimizedContext,
+  );
 
   return {
     key,
@@ -195,7 +225,7 @@ export async function createCard(options: CreateCardOptions): Promise<MiwakeCard
     reading,
     hint,
     fullContext: processedContext,
-    minimizedContext: aiFields.minimizedContext,
+    minimizedContext,
     dictionaryEntry,
     source,
     sourceURL,
