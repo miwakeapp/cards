@@ -54,7 +54,7 @@ const aiFieldsSchema = z.object({
     .string()
     .nullable()
     .describe(
-      "A shortened version of the context that preserves meaning, or null if already short enough.",
+      "A shortened version of the context that preserves meaning, or null if no useful shorter version exists.",
     ),
   cleanedSource: z
     .string()
@@ -110,7 +110,6 @@ Your task is to analyze a Japanese word usage in context and generate appropriat
    - Maximum: 8 characters total
 
 4. minimizedContext:
-   - Return null if context is already ≤50 characters
    - If >50 characters, create a SHORT, self-contained sentence
    - Return null if the result would be substantially the same as the full context
    - Return null if the only difference would be removing furigana, ruby, or other markup

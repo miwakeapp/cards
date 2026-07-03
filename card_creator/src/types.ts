@@ -48,7 +48,7 @@ export interface MiwakeCard {
   fullContext: string;
 
   /**
-   * AI-trimmed minimal context, or null if full context is already short enough.
+   * AI-trimmed minimal context, or null if no useful shorter version exists.
    */
   minimizedContext: string | null;
 
@@ -82,7 +82,7 @@ export interface AIGeneratedFields {
   /** Optional disambiguation hint. Null if not needed. */
   hint: string | null;
 
-  /** Trimmed context sentence, or null if original is short enough. */
+  /** Trimmed context sentence, or null if no useful shorter version exists. */
   minimizedContext: string | null;
 
   /** Cleaned source name, or null. */
