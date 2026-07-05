@@ -156,6 +156,20 @@ button.expando {
     color: inherit;
     text-decoration: underline;
   }
+
+  cite {
+    font-style: normal;
+
+    &:lang(ja) {
+      &::before {
+        content: "『";
+      }
+
+      &::after {
+        content: "』";
+      }
+    }
+  }
 }
 
 /* Deemphasize irrelevant senses */

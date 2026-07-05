@@ -8,7 +8,6 @@ snapshot[`createCard: full card structure snapshot 1`] = `
   minimizedContext: "箱の大小で値段が変わる。",
   reading: "大[だい] 小[しょう]",
   recognitionTarget: "大小",
-  source: "Test Book",
-  sourceURL: null,
+  source: '<span lang="en">Test Book</span>',
 }
 `;

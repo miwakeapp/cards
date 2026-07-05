@@ -101,7 +101,7 @@ Deno.test("createCard: reading has furigana for kanji words", async () => {
   assertEquals(card.reading, "大[だい] 小[しょう]");
 });
 
-Deno.test("createCard: sourceURL excluded when not public", async () => {
+Deno.test("createCard: source uses span when URL is not public", async () => {
   const jmdictEntry = await preextractedJMDictEntry("1414110");
 
   const mockAIFields: AIGeneratedFields = {
@@ -118,6 +118,7 @@ Deno.test("createCard: sourceURL excluded when not public", async () => {
     context: "テスト",
     jmdictId: "1414110",
     recognitionTarget: "大小",
+    source: "テスト本",
     sourceURL: "https://reader.ttsu.app/private",
   };
 
@@ -127,10 +128,10 @@ Deno.test("createCard: sourceURL excluded when not public", async () => {
     generateFields: createMockGenerator(mockAIFields),
   });
 
-  assertEquals(card.sourceURL, null);
+  assertEquals(card.source, `<span lang="ja">テスト本</span>`);
 });
 
-Deno.test("createCard: sourceURL included when public", async () => {
+Deno.test("createCard: source uses link when URL is public", async () => {
   const jmdictEntry = await preextractedJMDictEntry("1414110");
 
   const mockAIFields: AIGeneratedFields = {
@@ -147,6 +148,7 @@ Deno.test("createCard: sourceURL included when public", async () => {
     context: "テスト",
     jmdictId: "1414110",
     recognitionTarget: "大小",
+    source: "NHKニュース",
     sourceURL: "https://www3.nhk.or.jp/news/article",
   };
 
@@ -156,7 +158,39 @@ Deno.test("createCard: sourceURL included when public", async () => {
     generateFields: createMockGenerator(mockAIFields),
   });
 
-  assertEquals(card.sourceURL, "https://www3.nhk.or.jp/news/article");
+  assertEquals(
+    card.source,
+    `<a href="https://www3.nhk.or.jp/news/article" lang="ja">NHKニュース</a>`,
+  );
+});
+
+Deno.test("createCard: English source is marked with lang=en", async () => {
+  const jmdictEntry = await preextractedJMDictEntry("1414110");
+
+  const mockAIFields: AIGeneratedFields = {
+    applicableSenses: [1],
+    reading: "だいしょう",
+    hint: null,
+    targetInContext: "大小",
+    minimizedContext: null,
+    cleanedSource: null,
+    sourceURLIsPublic: false,
+  };
+
+  const input: CardCreationInput = {
+    context: "テスト",
+    jmdictId: "1414110",
+    recognitionTarget: "大小",
+    source: "Tatoeba",
+  };
+
+  const card = await createCard({
+    input,
+    jmdictEntry,
+    generateFields: createMockGenerator(mockAIFields),
+  });
+
+  assertEquals(card.source, `<span lang="en">Tatoeba</span>`);
 });
 
 // Snapshot test for full card structure

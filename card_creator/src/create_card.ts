@@ -141,6 +141,37 @@ function postProcessMinimizedContext(
   return minimizedContext;
 }
 
+function escapeHTML(text: string): string {
+  return text
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
+function inferSourceLanguage(sourceText: string): "ja" | "en" {
+  return /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/v.test(sourceText) ? "ja" : "en";
+}
+
+function formatSourceHTML(
+  sourceText: string | null,
+  sourceURL: string | null,
+): string | null {
+  if (sourceText === null && sourceURL === null) {
+    return null;
+  }
+
+  const label = sourceText ?? sourceURL!;
+  const lang = inferSourceLanguage(label);
+  const escapedLabel = escapeHTML(label);
+
+  if (sourceURL === null) {
+    return `<span lang="${lang}">${escapedLabel}</span>`;
+  }
+
+  return `<a href="${escapeHTML(sourceURL)}" lang="${lang}">${escapedLabel}</a>`;
+}
+
 /**
  * Creates a complete MiwakeCard from the given input.
  */
@@ -212,8 +243,9 @@ export async function createCard(options: CreateCardOptions): Promise<MiwakeCard
   );
 
   // Determine source and URL
-  const source = aiFields.cleanedSource ?? input.source ?? null;
+  const sourceText = aiFields.cleanedSource ?? input.source ?? null;
   const sourceURL = aiFields.sourceURLIsPublic ? (input.sourceURL ?? null) : null;
+  const source = formatSourceHTML(sourceText, sourceURL);
   const minimizedContext = postProcessMinimizedContext(
     processedContext,
     aiFields.minimizedContext,
@@ -228,6 +260,5 @@ export async function createCard(options: CreateCardOptions): Promise<MiwakeCard
     minimizedContext,
     dictionaryEntry,
     source,
-    sourceURL,
   };
 }

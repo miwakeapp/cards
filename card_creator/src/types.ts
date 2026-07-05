@@ -14,7 +14,7 @@ export interface CardCreationInput {
   /** Optional source name (e.g., book title). */
   source?: string;
 
-  /** Optional source URL. */
+  /** Optional source URL. Folded into the Source HTML field if useful. */
   sourceURL?: string;
 }
 
@@ -55,11 +55,8 @@ export interface MiwakeCard {
   /** Semantic HTML dictionary entry from jmdict_to_html. */
   dictionaryEntry: string;
 
-  /** Cleaned-up source name. */
+  /** Source HTML, or null if no source is available. */
   source: string | null;
-
-  /** Source URL, or null if not public/useful. */
-  sourceURL: string | null;
 }
 
 /**

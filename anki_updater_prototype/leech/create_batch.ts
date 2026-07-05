@@ -132,7 +132,6 @@ for (const { entry, card } of cards) {
     "Minimized context": card.minimizedContext ?? "",
     "Dictionary entry": card.dictionaryEntry,
     "Source": card.source ?? "",
-    "Source URL": card.sourceURL ?? "",
   };
 
   const note = {

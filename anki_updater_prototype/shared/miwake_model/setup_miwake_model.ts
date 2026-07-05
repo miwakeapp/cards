@@ -3,7 +3,7 @@
  *
  * - Fields (in order, with Key first for sorting/browsing):
  *   Key, Recognition target, Reading, Hint, Full context, Minimized context,
- *   Dictionary entry, Source, Source URL
+ *   Dictionary entry, Source
  * - Templates match the current Anki model (furigana:Reading fallback).
  * - CSS = card chrome + current minimal.css (night-mode aware).
  *
@@ -22,7 +22,6 @@ const FIELDS = [
   "Minimized context",
   "Dictionary entry",
   "Source",
-  "Source URL",
 ];
 const FIELD_FONT_TARGETS = [
   "Key",

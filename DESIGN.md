@@ -105,17 +105,13 @@ After that setup is complete, the unobtrusive indicator changes color. From now 
 
 - **Dictionary entry**: a semantic-HTML version of the specified JMDict entry. (Discussed in detail [later](#semantic-html-jmdict).) Importantly, this is not specific to the card in question, so it can be easily updated later as JMDict updates.
 
-- **Source**: the source from which this word was found. This is derived from the raw `<title>` and URL of the page where the term was mined, but trimmed by AI ✨ into something useful.
+- **Source**: the source from which this word was found. This field may contain HTML, such as an `<a>` element when the source URL is public/useful, or a `<span>` with the appropriate `lang` attribute when it is plain text. The source text is derived from the raw `<title>` and URL of the page where the term was mined, but trimmed by AI ✨ into something useful.
 
   - Sample: `ソードアート・オンライン2 アインクラッド (電撃文庫) | ッツ Ebook Reader` gets trimmed to `ソードアート・オンライン2 アインクラッド`
 
   - Sample: `北朝鮮から弾道ミサイル発射 日本のEEZ外に落下か 防衛省 | NHKニュース | 北朝鮮 ミサイル、核・ミサイル"` gets trimmed to `北朝鮮から弾道ミサイル発射 日本のEEZ外に落下か 防衛省`
 
-- **Source URL** (optional): the URL for the source from which this word was found.
-
-  - This will be omitted if AI ✨ or other heuristics can determine that the URL is not "public". (I.e., able to be revisited in the future, or shared when sharing flashcards between users.) Notably, `https://reader.ttsu.app/` URLs are not public.
-
-  - Making this foolproof might not be possible, and so this might not make it into the displayed flashcard, at least in the MVP. But, recording it is better than throwing it away.
+  - If AI ✨ or other heuristics determine that the URL is not "public" (i.e. able to be revisited in the future, or shared when sharing flashcards between users), the URL is omitted from the field. Notably, `https://reader.ttsu.app/` URLs are not public.
 
 - **Tags**: Tags are probably a reasonable place to store metadata. For example, it might be useful to store the JMDict version, or the version of this software, used to create the card.
 
@@ -123,7 +119,7 @@ After that setup is complete, the unobtrusive indicator changes color. From now 
 
 The core data model discussed above forms the foundation for displaying miwake cards with some amount of flexibility and customizability. A default display will be provided, but it might evolve over time as my opinions on the best flashcard format change, or it can be customized by advanced users.
 
-The default display uses the [Anki templating language](https://docs.ankiweb.net/templates/intro.html) to display a simple front side with the **Word** field, and the **Hint** field if present. The back side contains the **Reading** (or a repeat of the **Word** if there is no **Reading** field), the **Dictionary entry**, and the **Minimized context sentence**. The **Full context sentence** is hidden by default but can be shown with a disclosure button. The **Source** (linked to its **Source URL**, if present) is not currently included in the template, but TODO maybe we should.
+The default display uses the [Anki templating language](https://docs.ankiweb.net/templates/intro.html) to display a simple front side with the **Word** field, and the **Hint** field if present. The back side contains the **Reading** (or a repeat of the **Word** if there is no **Reading** field), the **Dictionary entry**, and the **Minimized context sentence**. The **Full context sentence** is hidden by default but can be shown with a disclosure button. The **Source** field is included when present.
 
 The HTML used for displaying these will be highly semantic, allowing customization with CSS. The default styling will work with both dark and light modes, keying off of Anki's `.night-mode` selector. (TODO or should we use `@media`? What are the tradeoffs, in modern Anki?)
 
