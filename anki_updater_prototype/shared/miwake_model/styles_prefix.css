@@ -45,14 +45,6 @@ rt {
   font-size: 3rem;
   text-align: center;
   margin: 0;
-
-  /*
-    Our base font-size is large enough we can reduce from 50% to 33%. This reduces horizontal shifting to cases where
-    the rt contains ≥4 characters, which is much rarer than 3.
-  */
-  rt {
-    font-size: 33%;
-  }
 }
 
 #hint {
@@ -118,7 +110,8 @@ button.expando {
     transform: rotate(0.5turn);
   }
 
-  &:hover, &:focus-visible {
+  &:hover,
+  &:focus-visible {
     opacity: 0.9;
     background-color: rgba(0 0 0 / 0.06);
 
