@@ -12,7 +12,7 @@
  *   recognition target against JMDict (preferring kanji forms over kana).
  *
  * Run with:
- *   deno task create-from-csv <file.csv> [--model=claude-opus-4-6] [--dry-run]
+ *   deno task create-from-csv <file.csv> [--model=claude-opus-4-8] [--dry-run]
  */
 
 import { parse as parseCSV } from "@std/csv";

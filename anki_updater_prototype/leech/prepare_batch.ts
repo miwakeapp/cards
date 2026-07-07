@@ -6,7 +6,7 @@
  * a JSON file for human review.
  *
  * Run with:
- *   deno task prepare-leech-batch [--count=20] [--model=claude-opus-4-6]
+ *   deno task prepare-leech-batch [--count=20] [--model=claude-opus-4-8]
  */
 
 import { join } from "@std/path";

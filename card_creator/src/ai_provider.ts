@@ -16,14 +16,14 @@ import { FEW_SHOT_EXAMPLES } from "./few_shot_examples.ts";
  * Supported AI model IDs.
  */
 export const MODEL_IDS = [
-  "gemini-3.1-pro-preview",
-  "claude-opus-4-6",
-  "gpt-5.2",
+  "gemini-3.5-flash",
+  "claude-opus-4-8",
+  "gpt-5.5",
 ] as const;
 
 export type ModelId = (typeof MODEL_IDS)[number];
 
-export const DEFAULT_MODEL_ID: ModelId = "claude-opus-4-6";
+export const DEFAULT_MODEL_ID: ModelId = "claude-opus-4-8";
 
 /**
  * Schema for AI-generated card fields.

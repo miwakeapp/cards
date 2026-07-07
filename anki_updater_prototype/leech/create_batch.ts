@@ -2,7 +2,7 @@
  * Creates Miwake cards from a reviewed batch JSON file and pushes them to Anki.
  *
  * Run with:
- *   deno task create-leech-batch <batch-file.json> [--model=claude-opus-4-6] [--dry-run]
+ *   deno task create-leech-batch <batch-file.json> [--model=claude-opus-4-8] [--dry-run]
  */
 
 import { createCard } from "../../card_creator/src/mod.ts";
