@@ -93,7 +93,8 @@
     > li {
       /* Hide inter-element whitespace */
       font-size: 0;
-      > *, &::after {
+      > *,
+      &::after {
         font-size: var(--default-font-size);
       }
 
@@ -151,7 +152,9 @@
     display: inline;
 
     font-size: 0;
-    > *, &::before, &::after {
+    > *,
+    &::before,
+    &::after {
       font-size: var(--default-font-size);
     }
 

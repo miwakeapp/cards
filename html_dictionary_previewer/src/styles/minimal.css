@@ -78,15 +78,24 @@
 
       /* Hide inter-element whitespace */
       font-size: 0;
-      > *, &::before, &::after {
+      > *,
+      &::before,
+      &::after {
         font-size: var(--default-font-size);
       }
 
-      &.tag-rK, &.tag-rk, &.tag-ik, &.tag-iK, &.tag-ok, &.tag-oK, &.tag-io {
+      &.tag-rK,
+      &.tag-rk,
+      &.tag-ik,
+      &.tag-iK,
+      &.tag-ok,
+      &.tag-oK,
+      &.tag-io {
         color: var(--rarely-used-color);
       }
 
-      &.tag-sK, &.tag-sk {
+      &.tag-sK,
+      &.tag-sk {
         display: none;
       }
 
@@ -117,7 +126,13 @@
     display: none;
   }
 
-  .part-of-speech, .applies-to, .field, .language-source, .dialect, .related, .info {
+  .part-of-speech,
+  .applies-to,
+  .field,
+  .language-source,
+  .dialect,
+  .related,
+  .info {
     list-style-type: none;
     margin: 0;
     padding: 0;
