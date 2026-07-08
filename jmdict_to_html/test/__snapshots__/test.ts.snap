@@ -1,5 +1,108 @@
 export const snapshot = {};
 
+snapshot[`renderEntry: 2030540 1`] = `
+'<ul class="forms kanji">
+  <li><span lang="ja">狂喜乱舞</span></li>
+</ul>
+<ul class="forms kana">
+  <li><span lang="ja">きょうきらんぶ</span></li>
+</ul>
+<ul class="part-of-speech">
+  <li class="n">noun</li>
+  <li class="vs"><span lang="ja">する</span> verb</li>
+</ul>
+<ol class="senses">
+  <li>
+    <ul class="glosses">
+      <li>boisterous dance</li>
+      <li>dancing wildly</li>
+    </ul>
+  </li>
+</ol>
+<ul class="misc">
+  <li class="yoji"><span lang="ja">四字熟語</span></li>
+</ul>'
+`;
+
+snapshot[`renderEntry: 1414110 1`] = `
+'<ul class="forms kanji">
+  <li class="common"><span lang="ja">大小</span></li>
+</ul>
+<ul class="forms kana">
+  <li class="common"><span lang="ja">だいしょう</span></li>
+</ul>
+<ul class="part-of-speech">
+  <li class="n">noun</li>
+</ul>
+<ol class="senses">
+  <li>
+    <ul class="glosses">
+      <li>size</li>
+    </ul>
+  </li>
+  <li>
+    <ul class="part-of-speech">
+      <li class="adj-no"><span lang="ja">の</span>-adj</li>
+    </ul>
+    <ul class="glosses">
+      <li>large and small (sizes)</li>
+      <li>various sizes</li>
+    </ul>
+  </li>
+  <li>
+    <ul class="glosses">
+      <li>daishō (matched pair of long and short swords)</li>
+    </ul>
+  </li>
+  <li>
+    <ul class="glosses">
+      <li>large and small drums</li>
+    </ul>
+  </li>
+  <li>
+    <ul class="glosses">
+      <li>long months and short months</li>
+    </ul>
+  </li>
+  <li>
+    <ul class="glosses">
+      <li>sic bo (Macao dice game)</li>
+      <li>tai sai</li>
+      <li>dai siu</li>
+      <li>big and small</li>
+    </ul>
+  </li>
+</ol>'
+`;
+
+snapshot[`renderEntry: 1590470 1`] = `
+'<ul class="forms kanji">
+  <li class="common"><span lang="ja">画期的</span></li>
+  <li class="tag-rK">
+    <span lang="ja">劃期的</span>
+    <ul class="tags">
+      <li class="rK">rare</li>
+    </ul>
+  </li>
+</ul>
+<ul class="forms kana">
+  <li class="common"><span lang="ja">かっきてき</span></li>
+</ul>
+<ul class="part-of-speech">
+  <li class="adj-na"><span lang="ja">な</span>-adj</li>
+</ul>
+<ol class="senses">
+  <li>
+    <ul class="glosses">
+      <li>ground-breaking</li>
+      <li>revolutionary</li>
+      <li>unprecedented</li>
+      <li>epoch-making</li>
+    </ul>
+  </li>
+</ol>'
+`;
+
 snapshot[`renderEntry: 1000230 1`] = `
 '<ul class="forms kanji">
   <li class="tag-rK">
@@ -188,198 +291,6 @@ snapshot[`renderEntry: 1158110 1`] = `
 </ol>'
 `;
 
-snapshot[`renderEntry: 1178920 1`] = `
-'<ul class="forms kanji">
-  <li class="tag-rK">
-    <span lang="ja">於いて</span>
-    <ul class="tags">
-      <li class="rK">rare</li>
-    </ul>
-  </li>
-  <li class="tag-rK">
-    <span lang="ja">於て</span>
-    <ul class="tags">
-      <li class="rK">rare</li>
-    </ul>
-  </li>
-  <li class="tag-sK">
-    <span lang="ja">於</span>
-    <ul class="tags">
-      <li class="sK">search-only</li>
-    </ul>
-  </li>
-</ul>
-<ul class="forms kana">
-  <li><span lang="ja">おいて</span></li>
-</ul>
-<ul class="part-of-speech">
-  <li class="exp">expression</li>
-</ul>
-<ol class="senses">
-  <li>
-    <ul class="glosses">
-      <li>at (a time or place)</li>
-      <li>in</li>
-      <li>on</li>
-    </ul>
-    <ul class="related">
-      <li><a href="https://takoboto.jp/?q=%E3%81%AB%E3%81%8A%E3%81%84%E3%81%A6" lang="ja">において</a> (sense 1)</li>
-    </ul>
-  </li>
-  <li>
-    <ul class="glosses">
-      <li>in (a situation, matter, etc.)</li>
-      <li>on (a point)</li>
-      <li>when it comes to</li>
-      <li>regarding</li>
-      <li>with respect to</li>
-      <li>in (terms of)</li>
-      <li>as to</li>
-      <li>as for</li>
-    </ul>
-    <ul class="related">
-      <li><a href="https://takoboto.jp/?q=%E3%81%AB%E3%81%8A%E3%81%84%E3%81%A6" lang="ja">において</a> (sense 2)</li>
-    </ul>
-  </li>
-  <li>
-    <ul class="glosses">
-      <li>on the part of</li>
-      <li>under the authority of</li>
-      <li>in the name of</li>
-    </ul>
-    <ul class="related">
-      <li><a href="https://takoboto.jp/?q=%E3%81%AB%E3%81%8A%E3%81%84%E3%81%A6" lang="ja">において</a> (sense 3)</li>
-    </ul>
-  </li>
-</ol>
-<ul class="misc">
-  <li class="uk">usually kana</li>
-</ul>
-<ul class="info">
-  <li>as ...<span lang="ja">において</span></li>
-</ul>'
-`;
-
-snapshot[`renderEntry: 1414110 1`] = `
-'<ul class="forms kanji">
-  <li class="common"><span lang="ja">大小</span></li>
-</ul>
-<ul class="forms kana">
-  <li class="common"><span lang="ja">だいしょう</span></li>
-</ul>
-<ul class="part-of-speech">
-  <li class="n">noun</li>
-</ul>
-<ol class="senses">
-  <li>
-    <ul class="glosses">
-      <li>size</li>
-    </ul>
-  </li>
-  <li>
-    <ul class="part-of-speech">
-      <li class="adj-no"><span lang="ja">の</span>-adj</li>
-    </ul>
-    <ul class="glosses">
-      <li>large and small (sizes)</li>
-      <li>various sizes</li>
-    </ul>
-  </li>
-  <li>
-    <ul class="glosses">
-      <li>daishō (matched pair of long and short swords)</li>
-    </ul>
-  </li>
-  <li>
-    <ul class="glosses">
-      <li>large and small drums</li>
-    </ul>
-  </li>
-  <li>
-    <ul class="glosses">
-      <li>long months and short months</li>
-    </ul>
-  </li>
-  <li>
-    <ul class="glosses">
-      <li>sic bo (Macao dice game)</li>
-      <li>tai sai</li>
-      <li>dai siu</li>
-      <li>big and small</li>
-    </ul>
-  </li>
-</ol>'
-`;
-
-snapshot[`renderEntry: 1590470 1`] = `
-'<ul class="forms kanji">
-  <li class="common"><span lang="ja">画期的</span></li>
-  <li class="tag-rK">
-    <span lang="ja">劃期的</span>
-    <ul class="tags">
-      <li class="rK">rare</li>
-    </ul>
-  </li>
-</ul>
-<ul class="forms kana">
-  <li class="common"><span lang="ja">かっきてき</span></li>
-</ul>
-<ul class="part-of-speech">
-  <li class="adj-na"><span lang="ja">な</span>-adj</li>
-</ul>
-<ol class="senses">
-  <li>
-    <ul class="glosses">
-      <li>ground-breaking</li>
-      <li>revolutionary</li>
-      <li>unprecedented</li>
-      <li>epoch-making</li>
-    </ul>
-  </li>
-</ol>'
-`;
-
-snapshot[`renderEntry: 1604990 1`] = `
-'<ul class="forms kanji">
-  <li><span lang="ja">目にあう</span></li>
-  <li><span lang="ja">目に遭う</span></li>
-  <li class="tag-iK">
-    <span lang="ja">目に会う</span>
-    <ul class="tags">
-      <li class="iK">irregular</li>
-    </ul>
-  </li>
-  <li class="tag-sK">
-    <span lang="ja">めに遭う</span>
-    <ul class="tags">
-      <li class="sK">search-only</li>
-    </ul>
-  </li>
-  <li class="tag-sK">
-    <span lang="ja">めに会う</span>
-    <ul class="tags">
-      <li class="sK">search-only</li>
-    </ul>
-  </li>
-</ul>
-<ul class="forms kana">
-  <li><span lang="ja">めにあう</span></li>
-</ul>
-<ul class="part-of-speech">
-  <li class="exp">expression</li>
-  <li class="v5u"><span lang="ja">5段</span> verb</li>
-</ul>
-<ol class="senses">
-  <li>
-    <ul class="glosses">
-      <li>to experience (something unpleasant)</li>
-      <li>to go through</li>
-      <li>to suffer</li>
-    </ul>
-  </li>
-</ol>'
-`;
-
 snapshot[`renderEntry: 1632080 1`] = `
 '<ul class="forms kanji">
   <li><span lang="ja">松明</span></li>
@@ -478,27 +389,75 @@ snapshot[`renderEntry: 2013080 1`] = `
 </ol>'
 `;
 
-snapshot[`renderEntry: 2030540 1`] = `
+snapshot[`renderEntry: 1178920 1`] = `
 '<ul class="forms kanji">
-  <li><span lang="ja">狂喜乱舞</span></li>
+  <li class="tag-rK">
+    <span lang="ja">於いて</span>
+    <ul class="tags">
+      <li class="rK">rare</li>
+    </ul>
+  </li>
+  <li class="tag-rK">
+    <span lang="ja">於て</span>
+    <ul class="tags">
+      <li class="rK">rare</li>
+    </ul>
+  </li>
+  <li class="tag-sK">
+    <span lang="ja">於</span>
+    <ul class="tags">
+      <li class="sK">search-only</li>
+    </ul>
+  </li>
 </ul>
 <ul class="forms kana">
-  <li><span lang="ja">きょうきらんぶ</span></li>
+  <li><span lang="ja">おいて</span></li>
 </ul>
 <ul class="part-of-speech">
-  <li class="n">noun</li>
-  <li class="vs"><span lang="ja">する</span> verb</li>
+  <li class="exp">expression</li>
 </ul>
 <ol class="senses">
   <li>
     <ul class="glosses">
-      <li>boisterous dance</li>
-      <li>dancing wildly</li>
+      <li>at (a time or place)</li>
+      <li>in</li>
+      <li>on</li>
+    </ul>
+    <ul class="related">
+      <li><a href="https://takoboto.jp/?q=%E3%81%AB%E3%81%8A%E3%81%84%E3%81%A6" lang="ja">において</a> (sense 1)</li>
+    </ul>
+  </li>
+  <li>
+    <ul class="glosses">
+      <li>in (a situation, matter, etc.)</li>
+      <li>on (a point)</li>
+      <li>when it comes to</li>
+      <li>regarding</li>
+      <li>with respect to</li>
+      <li>in (terms of)</li>
+      <li>as to</li>
+      <li>as for</li>
+    </ul>
+    <ul class="related">
+      <li><a href="https://takoboto.jp/?q=%E3%81%AB%E3%81%8A%E3%81%84%E3%81%A6" lang="ja">において</a> (sense 2)</li>
+    </ul>
+  </li>
+  <li>
+    <ul class="glosses">
+      <li>on the part of</li>
+      <li>under the authority of</li>
+      <li>in the name of</li>
+    </ul>
+    <ul class="related">
+      <li><a href="https://takoboto.jp/?q=%E3%81%AB%E3%81%8A%E3%81%84%E3%81%A6" lang="ja">において</a> (sense 3)</li>
     </ul>
   </li>
 </ol>
 <ul class="misc">
-  <li class="yoji"><span lang="ja">四字熟語</span></li>
+  <li class="uk">usually kana</li>
+</ul>
+<ul class="info">
+  <li>as ...<span lang="ja">において</span></li>
 </ul>'
 `;
 
@@ -550,6 +509,9 @@ snapshot[`renderEntry: 2861582 1`] = `
     <ul class="glosses">
       <li>introducing a customer or lead to other employees or departments</li>
     </ul>
+    <ul class="language-source">
+      <li class="lang-eng">English (wasei): <span lang="en">toss up</span></li>
+    </ul>
   </li>
   <li>
     <ul class="glosses">
@@ -559,10 +521,48 @@ snapshot[`renderEntry: 2861582 1`] = `
 </ol>
 <ul class="field">
   <li class="bus">business</li>
-</ul>
-<ul class="language-source">
-  <li class="lang-eng">English (wasei): <span lang="en">toss up</span></li>
 </ul>'
+`;
+
+snapshot[`renderEntry: 1604990 1`] = `
+'<ul class="forms kanji">
+  <li><span lang="ja">目にあう</span></li>
+  <li><span lang="ja">目に遭う</span></li>
+  <li class="tag-iK">
+    <span lang="ja">目に会う</span>
+    <ul class="tags">
+      <li class="iK">irregular</li>
+    </ul>
+  </li>
+  <li class="tag-sK">
+    <span lang="ja">めに遭う</span>
+    <ul class="tags">
+      <li class="sK">search-only</li>
+    </ul>
+  </li>
+  <li class="tag-sK">
+    <span lang="ja">めに会う</span>
+    <ul class="tags">
+      <li class="sK">search-only</li>
+    </ul>
+  </li>
+</ul>
+<ul class="forms kana">
+  <li><span lang="ja">めにあう</span></li>
+</ul>
+<ul class="part-of-speech">
+  <li class="exp">expression</li>
+  <li class="v5u"><span lang="ja">5段</span> verb</li>
+</ul>
+<ol class="senses">
+  <li>
+    <ul class="glosses">
+      <li>to experience (something unpleasant)</li>
+      <li>to go through</li>
+      <li>to suffer</li>
+    </ul>
+  </li>
+</ol>'
 `;
 
 snapshot[`formatReadingForAnki: 大人買い 1`] = `"大人[おとな] 買[が]い"`;

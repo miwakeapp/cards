@@ -8,7 +8,6 @@ import type {
   Xref,
 } from "@scriptin/jmdict-simplified-types";
 import { iso6392BTo1 } from "iso-639-2";
-import { escape } from "@std/html";
 import { equal } from "@std/assert";
 
 import {
@@ -44,7 +43,7 @@ const SECTION_DESCRIPTORS: SectionDescriptor[] = [
   {
     className: "field",
     getItems: (sense) =>
-      sense.field.map((tag) => `<li class="${tag}">${escape(expandField(tag as Tag))}</li>`),
+      sense.field.map((tag) => `<li class="${tag}">${escapeText(expandField(tag as Tag))}</li>`),
   },
   {
     className: "language-source",
@@ -53,7 +52,7 @@ const SECTION_DESCRIPTORS: SectionDescriptor[] = [
   {
     className: "dialect",
     getItems: (sense) =>
-      sense.dialect.map((tag) => `<li class="${tag}">${escape(expandTag(tag as Tag))}</li>`),
+      sense.dialect.map((tag) => `<li class="${tag}">${escapeText(expandTag(tag as Tag))}</li>`),
   },
   {
     className: "misc",
@@ -166,7 +165,7 @@ function renderSense(
 
   const glosses = sense.gloss;
   if (glosses.length > 0) {
-    const items = glosses.map((gloss) => `<li>${escape(gloss.text)}</li>`);
+    const items = glosses.map((gloss) => `<li>${escapeText(gloss.text)}</li>`);
     blocks.push(renderList("ul", "glosses", items));
   }
 
@@ -225,7 +224,7 @@ function renderPartOfSpeechItem(tag: string): string {
 }
 
 function renderLanguageSource(source: JMdictLanguageSource): string {
-  const base = escape(describeLanguage(source.lang));
+  const base = escapeText(describeLanguage(source.lang));
   const qualifiers: string[] = [];
   if (source.wasei) {
     qualifiers.push("wasei");
@@ -256,7 +255,7 @@ function renderReference(entry: Xref): string {
   }
 
   let label = `<a href="https://takoboto.jp/?q=${encodeURIComponent(hrefTarget)}" lang="ja">${
-    escape(target)
+    escapeText(target)
   }</a>`;
   if (typeof sense === "number") {
     label += ` (sense ${sense})`;
@@ -298,7 +297,7 @@ function indentBlock(block: string, level: number): string {
 }
 
 function renderLanguageSpan(text: string, lang: string): string {
-  return `<span lang="${escape(lang)}">${escape(text)}</span>`;
+  return `<span lang="${escapeAttribute(lang)}">${escapeText(text)}</span>`;
 }
 
 function renderJapaneseSpan(text: string): string {
@@ -319,15 +318,25 @@ function wrapJapaneseText(text: string): string {
   for (const match of text.matchAll(pattern)) {
     const index = match.index;
     if (index > lastIndex) {
-      result += escape(text.slice(lastIndex, index));
+      result += escapeText(text.slice(lastIndex, index));
     }
     result += renderJapaneseSpan(match[0]);
     lastIndex = index + match[0].length;
   }
 
   if (lastIndex < text.length) {
-    result += escape(text.slice(lastIndex));
+    result += escapeText(text.slice(lastIndex));
   }
 
   return result;
+}
+
+// Deliberately more minimal than `@std/html`'s `escape`: apostrophes and quotes stay literal
+// in text content, so re-rendered entries don't differ from stored card HTML by encoding alone.
+function escapeText(text: string): string {
+  return text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+}
+
+function escapeAttribute(text: string): string {
+  return escapeText(text).replaceAll('"', "&quot;");
 }

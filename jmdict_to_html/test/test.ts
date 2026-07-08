@@ -85,3 +85,30 @@ Deno.test("formatReadingForAnki: handles hiragana-katakana swapped surface forms
   assertEquals(formatReadingForAnki("2643730", "エンジ色", "えんじいろ"), "エンジ 色[いろ]");
   assertEquals(formatReadingForAnki("2643730", "エンジ色", "エンジいろ"), "エンジ 色[いろ]");
 });
+
+Deno.test("renderEntry: escapes text minimally (apostrophes stay literal)", () => {
+  const word = {
+    id: "9999999",
+    kanji: [],
+    kana: [{ common: true, text: "てすと", tags: [], appliesToKanji: ["*"] }],
+    sense: [{
+      partOfSpeech: ["n"],
+      appliesToKanji: ["*"],
+      appliesToKana: ["*"],
+      related: [],
+      antonym: [],
+      field: [],
+      dialect: [],
+      misc: [],
+      info: ["A & B <see 'note'>"],
+      languageSource: [],
+      gloss: [{ lang: "eng", gender: null, type: null, text: `when it's "most" important` }],
+    }],
+  } as Parameters<typeof renderEntry>[0];
+
+  const html = renderEntry(word);
+  // Apostrophes and double quotes stay literal in text content, so stored card HTML doesn't
+  // churn on re-render; only `&`, `<`, and `>` are escaped.
+  assertEquals(html.includes(`<li>when it's "most" important</li>`), true);
+  assertEquals(html.includes("<li>A &amp; B &lt;see 'note'&gt;</li>"), true);
+});
