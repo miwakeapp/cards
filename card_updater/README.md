@@ -21,11 +21,11 @@ Existing hints are never overwritten by default; the AI's hint is offered as an 
 ## Useful flags
 
 ```sh
-deno task update-cards -- --dry-run      # disable the Apply button
-deno task update-cards -- --limit=50     # analyze a subset
-deno task update-cards -- --skip-ai      # no AI calls; re-targets reviewed manually
-deno task update-cards -- --offline      # don't check for a newer JMDict
-deno task update-cards -- --query='...'  # different Anki search
+deno task update-cards --dry-run      # disable the Apply button
+deno task update-cards --limit=50     # analyze a subset
+deno task update-cards --skip-ai      # no AI calls; re-targets reviewed manually
+deno task update-cards --offline      # don't check for a newer JMDict
+deno task update-cards --query='...'  # different Anki search
 ```
 
 `runs/` (gitignored) holds the decision file, the AI suggestion cache, and an apply audit log. Decisions and cached suggestions invalidate automatically when a card or its dictionary entry changes.

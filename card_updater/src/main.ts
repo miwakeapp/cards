@@ -10,7 +10,7 @@
  *
  * Run with:
  *   deno task update-cards
- *   deno task update-cards -- --dry-run --limit=50
+ *   deno task update-cards --dry-run --limit=50
  */
 
 import { parseArgs } from "@std/cli/parse-args";
@@ -39,8 +39,7 @@ interface Options {
 }
 
 function parseArguments(args: string[]): Options {
-  // `deno task update-cards -- --flag` forwards the `--` itself; drop it.
-  const flags = parseArgs(args[0] === "--" ? args.slice(1) : args, {
+  const flags = parseArgs(args, {
     boolean: ["dry-run", "offline", "skip-ai", "open"],
     negatable: ["open"],
     string: ["query", "model", "limit", "port"],
@@ -52,6 +51,13 @@ function parseArguments(args: string[]): Options {
     },
     unknown: (arg) => exitWithUsage(`Unknown argument: ${arg}`),
   });
+
+  // Arguments after a literal `--` bypass the `unknown` callback; reject them rather than
+  // silently ignoring flags. (`deno task` needs no `--` — everything after the task name is
+  // passed through as-is.)
+  if (flags._.length > 0) {
+    exitWithUsage(`Unexpected arguments: ${flags._.join(" ")} — pass flags directly, without --`);
+  }
 
   if (!(MODEL_IDS as readonly string[]).includes(flags.model)) {
     exitWithUsage(`--model must be one of: ${MODEL_IDS.join(", ")}`);
@@ -80,7 +86,7 @@ function positiveInteger(value: unknown, flag: string): number {
 function exitWithUsage(message: string): never {
   console.error(message);
   console.error(
-    "Usage: deno task update-cards -- [--query=...] [--limit=N] [--model=...] [--port=N] [--dry-run] [--offline] [--skip-ai] [--no-open]",
+    "Usage: deno task update-cards [--query=...] [--limit=N] [--model=...] [--port=N] [--dry-run] [--offline] [--skip-ai] [--no-open]",
   );
   Deno.exit(1);
 }
