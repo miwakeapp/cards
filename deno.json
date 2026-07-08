@@ -25,6 +25,6 @@
   "fmt": {
     "lineWidth": 100,
     "proseWrap": "never",
-    "exclude": ["anki_updater_prototype/*.html"]
+    "exclude": ["anki_updater_prototype/**/*.html"]
   }
 }

@@ -190,15 +190,15 @@ The **Hint** field not being freely editable is a bit suboptimal, but it might b
 
 It was considered to include separate fields for each of the key's components (i.e., JMDict ID and applicable senses), in addition to including them in the key. This would make it easier to insert them into the template, e.g. with code such as
 
-```html
+```handlebars
 <a href="https://takoboto.jp/?w={{JMDict ID}}">{{Word}}</a>
 ```
 
 or
 
-```html
+```handlebars
 <script>
-  let applicableSenses = "{{Applicable senses}}".split(",");
+let applicableSenses = "{{Applicable senses}}".split(",");
 </script>
 ```
 
