@@ -1,0 +1,10 @@
+{
+  "tasks": {
+    "update-cards": "deno run --env-file=../.env --allow-net --allow-env --allow-read --allow-write=runs,../data --allow-run=cmd,open,xdg-open src/main.ts"
+  },
+  "test": {
+    "permissions": {
+      "read": true
+    }
+  }
+}
