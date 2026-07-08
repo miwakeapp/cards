@@ -6,6 +6,7 @@
 import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
 import { formatReadingForAnki, renderEntry } from "jmdict_to_html";
 import type { GenerateFieldsInput } from "./ai_provider.ts";
+import { formatMiwakeKey } from "./keys.ts";
 import type { AIGeneratedFields, CardCreationInput, MiwakeCard } from "./types.ts";
 
 /**
@@ -23,23 +24,6 @@ export interface CreateCardOptions {
    * Inject this to allow mocking in tests or to select different AI models.
    */
   generateFields: (input: GenerateFieldsInput) => Promise<AIGeneratedFields>;
-}
-
-/**
- * Formats the card key from its components.
- * Format: "spelling | jmdictId" or "spelling | jmdictId | sense1,sense2"
- */
-function formatKey(
-  recognitionTarget: string,
-  jmdictId: string,
-  applicableSenses: number[],
-  totalSenses: number,
-): string {
-  // Only include senses if not all senses apply
-  if (applicableSenses.length === 0 || applicableSenses.length === totalSenses) {
-    return `${recognitionTarget} | ${jmdictId}`;
-  }
-  return `${recognitionTarget} | ${jmdictId} | ${applicableSenses.join(",")}`;
 }
 
 /**
@@ -235,7 +219,7 @@ export async function createCard(options: CreateCardOptions): Promise<MiwakeCard
   const dictionaryEntry = renderEntry(jmdictEntry);
 
   // Build the key
-  const key = formatKey(
+  const key = formatMiwakeKey(
     recognitionTarget,
     input.jmdictId,
     aiFields.applicableSenses,

@@ -1,6 +1,9 @@
 {
   "name": "card_creator",
-  "exports": "./src/mod.ts",
+  "exports": {
+    ".": "./src/mod.ts",
+    "./keys": "./src/keys.ts"
+  },
   "imports": {
     "zod": "npm:zod@^4.1.13"
   },
