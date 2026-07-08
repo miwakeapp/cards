@@ -1,8 +1,11 @@
 {
   "name": "data",
-  "exports": "./mod.ts",
+  "exports": {
+    ".": "./mod.ts",
+    "./download": "./jmdict_download.ts"
+  },
   "tasks": {
-    "download_jmdict": "deno run --allow-net --allow-write=./jmdict_eng.json scripts/download_jmdict.ts",
+    "download_jmdict": "deno run --allow-net --allow-read=./jmdict_eng.json --allow-write=./jmdict_eng.json,./jmdict_eng.json.download scripts/download_jmdict.ts",
     "download_jmdictfurigana": "deno run --allow-net --allow-write=./jmdict_furigana.json scripts/download_jmdictfurigana.ts",
     "extract_tags": "deno run --allow-read=./jmdict_eng.json --allow-write=./jmdict_tags.json scripts/extract_tags.ts",
     "extract_entries": "deno run --allow-read=./jmdict_eng.json,../card_creator_evals/inputs --allow-write=./entries scripts/extract_entries.ts"

@@ -8,6 +8,7 @@
 
 import * as path from "@std/path";
 import type { JMdict, JMdictWord } from "@scriptin/jmdict-simplified-types";
+import { entriesCache } from "./entries_cache.ts";
 
 /** JMDict tag expansions. Key: tag abbreviation, value: full description. */
 export type JMDictTags = Record<string, string>;
@@ -18,10 +19,10 @@ export type JMDictFurigana = Record<string, string>;
 /** Map of JMDict entry ID to entry data. */
 export type JMDictEntries = Map<string, JMdictWord>;
 
-// Module-level promises for deduplication
+// Module-level promises for deduplication (the full-dictionary one lives in
+// `entries_cache.ts` so the download module can reset it)
 let tagsPromise: Promise<JMDictTags> | null = null;
 let furiganaPromise: Promise<JMDictFurigana> | null = null;
-let allEntriesPromise: Promise<JMDictEntries> | null = null;
 const preextractedEntryPromises = new Map<string, Promise<JMdictWord>>();
 
 const dataDir = import.meta.dirname!;
@@ -61,8 +62,8 @@ export function jmdictFurigana(): Promise<JMDictFurigana> {
  * Safe to call multiple times concurrently - will deduplicate requests.
  */
 export function allJMDictEntries(): Promise<JMDictEntries> {
-  if (!allEntriesPromise) {
-    allEntriesPromise = (async () => {
+  if (!entriesCache.promise) {
+    entriesCache.promise = (async () => {
       const jmdictPath = path.join(dataDir, "jmdict_eng.json");
       const content = await Deno.readTextFile(jmdictPath);
       const jmdict = JSON.parse(content) as JMdict;
@@ -74,7 +75,7 @@ export function allJMDictEntries(): Promise<JMDictEntries> {
       return entries;
     })();
   }
-  return allEntriesPromise;
+  return entriesCache.promise;
 }
 
 /**
