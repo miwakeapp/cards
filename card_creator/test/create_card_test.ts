@@ -1,4 +1,4 @@
-import { assertEquals } from "@std/assert";
+import { assertEquals, assertRejects } from "@std/assert";
 import { assertSnapshot } from "@std/testing/snapshot";
 import { allJMDictEntries, preextractedJMDictEntry } from "data";
 import { createCard } from "../src/create_card.ts";
@@ -71,6 +71,99 @@ Deno.test("createCard: key omits senses when all apply", async () => {
 
   // Key should NOT include senses
   assertEquals(card.key, "大小 | 1414110");
+});
+
+Deno.test("createCard: rejects non-plain recognition targets", async () => {
+  const jmdictEntry = await preextractedJMDictEntry("1414110");
+  const aiFields: AIGeneratedFields = {
+    applicableSenses: [1],
+    reading: "だいしょう",
+    hint: null,
+    targetInContext: "大小",
+    minimizedContext: null,
+    cleanedSource: null,
+    sourceURLIsPublic: false,
+  };
+
+  for (
+    const [recognitionTarget, expectedMessage] of [
+      ["", "must not be empty"],
+      [" 大小", "must not have surrounding whitespace"],
+      ["大小 ", "must not have surrounding whitespace"],
+      ["大\u00a0小", "must not contain nonbreaking spaces"],
+      ["<b>大小</b>", "must not contain HTML markup"],
+      ["大小&NonBreakingSpace;", "must not contain HTML character references"],
+    ]
+  ) {
+    await assertRejects(
+      () =>
+        createCard({
+          input: {
+            context: "この箱の大小によって値段が変わる。",
+            jmdictId: "1414110",
+            recognitionTarget,
+          },
+          jmdictEntry,
+          generateFields: createMockGenerator(aiFields),
+        }),
+      Error,
+      expectedMessage,
+    );
+  }
+});
+
+Deno.test("createCard: rejects non-plain targetInContext", async () => {
+  const jmdictEntry = await preextractedJMDictEntry("1414110");
+
+  await assertRejects(
+    () =>
+      createCard({
+        input: {
+          context: "この箱の大小によって値段が変わる。",
+          jmdictId: "1414110",
+          recognitionTarget: "大小",
+        },
+        jmdictEntry,
+        generateFields: createMockGenerator({
+          applicableSenses: [1],
+          reading: "だいしょう",
+          hint: null,
+          targetInContext: "大小 ",
+          minimizedContext: null,
+          cleanedSource: null,
+          sourceURLIsPublic: false,
+        }),
+      }),
+    Error,
+    "targetInContext must not have surrounding whitespace",
+  );
+});
+
+Deno.test("createCard: normalizes nonbreaking spaces in HTML context", async () => {
+  const jmdictEntry = await preextractedJMDictEntry("1414110");
+
+  const card = await createCard({
+    input: {
+      context: "この箱の&nbsp;大小&#0160;によって\u00a0値段が変わる。",
+      jmdictId: "1414110",
+      recognitionTarget: "大小",
+    },
+    jmdictEntry,
+    generateFields: (input) => {
+      assertEquals(input.context, "この箱の 大小 によって 値段が変わる。");
+      return Promise.resolve({
+        applicableSenses: [1],
+        reading: "だいしょう",
+        hint: null,
+        targetInContext: "大小",
+        minimizedContext: null,
+        cleanedSource: null,
+        sourceURLIsPublic: false,
+      });
+    },
+  });
+
+  assertEquals(card.fullContext, "この箱の <mark>大小</mark> によって 値段が変わる。");
 });
 
 Deno.test("createCard: reading has furigana for kanji words", async () => {

@@ -4,6 +4,7 @@
  */
 
 import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
+import { unescape } from "@std/html/entities";
 import { formatReadingForAnki, renderEntry } from "jmdict_to_html";
 import type { GenerateFieldsInput } from "./ai_provider.ts";
 import { formatMiwakeKey } from "./keys.ts";
@@ -24,6 +25,37 @@ export interface CreateCardOptions {
    * Inject this to allow mocking in tests or to select different AI models.
    */
   generateFields: (input: GenerateFieldsInput) => Promise<AIGeneratedFields>;
+}
+
+const htmlTagRegex = /<\/?[a-z][^>]*>/iu;
+const htmlCharacterReferenceRegex = /&(?:#(?:x[\da-f]+|\d+)|[\da-z]+);/giu;
+const hasHTMLCharacterReferenceRegex = /&(?:#(?:x[\da-f]+|\d+)|[\da-z]+);/iu;
+
+function normalizeNonBreakingSpaces(text: string): string {
+  return text
+    .replace(
+      htmlCharacterReferenceRegex,
+      (reference) => unescape(reference) === "\u00a0" ? " " : reference,
+    )
+    .replace(/[\u00a0\u202f]/gu, " ");
+}
+
+function assertPlainTarget(target: string, fieldName: string): void {
+  if (target === "") {
+    throw new Error(`${fieldName} must not be empty`);
+  }
+  if (target !== target.trim()) {
+    throw new Error(`${fieldName} must not have surrounding whitespace`);
+  }
+  if (target.includes("\u00a0") || target.includes("\u202f")) {
+    throw new Error(`${fieldName} must not contain nonbreaking spaces`);
+  }
+  if (htmlTagRegex.test(target)) {
+    throw new Error(`${fieldName} must not contain HTML markup`);
+  }
+  if (hasHTMLCharacterReferenceRegex.test(target)) {
+    throw new Error(`${fieldName} must not contain HTML character references`);
+  }
 }
 
 /**
@@ -53,10 +85,13 @@ function processContext(
     }
   }
 
-  // Convert all <ruby> tags to Anki bracket format: " X[Y]"
+  // Convert all <ruby> tags to Anki bracket format: "X[Y]" or "X[Y] Z[W]".
   let processed = context.replace(
     rubyTagPattern,
-    (_match, inner: string) => inner.replace(/([^<]+)<rt>([^<]+)<\/rt>/g, " $1[$2]"),
+    (_match, inner: string) =>
+      [...inner.matchAll(/([^<]+)<rt>([^<]+)<\/rt>/g)]
+        .map(([, base, reading]) => `${base}[${reading}]`)
+        .join(" "),
   );
 
   // Wrap target in <mark>. Use a furigana-aware pattern that matches the target
@@ -68,12 +103,9 @@ function processContext(
     const furiganaAwarePattern = chars
       .map((c) => `${RegExp.escape(c)}(?:\\[[^\\]]+\\])?`)
       .join("\\s?");
-    const pattern = new RegExp(`(\\s?)(${furiganaAwarePattern})`, "g");
-    processed = processed.replace(pattern, "<mark>$2</mark>");
+    const pattern = new RegExp(`(${furiganaAwarePattern})`, "g");
+    processed = processed.replace(pattern, "<mark>$1</mark>");
   }
-
-  // Clean up any leading space before first character
-  processed = processed.replace(/^\s+/, "");
 
   return { processedContext: processed, contextReading };
 }
@@ -161,28 +193,32 @@ function formatSourceHTML(
  */
 export async function createCard(options: CreateCardOptions): Promise<MiwakeCard> {
   const { input, jmdictEntry, generateFields } = options;
+  assertPlainTarget(input.recognitionTarget, "recognitionTarget");
+  const inputContext = normalizeNonBreakingSpaces(input.context);
 
   // Generate AI fields
   const aiFields = await generateFields({
-    context: input.context,
+    context: inputContext,
     recognitionTarget: input.recognitionTarget,
     jmdictEntry,
     source: input.source,
     sourceURL: input.sourceURL,
   });
 
+  assertPlainTarget(aiFields.targetInContext, "targetInContext");
+  const targetInContext = aiFields.targetInContext;
   const recognitionTarget = differsOnlyByKanaScript(
       input.recognitionTarget,
-      aiFields.targetInContext,
+      targetInContext,
     )
-    ? aiFields.targetInContext
+    ? targetInContext
     : input.recognitionTarget;
 
   // Process the context HTML (needs targetInContext from AI fields)
   const { processedContext, contextReading } = processContext(
-    input.context,
+    inputContext,
     recognitionTarget,
-    aiFields.targetInContext,
+    targetInContext,
   );
 
   // Post-process hints

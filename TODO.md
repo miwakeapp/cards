@@ -11,6 +11,7 @@
 
 ## General cleanup
 
+- Decide how to choose source markup based on semantics: `<cite>` for work titles, `<span>` for non-titles, and `<a>` for useful public links.
 - Evaluate rarity calibration and exact `wordfreq` data against a curated set of desired word orderings and coverage.
 - Consolidate the project's other HTML-entity decoders around `@std/html/entities`.
 - Stream ZIP extraction if setup needs to work within a lower memory ceiling.

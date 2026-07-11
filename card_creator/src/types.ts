@@ -8,7 +8,10 @@ export interface CardCreationInput {
   /** The JMDict entry ID for the word being studied. */
   jmdictId: string;
 
-  /** The specific spelling being tested (e.g., "鋏" or "ハサミ"). */
+  /**
+   * The nonempty plain-text spelling being tested (e.g., "鋏" or "ハサミ"). Must not contain
+   * surrounding whitespace, nonbreaking spaces, HTML markup, or HTML character references.
+   */
   recognitionTarget: string;
 
   /** Optional source name (e.g., book title). */
@@ -71,8 +74,9 @@ export interface AIGeneratedFields {
   reading: string;
 
   /**
-   * The exact substring from the context that corresponds to the recognition target.
-   * May be a conjugated or inflected form (e.g. "後ろめたさ" for target "後ろめたい").
+   * The plain-text exact substring from the context that corresponds to the recognition target.
+   * Must follow the same plain-text invariants as the recognition target. May be a conjugated or
+   * inflected form (e.g. "後ろめたさ" for target "後ろめたい").
    */
   targetInContext: string;
 
