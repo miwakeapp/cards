@@ -5,7 +5,7 @@
 // `data/download` export (e.g. the card updater refreshes the dictionary before scanning).
 
 import * as path from "@std/path";
-import { extract as extractZip } from "@quentinadam/zip";
+import { unzipSync } from "fflate";
 import { entriesCache } from "./entries_cache.ts";
 
 const RELEASES_URL = "https://api.github.com/repos/scriptin/jmdict-simplified/releases/latest";
@@ -95,14 +95,14 @@ async function downloadRelease(release: LatestRelease): Promise<void> {
   }
   const zipped = await response.bytes();
 
-  const unzipped = await extractZip(zipped);
+  const unzipped = Object.values(unzipSync(zipped));
   if (unzipped.length !== 1) {
     throw new Error("Expected the JMDict zip to contain exactly one file.");
   }
 
   // Write next to the target and rename, so a crash mid-download never corrupts the data file.
   const temporaryPath = `${jmdictPath}.download`;
-  await Deno.writeFile(temporaryPath, unzipped[0].data);
+  await Deno.writeFile(temporaryPath, unzipped[0]);
   await Deno.rename(temporaryPath, jmdictPath);
 
   // A caller may have already read the old file through `allJMDictEntries()`.

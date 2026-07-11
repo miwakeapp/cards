@@ -20,6 +20,11 @@
 /data/jmdict_eng.json
 /data/jmdict_furigana.json
 /data/jmdict_tags.json
+/data/bccwj/
+/data/nwjc/
+/data/rarity.sqlite3
+/data/rarity.sqlite3.download
+/data/test/.tmp-rarity-*
 /data/entries/
 
 /html_dictionary_previewer/_site/

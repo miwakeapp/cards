@@ -1,0 +1,7 @@
+{
+  "name": "rarity_score",
+  "exports": "./src/mod.ts",
+  "tasks": {
+    "test": "deno test"
+  }
+}
