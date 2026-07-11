@@ -17,6 +17,23 @@
   - Record a human-reviewed expected decision and a short rationale for each case. Evaluate sense selection and proposed key exactly; evaluate hints by explicit constraints such as keep, remove, or mention a required disambiguating spelling instead of requiring one exact sentence.
   - Keep this separate from ordinary unit tests if it calls a live model. Provide a repeatable command that reports per-case results and aggregate accuracy, so prompt or model changes can be compared deliberately instead of judged from a handful of current cards.
 
+## Leech regeneration
+
+- Turn the recurring prototype leech conversion into a review-then-apply workflow that preserves Anki history and never changes the proposed result between review and application.
+  - Keep the useful preparation flow: find eligible leeches, recover the original source and fuller context from the local EPUB corpus where possible, use AI to select an appropriate sentence window, and write a human-editable intermediate file. It can remain rough prototype code while this is a personal workflow.
+  - Generate the complete proposed Miwake fields once and persist them in a gitignored plan. Reviewing a dry run should inspect the same fields that will be written; applying the plan must not call AI again. Include enough generation metadata to understand how the proposal was produced, but do not commit personal contexts, note IDs, or run reports.
+  - Fingerprint the relevant source-note fields when building the plan. Before applying, refuse or hold an item if its source note has changed, disappeared, or no longer has the expected note type. Preflight duplicate Miwake keys and treat any collision as something to resolve, since the key is the card's identity.
+  - Normally update the existing note in place so its card ID, scheduling state, and review history survive the conversion. If Anki's note-model conversion cannot preserve those properties for a particular source shape, stop for review. Treat intentionally replacing it with a fresh card as a separate, explicit reset action.
+  - Make application resumable and auditable: record which exact plan entries were applied, make rerunning an interrupted plan idempotent, and report partial failures without regenerating already-reviewed fields or silently tagging unresolved source notes as converted.
+  - Keep the planning, validation, and field-mapping logic separate enough to test without a live Anki collection. The eventual product may present this through the broader leech-management UI described in `DESIGN.md`; the prototype does not need that UI before its data flow is safe.
+
+## AI result caching
+
+- Make persistent AI results valid for the exact request that produced them. A reusable cache entry must be invalidated by the model ID, the complete effective input, and a revision or fingerprint covering the system prompt, user-prompt construction, output schema, few-shot examples, and materially relevant post-processing rules.
+  - Apply this to `card_updater`: its suggestion hash should cover both the card and dictionary inputs and the behavior of `card_creator` used to produce the suggestion. Expose an explicit card-generation prompt revision, or a stable fingerprint of the prompt, schema, and examples, and include it in the suggestion hash.
+  - For future long-running batch workflows, persist each successful result promptly so interruption does not waste completed calls, validate cached values with the current schema and normalization rules before use, and provide an explicit way to force regeneration. Do not cache failed or malformed responses as successful results.
+  - Prefer a reviewed plan over a second cache when the plan itself contains the final generated fields, as in leech regeneration. Do not build a repository-wide generic AI-cache framework yet; implement correct workflow-specific persistence first, then extract shared hashing and atomic JSON-storage mechanics only after a second durable consumer demonstrates the common shape.
+
 ## General cleanup
 
 - Decide how to choose source markup based on semantics: `<cite>` for work titles, `<span>` for non-titles, and `<a>` for useful public links.

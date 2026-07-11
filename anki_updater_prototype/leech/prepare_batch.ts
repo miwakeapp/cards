@@ -6,7 +6,9 @@
  * a JSON file for human review.
  *
  * Run with:
- *   deno task prepare-leech-batch [--count=20] [--model=claude-opus-4-8]
+ *   deno task prepare-leech-batch [--count=20|all] [--model=claude-opus-4-8]
+ *     [--query="deck:Mining tag:leech -tag:converted-to-miwake"]
+ *     [--output=leech/batch_YYYY-MM-DD.json]
  */
 
 import { join } from "@std/path";
@@ -17,12 +19,15 @@ import { ac } from "../shared/anki_connect.ts";
 
 // --- CLI args ---
 
-let count = 20;
+let count: number | "all" = 20;
 let modelId: ModelId = DEFAULT_MODEL_ID;
+let query = "deck:Mining tag:leech -tag:converted-to-miwake";
+let outputPathArg: string | undefined;
 
 for (const arg of Deno.args) {
   if (arg.startsWith("--count=")) {
-    count = parseInt(arg.slice("--count=".length));
+    const value = arg.slice("--count=".length);
+    count = value === "all" ? "all" : parseInt(value);
   } else if (arg.startsWith("--model=")) {
     const m = arg.slice("--model=".length);
     if (!MODEL_IDS.includes(m as ModelId)) {
@@ -30,6 +35,10 @@ for (const arg of Deno.args) {
       Deno.exit(1);
     }
     modelId = m as ModelId;
+  } else if (arg.startsWith("--query=")) {
+    query = arg.slice("--query=".length);
+  } else if (arg.startsWith("--output=")) {
+    outputPathArg = arg.slice("--output=".length);
   }
 }
 
@@ -254,15 +263,16 @@ function wordInSentence(word: string, sentence: string): boolean {
 }
 
 const noteIds = await ac<number[]>("findNotes", {
-  query: "deck:Mining tag:leech -tag:converted-to-miwake",
+  query,
 });
 
+const processingCount = count === "all" ? noteIds.length : Math.min(count, noteIds.length);
 console.error(
-  `Found ${noteIds.length} leech notes total, processing ${Math.min(count, noteIds.length)}`,
+  `Found ${noteIds.length} notes total for query "${query}", processing ${processingCount}`,
 );
 
 const notes = await ac<Array<Record<string, any>>>("notesInfo", {
-  notes: noteIds.slice(0, count),
+  notes: noteIds.slice(0, processingCount),
 });
 
 console.error("Building epub index...");
@@ -343,7 +353,7 @@ for (const note of notes) {
 }
 
 const dateStr = new Date().toISOString().slice(0, 10);
-const outputPath = join(import.meta.dirname!, `batch_${dateStr}.json`);
+const outputPath = outputPathArg ?? join(import.meta.dirname!, `batch_${dateStr}.json`);
 await Deno.writeTextFile(outputPath, JSON.stringify(results, undefined, 2));
 console.error(`\nWrote ${results.length} entries to ${outputPath}`);
 
