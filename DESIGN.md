@@ -105,13 +105,15 @@ After that setup is complete, the unobtrusive indicator changes color. From now 
 
 - **Dictionary entry**: a semantic-HTML version of the specified JMDict entry. (Discussed in detail [later](#semantic-html-jmdict).) Importantly, this is not specific to the card in question, so it can be easily updated later as JMDict updates.
 
-- **Source**: the source from which this word was found. This field may contain HTML, such as an `<a>` element when the source URL is public/useful, or a `<span>` with the appropriate `lang` attribute when it is plain text. The source text is derived from the raw `<title>` and URL of the page where the term was mined, but trimmed by AI ✨ into something useful.
+- **Source**: the source from which this word was found. This field generally will contain HTML, at least identifying the language of the source's name, and additionally giving a link to it when available. For example:
 
-  - Sample: `ソードアート・オンライン2 アインクラッド (電撃文庫) | ッツ Ebook Reader` gets trimmed to `ソードアート・オンライン2 アインクラッド`
+  - `<span lang="en">GPT 5.5 Thinking</span>` for an AI-generated example sentence
 
-  - Sample: `北朝鮮から弾道ミサイル発射 日本のEEZ外に落下か 防衛省 | NHKニュース | 北朝鮮 ミサイル、核・ミサイル"` gets trimmed to `北朝鮮から弾道ミサイル発射 日本のEEZ外に落下か 防衛省`
+  - `<cite lang="ja">虐殺器官</cite>`, for a Japanese book title
 
-  - If AI ✨ or other heuristics determine that the URL is not "public" (i.e. able to be revisited in the future, or shared when sharing flashcards between users), the URL is omitted from the field. Notably, `https://reader.ttsu.app/` URLs are not public.
+  - `<a lang="en" href="https://tatoeba.org/en/sentences/show/76039">Tatoeba</a>`, for sentence from the Tatoeba project
+
+  When mining in a browser extension, we can anticipate using heuristics and AI ✨ to trim and improve the `<title>` of the page being mined, e.g. `ソードアート・オンライン2 アインクラッド (電撃文庫) | ッツ Ebook Reader` becomes `<cite lang="ja">ソードアート・オンライン2 アインクラッド</cite>`.
 
 - **Tags**: Tags are probably a reasonable place to store metadata. For example, it might be useful to store the JMDict version, or the version of this software, used to create the card.
 
@@ -332,6 +334,8 @@ Other examples: [介す](https://takoboto.jp/?w=2410320), ...
 [ちゃうちゃう](https://takoboto.jp/?w=2113530) ("that's not true!") and [チャウチャウ](https://takoboto.jp/?w=2864887) ("chow chow (dog)") are lumped together by Jitendex into a single dictionary entry. This makes for a pretty bad back of the flashcard! But, it does indicate there should be some hint ✨ distinguishing them?
 
 [はさみ](https://takoboto.jp/?w=2029540) ("pincers (of a crab, scorpion, etc.), claws, forceps") vs. [はさみ](https://takoboto.jp/?w=1573820) ("1. scissors, shears, clippers; 2. hole punch") may be a better example. Here Jitendex seems to have the opposite problem, with 5 separate dictionary entries!
+
+[包む](https://takoboto.jp/?w=1584060) (つつむ; "to wrap up, to pack, to bundle, to do up") vs. [包む](https://takoboto.jp/?w=2831360) (くるむ; "to wrap up (in), to roll up (in), to tuck (up)") is a particularly tricky class, where we'll have to hint at different readings somehow. Such cases might just need furigana on the front? I guess it depends on how these cases are encountered in the wild...
 
 ### Words with multiple acceptable readings
 
