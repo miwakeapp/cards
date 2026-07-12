@@ -1,0 +1,81 @@
+{
+  "id": "1567420",
+  "kanji": [
+    {
+      "common": true,
+      "text": "捏造",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "ねつ造",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "ねつぞう",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "でつぞう",
+      "tags": [],
+      "appliesToKanji": [
+        "捏造"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vt"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "fabrication"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "forgery"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "falsehood"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "hoax"
+        }
+      ]
+    }
+  ]
+}

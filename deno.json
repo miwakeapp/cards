@@ -9,24 +9,35 @@
     "./rarity_score",
     "./anki_updater_prototype"
   ],
+  "exclude": [
+    "card_creator_evals/src/main.js",
+    "html_dictionary_previewer/src/data/",
+    "html_dictionary_previewer/src/main.js"
+  ],
   "imports": {
     "@scriptin/jmdict-simplified-types": "npm:@scriptin/jmdict-simplified-types@^3.6.1",
     "@std/assert": "jsr:@std/assert@^1.0.16",
     "@std/cli": "jsr:@std/cli@^1.0.32",
     "@std/csv": "jsr:@std/csv@^1.0.6",
     "@std/encoding": "jsr:@std/encoding@^1.0.11",
+    "@std/fs": "jsr:@std/fs@^1.0.24",
     "@std/html": "jsr:@std/html@^1.0.5",
     "@std/http": "jsr:@std/http@^1.1.2",
     "@std/path": "jsr:@std/path@^1.1.2",
     "@std/streams": "jsr:@std/streams@^1.1.1",
     "@std/testing": "jsr:@std/testing@^1.0.16",
     "iso-639-2": "npm:iso-639-2",
-    "@ai-sdk/anthropic": "npm:@ai-sdk/anthropic@^2.0.54",
-    "@ai-sdk/google": "npm:@ai-sdk/google@^2.0.45",
-    "@ai-sdk/openai": "npm:@ai-sdk/openai@^2.0.80",
-    "ai": "npm:ai@^5.0.109",
+    "@ai-sdk/anthropic": "npm:@ai-sdk/anthropic@^4.0.11",
+    "@ai-sdk/google": "npm:@ai-sdk/google@^4.0.12",
+    "@ai-sdk/openai": "npm:@ai-sdk/openai@^4.0.11",
+    "ai": "npm:ai@^7.0.20",
     "fflate": "npm:fflate@^0.8.2",
     "kuromoji": "npm:kuromoji@^0.1.2"
+  },
+  "tasks": {
+    "test": "deno test --no-prompt -P",
+    "audit": "deno audit --level=low",
+    "ci": "deno ci && deno fmt --check && deno lint && deno check --doc --frozen && deno task --recursive doc:check && deno task test && deno task --recursive --if-present build"
   },
   "fmt": {
     "lineWidth": 100,

@@ -1,0 +1,92 @@
+{
+  "id": "1080510",
+  "kanji": [],
+  "kana": [
+    {
+      "common": true,
+      "text": "テレビ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "テレビジョン"
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "abbr"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "television"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "TV"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "TV program"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "TV programme"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "TV broadcast"
+        }
+      ]
+    }
+  ]
+}

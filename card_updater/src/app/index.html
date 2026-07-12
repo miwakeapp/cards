@@ -1,12 +1,14 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Miwake · Card updater</title>
     <link rel="stylesheet" href="/app.css">
-    <link rel="icon"
-      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📖</text></svg>">
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📖</text></svg>"
+    >
   </head>
   <body>
     <header class="topbar">
@@ -31,7 +33,9 @@
         <div class="section-head">
           <h2>Re-target senses</h2>
           <span
-            class="section-desc">The entry changed in a way that may affect what these cards test. AI has pre-worked each one; accept or adjust.</span>
+            class="section-desc"
+          >The entry changed in a way that may affect what these cards test. AI has pre-worked each
+            one; accept or adjust.</span>
         </div>
         <div id="retargetBanner"></div>
         <div id="focusWrap"></div>
@@ -42,7 +46,9 @@
         <div class="section-head">
           <h2>Routine updates</h2>
           <span
-            class="section-desc">What each card tests is unaffected. Staged to update by default; hold anything that looks off.</span>
+            class="section-desc"
+          >What each card tests is unaffected. Staged to update by default; hold anything that looks
+            off.</span>
         </div>
         <div id="routineBanner"></div>
         <div id="routineGroups"></div>
@@ -52,7 +58,9 @@
         <div class="section-head">
           <h2>Normalization</h2>
           <span
-            class="section-desc">Byte-level differences with no visible change. Applied with everything else; nothing to review.</span>
+            class="section-desc"
+          >Byte-level differences with no visible change. Applied with everything else; nothing to
+            review.</span>
         </div>
         <div id="normalizeBody"></div>
       </section>
@@ -69,7 +77,8 @@
     <div id="loadError" class="load-error" hidden></div>
 
     <footer id="footer" hidden>
-      <span>Decisions save to <code>card_updater/runs/decisions.json</code> as you click. Nothing touches Anki until you apply.</span>
+      <span>Decisions save to <code>card_updater/runs/decisions.json</code> as you click. Nothing
+        touches Anki until you apply.</span>
     </footer>
 
     <div id="toast"><span id="toastMessage"></span><button id="toastUndo">Undo</button></div>
@@ -77,16 +86,16 @@
     <dialog id="helpDialog">
       <h3>Keyboard shortcuts</h3>
       <div class="shortcut-grid">
-    <span><kbd>Enter</kbd></span><span>Accept the focused card (as shown)</span>
-    <span><kbd>x</kbd></span><span>Hold the focused card for later</span>
-    <span><kbd>s</kbd></span><span>Skip to the next undecided card</span>
-    <span><kbd>j</kbd> / <kbd>k</kbd></span><span>Next / previous card</span>
-    <span><kbd>1</kbd>–<kbd>9</kbd></span><span>Toggle sense selection</span>
-    <span><kbd>a</kbd></span><span>Reset to the AI suggestion</span>
-    <span><kbd>h</kbd></span><span>Edit the hint</span>
-    <span><kbd>z</kbd></span><span>Undo</span>
-    <span><kbd>?</kbd></span><span>This help</span>
-  </div>
+        <span><kbd>Enter</kbd></span><span>Accept the focused card (as shown)</span>
+        <span><kbd>x</kbd></span><span>Hold the focused card for later</span>
+        <span><kbd>s</kbd></span><span>Skip to the next undecided card</span>
+        <span><kbd>j</kbd> / <kbd>k</kbd></span><span>Next / previous card</span>
+        <span><kbd>1</kbd>–<kbd>9</kbd></span><span>Toggle sense selection</span>
+        <span><kbd>a</kbd></span><span>Reset to the AI suggestion</span>
+        <span><kbd>h</kbd></span><span>Edit the hint</span>
+        <span><kbd>z</kbd></span><span>Undo</span>
+        <span><kbd>?</kbd></span><span>This help</span>
+      </div>
     </dialog>
 
     <dialog id="applyDialog">

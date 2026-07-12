@@ -1,0 +1,83 @@
+{
+  "id": "1588890",
+  "kanji": [
+    {
+      "common": true,
+      "text": "大げさ",
+      "tags": []
+    },
+    {
+      "common": true,
+      "text": "大袈裟",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "おおげさ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adj-na"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "exaggerated"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "overdone"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "overblown"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "hyperbolic"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "bombastic"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "grandiose"
+        }
+      ]
+    }
+  ]
+}

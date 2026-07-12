@@ -1,0 +1,57 @@
+{
+  "id": "2252350",
+  "kanji": [
+    {
+      "common": false,
+      "text": "大人買い",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "オトナ買い",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "おとながい",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vt"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "col"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "buying a large amount (esp. of collectible items aimed at children, e.g. manga)"
+        }
+      ]
+    }
+  ]
+}

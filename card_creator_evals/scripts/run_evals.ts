@@ -151,7 +151,7 @@ for (const modelId of models) {
 
       // Save output
       const outputPath = path.join(runDir, `${input.id}.json`);
-      await Deno.writeTextFile(outputPath, JSON.stringify(output, null, 2) + "\n");
+      await Deno.writeTextFile(outputPath, JSON.stringify(output, undefined, 2) + "\n");
 
       // Compare to golden
       const golden = await loadGolden(input.id);

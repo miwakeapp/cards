@@ -1,0 +1,209 @@
+{
+  "id": "1178920",
+  "kanji": [
+    {
+      "common": false,
+      "text": "於いて",
+      "tags": [
+        "rK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "於て",
+      "tags": [
+        "rK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "於",
+      "tags": [
+        "sK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "おいて",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "exp"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "において",
+          1
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [
+        "as ...において"
+      ],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "at (a time or place)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "in"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "on"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "exp"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "において",
+          2
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [
+        "as ...において"
+      ],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "in (a situation, matter, etc.)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "on (a point)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "when it comes to"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "regarding"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "with respect to"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "in (terms of)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "as to"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "as for"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "exp"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "において",
+          3
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [
+        "as ...において"
+      ],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "on the part of"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "under the authority of"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "in the name of"
+        }
+      ]
+    }
+  ]
+}

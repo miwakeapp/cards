@@ -3,9 +3,10 @@
  * Takes input and produces a complete MiwakeCard.
  */
 
-import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
+import type { JMDictWord } from "data";
 import { unescape } from "@std/html/entities";
-import { formatReadingForAnki, renderEntry } from "jmdict_to_html";
+import { renderEntry } from "jmdict_to_html";
+import { formatReadingForAnki } from "jmdict_to_html/format-reading-for-anki";
 import type { GenerateFieldsInput } from "./ai_provider.ts";
 import { formatMiwakeKey } from "./keys.ts";
 import type { AIGeneratedFields, CardCreationInput, MiwakeCard } from "./types.ts";
@@ -18,7 +19,7 @@ export interface CreateCardOptions {
   input: CardCreationInput;
 
   /** The JMDict entry for the word. */
-  jmdictEntry: JMdictWord;
+  jmdictEntry: JMDictWord;
 
   /**
    * Function to generate AI fields.

@@ -1,0 +1,105 @@
+{
+  "id": "1207650",
+  "kanji": [
+    {
+      "common": false,
+      "text": "かけがえの無い",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "掛け替えのない",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "掛け替えの無い",
+      "tags": [
+        "sK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "掛替えのない",
+      "tags": [
+        "sK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "掛替えの無い",
+      "tags": [
+        "sK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "掛けがえのない",
+      "tags": [
+        "sK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "欠けがえのない",
+      "tags": [
+        "sK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "かけ替えのない",
+      "tags": [
+        "sK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "欠け替えのない",
+      "tags": [
+        "sK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "かけがえのない",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "exp",
+        "adj-f"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "irreplaceable"
+        }
+      ]
+    }
+  ]
+}

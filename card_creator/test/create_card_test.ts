@@ -1,6 +1,10 @@
+import "../../data/test/use_furigana_fixture.ts";
+
 import { assertEquals, assertRejects } from "@std/assert";
 import { assertSnapshot } from "@std/testing/snapshot";
-import { allJMDictEntries, preextractedJMDictEntry } from "data";
+import { preextractedJMDictEntry } from "data";
+// Ensure every few-shot example's checked JMDict entry remains available.
+import "../src/few_shot_examples.ts";
 import { createCard } from "../src/create_card.ts";
 import type { AIGeneratedFields, CardCreationInput } from "../src/types.ts";
 
@@ -453,11 +457,7 @@ Deno.test("createCard: marks plain target when no ruby present", async () => {
 });
 
 Deno.test("createCard: uses kana-swapped context spelling as recognition target", async () => {
-  const entries = await allJMDictEntries();
-  const jmdictEntry = entries.get("2643730");
-  if (!jmdictEntry) {
-    throw new Error("JMDict entry 2643730 not found");
-  }
+  const jmdictEntry = await preextractedJMDictEntry("2643730");
 
   const card = await createCard({
     input: {

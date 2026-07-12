@@ -1,0 +1,54 @@
+{
+  "id": "1361590",
+  "kanji": [
+    {
+      "common": true,
+      "text": "新幹線",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "しんかんせん",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "Shinkansen"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "bullet train"
+        }
+      ]
+    }
+  ]
+}

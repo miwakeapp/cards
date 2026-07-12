@@ -226,7 +226,7 @@ Some specific design decisions in our output:
 
 - Sidestep the problem of matching up kana and kanji. Like Takoboto but unlike Jisho.org, we simply list all kanji and kana readings, and lose the information contained in JMDict about which kana readings go with which Kanji. This can get complicated (see, e.g., [Jisho.org for 松明](https://jisho.org/word/%E6%9D%BE%E6%98%8E)) and in our framework is superseded by the display of the spelling being quizzed (the **Reading** field), which is separated from the dictionary entry. _That_ spelling will have precisely-placed kana, and will potentially use the JMDict information (plus ✨ AI) in assembling it.
 
-- Always mark up Japanese with `lang="ja"`. This includes inside tags like `<span lang="ja">の</span>-adj`. This allows custom Japanese fonts separate from the rest of the dictionary entry, and is generally good hygeine.
+- Always mark up Japanese with `lang="ja"`. This includes inside tags like `<span lang="ja">の</span>-adj`. This allows custom Japanese fonts separate from the rest of the dictionary entry, and is generally good hygiene.
 
 - Include human-readable text content (e.g. "する verb", "intransitive", "rare"), but annotate the containing elements with their raw JMDict data (e.g. `vs`, `vi`, `rK`) using the `class=""` attribute. This allows CSS to selectively hide certain tags. For example, I find the `uk` ("usually kana") tag to be useless information for the sorts of flashcards we are creating, which are focused on a specific spelling on the front side.
 
@@ -236,7 +236,7 @@ Some specific design decisions in our output:
 
 TODO Discuss ✨ removal of en-GB redundancy
 
-For examples, including tricky cases like multiple readings, multiple senses, etc., see [the test cases `inputs/` directory](./jmdict_to_html/test/inputs/) and [resulting HTML snapshot](./jmdict_to_html/test/__snapshots__/test.ts.snap).
+For examples, including tricky cases like multiple readings, multiple senses, etc., see the [pre-extracted JMDict entries](./data/preextracted_jmdict_entries/) and [resulting HTML snapshot](./jmdict_to_html/test/__snapshots__/test.ts.snap).
 
 ### Reading field and furigana placement
 

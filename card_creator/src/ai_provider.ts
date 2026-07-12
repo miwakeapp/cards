@@ -3,13 +3,13 @@
  * Supports Anthropic, Google, and OpenAI models.
  */
 
-import { generateObject } from "ai";
+import { generateText, type LanguageModel, Output } from "ai";
 import { anthropic } from "@ai-sdk/anthropic";
 import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
 import { z } from "zod";
 import type { AIGeneratedFields, CardCreationInput } from "./types.ts";
-import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
+import type { JMDictWord } from "data";
 import { FEW_SHOT_EXAMPLES } from "./few_shot_examples.ts";
 
 /**
@@ -21,8 +21,10 @@ export const MODEL_IDS = [
   "gpt-5.5",
 ] as const;
 
+/** A supported model identifier for card field generation. */
 export type ModelId = (typeof MODEL_IDS)[number];
 
+/** The model used when a caller does not choose one explicitly. */
 export const DEFAULT_MODEL_ID: ModelId = "claude-opus-4-8";
 
 /**
@@ -68,7 +70,7 @@ const aiFieldsSchema = z.object({
 /**
  * Gets the appropriate model instance for the given model ID.
  */
-export function getModel(modelId: ModelId) {
+export function getModel(modelId: ModelId): LanguageModel {
   if (modelId.startsWith("gemini-")) {
     return google(modelId);
   }
@@ -143,7 +145,7 @@ Your task is to analyze a Japanese word usage in context and generate appropriat
  * Input for AI field generation - CardCreationInput with jmdictId replaced by the full entry.
  */
 export type GenerateFieldsInput = Omit<CardCreationInput, "jmdictId"> & {
-  jmdictEntry: JMdictWord;
+  jmdictEntry: JMDictWord;
 };
 
 /**
@@ -157,7 +159,7 @@ Recognition target: ${input.recognitionTarget}
 Context: ${input.context}
 
 Dictionary entry (JSON):
-${JSON.stringify(input.jmdictEntry, null, 2)}
+${JSON.stringify(input.jmdictEntry, undefined, 2)}
 
 Source: ${input.source ?? "(none)"}
 Source URL: ${input.sourceURL ?? "(none)"}`;
@@ -201,12 +203,12 @@ export async function generateCardFields(
 ): Promise<AIGeneratedFields> {
   const model = getModel(modelId);
 
-  const result = await generateObject({
+  const result = await generateText({
     model,
-    schema: aiFieldsSchema,
+    output: Output.object({ schema: aiFieldsSchema }),
     system: SYSTEM_PROMPT,
     messages: buildFewShotMessages(input),
   });
 
-  return result.object;
+  return result.output;
 }

@@ -4,14 +4,17 @@
 // - jmdict_eng.json: Full JMDict dictionary (run: deno task download_jmdict)
 // - jmdict_furigana.json: Furigana placement data (run: deno task download_jmdictfurigana)
 // - jmdict_tags.json: Tag expansions (run: deno task extract_tags)
-// - entries/*.json: Individual JMDict entries by ID (run: deno task extract_entries)
+// - preextracted_jmdict_entries/*.json: Selected JMDict entries (run: deno task extract_entries)
 // - rarity.sqlite3: Rarity lookup resources (run: deno task build_rarity_resources)
 
 import * as path from "@std/path";
-import type { JMdict, JMdictWord } from "@scriptin/jmdict-simplified-types";
+import type { JMdict } from "@scriptin/jmdict-simplified-types";
 import { entriesCache } from "./entries_cache.ts";
+import type { JMDictWord } from "./jmdict_types.ts";
+import { resourcePaths } from "./resource_paths.ts";
 
 export { bccwjLUW2LemmaHit, nwjcSurface1GramHit } from "./rarity_resources.ts";
+export type { JMDictWord } from "./jmdict_types.ts";
 
 /** JMDict tag expansions. Key: tag abbreviation, value: full description. */
 export type JMDictTags = Record<string, string>;
@@ -20,15 +23,14 @@ export type JMDictTags = Record<string, string>;
 export type JMDictFurigana = Record<string, string>;
 
 /** Map of JMDict entry ID to entry data. */
-export type JMDictEntries = Map<string, JMdictWord>;
+export type JMDictEntries = Map<string, JMDictWord>;
 
 // Module-level promises for deduplication (the full-dictionary one lives in
 // `entries_cache.ts` so the download module can reset it)
 let tagsPromise: Promise<JMDictTags> | null = null;
 let furiganaPromise: Promise<JMDictFurigana> | null = null;
-const preextractedEntryPromises = new Map<string, Promise<JMdictWord>>();
-
-const dataDir = import.meta.dirname!;
+const preextractedEntryPromises = new Map<string, Promise<JMDictWord>>();
+const dataDirectory = import.meta.dirname!;
 
 /**
  * Lazily loads and returns JMDict tag expansions.
@@ -37,7 +39,7 @@ const dataDir = import.meta.dirname!;
 export function jmdictTags(): Promise<JMDictTags> {
   if (!tagsPromise) {
     tagsPromise = (async () => {
-      const tagsPath = path.join(dataDir, "jmdict_tags.json");
+      const tagsPath = path.join(dataDirectory, "jmdict_tags.json");
       const content = await Deno.readTextFile(tagsPath);
       return JSON.parse(content) as JMDictTags;
     })();
@@ -52,8 +54,7 @@ export function jmdictTags(): Promise<JMDictTags> {
 export function jmdictFurigana(): Promise<JMDictFurigana> {
   if (!furiganaPromise) {
     furiganaPromise = (async () => {
-      const furiganaPath = path.join(dataDir, "jmdict_furigana.json");
-      const content = await Deno.readTextFile(furiganaPath);
+      const content = await Deno.readTextFile(resourcePaths.jmdictFurigana);
       return JSON.parse(content) as JMDictFurigana;
     })();
   }
@@ -67,7 +68,7 @@ export function jmdictFurigana(): Promise<JMDictFurigana> {
 export function allJMDictEntries(): Promise<JMDictEntries> {
   if (!entriesCache.promise) {
     entriesCache.promise = (async () => {
-      const jmdictPath = path.join(dataDir, "jmdict_eng.json");
+      const jmdictPath = path.join(dataDirectory, "jmdict_eng.json");
       const content = await Deno.readTextFile(jmdictPath);
       const jmdict = JSON.parse(content) as JMdict;
 
@@ -86,14 +87,14 @@ export function allJMDictEntries(): Promise<JMDictEntries> {
  * Safe to call multiple times concurrently - will deduplicate requests.
  * Throws if the entry doesn't exist in the pre-extracted entries.
  */
-export function preextractedJMDictEntry(id: string): Promise<JMdictWord> {
+export function preextractedJMDictEntry(id: string): Promise<JMDictWord> {
   let promise = preextractedEntryPromises.get(id);
   if (!promise) {
     promise = (async () => {
-      const entryPath = path.join(dataDir, "entries", `${id}.json`);
+      const entryPath = path.join(dataDirectory, "preextracted_jmdict_entries", `${id}.json`);
       try {
         const content = await Deno.readTextFile(entryPath);
-        return JSON.parse(content) as JMdictWord;
+        return JSON.parse(content) as JMDictWord;
       } catch (e) {
         if (e instanceof Deno.errors.NotFound) {
           throw new Error(`JMDict entry ${id} not found in pre-extracted entries`);

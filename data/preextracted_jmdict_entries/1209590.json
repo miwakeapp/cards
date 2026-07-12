@@ -1,0 +1,56 @@
+{
+  "id": "1209590",
+  "kanji": [
+    {
+      "common": false,
+      "text": "瓦解",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "がかい",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "collapse"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "downfall"
+        }
+      ]
+    }
+  ]
+}

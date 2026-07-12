@@ -3,15 +3,13 @@
 //
 // Run with:
 //   deno task download_jmdict
-//   deno task download_jmdict -- --force
+//   deno task download_jmdict --force
 
 import { ensureLatestJMDict } from "../jmdict_download.ts";
 
 let force = false;
 for (const arg of Deno.args) {
-  if (arg === "--") {
-    continue;
-  } else if (arg === "--force") {
+  if (arg === "--force") {
     force = true;
   } else {
     console.error(`Unknown argument: ${arg}`);

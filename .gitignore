@@ -12,20 +12,20 @@
 /anki_updater_prototype/jlpt/jlpt-moji-goi/ambiguous-candidates.txt
 /anki_updater_prototype/jlpt/jlpt-moji-goi/jmdict-id-suggestions.csv
 
-/card_creator_evals/_site/
+/card_creator_evals/src/main.js
 /card_creator_evals/runs/
 
 /card_updater/runs/
 
 /data/jmdict_eng.json
+/data/jmdict_eng.json.download
 /data/jmdict_furigana.json
-/data/jmdict_tags.json
+/data/jmdict_furigana.json.download
 /data/bccwj/
 /data/nwjc/
 /data/rarity.sqlite3
 /data/rarity.sqlite3.download
-/data/test/.tmp-rarity-*
-/data/entries/
+/data/test/.tmp/
 
-/html_dictionary_previewer/_site/
+/html_dictionary_previewer/src/main.js
 /html_dictionary_previewer/src/data/entries.json

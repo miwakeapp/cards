@@ -1,0 +1,62 @@
+{
+  "id": "2254400",
+  "kanji": [
+    {
+      "common": false,
+      "text": "ベタ惚れ",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "べた惚れ",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "ベタぼれ",
+      "tags": [],
+      "appliesToKanji": [
+        "ベタ惚れ"
+      ]
+    },
+    {
+      "common": false,
+      "text": "べたぼれ",
+      "tags": [],
+      "appliesToKanji": [
+        "べた惚れ"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "vs"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "(falling) deeply in love"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "id": "1158110",
+  "kanji": [
+    {
+      "common": true,
+      "text": "異名",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "いみょう",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "いめい",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "another name"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "nickname"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "alias"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "いめい"
+      ],
+      "related": [
+        [
+          "シノニム",
+          2
+        ]
+      ],
+      "antonym": [],
+      "field": [
+        "biol"
+      ],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "synonym"
+        }
+      ]
+    }
+  ]
+}

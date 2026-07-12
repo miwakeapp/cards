@@ -294,7 +294,7 @@ function deriveCandidatesFromSpan(span: KuromojiToken[]): string[] {
   return [];
 }
 
-async function kuromojiTokenizer(): Promise<KuromojiTokenizer> {
+function kuromojiTokenizer(): Promise<KuromojiTokenizer> {
   if (!tokenizerPromise) {
     tokenizerPromise = new Promise((resolve, reject) => {
       kuromoji.builder({ dicPath: kuromojiDictPath }).build((

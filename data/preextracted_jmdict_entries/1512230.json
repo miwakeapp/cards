@@ -1,0 +1,74 @@
+{
+  "id": "1512230",
+  "kanji": [
+    {
+      "common": true,
+      "text": "返上",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "へんじょう",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vt"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "return"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "giving back"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "giving up"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "relinquishing"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "surrendering"
+        }
+      ]
+    }
+  ]
+}

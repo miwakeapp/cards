@@ -2,6 +2,7 @@ import * as path from "@std/path";
 
 const furiganaURL = "https://jisho.hlorenzi.com/furigana.txt";
 const outputFilename = path.resolve(import.meta.dirname!, "../jmdict_furigana.json");
+const temporaryFilename = `${outputFilename}.download`;
 
 console.log(`Downloading from: ${furiganaURL}`);
 
@@ -91,8 +92,14 @@ for (const line of lines) {
 }
 
 console.log(`Processed ${processedCount} entries, skipped ${skippedCount}`);
+if (processedCount < 500_000 || skippedCount > processedCount / 100) {
+  throw new Error(
+    `Implausible furigana data: processed ${processedCount} entries and skipped ${skippedCount}`,
+  );
+}
 
 const json = JSON.stringify(furiganaData);
-await Deno.writeTextFile(outputFilename, json);
+await Deno.writeTextFile(temporaryFilename, json);
+await Deno.rename(temporaryFilename, outputFilename);
 
 console.log(`Saved to ${outputFilename} (${(json.length / 1024 / 1024).toFixed(2)} MB)`);

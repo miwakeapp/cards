@@ -5,14 +5,27 @@
     "./download": "./jmdict_download.ts"
   },
   "tasks": {
-    "download_jmdict": "deno run --allow-net --allow-read=./jmdict_eng.json --allow-write=./jmdict_eng.json,./jmdict_eng.json.download scripts/download_jmdict.ts",
-    "download_jmdictfurigana": "deno run --allow-net --allow-write=./jmdict_furigana.json scripts/download_jmdictfurigana.ts",
+    "doc:check": "deno doc --lint mod.ts jmdict_download.ts jmdict_types.ts scripts/build_rarity_resources.ts scripts/download_bccwj_luw2.ts scripts/download_jmdict.ts scripts/download_jmdictfurigana.ts scripts/download_nwjc_surface_1gram.ts scripts/extract_entries.ts scripts/extract_furigana_fixture.ts scripts/extract_tags.ts",
+    "download_jmdict": "deno run --allow-net --allow-read=./jmdict_eng.json,./jmdict_eng.json.download --allow-write=./jmdict_eng.json,./jmdict_eng.json.download scripts/download_jmdict.ts",
+    "download_jmdictfurigana": "deno run --allow-net --allow-read=./jmdict_furigana.json.download --allow-write=./jmdict_furigana.json,./jmdict_furigana.json.download scripts/download_jmdictfurigana.ts",
     "download_nwjc_surface_1gram": "deno run --allow-net=github.com,raw.githubusercontent.com --allow-read=./nwjc/NWJC-surface-1gram.txt.download --allow-write=./nwjc scripts/download_nwjc_surface_1gram.ts",
     "download_bccwj_luw2": "deno run --allow-net=repository.ninjal.ac.jp --allow-read=./bccwj/BCCWJ_frequencylist_luw2_ver1_1.tsv.download --allow-write=./bccwj scripts/download_bccwj_luw2.ts",
     "extract_tags": "deno run --allow-read=./jmdict_eng.json --allow-write=./jmdict_tags.json scripts/extract_tags.ts",
-    "extract_entries": "deno run --allow-read=./jmdict_eng.json,../card_creator_evals/inputs --allow-write=./entries scripts/extract_entries.ts",
-    "build_rarity_resources": "deno run --allow-read=./nwjc,./bccwj,./rarity.sqlite3.download --allow-write=./rarity.sqlite3,./rarity.sqlite3.download scripts/build_rarity_resources.ts",
-    "test": "deno test --allow-read=./test --allow-write=./test"
+    "extract_entries": "deno run --allow-read=./jmdict_eng.json,../card_creator_evals/inputs,./preextracted_jmdict_entries --allow-write=./preextracted_jmdict_entries,./jmdict_snapshot.json scripts/extract_entries.ts",
+    "update_jmdict_snapshot": "deno task extract_tags && deno task extract_entries && deno run --allow-read=./preextracted_jmdict_entries,./jmdict_furigana.json --allow-write=./test/fixtures/jmdict_furigana.json scripts/extract_furigana_fixture.ts",
+    "build_rarity_resources": "deno run --allow-read=./nwjc,./bccwj,./rarity.sqlite3.download --allow-write=./rarity.sqlite3,./rarity.sqlite3.download scripts/build_rarity_resources.ts"
+  },
+  "test": {
+    "permissions": {
+      "read": [
+        "./jmdict_snapshot.json",
+        "./preextracted_jmdict_entries",
+        "./test/.tmp",
+        "./test/fixtures/jmdict_furigana.json",
+        "../card_creator_evals/inputs"
+      ],
+      "write": ["./test/.tmp"]
+    }
   },
   "compilerOptions": {
     "types": ["npm:@types/node@^24.13.3"]

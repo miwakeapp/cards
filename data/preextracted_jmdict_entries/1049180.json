@@ -1,0 +1,65 @@
+{
+  "id": "1049180",
+  "kanji": [
+    {
+      "common": false,
+      "text": "珈琲",
+      "tags": [
+        "ateji"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "コーヒー",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [
+        {
+          "lang": "eng",
+          "full": true,
+          "wasei": false,
+          "text": "coffee"
+        },
+        {
+          "lang": "dut",
+          "full": true,
+          "wasei": false,
+          "text": "koffie"
+        }
+      ],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "coffee"
+        }
+      ]
+    }
+  ]
+}
