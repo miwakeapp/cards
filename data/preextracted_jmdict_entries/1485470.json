@@ -1,0 +1,66 @@
+{
+  "id": "1485470",
+  "kanji": [
+    {
+      "common": true,
+      "text": "飛行機",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "ひこうき",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "airplane"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "aeroplane"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "plane"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "aircraft"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "id": "1000230",
+  "kanji": [
+    {
+      "common": false,
+      "text": "明かん",
+      "tags": [
+        "rK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "あかん",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "アカン",
+      "tags": [],
+      "appliesToKanji": []
+    },
+    {
+      "common": false,
+      "text": "あかーん",
+      "tags": [
+        "sk"
+      ],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "exp"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [
+        "ksb"
+      ],
+      "misc": [
+        "uk"
+      ],
+      "info": [
+        "commonly used with i-adjective inflections, e.g. あかんかった, あかんくない"
+      ],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "useless"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "no good"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "hopeless"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "exp"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [
+        "ksb"
+      ],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "cannot"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "must not"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "not allowed"
+        }
+      ]
+    }
+  ]
+}

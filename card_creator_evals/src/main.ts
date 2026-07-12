@@ -11,17 +11,17 @@ interface RunInfo {
   modelIds: string[];
 }
 
-const FIELD_NAMES: (keyof AIGeneratedFields)[] = [
+const FIELD_NAMES: Array<keyof AIGeneratedFields> = [
   "applicableSenses",
   "reading",
   "hint",
   "minimizedContext",
 ];
 
-const runSelect = document.getElementById("run-select") as HTMLSelectElement;
-const examplesContainer = document.getElementById("examples") as HTMLElement;
+const runSelect = document.querySelector<HTMLSelectElement>("#run-select")!;
+const examplesContainer = document.querySelector<HTMLElement>("#examples")!;
 
-async function fetchJson<T>(url: string): Promise<T> {
+async function fetchJSON<T>(url: string): Promise<T> {
   const response = await fetch(url);
   if (!response.ok) {
     throw new Error(`Failed to fetch ${url}: ${response.status}`);
@@ -29,28 +29,17 @@ async function fetchJson<T>(url: string): Promise<T> {
   return response.json();
 }
 
-function parseDirectoryListing(html: string): string[] {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, "text/html");
-  const links = doc.querySelectorAll("li a");
-  return Array.from(links).map((a) => decodeURIComponent(a.getAttribute("href") ?? ""));
-}
-
 async function discoverRuns(): Promise<RunInfo> {
-  const response = await fetch("/runs/");
-  const html = await response.text();
-  const entries = parseDirectoryListing(html);
-
+  const entries = await fetchJSON<string[]>("/api/runs");
   const timestamps = new Set<string>();
   const modelIds = new Set<string>();
 
   for (const entry of entries) {
-    // Parse dirname like "2025-12-21T02-39-55_gpt-5.1/"
-    const dirname = entry.replace(/\/$/, "");
-    const underscoreIndex = dirname.indexOf("_");
-    if (underscoreIndex !== -1) {
-      timestamps.add(dirname.slice(0, underscoreIndex));
-      modelIds.add(dirname.slice(underscoreIndex + 1));
+    // Parse a directory name such as `2025-12-21T02-39-55_gpt-5.1`.
+    const separatorIndex = entry.indexOf("_");
+    if (separatorIndex !== -1) {
+      timestamps.add(entry.slice(0, separatorIndex));
+      modelIds.add(entry.slice(separatorIndex + 1));
     }
   }
 
@@ -61,10 +50,7 @@ async function discoverRuns(): Promise<RunInfo> {
 }
 
 async function discoverInputIds(): Promise<string[]> {
-  const response = await fetch("/inputs/");
-  const html = await response.text();
-  const entries = parseDirectoryListing(html);
-
+  const entries = await fetchJSON<string[]>("/api/inputs");
   return entries
     .filter((entry) => entry.endsWith(".json"))
     .map((entry) => entry.replace(/\.json$/, ""));
@@ -72,35 +58,30 @@ async function discoverInputIds(): Promise<string[]> {
 
 async function loadExamples(timestamp: string, modelIds: string[]): Promise<Example[]> {
   const inputIds = await discoverInputIds();
-  const examples: Example[] = [];
-
-  for (const inputId of inputIds) {
+  const examples = await Promise.all(inputIds.map(async (inputId): Promise<Example | null> => {
     const encodedId = encodeURIComponent(inputId);
-
     const [input, golden] = await Promise.all([
-      fetchJson<EvalInput>(`/inputs/${encodedId}.json`),
-      fetchJson<EvalGolden>(`/goldens/${encodedId}.json`).catch(() => null),
+      fetchJSON<EvalInput>(`/inputs/${encodedId}.json`),
+      fetchJSON<EvalGolden>(`/goldens/${encodedId}.json`).catch(() => null),
     ]);
-
-    if (!golden) continue;
+    if (golden === null) {
+      return null;
+    }
 
     const results = new Map<string, EvalOutput>();
-
-    await Promise.all(modelIds.map(async (model) => {
+    await Promise.all(modelIds.map(async (modelId) => {
       try {
-        const result = await fetchJson<EvalOutput>(
-          `/runs/${timestamp}_${model}/${encodedId}.json`,
+        results.set(
+          modelId,
+          await fetchJSON<EvalOutput>(`/runs/${timestamp}_${modelId}/${encodedId}.json`),
         );
-        results.set(model, result);
       } catch {
-        // Model result not available for this run
+        // Not every model has a result for every timestamp and input.
       }
     }));
-
-    examples.push({ input, golden, results });
-  }
-
-  return examples;
+    return { input, golden, results };
+  }));
+  return examples.filter((example): example is Example => example !== null);
 }
 
 function formatFieldValue(value: unknown): string {
@@ -115,68 +96,52 @@ function formatFieldValue(value: unknown): string {
 
 function compareValues(golden: unknown, actual: unknown): "match" | "diff" | "missing" {
   if (actual === null || actual === undefined) {
-    if (golden === null || golden === undefined) {
-      return "match";
-    }
-    return "missing";
+    return golden === null || golden === undefined ? "match" : "missing";
   }
-
-  const goldenStr = JSON.stringify(golden);
-  const actualStr = JSON.stringify(actual);
-
-  return goldenStr === actualStr ? "match" : "diff";
+  return JSON.stringify(golden) === JSON.stringify(actual) ? "match" : "diff";
 }
 
 function renderExample(example: Example, modelIds: string[]): HTMLElement {
-  const card = document.createElement("article");
-  card.className = "example-card";
-
-  // Header with input info
+  const card = element("article", "example-card");
   const header = document.createElement("header");
-  header.innerHTML = `
-    <h2>${example.input.recognitionTarget}</h2>
-    <p class="context">${example.input.context}</p>
-  `;
+  header.append(
+    element("h2", undefined, example.input.recognitionTarget),
+    element("p", "context", example.input.context),
+  );
   card.appendChild(header);
 
-  // Comparison grid
-  const grid = document.createElement("div");
-  grid.className = "comparison-grid";
-
-  // Header row
-  const headerRow = document.createElement("div");
-  headerRow.className = "grid-row header-row";
-  headerRow.innerHTML = `
-    <div class="field-name"></div>
-    <div class="model-column">Golden</div>
-    ${modelIds.map((m) => `<div class="model-column">${m.replace("-preview", "")}</div>`).join("")}
-  `;
+  const grid = element("div", "comparison-grid");
+  const headerRow = element("div", "grid-row header-row");
+  headerRow.append(
+    element("div", "field-name"),
+    element("div", "model-column", "Golden"),
+    ...modelIds.map((modelId) => element("div", "model-column", modelId.replace("-preview", ""))),
+  );
   grid.appendChild(headerRow);
 
-  // Field rows
   for (const fieldName of FIELD_NAMES) {
-    const row = document.createElement("div");
-    row.className = "grid-row";
-
+    const row = element("div", "grid-row");
     const goldenValue = example.golden.aiFields[fieldName];
+    row.append(
+      element("div", "field-name", fieldName),
+      element("div", "field-value golden", formatFieldValue(goldenValue)),
+    );
 
-    let rowHtml = `
-      <div class="field-name">${fieldName}</div>
-      <div class="field-value golden">${formatFieldValue(goldenValue)}</div>
-    `;
-
-    for (const model of modelIds) {
-      const result = example.results.get(model);
-      if (result) {
-        const actualValue = result.aiFields[fieldName];
-        const status = compareValues(goldenValue, actualValue);
-        rowHtml += `<div class="field-value ${status}">${formatFieldValue(actualValue)}</div>`;
-      } else {
-        rowHtml += `<div class="field-value no-data">-</div>`;
+    for (const modelId of modelIds) {
+      const result = example.results.get(modelId);
+      if (result === undefined) {
+        row.appendChild(element("div", "field-value no-data", "-"));
+        continue;
       }
+      const actualValue = result.aiFields[fieldName];
+      row.appendChild(
+        element(
+          "div",
+          `field-value ${compareValues(goldenValue, actualValue)}`,
+          formatFieldValue(actualValue),
+        ),
+      );
     }
-
-    row.innerHTML = rowHtml;
     grid.appendChild(row);
   }
 
@@ -184,20 +149,23 @@ function renderExample(example: Example, modelIds: string[]): HTMLElement {
   return card;
 }
 
-function render(examples: Example[], modelIds: string[]) {
-  examplesContainer.innerHTML = "";
-  const fragment = document.createDocumentFragment();
-
-  for (const example of examples) {
-    fragment.appendChild(renderExample(example, modelIds));
+function element(tagName: string, className?: string, text?: string): HTMLElement {
+  const node = document.createElement(tagName);
+  if (className !== undefined) {
+    node.className = className;
   }
+  if (text !== undefined) {
+    node.textContent = text;
+  }
+  return node;
+}
 
-  examplesContainer.appendChild(fragment);
+function render(examples: Example[], modelIds: string[]): void {
+  examplesContainer.replaceChildren(...examples.map((example) => renderExample(example, modelIds)));
 }
 
 try {
   const { timestamps, modelIds } = await discoverRuns();
-
   if (timestamps.length === 0) {
     examplesContainer.textContent = "No eval runs found.";
   } else {
@@ -209,7 +177,6 @@ try {
     }
 
     render(await loadExamples(timestamps[0], modelIds), modelIds);
-
     runSelect.addEventListener("change", async () => {
       render(await loadExamples(runSelect.value, modelIds), modelIds);
     });

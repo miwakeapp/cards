@@ -1,31 +1,9 @@
 {
-  "imports": {
-    "lume/": "https://cdn.jsdelivr.net/gh/lumeland/lume@3.1.2/"
-  },
   "tasks": {
-    "lume": {
-      "description": "Run Lume command",
-      "command": "deno run -A lume/cli.ts"
-    },
-    "prepare_data": "deno run --allow-read=../jmdict_to_html --allow-write=./src/data scripts/build_entries.ts",
-    "build": {
-      "description": "Build the site for production",
-      "command": "deno task lume"
-    },
-    "serve": {
-      "description": "Run and serve the site for development",
-      "command": "deno task lume -s"
-    }
-  },
-  "lint": {
-    "plugins": [
-      "https://cdn.jsdelivr.net/gh/lumeland/lume@3.1.2/lint.ts"
-    ],
-    "rules": {
-      "exclude": [
-        "no-import-prefix"
-      ]
-    }
+    "doc:check": "deno doc --lint server.ts scripts/build_entries.ts src/main.ts",
+    "prepare_data": "deno run --allow-read=../data/preextracted_jmdict_entries,../data/jmdict_tags.json --allow-write=./src/data scripts/build_entries.ts",
+    "build": "deno task prepare_data && deno transpile --output=./src/main.js ./src/main.ts",
+    "dev": "deno task build && deno run --allow-net=127.0.0.1 --allow-read=./src server.ts"
   },
   "compilerOptions": {
     "lib": [

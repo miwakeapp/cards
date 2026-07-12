@@ -101,6 +101,11 @@ interface EpubFile {
   paragraphs: EpubParagraph[];
 }
 
+interface AnkiNote {
+  noteId: number;
+  fields: Record<string, { value: string }>;
+}
+
 const EPUB_TEXTS_DIR = join(import.meta.dirname!, "..", "epub_texts");
 
 async function buildEpubIndex(): Promise<EpubFile[]> {
@@ -271,7 +276,7 @@ console.error(
   `Found ${noteIds.length} notes total for query "${query}", processing ${processingCount}`,
 );
 
-const notes = await ac<Array<Record<string, any>>>("notesInfo", {
+const notes = await ac<AnkiNote[]>("notesInfo", {
   notes: noteIds.slice(0, processingCount),
 });
 

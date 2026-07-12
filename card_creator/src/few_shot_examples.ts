@@ -4,14 +4,14 @@
  */
 
 import type { AIGeneratedFields } from "./types.ts";
-import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
+import type { JMDictWord } from "data";
 import { preextractedJMDictEntry } from "data";
 
 export interface FewShotExample {
   input: {
     recognitionTarget: string;
     context: string;
-    jmdictEntry: JMdictWord;
+    jmdictEntry: JMDictWord;
     source?: string;
     sourceURL?: string;
   };

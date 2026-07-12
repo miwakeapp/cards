@@ -2,6 +2,20 @@
 
 Data access and generation package for Miwake. Large downloaded and generated resources are ignored by Git and built through the tasks in `deno.json`.
 
+## Checked-in JMDict data
+
+The full JMDict and furigana datasets are large, frequently updated runtime resources, so they remain local and ignored by Git. Tests, few-shot examples, evals, and the dictionary preview need only a small, stable subset. Checking in that subset makes a clean checkout and CI self-contained, deterministic, and independent of whatever full datasets a developer happens to have locally.
+
+After downloading a new JMDict revision and the corresponding furigana data, refresh that subset with:
+
+```sh
+deno task --cwd data update_jmdict_snapshot
+```
+
+This refreshes the selected entries and tag descriptions, records the source revision in `jmdict_snapshot.json`, and reduces the full furigana data to the relevant test records. Commit the resulting changes together.
+
+The JMDict snapshot is derived from [jmdict-simplified](https://github.com/scriptin/jmdict-simplified), which packages the Electronic Dictionary Research and Development Group's JMDict data under the [Creative Commons Attribution-ShareAlike 4.0 license](https://github.com/scriptin/jmdict-simplified/blob/master/LICENSE.txt). The small checked furigana fixture is extracted from [Lorenzi's Jisho](https://jisho.hlorenzi.com/); the full download remains local.
+
 ## Rarity resources
 
 Build the resources used by `rarity_score` from the repository root:

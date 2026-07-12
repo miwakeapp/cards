@@ -101,7 +101,7 @@ await Deno.mkdir(OUTPUT_DIR, { recursive: true });
 for (const input of evalInputs) {
   const filename = `${input.id}.json`;
   const filepath = `${OUTPUT_DIR}/${filename}`;
-  await Deno.writeTextFile(filepath, JSON.stringify(input, null, 2) + "\n");
+  await Deno.writeTextFile(filepath, JSON.stringify(input, undefined, 2) + "\n");
   console.log(`  ${filename}: ${input.recognitionTarget} (${input.jmdictId})`);
 }
 

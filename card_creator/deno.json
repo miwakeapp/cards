@@ -8,11 +8,17 @@
     "zod": "npm:zod@^4.1.13"
   },
   "tasks": {
+    "doc:check": "deno doc --lint src/mod.ts src/keys.ts",
     "test:update": "deno test --allow-read --allow-write -- --update"
   },
   "test": {
     "permissions": {
-      "read": ["./test/__snapshots__", "../data"]
+      "read": [
+        "./test/__snapshots__",
+        "../data/jmdict_tags.json",
+        "../data/preextracted_jmdict_entries",
+        "../data/test/fixtures/jmdict_furigana.json"
+      ]
     }
   }
 }

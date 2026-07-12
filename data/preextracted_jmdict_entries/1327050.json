@@ -1,0 +1,70 @@
+{
+  "id": "1327050",
+  "kanji": [
+    {
+      "common": false,
+      "text": "取捨選択",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "しゅしゃせんたく",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "adj-no"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "yoji"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "selection"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "making a choice"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "sifting"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "decision to adopt or reject"
+        }
+      ]
+    }
+  ]
+}

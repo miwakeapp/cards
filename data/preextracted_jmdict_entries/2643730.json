@@ -1,0 +1,59 @@
+{
+  "id": "2643730",
+  "kanji": [
+    {
+      "common": false,
+      "text": "えんじ色",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "臙脂色",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "えんじいろ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "dark red"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "deep red"
+        }
+      ]
+    }
+  ]
+}

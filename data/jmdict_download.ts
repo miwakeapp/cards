@@ -12,8 +12,11 @@ const RELEASES_URL = "https://api.github.com/repos/scriptin/jmdict-simplified/re
 
 const jmdictPath = path.join(import.meta.dirname!, "jmdict_eng.json");
 
+/** Identifies a jmdict-simplified package release and dictionary revision. */
 export interface JMDictVersion {
+  /** The jmdict-simplified package version. */
   version: string;
+  /** The source dictionary date in `YYYY-MM-DD` form. */
   dictDate: string;
 }
 
@@ -109,10 +112,15 @@ async function downloadRelease(release: LatestRelease): Promise<void> {
   entriesCache.promise = null;
 }
 
+/** The result of checking or updating the local JMDict data. */
 export interface EnsureLatestResult {
+  /** The action taken after comparing local and remote data. */
   action: "downloaded" | "already-current" | "offline" | "check-failed";
+  /** The local version before downloading, or the version used when no download occurred. */
   local: JMDictVersion | null;
+  /** The latest remote version when a release check succeeded. */
   remote?: JMDictVersion;
+  /** The nonfatal release-check error when an existing local copy was used. */
   error?: string;
 }
 

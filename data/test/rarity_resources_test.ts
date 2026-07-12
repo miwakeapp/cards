@@ -10,6 +10,9 @@ import {
 import { parseBCCWJRow, parseNWJCRow, validateBCCWJHeader } from "../scripts/rarity_source_rows.ts";
 
 const TEST_NWJC_TOKEN_TOTAL = 1_000_000;
+const TEMP_DIRECTORY = `${import.meta.dirname!}/.tmp`;
+
+await Deno.mkdir(TEMP_DIRECTORY, { recursive: true });
 
 Deno.test("normalizeRarityTerm canonicalizes plain resource keys", () => {
   assertEquals(normalizeRarityTerm("ｶｯｺ　ｲｲ"), "カッコイイ");
@@ -33,7 +36,7 @@ Deno.test("rarity resource lookup normalizes and returns minimal hits", async ()
 });
 
 Deno.test("rarity resource lookup rejects missing resources with complete guidance", async () => {
-  const databasePath = `${import.meta.dirname!}/does-not-exist.sqlite3`;
+  const databasePath = `${TEMP_DIRECTORY}/does-not-exist.sqlite3`;
   const lookup = createRarityResourceLookup(databasePath);
   try {
     await assertRejects(
@@ -47,7 +50,7 @@ Deno.test("rarity resource lookup rejects missing resources with complete guidan
 });
 
 Deno.test("rarity resource lookup rejects incompatible databases", async () => {
-  const directory = await Deno.makeTempDir({ dir: import.meta.dirname!, prefix: ".tmp-rarity-" });
+  const directory = await Deno.makeTempDir({ dir: TEMP_DIRECTORY, prefix: "rarity-" });
   const databasePath = `${directory}/rarity.sqlite3`;
   const database = new DatabaseSync(databasePath);
   database.exec("PRAGMA user_version = 99");
@@ -105,7 +108,7 @@ Deno.test("rarity source parsers reject malformed rows", () => {
 async function withFixtureDatabase(
   callback: (lookup: ReturnType<typeof createRarityResourceLookup>) => Promise<void>,
 ): Promise<void> {
-  const directory = await Deno.makeTempDir({ dir: import.meta.dirname!, prefix: ".tmp-rarity-" });
+  const directory = await Deno.makeTempDir({ dir: TEMP_DIRECTORY, prefix: "rarity-" });
   const databasePath = `${directory}/rarity.sqlite3`;
   const database = new DatabaseSync(databasePath);
   initializeRarityDatabase(database);

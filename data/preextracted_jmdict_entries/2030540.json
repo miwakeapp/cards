@@ -1,0 +1,57 @@
+{
+  "id": "2030540",
+  "kanji": [
+    {
+      "common": false,
+      "text": "狂喜乱舞",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "きょうきらんぶ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "vs"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "yoji"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "boisterous dance"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "dancing wildly"
+        }
+      ]
+    }
+  ]
+}

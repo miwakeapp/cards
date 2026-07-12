@@ -1,0 +1,61 @@
+{
+  "id": "1000110",
+  "kanji": [
+    {
+      "common": true,
+      "text": "ＣＤプレーヤー",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "ＣＤプレイヤー",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "シーディープレーヤー",
+      "tags": [],
+      "appliesToKanji": [
+        "ＣＤプレーヤー"
+      ]
+    },
+    {
+      "common": false,
+      "text": "シーディープレイヤー",
+      "tags": [],
+      "appliesToKanji": [
+        "ＣＤプレイヤー"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "CD player"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "id": "2830382",
+  "kanji": [
+    {
+      "common": false,
+      "text": "頭をよぎる",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "頭を過ぎる",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "あたまをよぎる",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "exp",
+        "v5r"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to cross one's mind"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to be reminded"
+        }
+      ]
+    }
+  ]
+}

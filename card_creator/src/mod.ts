@@ -14,5 +14,5 @@ export { formatMiwakeKey, parseMiwakeKey } from "./keys.ts";
 export type { MiwakeKey } from "./keys.ts";
 
 // AI provider
-export { DEFAULT_MODEL_ID, generateCardFields, getModel, MODEL_IDS } from "./ai_provider.ts";
+export { DEFAULT_MODEL_ID, generateCardFields, MODEL_IDS } from "./ai_provider.ts";
 export type { GenerateFieldsInput, ModelId } from "./ai_provider.ts";

@@ -1,8 +1,11 @@
+import "../../data/test/use_furigana_fixture.ts";
+
 import { assertEquals } from "@std/assert";
 import { assertSnapshot } from "@std/testing/snapshot";
 import { preextractedJMDictEntry } from "data";
 
-import { formatReadingForAnki, renderEntry } from "../src/mod.ts";
+import { formatReadingForAnki } from "../src/format_reading_for_anki.ts";
+import { renderEntry } from "../src/mod.ts";
 
 // Entry IDs to test renderEntry with
 const RENDER_ENTRY_TEST_IDS = [

@@ -1,10 +1,11 @@
 {
   "tasks": {
-    "update-cards": "deno run --env-file=../.env --allow-net --allow-env --allow-read --allow-write=runs,../data --allow-run=cmd,open,xdg-open src/main.ts"
+    "doc:check": "deno doc --lint src/main.ts",
+    "update-cards": "deno run --env-file=../.env --allow-net --allow-env --allow-read --allow-write=runs,../data --allow-run=cmd,open,xdg-open --allow-sys=hostname src/main.ts"
   },
   "test": {
     "permissions": {
-      "read": true
+      "read": ["../data/jmdict_tags.json"]
     }
   }
 }

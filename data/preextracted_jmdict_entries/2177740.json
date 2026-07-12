@@ -1,0 +1,63 @@
+{
+  "id": "2177740",
+  "kanji": [
+    {
+      "common": false,
+      "text": "願わくば",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "希わくば",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "ねがわくば",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adv"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "願わくは"
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "I pray"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "I wish"
+        }
+      ]
+    }
+  ]
+}

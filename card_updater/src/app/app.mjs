@@ -383,7 +383,7 @@ function renderRetargetBanner() {
   });
 }
 
-function senseTags(view, item) {
+function senseTags(view) {
   const tags = [];
   if (view.wasTargeted) {
     tags.push(
@@ -434,7 +434,7 @@ function renderFocusCard() {
         <input type="checkbox" ${selected ? "checked" : ""} tabindex="-1">
         <span class="sense-num">${view.number}.</span>
         <span class="sense-text">${textHTML}</span>
-        <span class="sense-tags">${senseTags(view, item)}</span>
+        <span class="sense-tags">${senseTags(view)}</span>
       </label>`;
   }).join("");
 
@@ -1164,7 +1164,7 @@ function moveFocus(delta) {
 function isInViewport(element) {
   if (!element) return false;
   const rect = element.getBoundingClientRect();
-  return rect.bottom > 90 && rect.top < window.innerHeight * 0.8;
+  return rect.bottom > 90 && rect.top < globalThis.innerHeight * 0.8;
 }
 
 /* ---------- boot ---------- */

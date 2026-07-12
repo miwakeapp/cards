@@ -162,70 +162,66 @@ function openBrowser(url: string): void {
   }
 }
 
-async function main() {
-  const options = parseArguments(Deno.args);
-  const generatedAt = new Date().toISOString();
+const options = parseArguments(Deno.args);
+const generatedAt = new Date().toISOString();
 
-  const jmdict = await ensureLatestJMDict({
-    offline: options.offline,
-    log: (message) => console.error(message),
-  });
+const jmdict = await ensureLatestJMDict({
+  offline: options.offline,
+  log: (message) => console.error(message),
+});
 
-  console.error(`Querying Anki: ${options.query}`);
-  const notes = await fetchMiwakeNotes(options.query, {
-    limit: options.limit,
-    onProgress: (fetched, total) => console.error(`  Fetched ${fetched}/${total} notes`),
-  });
-  console.error(`Fetched ${notes.length} Miwake notes.`);
+console.error(`Querying Anki: ${options.query}`);
+const notes = await fetchMiwakeNotes(options.query, {
+  limit: options.limit,
+  onProgress: (fetched, total) => console.error(`  Fetched ${fetched}/${total} notes`),
+});
+console.error(`Fetched ${notes.length} Miwake notes.`);
 
-  console.error("Loading local JMDict...");
-  const entries = await allJMDictEntries();
-  console.error(`Loaded ${entries.size} JMDict entries.`);
+console.error("Loading local JMDict...");
+const entries = await allJMDictEntries();
+console.error(`Loaded ${entries.size} JMDict entries.`);
 
-  console.error("Analyzing cards...");
-  const cards = notes.map((note) => {
-    const jmdictId = note.fields.key.split("|")[1]?.trim();
-    return analyzeCard(note, jmdictId === undefined ? undefined : entries.get(jmdictId));
-  });
+console.error("Analyzing cards...");
+const cards = notes.map((note) => {
+  const jmdictId = note.fields.key.split("|")[1]?.trim();
+  return analyzeCard(note, jmdictId === undefined ? undefined : entries.get(jmdictId));
+});
 
-  const counts = { unchanged: 0, normalize: 0, routine: 0, retarget: 0, exception: 0 };
-  for (const card of cards) {
-    ++counts[card.verdict];
-  }
-  console.error(
-    `Analysis: ${counts.unchanged} unchanged, ${counts.normalize} normalize-only, ` +
-      `${counts.routine} routine, ${counts.retarget} re-target, ${counts.exception} exceptions.`,
-  );
-
-  const suggestions = await generateSuggestions(cards, options);
-  const suggestionCache = await loadSuggestionCache();
-  const state = await ReviewState.load(cards);
-
-  startServer({
-    cards,
-    suggestions,
-    suggestionCache,
-    state,
-    meta: {
-      generatedAt,
-      query: options.query,
-      dryRun: options.dryRun,
-      modelId: options.modelId,
-      jmdict,
-      scannedCount: cards.length,
-    },
-    port: options.port,
-  });
-
-  const url = `http://127.0.0.1:${options.port}/`;
-  console.error(`\nReview app ready: ${url}`);
-  if (options.dryRun) {
-    console.error("Running with --dry-run: decisions are saved, but applying is disabled.");
-  }
-  console.error("Press Ctrl+C to stop.");
-  if (options.openBrowser) {
-    openBrowser(url);
-  }
+const counts = { unchanged: 0, normalize: 0, routine: 0, retarget: 0, exception: 0 };
+for (const card of cards) {
+  ++counts[card.verdict];
 }
+console.error(
+  `Analysis: ${counts.unchanged} unchanged, ${counts.normalize} normalize-only, ` +
+    `${counts.routine} routine, ${counts.retarget} re-target, ${counts.exception} exceptions.`,
+);
 
-await main();
+const suggestions = await generateSuggestions(cards, options);
+const suggestionCache = await loadSuggestionCache();
+const state = await ReviewState.load(cards);
+
+startServer({
+  cards,
+  suggestions,
+  suggestionCache,
+  state,
+  meta: {
+    generatedAt,
+    query: options.query,
+    dryRun: options.dryRun,
+    modelId: options.modelId,
+    jmdict,
+    scannedCount: cards.length,
+  },
+  port: options.port,
+});
+
+const url = `http://127.0.0.1:${options.port}/`;
+console.error(`\nReview app ready: ${url}`);
+if (options.dryRun) {
+  console.error("Running with --dry-run: decisions are saved, but applying is disabled.");
+}
+console.error("Press Ctrl+C to stop.");
+if (options.openBrowser) {
+  openBrowser(url);
+}

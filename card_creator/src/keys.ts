@@ -6,12 +6,15 @@
  */
 
 export interface MiwakeKey {
+  /** The spelling shown on the front of the card. */
   recognitionTarget: string;
+  /** The stable JMDict entry identifier. */
   jmdictId: string;
   /** 1-indexed applicable sense numbers, or `null` when all senses apply. */
   senseNumbers: number[] | null;
 }
 
+/** Parses a Miwake key, returning `null` when its syntax or sense list is invalid. */
 export function parseMiwakeKey(text: string): MiwakeKey | null {
   const parts = text.split("|").map((part) => part.trim());
   if (parts.length !== 2 && parts.length !== 3) {

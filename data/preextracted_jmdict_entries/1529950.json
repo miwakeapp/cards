@@ -1,0 +1,148 @@
+{
+  "id": "1529950",
+  "kanji": [
+    {
+      "common": false,
+      "text": "無垢",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "むく",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adj-na",
+        "adj-no",
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "pure"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "innocent"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "spotless"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "immaculate"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "unspoiled"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adj-na",
+        "adj-no",
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "金無垢"
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "pure"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "unmixed"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "unadulterated"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "白無垢"
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "long kimono made from the same plain-coloured cloth"
+        }
+      ]
+    }
+  ]
+}

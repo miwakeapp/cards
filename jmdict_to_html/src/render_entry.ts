@@ -1,9 +1,9 @@
+import type { JMDictWord } from "data";
 import type {
   JMdictKana,
   JMdictKanji,
   JMdictLanguageSource,
   JMdictSense,
-  JMdictWord,
   Tag,
   Xref,
 } from "@scriptin/jmdict-simplified-types";
@@ -17,7 +17,7 @@ import {
   tag as expandTag,
 } from "./jmdict_tag_expansions.ts";
 
-export type { JMdictWord };
+export type { JMDictWord };
 
 type SectionDescriptor = {
   className: string;
@@ -82,7 +82,8 @@ type SectionComputation = {
   shared: boolean;
 };
 
-export function renderEntry(word: JMdictWord): string {
+/** Renders a JMDict word as semantic HTML for a Miwake card. */
+export function renderEntry(word: JMDictWord): string {
   const senses = word.sense;
   const sharedParts = computeSharedPartOfSpeech(senses);
   const sharedSet = new Set(sharedParts);

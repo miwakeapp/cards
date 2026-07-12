@@ -2,6 +2,9 @@
   "name": "rarity_score",
   "exports": "./src/mod.ts",
   "tasks": {
-    "test": "deno test"
+    "doc:check": "deno doc --lint src/mod.ts"
+  },
+  "test": {
+    "permissions": {}
   }
 }

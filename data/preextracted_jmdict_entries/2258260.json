@@ -1,0 +1,61 @@
+{
+  "id": "2258260",
+  "kanji": [
+    {
+      "common": false,
+      "text": "ハンダ付け",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "半田付け",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "はんだ付け",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "はんだづけ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vt",
+        "adj-no"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "soldering"
+        }
+      ]
+    }
+  ]
+}

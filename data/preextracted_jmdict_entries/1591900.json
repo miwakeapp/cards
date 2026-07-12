@@ -1,0 +1,182 @@
+{
+  "id": "1591900",
+  "kanji": [
+    {
+      "common": true,
+      "text": "綺麗",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "奇麗",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "暉麗",
+      "tags": [
+        "sK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "きれい",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": true,
+      "text": "キレイ",
+      "tags": [],
+      "appliesToKanji": []
+    },
+    {
+      "common": false,
+      "text": "きれーい",
+      "tags": [
+        "sk"
+      ],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adj-na"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "pretty"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "lovely"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "beautiful"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "fair"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adj-na"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "clean"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "clear"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "pure"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "tidy"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "neat"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adj-na"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [
+        "as 〜に"
+      ],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "completely"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "entirely"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "id": "1204030",
+  "kanji": [
+    {
+      "common": false,
+      "text": "外泊",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "がいはく",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "staying somewhere else (overnight)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "spending the night away (e.g. from home)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "going home (e.g. from hospital) for the night"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "sleepover"
+        }
+      ]
+    }
+  ]
+}
