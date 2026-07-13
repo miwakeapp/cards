@@ -1,17 +1,33 @@
 /** Client for the Miwake card-updater review app. All data comes from the local server. */
 
+import type { ChangeChip, SenseView, Verdict } from "../analyze.ts";
+import type { DiffSegment } from "../entry_text.ts";
+import type {
+  ApplyResultPayload,
+  DecisionDraft,
+  DecisionUpdate,
+  ReviewItem,
+  ReviewMeta,
+  ReviewPayload,
+} from "../review_api.ts";
+import type { Suggestion, SuggestionConfidence } from "../suggest.ts";
+
 /* ---------- state ---------- */
 
-let meta = null;
-let items = [];
-const itemsByNoteId = new Map();
+let meta: ReviewMeta;
+let items: ReviewItem[] = [];
+const itemsByNoteId = new Map<number, ReviewItem>();
 
-let focusNoteId = null;
-const working = new Map(); // noteId -> { senses: Set, hint: string }
-const expandedRows = new Set();
-const undoStack = []; // arrays of { noteId, previous }
+let focusNoteId: number | null = null;
+interface WorkingSelection {
+  senses: Set<number>;
+  hint: string;
+}
+const working = new Map<number, WorkingSelection>();
+const expandedRows = new Set<number>();
+const undoStack: Array<Array<{ noteId: number; previous: DecisionDraft | null }>> = [];
 
-const REASON_LABELS = {
+const REASON_LABELS: Record<string, { title: string; explain?: string }> = {
   "single-sense": {
     title: "Single-sense entries, wording updated",
     explain: "One sense before and after — the card can't point at the wrong sense.",
@@ -39,7 +55,7 @@ const REASON_LABELS = {
   "target-out-of-range": { title: "Key targets a sense the stored entry lacks" },
 };
 
-const ROUTINE_GROUP_ORDER = [
+const ROUTINE_GROUP_ORDER: string[] = [
   "single-sense",
   "targets-intact",
   "target-metadata",
@@ -48,7 +64,7 @@ const ROUTINE_GROUP_ORDER = [
 
 /* ---------- helpers ---------- */
 
-function escapeHTML(value) {
+function escapeHTML(value: unknown): string {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
@@ -57,7 +73,7 @@ function escapeHTML(value) {
     .replaceAll("'", "&#39;");
 }
 
-function segmentsHTML(segments) {
+function segmentsHTML(segments: DiffSegment[]): string {
   return segments.map(({ type, text }) => {
     const escaped = escapeHTML(text);
     if (type === "ins") return `<ins>${escaped}</ins>`;
@@ -67,7 +83,7 @@ function segmentsHTML(segments) {
 }
 
 /** Trims the unchanged stretches of a diff so it fits on one chip line. */
-function segmentsSnippetHTML(segments, keep = 18) {
+function segmentsSnippetHTML(segments: DiffSegment[], keep = 18): string {
   const trimmed = segments.map((segment, index) => {
     if (segment.type !== "same") return segment;
     let text = segment.text;
@@ -83,24 +99,32 @@ function segmentsSnippetHTML(segments, keep = 18) {
   return segmentsHTML(trimmed);
 }
 
-function truncate(text, length) {
+function truncate(text: string, length: number): string {
   return text.length > length ? text.slice(0, length - 1) + "…" : text;
 }
 
-function reasonTitle(reason) {
+function reasonTitle(reason: string): string {
   return REASON_LABELS[reason]?.title ?? reason;
 }
 
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
+function element<T extends HTMLElement = HTMLElement>(id: string): T {
+  return document.getElementById(id) as T;
+}
+
 /** Renders a note-field's HTML safely: keeps simple inline tags, converts Anki furigana to ruby. */
-function renderContextHTML(raw) {
+function renderContextHTML(raw: string): string {
   const doc = new DOMParser().parseFromString(raw || "", "text/html");
   const keep = new Set(["MARK", "B", "I", "RUBY", "RT", "BR"]);
-  const walk = (node) => {
+  const walk = (node: Node): string => {
     let html = "";
     for (const child of node.childNodes) {
       if (child.nodeType === Node.TEXT_NODE) {
         html += furiganaToRuby(escapeHTML(child.textContent));
-      } else if (child.nodeType === Node.ELEMENT_NODE) {
+      } else if (child instanceof Element) {
         const tag = child.tagName.toLowerCase();
         html += keep.has(child.tagName) ? `<${tag}>${walk(child)}</${tag}>` : walk(child);
       }
@@ -110,7 +134,7 @@ function renderContextHTML(raw) {
   return walk(doc.body);
 }
 
-function furiganaToRuby(escapedText) {
+function furiganaToRuby(escapedText: string): string {
   return escapedText.replace(
     /(?:^|[  ])([^  \[\]]+)\[([^\]]+)\]/g,
     (_match, base, reading) => `<ruby>${base}<rt>${reading}</rt></ruby>`,
@@ -118,7 +142,7 @@ function furiganaToRuby(escapedText) {
 }
 
 /** Client-side mirror of card_creator's `formatMiwakeKey`, for live key previews. */
-function computeKey(item, senses) {
+function computeKey(item: ReviewItem, senses: Iterable<number>): string {
   const sorted = [...senses].sort((a, b) => a - b);
   if (sorted.length === 0 || sorted.length === item.totalNewSenses) {
     return `${item.recognitionTarget} | ${item.jmdictId}`;
@@ -127,7 +151,7 @@ function computeKey(item, senses) {
 }
 
 /** Character-level diff used only for the key transition line. */
-function keyDiffHTML(oldKey, newKey) {
+function keyDiffHTML(oldKey: string, newKey: string): string {
   if (oldKey === newKey) return escapeHTML(newKey);
   let prefix = 0;
   while (prefix < oldKey.length && prefix < newKey.length && oldKey[prefix] === newKey[prefix]) {
@@ -148,13 +172,13 @@ function keyDiffHTML(oldKey, newKey) {
     (added ? `<ins>${escapeHTML(added)}</ins>` : "") + tail;
 }
 
-async function api(pathname, body) {
+async function api<T>(pathname: string, body?: unknown): Promise<T> {
   const response = await fetch(pathname, {
     method: body === undefined ? "GET" : "POST",
     headers: body === undefined ? {} : { "Content-Type": "application/json" },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
-  const payload = await response.json();
+  const payload = await response.json() as T & { error?: string };
   if (!response.ok) {
     throw new Error(payload.error ?? `Request failed: ${response.status}`);
   }
@@ -163,7 +187,7 @@ async function api(pathname, body) {
 
 /* ---------- buckets ---------- */
 
-function bucket(verdict) {
+function bucket(verdict: Verdict): ReviewItem[] {
   return items.filter((item) => item.verdict === verdict);
 }
 
@@ -172,34 +196,41 @@ const routineItems = () => bucket("routine");
 const normalizeItems = () => bucket("normalize");
 const exceptionItems = () => bucket("exception");
 
-function impliedDecision(item) {
+function impliedDecision(item: ReviewItem): DecisionDraft["decision"] | "none" {
   return item.verdict === "routine" || item.verdict === "normalize" ? "accept" : "none";
 }
 
-function effectiveDecision(item) {
+function effectiveDecision(item: ReviewItem): DecisionDraft["decision"] | "none" {
   return item.decision?.decision ?? impliedDecision(item);
 }
 
 /* ---------- decisions ---------- */
 
-async function postDecisions(entries, { toast: message } = {}) {
+async function postDecisions(
+  entries: DecisionUpdate[],
+  { toast: message }: { toast?: string } = {},
+): Promise<void> {
   undoStack.push(entries.map(({ noteId }) => ({
     noteId,
-    previous: itemsByNoteId.get(noteId).decision,
+    previous: itemsByNoteId.get(noteId)!.decision,
   })));
   for (const { noteId, record } of entries) {
-    itemsByNoteId.get(noteId).decision = record;
+    itemsByNoteId.get(noteId)!.decision = record;
   }
   renderAll();
   if (message) showToast(message);
   try {
-    await api("/api/decisions", { entries });
+    await api<unknown>("/api/decisions", { entries });
   } catch (error) {
-    showToast(`Saving failed: ${error.message}`);
+    showToast(`Saving failed: ${errorMessage(error)}`);
   }
 }
 
-function decide(item, record, { advance = true } = {}) {
+function decide(
+  item: ReviewItem,
+  record: DecisionDraft | null,
+  { advance = true }: { advance?: boolean } = {},
+): void {
   const verb = record === null
     ? "Cleared"
     : { accept: "Accepted", hold: "Held", reject: "Rejected" }[record.decision];
@@ -216,7 +247,7 @@ async function undo() {
     return;
   }
   for (const { noteId, previous } of [...batch].reverse()) {
-    itemsByNoteId.get(noteId).decision = previous;
+    itemsByNoteId.get(noteId)!.decision = previous;
     working.delete(noteId);
   }
   const firstItem = itemsByNoteId.get(batch[0].noteId);
@@ -228,39 +259,45 @@ async function undo() {
     batch.length === 1 ? `Undid ${firstItem?.word ?? ""}` : `Undid ${batch.length} decisions`,
   );
   try {
-    await api("/api/decisions", {
+    await api<unknown>("/api/decisions", {
       entries: batch.map(({ noteId }) => ({
         noteId,
-        record: itemsByNoteId.get(noteId).decision,
+        record: itemsByNoteId.get(noteId)!.decision,
       })),
     });
   } catch (error) {
-    showToast(`Saving failed: ${error.message}`);
+    showToast(`Saving failed: ${errorMessage(error)}`);
   }
 }
 
-function nextUndecidedRetarget(afterNoteId) {
+function nextUndecidedRetarget(afterNoteId: number | null): ReviewItem | undefined {
   const list = retargetItems();
   const startIndex = list.findIndex((item) => item.noteId === afterNoteId);
   const rotated = [...list.slice(startIndex + 1), ...list.slice(0, startIndex + 1)];
   return rotated.find((item) => !item.decision && !item.applied);
 }
 
-function getWorking(item) {
+function getWorking(item: ReviewItem): WorkingSelection {
   if (!working.has(item.noteId)) {
     const initial = item.decision?.senses ?? item.suggestion?.senses ?? item.mappedTargetSenses;
     const hint = item.decision?.hint ?? item.suggestion?.defaultHint ?? (item.hint || null);
     working.set(item.noteId, { senses: new Set(initial), hint: hint ?? "" });
   }
-  return working.get(item.noteId);
+  return working.get(item.noteId)!;
 }
 
 /* ---------- header ---------- */
 
-function renderHeader() {
+function renderHeader(): void {
   const actionable = items.filter((item) => item.verdict !== "exception");
   const total = actionable.length;
-  const counts = { applied: 0, accept: 0, ai: 0, hold: 0, reject: 0 };
+  const counts: Record<"applied" | "accept" | "ai" | "hold" | "reject", number> = {
+    applied: 0,
+    accept: 0,
+    ai: 0,
+    hold: 0,
+    reject: 0,
+  };
   let staged = 0;
   for (const item of actionable) {
     if (item.applied) {
@@ -278,12 +315,12 @@ function renderHeader() {
   }
 
   const jmdictVersion = meta.jmdict.remote ?? meta.jmdict.local;
-  document.getElementById("brandSub").textContent =
+  element("brandSub").textContent =
     `${meta.scannedCount.toLocaleString()} cards scanned · ${meta.counts.unchanged.toLocaleString()} already current · ` +
     `JMDict ${jmdictVersion?.version ?? "?"} (${jmdictVersion?.dictDate ?? "?"})` +
     (meta.dryRun ? " · dry run" : "");
 
-  const bar = document.getElementById("progressBar");
+  const bar = element("progressBar");
   bar.innerHTML = "";
   for (
     const [key, cls] of [
@@ -292,7 +329,7 @@ function renderHeader() {
       ["ai", "p-ai"],
       ["hold", "p-hold"],
       ["reject", "p-reject"],
-    ]
+    ] as const
   ) {
     const div = document.createElement("div");
     div.className = cls;
@@ -301,13 +338,13 @@ function renderHeader() {
   }
 
   const toReview = retargetItems().filter((item) => !item.decision && !item.applied).length;
-  document.getElementById("progressCaption").textContent = counts.applied === total && total > 0
+  element("progressCaption").textContent = counts.applied === total && total > 0
     ? `All ${total} applied 🎉`
     : `${staged} / ${total} staged` + (toReview > 0 ? ` · ${toReview} to review` : "");
 
-  document.getElementById("undoButton").disabled = undoStack.length === 0;
+  element<HTMLButtonElement>("undoButton").disabled = undoStack.length === 0;
 
-  const applyButton = document.getElementById("applyButton");
+  const applyButton = element<HTMLButtonElement>("applyButton");
   const applicable = applyableItems().length;
   applyButton.textContent = meta.dryRun
     ? "Apply (dry run)"
@@ -317,7 +354,7 @@ function renderHeader() {
     ? "This run was started with --dry-run; restart without it to apply."
     : "Write the staged updates to Anki";
 
-  document.getElementById("sectionNav").innerHTML = [
+  element("sectionNav").innerHTML = [
     ["#retarget", "✨ Re-target", retargetItems().length],
     ["#routine", "Routine", routineItems().length],
     ["#normalize", "Normalize", normalizeItems().length],
@@ -329,8 +366,8 @@ function renderHeader() {
 
 /* ---------- re-target section ---------- */
 
-function renderRetargetBanner() {
-  const container = document.getElementById("retargetBanner");
+function renderRetargetBanner(): void {
+  const container = element("retargetBanner");
   const list = retargetItems();
   if (list.length === 0) {
     container.innerHTML =
@@ -338,12 +375,17 @@ function renderRetargetBanner() {
     return;
   }
 
-  const byConfidence = { high: [], medium: [], low: [], none: [] };
+  const byConfidence: Record<SuggestionConfidence | "none", ReviewItem[]> = {
+    high: [],
+    medium: [],
+    low: [],
+    none: [],
+  };
   for (const item of list) {
     byConfidence[item.suggestion?.confidence ?? "none"].push(item);
   }
   const undecidedHigh = byConfidence.high.filter((item) => !item.decision && !item.applied);
-  const parts = [];
+  const parts: string[] = [];
   if (byConfidence.high.length) {
     parts.push(`<span class="conf-dot high"></span> ${byConfidence.high.length} high`);
   }
@@ -366,25 +408,28 @@ function renderRetargetBanner() {
         ✓ Accept ${undecidedHigh.length} high-confidence
       </button>
     </div>`;
-  document.getElementById("acceptHighButton")?.addEventListener("click", () => {
+  element("acceptHighButton")?.addEventListener("click", () => {
     const targets = byConfidence.high.filter((item) => !item.decision && !item.applied);
-    const entries = targets.map((item) => ({
-      noteId: item.noteId,
-      record: {
-        decision: "accept",
-        senses: item.suggestion.senses,
-        hint: item.suggestion.defaultHint,
-        resolvedBy: "ai",
-        decidedAt: new Date().toISOString(),
-      },
-    }));
+    const entries: DecisionUpdate[] = targets.map((item) => {
+      const suggestion = item.suggestion!;
+      return {
+        noteId: item.noteId,
+        record: {
+          decision: "accept",
+          senses: suggestion.senses,
+          hint: suggestion.defaultHint,
+          resolvedBy: "ai",
+          decidedAt: new Date().toISOString(),
+        },
+      };
+    });
     focusNoteId = null;
     postDecisions(entries, { toast: `Accepted ${targets.length} high-confidence suggestions` });
   });
 }
 
-function senseTags(view) {
-  const tags = [];
+function senseTags(view: SenseView): string {
+  const tags: string[] = [];
   if (view.wasTargeted) {
     tags.push(
       '<span class="chip chip-warn" title="This card was testing this sense"><span class="was-dot"></span>was testing</span>',
@@ -398,8 +443,8 @@ function senseTags(view) {
   return tags.join("");
 }
 
-function renderFocusCard() {
-  const container = document.getElementById("focusWrap");
+function renderFocusCard(): void {
+  const container = element("focusWrap");
   const list = retargetItems();
   if (list.length === 0) {
     container.innerHTML = "";
@@ -414,7 +459,7 @@ function renderFocusCard() {
     return;
   }
 
-  const item = itemsByNoteId.get(focusNoteId);
+  const item = itemsByNoteId.get(focusNoteId)!;
   const work = getWorking(item);
   const selection = [...work.senses].sort((a, b) => a - b);
   const newKey = computeKey(item, selection);
@@ -567,9 +612,9 @@ function renderFocusCard() {
   wireFocusCard(item, work);
 }
 
-function wireFocusCard(item, work) {
-  const container = document.getElementById("focusWrap");
-  for (const option of container.querySelectorAll(".sense-option[data-sense]")) {
+function wireFocusCard(item: ReviewItem, work: WorkingSelection): void {
+  const container = element("focusWrap");
+  for (const option of container.querySelectorAll<HTMLElement>(".sense-option[data-sense]")) {
     option.addEventListener("click", (event) => {
       event.preventDefault();
       toggleSense(item, Number(option.dataset.sense));
@@ -577,35 +622,38 @@ function wireFocusCard(item, work) {
   }
   container.querySelector("#resetToAI")?.addEventListener("click", (event) => {
     event.preventDefault();
+    const suggestion = item.suggestion!;
     working.set(item.noteId, {
-      senses: new Set(item.suggestion.senses),
-      hint: item.suggestion.defaultHint ?? "",
+      senses: new Set(suggestion.senses),
+      hint: suggestion.defaultHint ?? "",
     });
     renderAll();
   });
   container.querySelector("#runAI")?.addEventListener("click", async (event) => {
     event.preventDefault();
-    event.target.textContent = "✨ running…";
+    (event.currentTarget as HTMLElement).textContent = "✨ running…";
     try {
-      const { suggestion } = await api("/api/suggest", { noteId: item.noteId });
+      const { suggestion } = await api<{ suggestion: Suggestion }>("/api/suggest", {
+        noteId: item.noteId,
+      });
       item.suggestion = suggestion;
       working.delete(item.noteId);
       renderAll();
       showToast(`AI suggestion ready for ${item.word}`);
     } catch (error) {
-      showToast(`AI failed: ${error.message}`);
+      showToast(`AI failed: ${errorMessage(error)}`);
       renderAll();
     }
   });
   container.querySelector("#useAIHint")?.addEventListener("click", () => {
-    work.hint = item.suggestion.aiHint;
+    work.hint = item.suggestion!.aiHint!;
     renderAll();
   });
   container.querySelector("#useCardHint")?.addEventListener("click", () => {
     work.hint = item.hint;
     renderAll();
   });
-  const hintInput = container.querySelector("#hintInput");
+  const hintInput = container.querySelector<HTMLInputElement>("#hintInput")!;
   hintInput.addEventListener("input", () => {
     work.hint = hintInput.value;
   });
@@ -617,8 +665,8 @@ function wireFocusCard(item, work) {
     }
     event.stopPropagation();
   });
-  container.querySelector("#acceptButton").addEventListener("click", acceptFocus);
-  container.querySelector("#holdButton").addEventListener("click", () =>
+  container.querySelector("#acceptButton")!.addEventListener("click", acceptFocus);
+  container.querySelector("#holdButton")!.addEventListener("click", () =>
     decide(item, {
       decision: "hold",
       senses: null,
@@ -626,11 +674,11 @@ function wireFocusCard(item, work) {
       resolvedBy: "human",
       decidedAt: new Date().toISOString(),
     }));
-  container.querySelector("#skipButton").addEventListener("click", () => {
+  container.querySelector("#skipButton")!.addEventListener("click", () => {
     focusNoteId = nextUndecidedRetarget(item.noteId)?.noteId ?? focusNoteId;
     renderAll();
   });
-  container.querySelector("#rejectButton").addEventListener("click", () =>
+  container.querySelector("#rejectButton")!.addEventListener("click", () =>
     decide(item, {
       decision: "reject",
       senses: null,
@@ -638,17 +686,17 @@ function wireFocusCard(item, work) {
       resolvedBy: "human",
       decidedAt: new Date().toISOString(),
     }));
-  container.querySelector("#openAnkiButton").addEventListener("click", async () => {
+  container.querySelector("#openAnkiButton")!.addEventListener("click", async () => {
     try {
-      await api("/api/open-note", { noteId: item.noteId });
+      await api<unknown>("/api/open-note", { noteId: item.noteId });
       showToast("Opened in the Anki browser");
     } catch (error) {
-      showToast(`Could not open: ${error.message}`);
+      showToast(`Could not open: ${errorMessage(error)}`);
     }
   });
 }
 
-function toggleSense(item, senseNumber) {
+function toggleSense(item: ReviewItem, senseNumber: number): void {
   if (item.applied) return;
   const work = getWorking(item);
   if (work.senses.has(senseNumber)) work.senses.delete(senseNumber);
@@ -656,7 +704,8 @@ function toggleSense(item, senseNumber) {
   renderAll();
 }
 
-function acceptFocus() {
+function acceptFocus(): void {
+  if (focusNoteId === null) return;
   const item = itemsByNoteId.get(focusNoteId);
   if (!item || item.applied) return;
   const work = getWorking(item);
@@ -676,8 +725,8 @@ function acceptFocus() {
   });
 }
 
-function renderRetargetQueue() {
-  const container = document.getElementById("retargetQueue");
+function renderRetargetQueue(): void {
+  const container = element("retargetQueue");
   container.innerHTML = "";
   for (const item of retargetItems()) {
     const stateIcon = item.applied
@@ -685,7 +734,7 @@ function renderRetargetQueue() {
       : item.decision
       ? { accept: "✅", hold: "✋", reject: "🚫" }[item.decision.decision] ?? "•"
       : (item.noteId === focusNoteId ? "▶" : "○");
-    let summary;
+    let summary: string;
     if (item.decision?.decision === "accept") {
       const finalKey = computeKey(item, item.decision.senses ?? []);
       summary = `→ ${finalKey}${item.decision.hint ? ` · hint 「${item.decision.hint}」` : ""}`;
@@ -716,7 +765,7 @@ function renderRetargetQueue() {
     row.addEventListener("click", () => {
       focusNoteId = item.noteId;
       renderAll();
-      document.getElementById("focusCard")?.scrollIntoView({ block: "nearest" });
+      element("focusCard")?.scrollIntoView({ block: "nearest" });
     });
     container.append(row);
   }
@@ -724,9 +773,9 @@ function renderRetargetQueue() {
 
 /* ---------- routine section ---------- */
 
-function renderRoutine() {
-  const banner = document.getElementById("routineBanner");
-  const container = document.getElementById("routineGroups");
+function renderRoutine(): void {
+  const banner = element("routineBanner");
+  const container = element("routineGroups");
   const list = routineItems();
   container.innerHTML = "";
   if (list.length === 0) {
@@ -743,17 +792,18 @@ function renderRoutine() {
         ${held ? `<span class="chip chip-warn">${held} held</span>` : ""}</div>
       <button id="stageAllButton" ${held === 0 ? "disabled" : ""}>Stage all</button>
     </div>`;
-  document.getElementById("stageAllButton")?.addEventListener("click", () => {
+  element("stageAllButton")?.addEventListener("click", () => {
     const entries = list
       .filter((item) => effectiveDecision(item) === "hold")
       .map((item) => ({ noteId: item.noteId, record: null }));
     postDecisions(entries, { toast: "All routine updates staged" });
   });
 
-  const byReason = new Map();
+  const byReason = new Map<string, ReviewItem[]>();
   for (const item of list) {
-    if (!byReason.has(item.reason)) byReason.set(item.reason, []);
-    byReason.get(item.reason).push(item);
+    const group = byReason.get(item.reason) ?? [];
+    group.push(item);
+    byReason.set(item.reason, group);
   }
   const order = [
     ...ROUTINE_GROUP_ORDER,
@@ -778,9 +828,9 @@ function renderRoutine() {
         </div>
       </div>
       <div class="rows"></div>`;
-    const rows = groupElement.querySelector(".rows");
+    const rows = groupElement.querySelector<HTMLElement>(".rows")!;
     for (const item of groupItems) rows.append(routineRow(item));
-    groupElement.querySelector('[data-action="hold"]').addEventListener(
+    groupElement.querySelector('[data-action="hold"]')!.addEventListener(
       "click",
       () =>
         postDecisions(
@@ -797,7 +847,7 @@ function renderRoutine() {
           { toast: `Held ${groupItems.length}` },
         ),
     );
-    groupElement.querySelector('[data-action="stage"]').addEventListener(
+    groupElement.querySelector('[data-action="stage"]')!.addEventListener(
       "click",
       () =>
         postDecisions(
@@ -811,13 +861,13 @@ function renderRoutine() {
   }
 }
 
-function chipHTML(chip) {
+function chipHTML(chip: ChangeChip): string {
   const kindClass = chip.kind.includes("added")
     ? "add"
     : chip.kind.includes("removed")
     ? "remove"
     : "";
-  let body;
+  let body: string;
   if (chip.segments) {
     body = `<b>${escapeHTML(chip.label)}</b> ${segmentsSnippetHTML(chip.segments)}`;
   } else if (chip.kind === "form-added" || chip.kind === "form-removed") {
@@ -830,11 +880,11 @@ function chipHTML(chip) {
   return `<span class="change-chip ${kindClass}">${body}</span>`;
 }
 
-function routineRow(item) {
+function routineRow(item: ReviewItem): HTMLDivElement {
   const held = effectiveDecision(item) === "hold";
   const row = document.createElement("div");
   row.className = `row ${held ? "held" : ""}`;
-  row.dataset.noteId = item.noteId;
+  row.dataset.noteId = String(item.noteId);
 
   const keyParts = item.key.split("|").map((part) => part.trim());
   const keySuffix = item.proposedKey
@@ -864,7 +914,7 @@ function routineRow(item) {
     </div>
     ${expanded ? routineDetail(item) : ""}`;
 
-  row.querySelector(".state-toggle").addEventListener("click", (event) => {
+  row.querySelector(".state-toggle")!.addEventListener("click", (event) => {
     event.stopPropagation();
     if (item.applied) return;
     if (held) {
@@ -879,7 +929,7 @@ function routineRow(item) {
       }, { advance: false });
     }
   });
-  row.querySelector(".row-main").addEventListener("click", () => {
+  row.querySelector(".row-main")!.addEventListener("click", () => {
     if (expandedRows.has(item.noteId)) expandedRows.delete(item.noteId);
     else expandedRows.add(item.noteId);
     renderAll();
@@ -887,7 +937,7 @@ function routineRow(item) {
   return row;
 }
 
-function routineDetail(item) {
+function routineDetail(item: ReviewItem): string {
   const lines = item.changeChips.map((chip) => `
     <div class="detail-change-line">
       <span class="line-label">${escapeHTML(chip.label)}</span>
@@ -915,7 +965,7 @@ function routineDetail(item) {
     </div>`;
 }
 
-function markTargets(entryHTML, targetNumbers) {
+function markTargets(entryHTML: string | null, targetNumbers: number[]): string {
   const doc = new DOMParser().parseFromString(entryHTML || "", "text/html");
   const targets = new Set(targetNumbers);
   for (const [index, li] of [...doc.querySelectorAll("ol.senses > li")].entries()) {
@@ -926,8 +976,8 @@ function markTargets(entryHTML, targetNumbers) {
 
 /* ---------- normalize & exceptions ---------- */
 
-function renderNormalize() {
-  const container = document.getElementById("normalizeBody");
+function renderNormalize(): void {
+  const container = element("normalizeBody");
   const list = normalizeItems();
   if (list.length === 0) {
     container.innerHTML =
@@ -951,8 +1001,8 @@ function renderNormalize() {
     </div>`;
 }
 
-function renderExceptions() {
-  const container = document.getElementById("exceptionsBody");
+function renderExceptions(): void {
+  const container = element("exceptionsBody");
   const list = exceptionItems();
   if (list.length === 0) {
     container.innerHTML = `
@@ -977,12 +1027,12 @@ function renderExceptions() {
         <span></span>
         <button class="disclose" data-open>Open in Anki</button>
       </div>`;
-    row.querySelector("[data-open]").addEventListener("click", async () => {
+    row.querySelector("[data-open]")!.addEventListener("click", async () => {
       try {
-        await api("/api/open-note", { noteId: item.noteId });
+        await api<unknown>("/api/open-note", { noteId: item.noteId });
         showToast("Opened in the Anki browser");
       } catch (error) {
-        showToast(`Could not open: ${error.message}`);
+        showToast(`Could not open: ${errorMessage(error)}`);
       }
     });
     container.append(row);
@@ -991,20 +1041,26 @@ function renderExceptions() {
 
 /* ---------- apply ---------- */
 
-function applyableItems() {
+function applyableItems(): ReviewItem[] {
   return items.filter((item) =>
     item.verdict !== "exception" && !item.applied && effectiveDecision(item) === "accept" &&
     (item.verdict !== "retarget" || item.decision?.decision === "accept")
   );
 }
 
-function openApplyDialog() {
-  const dialog = document.getElementById("applyDialog");
-  const summary = document.getElementById("applySummary");
-  const results = document.getElementById("applyResults");
-  const confirm = document.getElementById("applyConfirm");
+function openApplyDialog(): void {
+  const dialog = element<HTMLDialogElement>("applyDialog");
+  const summary = element("applySummary");
+  const results = element("applyResults");
+  const confirm = element<HTMLButtonElement>("applyConfirm");
   const targets = applyableItems();
-  const counts = { retarget: 0, routine: 0, normalize: 0 };
+  const counts: Record<Verdict, number> = {
+    unchanged: 0,
+    normalize: 0,
+    routine: 0,
+    retarget: 0,
+    exception: 0,
+  };
   for (const item of targets) ++counts[item.verdict];
 
   summary.innerHTML = `
@@ -1030,13 +1086,13 @@ function openApplyDialog() {
   dialog.showModal();
 }
 
-async function runApply(targets) {
-  const confirm = document.getElementById("applyConfirm");
-  const results = document.getElementById("applyResults");
+async function runApply(targets: ReviewItem[]): Promise<void> {
+  const confirm = element<HTMLButtonElement>("applyConfirm");
+  const results = element("applyResults");
   confirm.disabled = true;
   confirm.textContent = "Applying…";
   try {
-    const { results: applyResults } = await api("/api/apply", {
+    const { results: applyResults } = await api<{ results: ApplyResultPayload[] }>("/api/apply", {
       noteIds: targets.map((item) => item.noteId),
     });
     let succeeded = 0;
@@ -1046,7 +1102,7 @@ async function runApply(targets) {
       const item = itemsByNoteId.get(result.noteId);
       if (result.ok) {
         ++succeeded;
-        item.applied = { wroteFields: result.wroteFields };
+        item!.applied = { wroteFields: result.wroteFields ?? [] };
         const line = document.createElement("div");
         line.className = "apply-result";
         line.innerHTML = `✅ <span lang="ja">${
@@ -1068,17 +1124,19 @@ async function runApply(targets) {
     renderAll();
   } catch (error) {
     results.hidden = false;
-    results.innerHTML = `<div class="apply-result failed">❌ ${escapeHTML(error.message)}</div>`;
+    results.innerHTML = `<div class="apply-result failed">❌ ${
+      escapeHTML(errorMessage(error))
+    }</div>`;
     confirm.textContent = "Apply failed";
   }
 }
 
 /* ---------- toast ---------- */
 
-let toastTimer = null;
-function showToast(message) {
-  const toast = document.getElementById("toast");
-  document.getElementById("toastMessage").textContent = message;
+let toastTimer: ReturnType<typeof setTimeout> | undefined;
+function showToast(message: string): void {
+  const toast = element("toast");
+  element("toastMessage").textContent = message;
   toast.classList.add("show");
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toast.classList.remove("show"), 3200);
@@ -1095,15 +1153,15 @@ document.addEventListener("keydown", (event) => {
 
   switch (event.key) {
     case "?":
-      document.getElementById("helpDialog").showModal();
+      element<HTMLDialogElement>("helpDialog").showModal();
       return;
     case "z":
       undo();
       return;
   }
 
-  const focusItem = itemsByNoteId.get(focusNoteId);
-  if (!focusItem || !isInViewport(document.getElementById("focusCard"))) return;
+  const focusItem = focusNoteId === null ? undefined : itemsByNoteId.get(focusNoteId);
+  if (!focusItem || !isInViewport(element("focusCard"))) return;
 
   switch (event.key) {
     case "Enter":
@@ -1133,7 +1191,7 @@ document.addEventListener("keydown", (event) => {
       }
       return;
     case "h":
-      document.getElementById("hintInput")?.focus();
+      element("hintInput")?.focus();
       event.preventDefault();
       return;
     case "j":
@@ -1153,7 +1211,7 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-function moveFocus(delta) {
+function moveFocus(delta: number): void {
   const list = retargetItems();
   if (list.length === 0) return;
   const index = list.findIndex((item) => item.noteId === focusNoteId);
@@ -1161,7 +1219,7 @@ function moveFocus(delta) {
   renderAll();
 }
 
-function isInViewport(element) {
+function isInViewport(element: Element | null): boolean {
   if (!element) return false;
   const rect = element.getBoundingClientRect();
   return rect.bottom > 90 && rect.top < globalThis.innerHeight * 0.8;
@@ -1169,7 +1227,7 @@ function isInViewport(element) {
 
 /* ---------- boot ---------- */
 
-function renderAll() {
+function renderAll(): void {
   renderHeader();
   renderRetargetBanner();
   renderFocusCard();
@@ -1179,39 +1237,39 @@ function renderAll() {
   renderExceptions();
 }
 
-async function boot() {
+async function boot(): Promise<void> {
   try {
-    const state = await api("/api/state");
+    const state = await api<ReviewPayload>("/api/state");
     meta = state.meta;
     items = state.items;
     itemsByNoteId.clear();
     for (const item of state.items) itemsByNoteId.set(item.noteId, item);
   } catch (error) {
-    const errorBox = document.getElementById("loadError");
+    const errorBox = element("loadError");
     errorBox.hidden = false;
-    errorBox.textContent = `Could not load the review data: ${error.message}`;
+    errorBox.textContent = `Could not load the review data: ${errorMessage(error)}`;
     return;
   }
 
-  document.getElementById("main").hidden = false;
-  document.getElementById("footer").hidden = false;
-  document.getElementById("sectionNav").hidden = false;
-  document.querySelector(".progress-cluster").hidden = false;
-  document.querySelector(".topbar-actions").hidden = false;
+  element("main").hidden = false;
+  element("footer").hidden = false;
+  element("sectionNav").hidden = false;
+  document.querySelector<HTMLElement>(".progress-cluster")!.hidden = false;
+  document.querySelector<HTMLElement>(".topbar-actions")!.hidden = false;
 
-  document.getElementById("undoButton").addEventListener("click", undo);
-  document.getElementById("helpButton").addEventListener(
+  element("undoButton").addEventListener("click", undo);
+  element("helpButton").addEventListener(
     "click",
-    () => document.getElementById("helpDialog").showModal(),
+    () => element<HTMLDialogElement>("helpDialog").showModal(),
   );
-  document.getElementById("applyButton").addEventListener("click", openApplyDialog);
-  document.getElementById("applyCancel").addEventListener(
+  element("applyButton").addEventListener("click", openApplyDialog);
+  element("applyCancel").addEventListener(
     "click",
-    () => document.getElementById("applyDialog").close(),
+    () => element<HTMLDialogElement>("applyDialog").close(),
   );
-  document.getElementById("toastUndo").addEventListener("click", () => {
+  element("toastUndo").addEventListener("click", () => {
     undo();
-    document.getElementById("toast").classList.remove("show");
+    element("toast").classList.remove("show");
   });
   for (const dialog of document.querySelectorAll("dialog")) {
     dialog.addEventListener("click", (event) => {
@@ -1222,4 +1280,4 @@ async function boot() {
   renderAll();
 }
 
-boot();
+await boot();

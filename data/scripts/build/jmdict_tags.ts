@@ -1,7 +1,7 @@
-import * as path from "@std/path";
+import { resourcePaths } from "../../src/resource_paths.ts";
 
-const input = path.resolve(import.meta.dirname!, "../jmdict_eng.json");
-const output = path.resolve(import.meta.dirname!, "../jmdict_tags.json");
+const input = resourcePaths.jmdict;
+const output = resourcePaths.jmdictTags;
 
 const text = await Deno.readTextFile(input);
 const json = JSON.parse(text) as { tags: Record<string, string> };

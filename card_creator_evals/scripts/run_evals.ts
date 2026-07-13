@@ -9,7 +9,7 @@
 import { parseArgs } from "@std/cli/parse-args";
 import * as path from "@std/path";
 import { preextractedJMDictEntry } from "data";
-import { generateCardFields, MODEL_IDS, type ModelId } from "card_creator";
+import { generateCardFields, MODEL_IDS, type ModelId } from "card_creator/ai";
 import type {
   AIGeneratedFields,
   EvalDiff,
@@ -21,7 +21,7 @@ import type {
 const BASE_DIR = path.resolve(import.meta.dirname!, "..");
 const INPUTS_DIR = path.join(BASE_DIR, "inputs");
 const GOLDENS_DIR = path.join(BASE_DIR, "goldens");
-const RUNS_DIR = path.join(BASE_DIR, "runs");
+const RUNS_DIR = path.join(BASE_DIR, "generated", "runs");
 
 function getModelsFromArgs(): ModelId[] {
   const args = parseArgs(Deno.args, {

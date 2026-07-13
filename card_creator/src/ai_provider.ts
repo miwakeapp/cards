@@ -8,8 +8,7 @@ import { anthropic } from "@ai-sdk/anthropic";
 import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
 import { z } from "zod";
-import type { AIGeneratedFields, CardCreationInput } from "./types.ts";
-import type { JMDictWord } from "data";
+import type { AIGeneratedFields, GenerateFieldsInput } from "./types.ts";
 import { FEW_SHOT_EXAMPLES } from "./few_shot_examples.ts";
 
 /**
@@ -70,7 +69,7 @@ const aiFieldsSchema = z.object({
 /**
  * Gets the appropriate model instance for the given model ID.
  */
-export function getModel(modelId: ModelId): LanguageModel {
+function getModel(modelId: ModelId): LanguageModel {
   if (modelId.startsWith("gemini-")) {
     return google(modelId);
   }
@@ -140,13 +139,6 @@ Your task is to analyze a Japanese word usage in context and generate appropriat
      * "はしゃぐ" in "はしゃいでいる" → "はしゃいで" (not "はしゃいでいる" — いる is a separate element)
      * "噛み締める" in "噛み締められる" → "噛み締められる" (potential is part of the verb)
    - Must be a literal substring of the context`;
-
-/**
- * Input for AI field generation - CardCreationInput with jmdictId replaced by the full entry.
- */
-export type GenerateFieldsInput = Omit<CardCreationInput, "jmdictId"> & {
-  jmdictEntry: JMDictWord;
-};
 
 /**
  * Formats an input for the user prompt.

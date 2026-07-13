@@ -1,7 +1,8 @@
 import * as path from "@std/path";
+import { resourcePaths } from "../../src/resource_paths.ts";
 
 const furiganaURL = "https://jisho.hlorenzi.com/furigana.txt";
-const outputFilename = path.resolve(import.meta.dirname!, "../jmdict_furigana.json");
+const outputFilename = resourcePaths.jmdictFurigana;
 const temporaryFilename = `${outputFilename}.download`;
 
 console.log(`Downloading from: ${furiganaURL}`);
@@ -99,6 +100,7 @@ if (processedCount < 500_000 || skippedCount > processedCount / 100) {
 }
 
 const json = JSON.stringify(furiganaData);
+await Deno.mkdir(path.dirname(outputFilename), { recursive: true });
 await Deno.writeTextFile(temporaryFilename, json);
 await Deno.rename(temporaryFilename, outputFilename);
 

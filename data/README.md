@@ -1,30 +1,30 @@
-# data
+# Data
 
-Data access and generation package for Miwake. Large downloaded and generated resources are ignored by Git and built through the tasks in `deno.json`.
+Data access and generation package for Miwake. Checked resources live under `resources/`; large downloads, derived databases, and test scratch data live under the ignored `generated/` directory.
 
 ## Checked-in JMDict data
 
-The full JMDict and furigana datasets are large, frequently updated runtime resources, so they remain local and ignored by Git. Tests, few-shot examples, evals, and the dictionary preview need only a small, stable subset. Checking in that subset makes a clean checkout and CI self-contained, deterministic, and independent of whatever full datasets a developer happens to have locally.
+The full JMDict and furigana datasets are large, frequently updated runtime resources, so they remain local under `generated/`. Tests, few-shot examples, evals, and the dictionary preview need only a small, stable subset under `resources/jmdict/`. Checking in that subset makes a clean checkout and CI self-contained, deterministic, and independent of whatever full datasets a developer happens to have locally.
 
-After downloading a new JMDict revision and the corresponding furigana data, refresh that subset with:
+Download the latest JMDict and furigana data and rebuild the checked-in subset with:
 
 ```sh
-deno task --cwd data update_jmdict_snapshot
+deno task --cwd data update:jmdict
 ```
 
-This refreshes the selected entries and tag descriptions, records the source revision in `jmdict_snapshot.json`, and reduces the full furigana data to the relevant test records. Commit the resulting changes together.
+`update:jmdict` downloads its two independent inputs in parallel and then runs `build:jmdict`. The build refreshes the selected entries and tag descriptions, records the source revision in `resources/jmdict/snapshot.json`, and reduces the full furigana data to the relevant test records. Run `build:jmdict` directly to rebuild from existing local inputs. Commit the resulting checked-in resource changes together.
 
-The JMDict snapshot is derived from [jmdict-simplified](https://github.com/scriptin/jmdict-simplified), which packages the Electronic Dictionary Research and Development Group's JMDict data under the [Creative Commons Attribution-ShareAlike 4.0 license](https://github.com/scriptin/jmdict-simplified/blob/master/LICENSE.txt). The small checked furigana fixture is extracted from [Lorenzi's Jisho](https://jisho.hlorenzi.com/); the full download remains local.
+The JMDict snapshot is derived from [jmdict-simplified](https://github.com/scriptin/jmdict-simplified), which packages the Electronic Dictionary Research and Development Group's JMDict data under the [Creative Commons Attribution-ShareAlike 4.0 license](https://github.com/scriptin/jmdict-simplified/blob/master/LICENSE.txt). The small checked-in furigana fixture is extracted from [Lorenzi's Jisho](https://jisho.hlorenzi.com/); the full download remains local.
 
 ## Rarity resources
 
-Build the resources used by `rarity_score` from the repository root:
+Download the corpus inputs and build the resources used by `rarity_score`:
 
 ```sh
-deno task --cwd data download_nwjc_surface_1gram
-deno task --cwd data download_bccwj_luw2
-deno task --cwd data build_rarity_resources
+deno task --cwd data update:rarity
 ```
+
+Run `build:rarity` directly to rebuild from existing local inputs. The `download:*`, `build:*`, and `update:*` task families can also be run as quoted wildcard patterns.
 
 The primary source is the National Institute for Japanese Language and Linguistics (2020) [NWJC surface 1-gram data](https://github.com/masayu-a/NWJC/blob/master/NWJC-n-gram/00README.md), using the 2014-Q4 corpus data and licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Frequencies are normalized against the sum of counts in the downloaded file.
 

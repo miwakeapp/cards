@@ -1,30 +1,44 @@
 {
   "name": "data",
   "exports": {
-    ".": "./mod.ts",
-    "./download": "./jmdict_download.ts"
+    ".": "./src/mod.ts",
+    "./download": "./src/download.ts",
+    "./rarity": "./src/rarity.ts"
   },
   "tasks": {
-    "doc:check": "deno doc --lint mod.ts jmdict_download.ts jmdict_types.ts scripts/build_rarity_resources.ts scripts/download_bccwj_luw2.ts scripts/download_jmdict.ts scripts/download_jmdictfurigana.ts scripts/download_nwjc_surface_1gram.ts scripts/extract_entries.ts scripts/extract_furigana_fixture.ts scripts/extract_tags.ts",
-    "download_jmdict": "deno run --allow-net --allow-read=./jmdict_eng.json,./jmdict_eng.json.download --allow-write=./jmdict_eng.json,./jmdict_eng.json.download scripts/download_jmdict.ts",
-    "download_jmdictfurigana": "deno run --allow-net --allow-read=./jmdict_furigana.json.download --allow-write=./jmdict_furigana.json,./jmdict_furigana.json.download scripts/download_jmdictfurigana.ts",
-    "download_nwjc_surface_1gram": "deno run --allow-net=github.com,raw.githubusercontent.com --allow-read=./nwjc/NWJC-surface-1gram.txt.download --allow-write=./nwjc scripts/download_nwjc_surface_1gram.ts",
-    "download_bccwj_luw2": "deno run --allow-net=repository.ninjal.ac.jp --allow-read=./bccwj/BCCWJ_frequencylist_luw2_ver1_1.tsv.download --allow-write=./bccwj scripts/download_bccwj_luw2.ts",
-    "extract_tags": "deno run --allow-read=./jmdict_eng.json --allow-write=./jmdict_tags.json scripts/extract_tags.ts",
-    "extract_entries": "deno run --allow-read=./jmdict_eng.json,../card_creator_evals/inputs,./preextracted_jmdict_entries --allow-write=./preextracted_jmdict_entries,./jmdict_snapshot.json scripts/extract_entries.ts",
-    "update_jmdict_snapshot": "deno task extract_tags && deno task extract_entries && deno run --allow-read=./preextracted_jmdict_entries,./jmdict_furigana.json --allow-write=./test/fixtures/jmdict_furigana.json scripts/extract_furigana_fixture.ts",
-    "build_rarity_resources": "deno run --allow-read=./nwjc,./bccwj,./rarity.sqlite3.download --allow-write=./rarity.sqlite3,./rarity.sqlite3.download scripts/build_rarity_resources.ts"
+    "doc:check": "deno doc --lint src/mod.ts src/download.ts src/rarity.ts scripts/download/jmdict.ts scripts/download/furigana.ts scripts/download/nwjc.ts scripts/download/bccwj.ts scripts/build/jmdict_entries.ts scripts/build/jmdict_tags.ts scripts/build/jmdict_furigana_fixture.ts scripts/build/rarity.ts",
+    "download:jmdict": "deno run --allow-net --allow-read=./generated --allow-write=./generated scripts/download/jmdict.ts",
+    "download:furigana": "deno run --allow-net --allow-read=./generated --allow-write=./generated scripts/download/furigana.ts",
+    "download:nwjc": "deno run --allow-net=github.com,raw.githubusercontent.com --allow-write=./generated scripts/download/nwjc.ts",
+    "download:bccwj": "deno run --allow-net=repository.ninjal.ac.jp --allow-write=./generated scripts/download/bccwj.ts",
+    "build:jmdict:entries": "deno run --allow-read=./generated/jmdict_eng.json,../card_creator_evals/inputs,./resources/jmdict/entries --allow-write=./resources/jmdict scripts/build/jmdict_entries.ts",
+    "build:jmdict:tags": "deno run --allow-read=./generated/jmdict_eng.json --allow-write=./resources/jmdict/tags.json scripts/build/jmdict_tags.ts",
+    "build:jmdict:furigana-fixture": {
+      "command": "deno run --allow-read=./resources/jmdict/entries,./generated/jmdict_furigana.json --allow-write=./test/fixtures/jmdict_furigana.json scripts/build/jmdict_furigana_fixture.ts",
+      "dependencies": ["build:jmdict:entries"]
+    },
+    "build:jmdict": {
+      "dependencies": ["build:jmdict:tags", "build:jmdict:furigana-fixture"]
+    },
+    "build:rarity": "deno run --allow-read=./generated --allow-write=./generated scripts/build/rarity.ts",
+    "update:jmdict": {
+      "command": "deno task build:jmdict",
+      "dependencies": ["download:jmdict", "download:furigana"]
+    },
+    "update:rarity": {
+      "command": "deno task build:rarity",
+      "dependencies": ["download:nwjc", "download:bccwj"]
+    }
   },
   "test": {
     "permissions": {
       "read": [
-        "./jmdict_snapshot.json",
-        "./preextracted_jmdict_entries",
-        "./test/.tmp",
+        "./resources/jmdict",
+        "./generated/test",
         "./test/fixtures/jmdict_furigana.json",
         "../card_creator_evals/inputs"
       ],
-      "write": ["./test/.tmp"]
+      "write": ["./generated/test"]
     }
   },
   "compilerOptions": {

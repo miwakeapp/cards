@@ -1,5 +1,5 @@
 import { assertEquals } from "@std/assert";
-import { parseJMDictAssetName, parseJMDictHeader } from "../jmdict_download.ts";
+import { parseJMDictAssetName, parseJMDictHeader } from "../src/jmdict_download.ts";
 
 Deno.test("parseJMDictAssetName: extracts version and dictionary date", () => {
   assertEquals(parseJMDictAssetName("jmdict-eng-3.6.2+20260706122413.json.zip"), {

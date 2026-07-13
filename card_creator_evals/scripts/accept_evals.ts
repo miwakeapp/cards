@@ -8,12 +8,12 @@
 
 import { parseArgs } from "@std/cli/parse-args";
 import * as path from "@std/path";
-import { MODEL_IDS, type ModelId } from "card_creator";
+import { MODEL_IDS, type ModelId } from "card_creator/ai";
 import type { EvalGolden, EvalOutput } from "../src/types.ts";
 
 const BASE_DIR = path.resolve(import.meta.dirname!, "..");
 const GOLDENS_DIR = path.join(BASE_DIR, "goldens");
-const RUNS_DIR = path.join(BASE_DIR, "runs");
+const RUNS_DIR = path.join(BASE_DIR, "generated", "runs");
 
 async function getArgsFromCLI(): Promise<{ runTimestamp: string; model: ModelId | null }> {
   const args = parseArgs(Deno.args, {

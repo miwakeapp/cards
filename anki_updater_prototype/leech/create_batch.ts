@@ -5,12 +5,9 @@
  *   deno task create-leech-batch <batch-file.json> [--model=claude-opus-4-8] [--dry-run]
  */
 
-import { createCard } from "../../card_creator/src/mod.ts";
-import { generateCardFields } from "../../card_creator/src/ai_provider.ts";
-import type { ModelId } from "../../card_creator/src/ai_provider.ts";
-import { DEFAULT_MODEL_ID, MODEL_IDS } from "../../card_creator/src/ai_provider.ts";
-import type { MiwakeCard } from "../../card_creator/src/types.ts";
-import { allJMDictEntries } from "../../data/mod.ts";
+import { createCard, type MiwakeCard } from "card_creator";
+import { DEFAULT_MODEL_ID, generateCardFields, MODEL_IDS, type ModelId } from "card_creator/ai";
+import { allJMDictEntries } from "data";
 import { ac } from "../shared/anki_connect.ts";
 
 // --- CLI args ---

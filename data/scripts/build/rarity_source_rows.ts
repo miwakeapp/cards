@@ -1,4 +1,4 @@
-const expectedBCCWJColumns = [
+const requiredBCCWJColumns = [
   "rank",
   "lForm",
   "lemma",
@@ -30,7 +30,7 @@ export function validateBCCWJHeader(line: string): void {
   const columns = line.split("\t");
   if (
     columns.length !== expectedBCCWJFieldCount ||
-    !expectedBCCWJColumns.every((column, index) => columns[index] === column)
+    !requiredBCCWJColumns.every((column, index) => columns[index] === column)
   ) {
     throw new Error("Invalid BCCWJ header: unsupported LUW2 schema");
   }

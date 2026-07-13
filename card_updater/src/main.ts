@@ -9,12 +9,12 @@
  * 6. Applies accepted updates to Anki when the reviewer says so.
  *
  * Run with:
- *   deno task update-cards
- *   deno task update-cards --dry-run --limit=50
+ *   deno task update:cards
+ *   deno task update:cards --dry-run --limit=50
  */
 
 import { parseArgs } from "@std/cli/parse-args";
-import { DEFAULT_MODEL_ID, MODEL_IDS, type ModelId } from "card_creator";
+import { DEFAULT_MODEL_ID, MODEL_IDS, type ModelId } from "card_creator/ai";
 import { allJMDictEntries } from "data";
 import { fetchMiwakeNotes } from "./anki.ts";
 import { analyzeCard, type AnalyzedCard } from "./analyze.ts";
@@ -86,7 +86,7 @@ function positiveInteger(value: unknown, flag: string): number {
 function exitWithUsage(message: string): never {
   console.error(message);
   console.error(
-    "Usage: deno task update-cards [--query=...] [--limit=N] [--model=...] [--port=N] [--dry-run] [--offline] [--skip-ai] [--no-open]",
+    "Usage: deno task update:cards [--query=...] [--limit=N] [--model=...] [--port=N] [--dry-run] [--offline] [--skip-ai] [--no-open]",
   );
   Deno.exit(1);
 }

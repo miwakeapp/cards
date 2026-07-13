@@ -10,9 +10,8 @@
     "./anki_updater_prototype"
   ],
   "exclude": [
-    "card_creator_evals/src/main.js",
-    "html_dictionary_previewer/src/data/",
-    "html_dictionary_previewer/src/main.js"
+    "**/build/",
+    "**/generated/"
   ],
   "imports": {
     "@scriptin/jmdict-simplified-types": "npm:@scriptin/jmdict-simplified-types@^3.6.1",

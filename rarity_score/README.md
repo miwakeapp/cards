@@ -1,4 +1,4 @@
-# rarity_score
+# Rarity Score
 
 Scores the rarity of a Miwake recognition target on a fixed scale from `0` (most common) to `100` (rarest). Scores are primarily intended for sorting recognition targets from common to rare. This is a corpus-frequency heuristic, not a percentile, probability, or linear measure of difficulty.
 
@@ -31,3 +31,5 @@ When both sources contain a target, the scorer uses the higher frequency estimat
 This rule is a conservative frequency heuristic, not an attempt to merge the corpora into a single statistical population. Targets absent from both sources return `null` instead of being assumed maximally rare.
 
 Corpus provenance and resource setup belong to the [`data` package](../data/README.md).
+
+Run the package's resource-independent unit tests with `deno test -P rarity_score`.

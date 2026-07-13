@@ -3,6 +3,9 @@
 /.vscode/
 /STATUS.md
 
+/*/build/
+/*/generated/
+
 /anki_updater_prototype/epub_texts/
 /anki_updater_prototype/batch_*.json
 /anki_updater_prototype/leech/batch_*.json
@@ -11,21 +14,3 @@
 /anki_updater_prototype/jlpt/jlpt-moji-goi/remaining-unresolved-after-*.csv
 /anki_updater_prototype/jlpt/jlpt-moji-goi/ambiguous-candidates.txt
 /anki_updater_prototype/jlpt/jlpt-moji-goi/jmdict-id-suggestions.csv
-
-/card_creator_evals/src/main.js
-/card_creator_evals/runs/
-
-/card_updater/runs/
-
-/data/jmdict_eng.json
-/data/jmdict_eng.json.download
-/data/jmdict_furigana.json
-/data/jmdict_furigana.json.download
-/data/bccwj/
-/data/nwjc/
-/data/rarity.sqlite3
-/data/rarity.sqlite3.download
-/data/test/.tmp/
-
-/html_dictionary_previewer/src/main.js
-/html_dictionary_previewer/src/data/entries.json

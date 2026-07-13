@@ -12,9 +12,11 @@
  */
 
 import { join } from "@std/path";
-import { generateText } from "ai";
-import { DEFAULT_MODEL_ID, getModel, MODEL_IDS } from "../../card_creator/src/ai_provider.ts";
-import type { ModelId } from "../../card_creator/src/ai_provider.ts";
+import { anthropic } from "@ai-sdk/anthropic";
+import { google } from "@ai-sdk/google";
+import { openai } from "@ai-sdk/openai";
+import { generateText, type LanguageModel } from "ai";
+import { DEFAULT_MODEL_ID, MODEL_IDS, type ModelId } from "card_creator/ai";
 import { ac } from "../shared/anki_connect.ts";
 
 // --- CLI args ---
@@ -23,6 +25,19 @@ let count: number | "all" = 20;
 let modelId: ModelId = DEFAULT_MODEL_ID;
 let query = "deck:Mining tag:leech -tag:converted-to-miwake";
 let outputPathArg: string | undefined;
+
+function getModel(modelId: ModelId): LanguageModel {
+  if (modelId.startsWith("gemini-")) {
+    return google(modelId);
+  }
+  if (modelId.startsWith("claude-")) {
+    return anthropic(modelId);
+  }
+  if (modelId.startsWith("gpt-")) {
+    return openai(modelId);
+  }
+  throw new Error(`Unknown model ID: ${modelId}`);
+}
 
 for (const arg of Deno.args) {
   if (arg.startsWith("--count=")) {

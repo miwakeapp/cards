@@ -6,7 +6,7 @@
  */
 
 import { parse as parseCSV } from "@std/csv";
-import { allJMDictEntries } from "../../data/mod.ts";
+import { allJMDictEntries } from "data";
 import {
   type CSVRow,
   type ResolutionIssue,

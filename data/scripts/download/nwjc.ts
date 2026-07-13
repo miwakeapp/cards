@@ -1,10 +1,11 @@
 import * as path from "@std/path";
 import { unzipSync } from "fflate";
+import { resourcePaths } from "../../src/resource_paths.ts";
 
 const nwjcSurface1GramURL =
   "https://github.com/masayu-a/NWJC/raw/master/NWJC-n-gram/NWJC-surface-1gram.zip";
-const outputDir = path.resolve(import.meta.dirname!, "../nwjc");
-const outputFilename = path.join(outputDir, "NWJC-surface-1gram.txt");
+const outputFilename = resourcePaths.nwjcSurface1Gram;
+const outputDir = path.dirname(outputFilename);
 const temporaryFilename = `${outputFilename}.download`;
 
 console.log(`Downloading from: ${nwjcSurface1GramURL}`);

@@ -1,9 +1,10 @@
 import { assert, assertEquals, assertMatch } from "@std/assert";
 import * as path from "@std/path";
-import type { JMDictWord } from "../mod.ts";
+import type { JMDictWord } from "../src/mod.ts";
+import { resourcePaths } from "../src/resource_paths.ts";
 
 const dataDirectory = path.resolve(import.meta.dirname!, "..");
-const entriesDirectory = path.join(dataDirectory, "preextracted_jmdict_entries");
+const entriesDirectory = resourcePaths.preextractedJMDictEntries;
 
 Deno.test("pre-extracted JMDict entries are internally consistent and cover consumers", async () => {
   const ids = new Set<string>();
@@ -38,7 +39,7 @@ Deno.test("pre-extracted JMDict entries are internally consistent and cover cons
   }
 
   const snapshot = JSON.parse(
-    await Deno.readTextFile(path.join(dataDirectory, "jmdict_snapshot.json")),
+    await Deno.readTextFile(resourcePaths.jmdictSnapshot),
   ) as { source: string; version: string; dictDate: string };
   assertEquals(snapshot.source, "https://github.com/scriptin/jmdict-simplified");
   assertMatch(snapshot.version, /^\d+\.\d+\.\d+$/);

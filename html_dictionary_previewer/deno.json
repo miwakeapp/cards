@@ -1,9 +1,9 @@
 {
   "tasks": {
-    "doc:check": "deno doc --lint server.ts scripts/build_entries.ts src/main.ts",
-    "prepare_data": "deno run --allow-read=../data/preextracted_jmdict_entries,../data/jmdict_tags.json --allow-write=./src/data scripts/build_entries.ts",
-    "build": "deno task prepare_data && deno transpile --output=./src/main.js ./src/main.ts",
-    "dev": "deno task build && deno run --allow-net=127.0.0.1 --allow-read=./src server.ts"
+    "doc:check": "deno doc --lint src/main.ts src/client/main.ts scripts/build_entries.ts",
+    "prepare:data": "deno run --allow-read=../data/resources/jmdict --allow-write=./build scripts/build_entries.ts",
+    "build": "deno task prepare:data && deno transpile --output=./build/main.js ./src/client/main.ts",
+    "dev": "deno task build && deno run --allow-net=127.0.0.1 --allow-read=./src/client,./build src/main.ts"
   },
   "compilerOptions": {
     "lib": [

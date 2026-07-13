@@ -3,12 +3,12 @@
     "yanki-connect": "npm:yanki-connect@^4.0.6"
   },
   "tasks": {
-    "doc:check": "deno doc --lint server.ts scripts/accept_evals.ts scripts/fetch_samples.ts scripts/run_evals.ts src/main.ts",
-    "fetch-samples": "deno run --allow-net --allow-write=./inputs scripts/fetch_samples.ts",
-    "run": "deno run --env-file=../.env --allow-net --allow-read --allow-write=./runs --allow-env --allow-sys=hostname scripts/run_evals.ts",
-    "accept": "deno run --env-file=../.env --allow-read --allow-write=./goldens --allow-env --allow-sys=hostname scripts/accept_evals.ts",
-    "build": "deno transpile --output=./src/main.js ./src/main.ts",
-    "dev": "deno task build && deno run --allow-net=127.0.0.1 --allow-read=./src,./inputs,./goldens,./runs server.ts"
+    "doc:check": "deno doc --lint src/main.ts src/client/main.ts scripts/accept_evals.ts scripts/fetch_samples.ts scripts/run_evals.ts",
+    "fetch:samples": "deno run --allow-net --allow-write=./inputs scripts/fetch_samples.ts",
+    "run": "deno run --env-file=../.env --allow-net --allow-read --allow-write=./generated/runs --allow-env --allow-sys=hostname scripts/run_evals.ts",
+    "accept": "deno run --allow-read=./generated/runs --allow-write=./goldens scripts/accept_evals.ts",
+    "build": "deno transpile --output=./build/main.js ./src/client/main.ts",
+    "dev": "deno task build && deno run --allow-net=127.0.0.1 --allow-read=./src/client,./build,./inputs,./goldens,./generated/runs src/main.ts"
   },
   "compilerOptions": {
     "lib": ["dom", "dom.iterable", "deno.ns"]

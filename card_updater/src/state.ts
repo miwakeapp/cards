@@ -1,6 +1,6 @@
 /**
  * On-disk persistence for review decisions, the AI suggestion cache, and the apply log.
- * Everything lives under `card_updater/runs/` (gitignored).
+ * Everything lives under `card_updater/generated/` (gitignored).
  */
 
 import * as path from "@std/path";
@@ -8,10 +8,10 @@ import type { AnalyzedCard } from "./analyze.ts";
 import { sha256OfJSON } from "./hash.ts";
 import type { SuggestionCache } from "./suggest.ts";
 
-const RUNS_DIRECTORY = path.resolve(import.meta.dirname!, "../runs");
-const DECISIONS_PATH = path.join(RUNS_DIRECTORY, "decisions.json");
-const AI_CACHE_PATH = path.join(RUNS_DIRECTORY, "ai-cache.json");
-const APPLY_LOG_PATH = path.join(RUNS_DIRECTORY, "apply-log.jsonl");
+const GENERATED_DIRECTORY = path.resolve(import.meta.dirname!, "../generated");
+const DECISIONS_PATH = path.join(GENERATED_DIRECTORY, "decisions.json");
+const AI_CACHE_PATH = path.join(GENERATED_DIRECTORY, "ai-cache.json");
+const APPLY_LOG_PATH = path.join(GENERATED_DIRECTORY, "apply-log.jsonl");
 
 export type DecisionKind = "accept" | "hold" | "reject";
 
@@ -57,7 +57,7 @@ async function readJSONFile<T>(filePath: string, fallback: T): Promise<T> {
 }
 
 async function writeJSONFile(filePath: string, value: unknown): Promise<void> {
-  await Deno.mkdir(RUNS_DIRECTORY, { recursive: true });
+  await Deno.mkdir(GENERATED_DIRECTORY, { recursive: true });
   await Deno.writeTextFile(filePath, JSON.stringify(value, undefined, 2) + "\n");
 }
 
@@ -128,7 +128,7 @@ export class ReviewState {
 
   async markApplied(noteId: number, record: AppliedRecord): Promise<void> {
     this.#applied.set(noteId, record);
-    await Deno.mkdir(RUNS_DIRECTORY, { recursive: true });
+    await Deno.mkdir(GENERATED_DIRECTORY, { recursive: true });
     await Deno.writeTextFile(
       APPLY_LOG_PATH,
       JSON.stringify({ noteId, ...record }) + "\n",

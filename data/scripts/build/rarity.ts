@@ -1,25 +1,25 @@
 import * as path from "@std/path";
 import { TextLineStream } from "@std/streams";
 import { DatabaseSync } from "node:sqlite";
-import { normalizeRarityTerm } from "../rarity_normalization.ts";
+import { normalizeRarityTerm } from "../../src/rarity_normalization.ts";
 import {
   initializeRarityDatabase,
-  RARITY_DATABASE_FILENAME,
   UPSERT_BCCWJ_SQL,
   UPSERT_NWJC_SQL,
-} from "../rarity_resources.ts";
+} from "../../src/rarity_resources.ts";
+import { resourcePaths } from "../../src/resource_paths.ts";
 import { parseBCCWJRow, parseNWJCRow, validateBCCWJHeader } from "./rarity_source_rows.ts";
 
-const dataDir = path.resolve(import.meta.dirname!, "..");
-const databasePath = path.join(dataDir, RARITY_DATABASE_FILENAME);
+const databasePath = resourcePaths.rarityDatabase;
 const temporaryDatabasePath = `${databasePath}.download`;
-const nwjcSourcePath = path.join(dataDir, "nwjc", "NWJC-surface-1gram.txt");
-const bccwjSourcePath = path.join(dataDir, "bccwj", "BCCWJ_frequencylist_luw2_ver1_1.tsv");
+const nwjcSourcePath = resourcePaths.nwjcSurface1Gram;
+const bccwjSourcePath = resourcePaths.bccwjLUW2;
 
 await Promise.all([Deno.stat(nwjcSourcePath), Deno.stat(bccwjSourcePath)]);
 parseNWJCRow(await readFirstLine(nwjcSourcePath), 1);
 validateBCCWJHeader(await readFirstLine(bccwjSourcePath));
 await removeIfExists(temporaryDatabasePath);
+await Deno.mkdir(path.dirname(databasePath), { recursive: true });
 
 const database = new DatabaseSync(temporaryDatabasePath);
 try {

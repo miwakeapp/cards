@@ -4,9 +4,9 @@ import { renderEntry } from "jmdict_to_html";
 
 const entriesDirectory = path.resolve(
   import.meta.dirname!,
-  "../../data/preextracted_jmdict_entries",
+  "../../data/resources/jmdict/entries",
 );
-const dataDir = path.resolve(import.meta.dirname!, "../src/data");
+const dataDir = path.resolve(import.meta.dirname!, "../build/data");
 const outputFile = path.resolve(dataDir, "entries.json");
 
 const entryFilenames: string[] = [];
