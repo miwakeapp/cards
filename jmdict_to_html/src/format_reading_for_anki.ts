@@ -1,6 +1,5 @@
 import { jmdictFurigana } from "data";
 
-const furigana = await jmdictFurigana();
 let kanaNormalizedFurigana: Map<string, string> | null = null;
 
 function normalizeKanaScript(text: string): string {
@@ -13,7 +12,7 @@ function normalizeKanaScript(text: string): string {
   }).join("");
 }
 
-function getKanaNormalizedFurigana(): Map<string, string> {
+function getKanaNormalizedFurigana(furigana: Record<string, string>): Map<string, string> {
   if (kanaNormalizedFurigana === null) {
     kanaNormalizedFurigana = new Map();
     for (const [key, value] of Object.entries(furigana)) {
@@ -76,16 +75,17 @@ function applyKanaScriptFromWord(formattedReading: string, word: string): string
  * For kana-only words (where word === reading), returns the word as-is.
  * Returns null if the word/reading pair is not found in the database.
  */
-export function formatReadingForAnki(
+export async function formatReadingForAnki(
   jmdictId: string,
   word: string,
   reading: string,
-): string | null {
+): Promise<string | null> {
   // Kana-only words: if word equals reading, return it unchanged
   if (word === reading) {
     return word;
   }
 
+  const furigana = await jmdictFurigana();
   const key = `${jmdictId}|${word}|${reading}`;
   const exact = furigana[key];
   if (exact !== undefined) {
@@ -97,7 +97,7 @@ export function formatReadingForAnki(
     normalizeKanaScript(word),
     normalizeKanaScript(reading),
   ].join("|");
-  const kanaSwapped = getKanaNormalizedFurigana().get(normalizedKey);
+  const kanaSwapped = getKanaNormalizedFurigana(furigana).get(normalizedKey);
   if (kanaSwapped !== undefined) {
     return applyKanaScriptFromWord(kanaSwapped, word);
   }

@@ -9,7 +9,7 @@
 
 import { parse as parseCSV } from "@std/csv";
 import * as path from "@std/path";
-import { allJMDictEntries } from "../../data/mod.ts";
+import { allJMDictEntries } from "data";
 import { type CSVRow, resolveCSVRows } from "../shared/jmdict_resolution/csv_resolution.ts";
 
 let inputPath: string | undefined;

@@ -5,28 +5,21 @@
 
 import { serveDir } from "@std/http/file-server";
 import * as path from "@std/path";
-import type { ModelId } from "card_creator";
 import { ac, type ACInvoke, applyNoteUpdate, openNoteInAnki } from "./anki.ts";
 import type { AnalyzedCard } from "./analyze.ts";
-import type { EnsureLatestResult } from "data/download";
+import type { ReviewItem, ReviewMeta, ReviewPayload } from "./review_api.ts";
 import { suggestedKey, suggestForCard, type Suggestion, type SuggestionCache } from "./suggest.ts";
 import { type DecisionRecord, type ReviewState, saveSuggestionCache } from "./state.ts";
 
-const APP_DIRECTORY = path.resolve(import.meta.dirname!, "app");
+const CLIENT_DIRECTORY = path.resolve(import.meta.dirname!, "client");
+const BUILD_DIRECTORY = path.resolve(import.meta.dirname!, "../build");
 
 export interface ServerOptions {
   cards: AnalyzedCard[];
   suggestions: Map<number, Suggestion>;
   suggestionCache: SuggestionCache;
   state: ReviewState;
-  meta: {
-    generatedAt: string;
-    query: string;
-    dryRun: boolean;
-    modelId: ModelId;
-    jmdict: EnsureLatestResult;
-    scannedCount: number;
-  };
+  meta: Omit<ReviewMeta, "counts">;
   port: number;
   invoke?: ACInvoke;
 }
@@ -42,8 +35,9 @@ export function startServer(options: ServerOptions): Deno.HttpServer {
   const cardsByNoteId = new Map(cards.map((card) => [card.note.noteId, card]));
   const allKeys = new Set(cards.map((card) => card.note.fields.key));
 
-  function cardPayload(card: AnalyzedCard) {
+  function cardPayload(card: AnalyzedCard): ReviewItem {
     const suggestion = suggestions.get(card.note.noteId) ?? null;
+    const savedDecision = state.decision(card.note.noteId);
     return {
       noteId: card.note.noteId,
       verdict: card.verdict,
@@ -73,13 +67,19 @@ export function startServer(options: ServerOptions): Deno.HttpServer {
       senseViews: card.senseViews,
       changeChips: card.changeChips,
       suggestion,
-      decision: state.decision(card.note.noteId),
+      decision: savedDecision === null ? null : {
+        decision: savedDecision.decision,
+        senses: savedDecision.senses,
+        hint: savedDecision.hint,
+        resolvedBy: savedDecision.resolvedBy,
+        decidedAt: savedDecision.decidedAt,
+      },
       applied: state.applied(card.note.noteId),
       fingerprint: state.fingerprint(card.note.noteId),
     };
   }
 
-  function statePayload() {
+  function statePayload(): ReviewPayload {
     const counts = { unchanged: 0, normalize: 0, routine: 0, retarget: 0, exception: 0 };
     for (const card of cards) {
       ++counts[card.verdict];
@@ -250,7 +250,7 @@ export function startServer(options: ServerOptions): Deno.HttpServer {
         return await handleAPI(request, url);
       }
       return await serveDir(request, {
-        fsRoot: APP_DIRECTORY,
+        fsRoot: url.pathname === "/main.js" ? BUILD_DIRECTORY : CLIENT_DIRECTORY,
         quiet: true,
         headers: ["cache-control: no-store"],
       });

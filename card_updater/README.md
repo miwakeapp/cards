@@ -3,10 +3,12 @@
 Updates existing Miwake cards when JMDict changes. One command runs the whole workflow:
 
 ```sh
-deno task update-cards
+deno task --cwd card_updater update:cards
 ```
 
-This downloads the latest JMDict release (only when newer than `data/jmdict_eng.json`), scans the collection (read-only), classifies every card, pre-works the ambiguous ones with AI, and opens a local review app. Decisions persist to `runs/decisions.json` as you make them, and the Apply button writes accepted updates back to Anki via AnkiConnect.
+This downloads the latest JMDict release when needed, scans the collection read-only, classifies every card, pre-works the ambiguous ones with AI, and opens a local review app. Decisions persist under `generated/` as you make them, and the Apply button writes accepted updates back to Anki via AnkiConnect.
+
+The workflow requires a running Anki with AnkiConnect, plus the AI provider credentials described in the root `.env.sample`. Use `--skip-ai` when reviewing without provider access.
 
 ## How cards are classified
 
@@ -21,11 +23,11 @@ Existing hints are never overwritten by default; the AI's hint is offered as an 
 ## Useful flags
 
 ```sh
-deno task update-cards --dry-run      # disable the Apply button
-deno task update-cards --limit=50     # analyze a subset
-deno task update-cards --skip-ai      # no AI calls; re-targets reviewed manually
-deno task update-cards --offline      # don't check for a newer JMDict
-deno task update-cards --query='...'  # different Anki search
+deno task --cwd card_updater update:cards --dry-run      # disable the Apply button
+deno task --cwd card_updater update:cards --limit=50     # analyze a subset
+deno task --cwd card_updater update:cards --skip-ai      # no AI calls; re-targets reviewed manually
+deno task --cwd card_updater update:cards --offline      # don't check for a newer JMDict
+deno task --cwd card_updater update:cards --query='...'  # different Anki search
 ```
 
-`runs/` (gitignored) holds the decision file, the AI suggestion cache, and an apply audit log. Decisions and cached suggestions invalidate automatically when a card or its dictionary entry changes.
+`generated/` holds the decision file, AI suggestion cache, and apply audit log. Decisions and cached suggestions invalidate automatically when a card or its dictionary entry changes.

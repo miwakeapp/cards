@@ -1,11 +1,12 @@
 import * as path from "@std/path";
 import { unzipSync } from "fflate";
+import { resourcePaths } from "../../src/resource_paths.ts";
 
 const bccwjLUW2URL =
   "https://repository.ninjal.ac.jp/record/3231/files/BCCWJ_frequencylist_luw2_ver1_1.zip";
 const expectedSHA256 = "9d73dc2962353f29610bd1175112a822b2cf4e0615fe6cde792d26038846313c";
-const outputDir = path.resolve(import.meta.dirname!, "../bccwj");
-const outputFilename = path.join(outputDir, "BCCWJ_frequencylist_luw2_ver1_1.tsv");
+const outputFilename = resourcePaths.bccwjLUW2;
+const outputDir = path.dirname(outputFilename);
 const temporaryFilename = `${outputFilename}.download`;
 
 console.log(`Downloading from: ${bccwjLUW2URL}`);

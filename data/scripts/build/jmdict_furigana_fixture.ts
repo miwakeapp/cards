@@ -1,8 +1,9 @@
 import * as path from "@std/path";
-import type { JMDictFurigana } from "../mod.ts";
+import type { JMDictFurigana } from "../../src/mod.ts";
+import { resourcePaths } from "../../src/resource_paths.ts";
 
-const dataDirectory = path.resolve(import.meta.dirname!, "..");
-const entriesDirectory = path.join(dataDirectory, "preextracted_jmdict_entries");
+const dataDirectory = path.resolve(import.meta.dirname!, "../..");
+const entriesDirectory = resourcePaths.preextractedJMDictEntries;
 const fixturePath = path.join(dataDirectory, "test", "fixtures", "jmdict_furigana.json");
 
 const entryIds = new Set<string>();
@@ -14,7 +15,7 @@ for await (const entry of Deno.readDir(entriesDirectory)) {
 if (entryIds.size === 0) throw new Error("No pre-extracted JMDict entries found");
 
 const furigana = JSON.parse(
-  await Deno.readTextFile(path.join(dataDirectory, "jmdict_furigana.json")),
+  await Deno.readTextFile(resourcePaths.jmdictFurigana),
 ) as JMDictFurigana;
 const fixtureFurigana = Object.fromEntries(
   Object.entries(furigana).filter(([key]) => entryIds.has(key.slice(0, key.indexOf("|")))),

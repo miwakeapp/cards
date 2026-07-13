@@ -7,9 +7,13 @@ import type { JMDictWord } from "data";
 import { unescape } from "@std/html/entities";
 import { renderEntry } from "jmdict_to_html";
 import { formatReadingForAnki } from "jmdict_to_html/format-reading-for-anki";
-import type { GenerateFieldsInput } from "./ai_provider.ts";
 import { formatMiwakeKey } from "./keys.ts";
-import type { AIGeneratedFields, CardCreationInput, MiwakeCard } from "./types.ts";
+import type {
+  AIGeneratedFields,
+  CardCreationInput,
+  GenerateFieldsInput,
+  MiwakeCard,
+} from "./types.ts";
 
 /**
  * Options for card creation.
@@ -244,7 +248,7 @@ export async function createCard(options: CreateCardOptions): Promise<MiwakeCard
   // Format reading with precise furigana placement
   let reading: string | null = null;
   if (containsKanji(recognitionTarget)) {
-    reading = formatReadingForAnki(jmdictEntry.id, recognitionTarget, readingKana);
+    reading = await formatReadingForAnki(jmdictEntry.id, recognitionTarget, readingKana);
     // Fallback if formatReadingForAnki returns null (not in furigana database)
     if (reading === null) {
       // Simple fallback: just append reading in brackets

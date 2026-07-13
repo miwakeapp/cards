@@ -1,7 +1,7 @@
 /**
  * Fetches sample cards from Anki's Mining deck to create eval inputs.
  * This is somewhat specific to Domenic's existing Animecards/Anki setup, but the resulting baseline
- * Run with: deno task fetch-samples
+ * Run with: deno task fetch:samples
  */
 
 import * as path from "@std/path";

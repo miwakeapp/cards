@@ -564,27 +564,3 @@ snapshot[`renderEntry: 1604990 1`] = `
   </li>
 </ol>'
 `;
-
-snapshot[`formatReadingForAnki: 大人買い 1`] = `"大人[おとな] 買[が]い"`;
-
-snapshot[`formatReadingForAnki: 頑張る 1`] = `"頑[がん] 張[ば]る"`;
-
-snapshot[`formatReadingForAnki: 食べる 1`] = `"食[た]べる"`;
-
-snapshot[`formatReadingForAnki: 走る 1`] = `"走[はし]る"`;
-
-snapshot[`formatReadingForAnki: 日本語 1`] = `"日[に] 本[ほん] 語[ご]"`;
-
-snapshot[`formatReadingForAnki: 東京 1`] = `"東[とう] 京[きょう]"`;
-
-snapshot[`formatReadingForAnki: 飛行機 1`] = `"飛[ひ] 行[こう] 機[き]"`;
-
-snapshot[`formatReadingForAnki: 新幹線 1`] = `"新[しん] 幹[かん] 線[せん]"`;
-
-snapshot[`formatReadingForAnki: 図書館 1`] = `"図[と] 書[しょ] 館[かん]"`;
-
-snapshot[`formatReadingForAnki: 大学生 1`] = `"大[だい] 学[がく] 生[せい]"`;
-
-snapshot[`formatReadingForAnki (non-kanji): ＡＢＣ順 1`] = `"Ａ[エー] Ｂ[ビー] Ｃ[シー] 順[じゅん]"`;
-
-snapshot[`formatReadingForAnki (non-kanji): ＣＤプレーヤー 1`] = `"Ｃ[シー] Ｄ[ディー]プレーヤー"`;

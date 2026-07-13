@@ -1,16 +1,21 @@
 import { assertEquals, assertRejects, assertThrows } from "@std/assert";
+import * as path from "@std/path";
 import { DatabaseSync } from "node:sqlite";
-import { normalizeRarityTerm } from "../rarity_normalization.ts";
+import { normalizeRarityTerm } from "../src/rarity_normalization.ts";
 import {
   createRarityResourceLookup,
   initializeRarityDatabase,
   UPSERT_BCCWJ_SQL,
   UPSERT_NWJC_SQL,
-} from "../rarity_resources.ts";
-import { parseBCCWJRow, parseNWJCRow, validateBCCWJHeader } from "../scripts/rarity_source_rows.ts";
+} from "../src/rarity_resources.ts";
+import {
+  parseBCCWJRow,
+  parseNWJCRow,
+  validateBCCWJHeader,
+} from "../scripts/build/rarity_source_rows.ts";
 
 const TEST_NWJC_TOKEN_TOTAL = 1_000_000;
-const TEMP_DIRECTORY = `${import.meta.dirname!}/.tmp`;
+const TEMP_DIRECTORY = path.resolve(import.meta.dirname!, "../generated/test");
 
 await Deno.mkdir(TEMP_DIRECTORY, { recursive: true });
 
@@ -42,7 +47,7 @@ Deno.test("rarity resource lookup rejects missing resources with complete guidan
     await assertRejects(
       () => lookup.nwjcSurface1GramHit("target"),
       Error,
-      "download_nwjc_surface_1gram",
+      "update:rarity",
     );
   } finally {
     await lookup.close();

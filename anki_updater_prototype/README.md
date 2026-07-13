@@ -1,8 +1,8 @@
 # Anki Updater Prototype
 
-This package contains workflows for creating Miwake notes in Anki.
+This package is a saved-work scratchpad for recurring or potentially reusable Anki workflows. It follows the repository's public package boundaries and task conventions, but it is intentionally exempt from the source-layout and polish standards applied to maintained libraries and applications.
 
-## Layout
+## Workflows
 
 - `shared/` contains reusable AnkiConnect, Miwake note-model, and JMDict resolution code.
 - `leech/` contains the Mining-deck leech-card conversion workflow.

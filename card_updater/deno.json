@@ -1,11 +1,15 @@
 {
   "tasks": {
-    "doc:check": "deno doc --lint src/main.ts",
-    "update-cards": "deno run --env-file=../.env --allow-net --allow-env --allow-read --allow-write=runs,../data --allow-run=cmd,open,xdg-open --allow-sys=hostname src/main.ts"
+    "doc:check": "deno doc --lint src/main.ts src/client/main.ts",
+    "build": "deno transpile --output=./build/main.js ./src/client/main.ts",
+    "update:cards": "deno task build && deno run --env-file=../.env --allow-net --allow-env --allow-read --allow-write=generated,../data/generated --allow-run=cmd,open,xdg-open --allow-sys=hostname src/main.ts"
   },
   "test": {
     "permissions": {
-      "read": ["../data/jmdict_tags.json"]
+      "read": ["../data/resources/jmdict/tags.json"]
     }
+  },
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "deno.ns"]
   }
 }

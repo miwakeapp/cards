@@ -1,16 +1,17 @@
 // Keeps `jmdict_eng.json` up to date with the latest jmdict-simplified release, downloading
 // only when the release is actually newer (or when forced).
 //
-// This is the library behind `deno task download_jmdict`; other packages use it via the
+// This is the library behind `deno task download:jmdict`; other packages use it via the
 // `data/download` export (e.g. the card updater refreshes the dictionary before scanning).
 
 import * as path from "@std/path";
 import { unzipSync } from "fflate";
 import { entriesCache } from "./entries_cache.ts";
+import { resourcePaths } from "./resource_paths.ts";
 
 const RELEASES_URL = "https://api.github.com/repos/scriptin/jmdict-simplified/releases/latest";
 
-const jmdictPath = path.join(import.meta.dirname!, "jmdict_eng.json");
+const jmdictPath = resourcePaths.jmdict;
 
 /** Identifies a jmdict-simplified package release and dictionary revision. */
 export interface JMDictVersion {
@@ -104,6 +105,7 @@ async function downloadRelease(release: LatestRelease): Promise<void> {
   }
 
   // Write next to the target and rename, so a crash mid-download never corrupts the data file.
+  await Deno.mkdir(path.dirname(jmdictPath), { recursive: true });
   const temporaryPath = `${jmdictPath}.download`;
   await Deno.writeFile(temporaryPath, unzipped[0]);
   await Deno.rename(temporaryPath, jmdictPath);

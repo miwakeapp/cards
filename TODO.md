@@ -32,7 +32,6 @@
 
 ## General cleanup
 
-- Decide how to choose source markup based on semantics: `<cite>` for work titles, `<span>` for non-titles, and `<a>` for useful public links.
 - Evaluate rarity calibration and exact `wordfreq` data against a curated set of desired word orderings and coverage.
 - Consolidate the project's other HTML-entity decoders around `@std/html/entities`.
 - Stream ZIP extraction if setup needs to work within a lower memory ceiling.
@@ -40,8 +39,5 @@
 
 ## Repository maintenance
 
-- Add a root README with the package map, Deno prerequisite, common development commands, and an explanation of which generated resources are checked in versus kept local.
-- Add dependency-update automation that updates the lockfile and opens reviewable pull requests. Keep related AI SDK core/provider packages on compatible generations instead of updating providers independently.
 - Document a small, non-destructive manual smoke procedure for AI providers and AnkiConnect after major dependency upgrades. CI can validate types and mocked behavior but cannot exercise credentials, provider responses, or a live Anki collection.
-- Validate the downloaded `jmdict-simplified` schema before replacing the local dictionary, and record stronger source identity such as the exact asset name or input hash in the checked snapshot metadata. The downloader intentionally follows current releases, while the TypeScript types update independently.
-- If the full Lorenzi furigana dataset is ever bundled or redistributed, resolve its distribution terms explicitly. The current full download remains local; only a small test excerpt is checked in.
+- Validate the downloaded `jmdict-simplified` schema before replacing the local dictionary, and record stronger source identity such as the exact asset name or input hash in the checked-in snapshot metadata. The downloader intentionally follows current releases, while the TypeScript types update independently.

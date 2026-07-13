@@ -2,10 +2,10 @@
 // when the local copy is already current.
 //
 // Run with:
-//   deno task download_jmdict
-//   deno task download_jmdict --force
+//   deno task download:jmdict
+//   deno task download:jmdict --force
 
-import { ensureLatestJMDict } from "../jmdict_download.ts";
+import { ensureLatestJMDict } from "../../src/jmdict_download.ts";
 
 let force = false;
 for (const arg of Deno.args) {

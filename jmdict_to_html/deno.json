@@ -12,8 +12,8 @@
     "permissions": {
       "read": [
         "./test/__snapshots__",
-        "../data/jmdict_tags.json",
-        "../data/preextracted_jmdict_entries",
+        "../data/resources/jmdict/tags.json",
+        "../data/resources/jmdict/entries",
         "../data/test/fixtures/jmdict_furigana.json"
       ]
     }

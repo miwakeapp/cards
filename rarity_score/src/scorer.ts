@@ -1,4 +1,4 @@
-import { bccwjLUW2LemmaHit, nwjcSurface1GramHit } from "data";
+import { bccwjLUW2LemmaHit, nwjcSurface1GramHit } from "data/rarity";
 import { unescape } from "@std/html/entities";
 
 // These anchors are part of the public score definition. The rare endpoint sits just below one

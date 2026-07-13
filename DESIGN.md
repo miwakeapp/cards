@@ -1,10 +1,10 @@
-# Miwake Design Doc
+# Miwake Cards Design Doc
 
 ## Problem and motivation
 
 At a sufficiently-advanced stage, learning Japanese vocabulary is best done via **vocabulary mining**: encountering unknown (or forgotten) words in context, then creating flashcards for them.
 
-Tools for this exist. However, they are clunky to wire together, and the end product (the vocabulary flashcards produced) are not ideal. Miwake is a software suite that streamlines the vocabulary mining process, creating an optimal corpus of "miwake card" flashcards which can be updated and customized over time.
+Tools for this exist. However, they are clunky to wire together, and the end product (the vocabulary flashcards produced) are not ideal. The Miwake Cards software suite streamlines the vocabulary mining process, creating an optimal corpus of "Miwake card" flashcards which can be updated and customized over time.
 
 ### Principles
 
@@ -16,17 +16,17 @@ Tools for this exist. However, they are clunky to wire together, and the end pro
 
 - **Customizable around the edges**: Despite being opinionated, there will be some room for customization, especially around areas that I've changed my mind on over time, or am not yet sure about. This will be enabled by a flexible data model: e.g., storing extra data in the Anki cards even if it's not displayed by default, or using semantic HTML and relying heavily on CSS for display customization.
 
-- **Sprinkles of AI** ✨: AI enables previously-impossible or -manual steps to be automated to help the experience become seamless and the end products more useful. For example, precise furigana placement, example sentence extraction and shortening, or dictionary gloss highlighting.
+- **Sprinkles of AI** ✨: AI enables previously-impossible or -manual steps to be automated to help the experience become seamless and the end products more useful. For example, hint generation, example sentence shortening, or dictionary gloss highlighting.
 
 ### Existing solutions
 
-The existing solution I am using is a combination of [ｯﾂ Reader](https://github.com/ttu-ttu/ebook-reader) + [Yomitan](https://yomitan.wiki/) + [Jitendex](https://jitendex.org/) + [AnkiConnect](https://ankiweb.net/shared/info/2055492159) + a customized version of the [Animecards template](https://animecards.site/yomichansetup/#connect-yomitan-and-anki).
+The existing solution I am using is a combination of [Miwake Reader](https://github.com/miwakeapp/ebook-reader) + [Yomitan](https://yomitan.wiki/) + [Jitendex](https://jitendex.org/) + [AnkiConnect](https://ankiweb.net/shared/info/2055492159) + a customized version of the [Animecards template](https://animecards.site/yomichansetup/#connect-yomitan-and-anki).
 
 Although in the fullness of time, a _fully_ integrated project might somehow replace all of these, the priority target for replacement is the Yomitan + Jitendex + Animecards template flow:
 
-- Yomitan is great software, but extremely configurable and requires lots of setup and maintenance (e.g. dictionary updates). Once set up, its flow is mostly-seamless, but can be rough around the edges in, e.g., the awkward clipboard-based context extraction flow, or its treatment of multiple readings for the same word. Overall, it is somewhat too focused on being a generic popup dictionary, and not optimized enough for Japanese sentence mining.
+- Yomitan is great software, but extremely configurable and requires lots of setup and maintenance (e.g. dictionary updates). Once set up, its flow is mostly-seamless, but can be rough around the edges in, e.g., the sentence-based context extraction, or its treatment of multiple readings for the same word. Overall, it is somewhat too focused on being a generic popup dictionary, and not optimized enough for Japanese sentence mining.
 
-- Jitendex is not well-factored. For some reason they've encoded their dictionary entries as a kind of JSON serialization of HTML, with lots of inline styles, which makes customizing the dictionary entries displayed on cards difficult. They seem to have some logic for merging multiple JMDict entries into a single Jitendex entry, which can cause confusion. A cleaner JMDict → semantic HTML-for-Anki flow is a high priority.
+- Jitendex is not well-factored. For some reason they've encoded their dictionary entries as a kind of JSON serialization of HTML, with lots of inline styles, which makes customizing the dictionary entries displayed on cards difficult. They seem to have some logic for merging multiple JMDict entries into a single Jitendex entry, or splitting single JMDict entries into multiple Jitendex entries with redirects, which causes confusion. A cleaner JMDict → semantic HTML-for-Anki flow is a high priority.
 
 - The Animecards flashcard format is like 80% of what I want, but some enhancements—especially via sprinkles of AI ✨—would get us to 100%. Designing the format (notably, the fields) from scratch is an important part of this, e.g., determining the best primary key.
 
@@ -48,7 +48,7 @@ Although in the fullness of time, a _fully_ integrated project might somehow rep
 
 ### Installation and usage
 
-You install the Miwake browser add-on, via your browser's add-on store. Out of the box, you get a Yomitan-like experience of a popup dictionary, but there is an unobtrusive indicator guiding you to do the Anki setup as well.
+You install the Miwake Cards browser add-on, via your browser's add-on store. Out of the box, you get a Yomitan-like experience of a popup dictionary, but there is an unobtrusive indicator guiding you to do the Anki setup as well.
 
 The popup dictionary is slightly ✨ smarter than Yomitan in how it prioritizes larger phrases. For example, TODO insert example.
 
@@ -81,7 +81,7 @@ After that setup is complete, the unobtrusive indicator changes color. From now 
 
   - This generally never contains furigana, even for cases where the originally mined text used furigana and the word is highly ambigious. (Such as 番 being either ばん or つがい.) Instead, the hint field can contain appropriate context, including furigana if necessary.
 
-- **Reading** (optional): if the spelling in question contains any Kanji, this field exists and contains the same spelling, but with precisely-placed ✨ furigana (using Anki's `[]`-suffix microsyntax).
+- **Reading** (optional): if the spelling in question contains any Kanji, this field exists and contains the same spelling, but with [mono-ruby](https://www.w3.org/International/questions/qa-ruby.en#mono)-when-possible furigana. This field uses Anki's `[]`-suffix microsyntax for ruby.
 
 - **Hint** (optional): a sparingly-used disambiguation field for when multiple senses or JMDict entries match the same spelling, such that it would be roughly impossible to tell which was intended without the hint. (This is not used by default for cards with only one sense, or cards where all senses are applicable.) The hint is a Japanese phrase or fragment that uses the word in extremely-minimal context. AI-generated initially ✨, but users can edit this and the software should not interfere with that.
 
@@ -105,21 +105,21 @@ After that setup is complete, the unobtrusive indicator changes color. From now 
 
 - **Dictionary entry**: a semantic-HTML version of the specified JMDict entry. (Discussed in detail [later](#semantic-html-jmdict).) Importantly, this is not specific to the card in question, so it can be easily updated later as JMDict updates.
 
-- **Source**: the source from which this word was found. This field generally will contain HTML, at least identifying the language of the source's name, and additionally giving a link to it when available. For example:
+- **Source** (optional): the source from which this word was found. This field generally will contain HTML, at least identifying the language of the source's name, and additionally giving a link to it when available. For example:
 
-  - `<span lang="en">GPT 5.5 Thinking</span>` for an AI-generated example sentence
+  - `<span lang="en">GPT 5.5 Thinking</span>`, for an AI-generated example sentence
 
-  - `<cite lang="ja">虐殺器官</cite>`, for a Japanese book title
+  - `『<cite lang="ja">虐殺器官</cite>』`, for a Japanese book title
+
+  - `「<a lang="ja" href="https://news.web.nhk/newsweb/na/na-k10015175781000"><cite>羽田空港 C滑走路で路面剥離 閉鎖し修復作業 再開午後6時ごろ</cite></a>」`, for a Japanese article title
 
   - `<a lang="en" href="https://tatoeba.org/en/sentences/show/76039">Tatoeba</a>`, for sentence from the Tatoeba project
 
-  When mining in a browser extension, we can anticipate using heuristics and AI ✨ to trim and improve the `<title>` of the page being mined, e.g. `ソードアート・オンライン2 アインクラッド (電撃文庫) | ッツ Ebook Reader` becomes `<cite lang="ja">ソードアート・オンライン2 アインクラッド</cite>`.
-
-- **Tags**: Tags are probably a reasonable place to store metadata. For example, it might be useful to store the JMDict version, or the version of this software, used to create the card.
+  When mining in a browser extension, we can anticipate using heuristics and AI ✨ to trim and improve the `<title>` of the page being mined, e.g. `ソードアート・オンライン2 アインクラッド (電撃文庫) | Miwake Reader` becomes `『<cite lang="ja">ソードアート・オンライン2 アインクラッド</cite>』`.
 
 #### The displayed cards
 
-The core data model discussed above forms the foundation for displaying miwake cards with some amount of flexibility and customizability. A default display will be provided, but it might evolve over time as my opinions on the best flashcard format change, or it can be customized by advanced users.
+The core data model discussed above forms the foundation for displaying Miwake cards with some amount of flexibility and customizability. A default display will be provided, but it might evolve over time as my opinions on the best flashcard format change, or it can be customized by advanced users.
 
 The default display uses the [Anki templating language](https://docs.ankiweb.net/templates/intro.html) to display a simple front side with the **Word** field, and the **Hint** field if present. The back side contains the **Reading** (or a repeat of the **Word** if there is no **Reading** field), the **Dictionary entry**, and the **Minimized context sentence**. The **Full context sentence** is hidden by default but can be shown with a disclosure button. The **Source** field is included when present.
 
@@ -130,6 +130,10 @@ The back-side HTML will contain additional JavaScript which customizes the card 
 See [below](#anki-templates) for implementation discussions.
 
 TODO: the given setup doesn't seem to work well if we want slightly more hints on the front, e.g., the part of speech. Is that an issue? They might be especially useful for leeches.
+
+#### Tags
+
+TODO: do we want to include any information in the Anki card's tags? We could consider storing metadata like JMDict version, Miwake Cards version, etc. However, this would have the unfortunate side effect of cluttering up the user's Anki card browser. Perhaps HTML comments or a dedicated metadata field are better for such information, if it is useful? Are there any tags that would be actually useful for our users?
 
 ### Maintenance
 
@@ -236,7 +240,7 @@ Some specific design decisions in our output:
 
 TODO Discuss ✨ removal of en-GB redundancy
 
-For examples, including tricky cases like multiple readings, multiple senses, etc., see the [pre-extracted JMDict entries](./data/preextracted_jmdict_entries/) and [resulting HTML snapshot](./jmdict_to_html/test/__snapshots__/test.ts.snap).
+For examples, including tricky cases like multiple readings, multiple senses, etc., see the [checked-in JMDict entries](./data/resources/jmdict/entries/) and [resulting HTML snapshots](./jmdict_to_html/test/__snapshots__/render_entry_test.ts.snap).
 
 ### Reading field and furigana placement
 
@@ -248,7 +252,7 @@ Once we have the front recognition target and a reading, precise furigana placem
 
 Using the [JmdictFurigana project](https://github.com/Doublevil/JmdictFurigana) was considered, but some quick smoke-testing revealed [it's missing at least one obvious case](https://github.com/Doublevil/JmdictFurigana/issues/25), so I lost confidence in the project.
 
-Furigana placement involves lookups in large data tables. The current design pre-computes a ~60 MiB JSON file and loads it into memory on startup, for fast lookups, at the cost of ~1 second startup time. This is not terrible, but not ideal either. If I want to optimize this in the future, we can consider strategies like sharding by JMDict ID prefix or similar.
+Furigana placement involves lookups in large data tables. The current design pre-computes a ~60 MiB JSON file, loads it lazily the first time a kanji reading is formatted, and retains it in memory for fast subsequent lookups. This avoids the cost for consumers that never format readings, but adds about a second to the first lookup and retains the full table afterward. If I want to optimize this in the future, we can consider strategies like sharding by JMDict ID prefix or similar.
 
 ### Anki templates
 

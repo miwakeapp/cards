@@ -1,6 +1,6 @@
-import * as path from "@std/path";
 import { DatabaseSync } from "node:sqlite";
 import { normalizeRarityTerm } from "./rarity_normalization.ts";
+import { resourcePaths } from "./resource_paths.ts";
 
 export const RARITY_DATABASE_FILENAME = "rarity.sqlite3";
 export const RARITY_DATABASE_VERSION = 1;
@@ -14,9 +14,7 @@ export const UPSERT_BCCWJ_SQL = `
 `;
 
 const resourcesNotFoundMessage =
-  "Rarity resources not found. Run `deno task --cwd data download_nwjc_surface_1gram`, " +
-  "`deno task --cwd data download_bccwj_luw2`, and " +
-  "`deno task --cwd data build_rarity_resources`.";
+  "Rarity resources not found. Run `deno task --cwd data update:rarity`.";
 
 interface DatabaseState {
   database: DatabaseSync;
@@ -95,9 +93,7 @@ export function createRarityResourceLookup(databasePath: string): RarityResource
   };
 }
 
-const defaultLookup = createRarityResourceLookup(
-  path.join(import.meta.dirname!, RARITY_DATABASE_FILENAME),
-);
+const defaultLookup = createRarityResourceLookup(resourcePaths.rarityDatabase);
 
 /** Looks up a target in the NWJC surface 1-gram resource. */
 export function nwjcSurface1GramHit(

@@ -7,7 +7,7 @@
  * deterministically by comparing the AI's choice against the structural sense alignment.
  */
 
-import { DEFAULT_MODEL_ID, generateCardFields, type ModelId } from "card_creator";
+import { DEFAULT_MODEL_ID, generateCardFields, type ModelId } from "card_creator/ai";
 import { formatMiwakeKey } from "card_creator/keys";
 import type { AnalyzedCard } from "./analyze.ts";
 import { sha256OfJSON } from "./hash.ts";

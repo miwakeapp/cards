@@ -1,3 +1,5 @@
+import type { JMDictWord } from "data";
+
 /**
  * Input for creating a Miwake card.
  */
@@ -20,6 +22,11 @@ export interface CardCreationInput {
   /** Optional source URL. Folded into the Source HTML field if useful. */
   sourceURL?: string;
 }
+
+/** Card-creation input with the referenced JMDict entry already loaded. */
+export type GenerateFieldsInput = Omit<CardCreationInput, "jmdictId"> & {
+  jmdictEntry: JMDictWord;
+};
 
 /**
  * A complete Miwake card with all fields populated.

@@ -1,11 +1,12 @@
 import { emptyDir } from "@std/fs/empty-dir";
 import * as path from "@std/path";
 import type { JMdict } from "@scriptin/jmdict-simplified-types";
+import { resourcePaths } from "../../src/resource_paths.ts";
 
-const dataDir = path.resolve(import.meta.dirname!, "..");
-const jmdictFilename = path.join(dataDir, "jmdict_eng.json");
-const entriesDirectory = path.join(dataDir, "preextracted_jmdict_entries");
-const snapshotFilename = path.join(dataDir, "jmdict_snapshot.json");
+const dataDir = path.resolve(import.meta.dirname!, "../..");
+const jmdictFilename = resourcePaths.jmdict;
+const entriesDirectory = resourcePaths.preextractedJMDictEntries;
+const snapshotFilename = resourcePaths.jmdictSnapshot;
 
 // IDs used by jmdict_to_html tests
 const JMDICT_TO_HTML_TEST_IDS = new Set([
