@@ -11,6 +11,7 @@ import type {
   ReviewPayload,
 } from "../review_api.ts";
 import type { Suggestion, SuggestionConfidence } from "../suggest.ts";
+import { applyRestrictionReason } from "./apply_policy.ts";
 
 /* ---------- state ---------- */
 
@@ -113,6 +114,10 @@ function errorMessage(error: unknown): string {
 
 function element<T extends HTMLElement = HTMLElement>(id: string): T {
   return document.getElementById(id) as T;
+}
+
+function ankiTargetLabel(): string {
+  return `${meta.ankiProfile} @ ${new URL(meta.ankiConnectURL).host}`;
 }
 
 /** Renders a note-field's HTML safely: keeps simple inline tags, converts Anki furigana to ruby. */
@@ -315,10 +320,14 @@ function renderHeader(): void {
   }
 
   const jmdictVersion = meta.jmdict.remote ?? meta.jmdict.local;
-  element("brandSub").textContent =
-    `${meta.scannedCount.toLocaleString()} cards scanned · ${meta.counts.unchanged.toLocaleString()} already current · ` +
+  const brandSub = element("brandSub");
+  brandSub.textContent =
+    `${ankiTargetLabel()} · ${meta.scannedCount.toLocaleString()} cards scanned · ${meta.counts.unchanged.toLocaleString()} already current · ` +
     `JMDict ${jmdictVersion?.version ?? "?"} (${jmdictVersion?.dictDate ?? "?"})` +
-    (meta.dryRun ? " · dry run" : "");
+    (meta.dryRun ? " · dry run" : "") +
+    (meta.limit === undefined ? "" : " · limited scan");
+  brandSub.title =
+    `AnkiConnect: ${meta.ankiConnectURL}\nProfile: ${meta.ankiProfile}\nQuery: ${meta.query}`;
 
   const bar = element("progressBar");
   bar.innerHTML = "";
@@ -346,13 +355,12 @@ function renderHeader(): void {
 
   const applyButton = element<HTMLButtonElement>("applyButton");
   const applicable = applyableItems().length;
-  applyButton.textContent = meta.dryRun
-    ? "Apply (dry run)"
-    : `Apply ${applicable} update${applicable === 1 ? "" : "s"}…`;
-  applyButton.disabled = meta.dryRun || applicable === 0;
-  applyButton.title = meta.dryRun
-    ? "This run was started with --dry-run; restart without it to apply."
-    : "Write the staged updates to Anki";
+  const disabledReason = applyRestrictionReason(meta);
+  applyButton.textContent = disabledReason === undefined
+    ? `Apply ${applicable} update${applicable === 1 ? "" : "s"}…`
+    : "Apply disabled";
+  applyButton.disabled = disabledReason !== undefined || applicable === 0;
+  applyButton.title = disabledReason ?? "Write the staged updates to Anki";
 
   element("sectionNav").innerHTML = [
     ["#retarget", "✨ Re-target", retargetItems().length],
@@ -1064,7 +1072,10 @@ function openApplyDialog(): void {
   for (const item of targets) ++counts[item.verdict];
 
   summary.innerHTML = `
-    This writes to your Anki collection via AnkiConnect:
+    This writes to <strong>${escapeHTML(ankiTargetLabel())}</strong> via
+    <code>${escapeHTML(meta.ankiConnectURL)}</code>:
+    <div class="apply-target-query">Query: <code>${escapeHTML(meta.query)}</code> ·
+      ${meta.scannedCount.toLocaleString()} notes scanned</div>
     <ul>
       ${
     counts.retarget

@@ -5,6 +5,7 @@
 
 import * as path from "@std/path";
 import type { AnalyzedCard } from "./analyze.ts";
+import type { AppliedFieldValues } from "./anki.ts";
 import { sha256OfJSON } from "./hash.ts";
 import type { SuggestionCache } from "./suggest.ts";
 
@@ -32,6 +33,8 @@ export interface AppliedRecord {
   fromKey: string;
   toKey: string;
   wroteFields: string[];
+  before: AppliedFieldValues;
+  after: AppliedFieldValues;
 }
 
 /** Hashes the analysis-relevant content of a card, for decision/suggestion invalidation. */

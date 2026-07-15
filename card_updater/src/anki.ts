@@ -8,31 +8,38 @@ export type ACInvoke = <T = unknown>(
   params?: Record<string, unknown>,
 ) => Promise<T>;
 
-const ANKI_CONNECT_URL = "http://127.0.0.1:8765";
+export const DEFAULT_ANKI_CONNECT_URL = "http://127.0.0.1:8765";
 
-export const ac: ACInvoke = async <T = unknown>(
-  action: string,
-  params: Record<string, unknown> = {},
-): Promise<T> => {
-  let response: Response;
-  try {
-    response = await fetch(ANKI_CONNECT_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action, version: 6, params }),
-    });
-  } catch (cause) {
-    throw new Error(
-      "Could not reach AnkiConnect at 127.0.0.1:8765. Is Anki running with the AnkiConnect add-on?",
-      { cause },
-    );
-  }
-  const json = await response.json();
-  if (json.error) {
-    throw new Error(`AnkiConnect error for ${action}: ${json.error}`);
-  }
-  return json.result as T;
-};
+export function createACInvoke(
+  ankiConnectURL: string,
+  fetchImplementation: typeof fetch = fetch,
+): ACInvoke {
+  return async <T = unknown>(
+    action: string,
+    params: Record<string, unknown> = {},
+  ): Promise<T> => {
+    let response: Response;
+    try {
+      response = await fetchImplementation(ankiConnectURL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, version: 6, params }),
+      });
+    } catch (cause) {
+      throw new Error(
+        `Could not reach AnkiConnect at ${ankiConnectURL}. Is Anki running with the AnkiConnect add-on?`,
+        { cause },
+      );
+    }
+    const json = await response.json();
+    if (json.error) {
+      throw new Error(`AnkiConnect error for ${action}: ${json.error}`);
+    }
+    return json.result as T;
+  };
+}
+
+export const ac = createACInvoke(DEFAULT_ANKI_CONNECT_URL);
 
 export interface MiwakeNoteFields {
   key: string;
@@ -141,12 +148,25 @@ export interface NoteFieldUpdate {
   set: { key?: string; dictionaryEntry?: string; hint?: string };
 }
 
-export interface ApplyResult {
-  noteId: number;
-  ok: boolean;
-  error?: string;
-  wroteFields: string[];
-}
+export type AppliedFieldValues = Pick<MiwakeNoteFields, "key" | "dictionaryEntry" | "hint">;
+
+export type ApplyResult =
+  | {
+    noteId: number;
+    ok: true;
+    error?: never;
+    wroteFields: string[];
+    before: AppliedFieldValues;
+    after: AppliedFieldValues;
+  }
+  | {
+    noteId: number;
+    ok: false;
+    error: string;
+    wroteFields: string[];
+    before?: never;
+    after?: never;
+  };
 
 /**
  * Applies one reviewed update, guarding against the note having changed in Anki since it was
@@ -182,6 +202,17 @@ export async function applyNoteUpdate(
     };
   }
 
+  const before = {
+    key: snapshot.fields.key,
+    dictionaryEntry: snapshot.fields.dictionaryEntry,
+    hint: snapshot.fields.hint,
+  };
+  const after = {
+    key: update.set.key ?? before.key,
+    dictionaryEntry: update.set.dictionaryEntry ?? before.dictionaryEntry,
+    hint: update.set.hint ?? before.hint,
+  };
+
   const fields: Record<string, string> = {};
   if (update.set.key !== undefined && update.set.key !== snapshot.fields.key) {
     fields[FIELD_NAMES.key] = update.set.key;
@@ -194,7 +225,7 @@ export async function applyNoteUpdate(
   }
 
   if (Object.keys(fields).length === 0) {
-    return { noteId: update.noteId, ok: true, wroteFields: [] };
+    return { noteId: update.noteId, ok: true, wroteFields: [], before, after };
   }
 
   try {
@@ -208,7 +239,7 @@ export async function applyNoteUpdate(
     };
   }
 
-  return { noteId: update.noteId, ok: true, wroteFields: Object.keys(fields) };
+  return { noteId: update.noteId, ok: true, wroteFields: Object.keys(fields), before, after };
 }
 
 /** Opens the Anki card browser focused on the given note. */

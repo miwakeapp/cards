@@ -53,6 +53,16 @@ Deno.test("applyNoteUpdate: writes only changed fields when the snapshot still m
 
   assertEquals(result.ok, true);
   assertEquals(result.wroteFields, ["Dictionary entry"]);
+  assertEquals(result.before, {
+    key: "掬う | 1226200 | 1",
+    dictionaryEntry: '<ol class="senses"><li>old</li></ol>',
+    hint: "",
+  });
+  assertEquals(result.after, {
+    key: "掬う | 1226200 | 1",
+    dictionaryEntry: '<ol class="senses"><li>new</li></ol>',
+    hint: "",
+  });
   const update = calls.find((call) => call.action === "updateNoteFields")!;
   assertEquals(update.params, {
     note: { id: 42, fields: { "Dictionary entry": '<ol class="senses"><li>new</li></ol>' } },

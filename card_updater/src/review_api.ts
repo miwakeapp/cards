@@ -7,6 +7,9 @@ import type { Suggestion } from "./suggest.ts";
 export interface ReviewMeta {
   generatedAt: string;
   query: string;
+  ankiConnectURL: string;
+  ankiProfile: string;
+  limit: number | undefined;
   dryRun: boolean;
   modelId: ModelId;
   jmdict: EnsureLatestResult;

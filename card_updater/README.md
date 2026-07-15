@@ -24,10 +24,15 @@ Existing hints are never overwritten by default; the AI's hint is offered as an 
 
 ```sh
 deno task --cwd card_updater update:cards --dry-run      # disable the Apply button
-deno task --cwd card_updater update:cards --limit=50     # analyze a subset
+deno task --cwd card_updater update:cards --limit=50     # analyze a subset; Apply is disabled
 deno task --cwd card_updater update:cards --skip-ai      # no AI calls; re-targets reviewed manually
 deno task --cwd card_updater update:cards --offline      # don't check for a newer JMDict
 deno task --cwd card_updater update:cards --query='...'  # different Anki search
+deno task --cwd card_updater update:cards --anki-connect-url=http://surfacepro11:8765  # remote AnkiConnect
 ```
 
-`generated/` holds the decision file, AI suggestion cache, and apply audit log. Decisions and cached suggestions invalidate automatically when a card or its dictionary entry changes.
+AnkiConnect defaults to `http://127.0.0.1:8765`. Use `--anki-connect-url` when Anki is running on another machine reachable over the local network or Tailnet.
+
+Runs started with `--dry-run` or `--limit` keep the Apply button disabled. Hover over the disabled button for the reason. Limited scans are review-only because duplicate-key safety requires checking the complete query result; restart without `--limit` when you are ready to apply.
+
+`generated/` holds the decision file, AI suggestion cache, and `apply-log.jsonl` audit log. Each successful apply record includes the note ID, key transition, written fields, and the before/after values of every updater-managed field. Decisions and cached suggestions invalidate automatically when a card or its dictionary entry changes.
