@@ -16,7 +16,7 @@
 import { parseArgs } from "@std/cli/parse-args";
 import { DEFAULT_MODEL_ID, MODEL_IDS, type ModelId } from "card_creator/ai";
 import { allJMDictEntries } from "data";
-import { fetchMiwakeNotes } from "./anki.ts";
+import { createACInvoke, DEFAULT_ANKI_CONNECT_URL, fetchMiwakeNotes } from "./anki.ts";
 import { analyzeCard, type AnalyzedCard } from "./analyze.ts";
 import { ensureLatestJMDict } from "data/download";
 import { startServer } from "./server.ts";
@@ -32,6 +32,7 @@ interface Options {
   limit: number | undefined;
   modelId: ModelId;
   port: number;
+  ankiConnectURL: string;
   dryRun: boolean;
   offline: boolean;
   skipAI: boolean;
@@ -42,11 +43,12 @@ function parseArguments(args: string[]): Options {
   const flags = parseArgs(args, {
     boolean: ["dry-run", "offline", "skip-ai", "open"],
     negatable: ["open"],
-    string: ["query", "model", "limit", "port"],
+    string: ["query", "model", "limit", "port", "anki-connect-url"],
     default: {
       query: DEFAULT_QUERY,
       model: DEFAULT_MODEL_ID,
       port: DEFAULT_PORT,
+      "anki-connect-url": DEFAULT_ANKI_CONNECT_URL,
       open: true,
     },
     unknown: (arg) => exitWithUsage(`Unknown argument: ${arg}`),
@@ -68,11 +70,25 @@ function parseArguments(args: string[]): Options {
     limit: flags.limit === undefined ? undefined : positiveInteger(flags.limit, "--limit"),
     modelId: flags.model as ModelId,
     port: positiveInteger(flags.port, "--port"),
+    ankiConnectURL: validateAnkiConnectURL(flags["anki-connect-url"]),
     dryRun: flags["dry-run"],
     offline: flags.offline,
     skipAI: flags["skip-ai"],
     openBrowser: flags.open,
   };
+}
+
+function validateAnkiConnectURL(value: string): string {
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch {
+    exitWithUsage("--anki-connect-url must be an absolute HTTP or HTTPS URL");
+  }
+  if (url.protocol !== "http:" && url.protocol !== "https:") {
+    exitWithUsage("--anki-connect-url must be an absolute HTTP or HTTPS URL");
+  }
+  return value;
 }
 
 function positiveInteger(value: unknown, flag: string): number {
@@ -86,7 +102,7 @@ function positiveInteger(value: unknown, flag: string): number {
 function exitWithUsage(message: string): never {
   console.error(message);
   console.error(
-    "Usage: deno task update:cards [--query=...] [--limit=N] [--model=...] [--port=N] [--dry-run] [--offline] [--skip-ai] [--no-open]",
+    "Usage: deno task update:cards [--query=...] [--limit=N] [--model=...] [--port=N] [--anki-connect-url=URL] [--dry-run] [--offline] [--skip-ai] [--no-open]",
   );
   Deno.exit(1);
 }
@@ -164,15 +180,19 @@ function openBrowser(url: string): void {
 
 const options = parseArguments(Deno.args);
 const generatedAt = new Date().toISOString();
+const invoke = createACInvoke(options.ankiConnectURL);
+const ankiProfile = await invoke<string>("getActiveProfile");
+console.error(`Connected to Anki profile "${ankiProfile}" at ${options.ankiConnectURL}.`);
 
 const jmdict = await ensureLatestJMDict({
   offline: options.offline,
   log: (message) => console.error(message),
 });
 
-console.error(`Querying Anki: ${options.query}`);
+console.error(`Querying Anki at ${options.ankiConnectURL}: ${options.query}`);
 const notes = await fetchMiwakeNotes(options.query, {
   limit: options.limit,
+  invoke,
   onProgress: (fetched, total) => console.error(`  Fetched ${fetched}/${total} notes`),
 });
 console.error(`Fetched ${notes.length} Miwake notes.`);
@@ -208,18 +228,27 @@ startServer({
   meta: {
     generatedAt,
     query: options.query,
+    ankiConnectURL: options.ankiConnectURL,
+    ankiProfile,
+    limit: options.limit,
     dryRun: options.dryRun,
     modelId: options.modelId,
     jmdict,
     scannedCount: cards.length,
   },
   port: options.port,
+  invoke,
 });
 
 const url = `http://127.0.0.1:${options.port}/`;
 console.error(`\nReview app ready: ${url}`);
 if (options.dryRun) {
   console.error("Running with --dry-run: decisions are saved, but applying is disabled.");
+}
+if (options.limit !== undefined) {
+  console.error(
+    "Running with --limit: review is available, but applying is disabled until restarted without --limit.",
+  );
 }
 console.error("Press Ctrl+C to stop.");
 if (options.openBrowser) {

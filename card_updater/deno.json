@@ -1,7 +1,7 @@
 {
   "tasks": {
     "doc:check": "deno doc --lint src/main.ts src/client/main.ts",
-    "build": "deno transpile --output=./build/main.js ./src/client/main.ts",
+    "build": "deno bundle --platform=browser --output=./build/main.js ./src/client/main.ts",
     "update:cards": "deno task build && deno run --env-file=../.env --allow-net --allow-env --allow-read --allow-write=generated,../data/generated --allow-run=cmd,open,xdg-open --allow-sys=hostname src/main.ts"
   },
   "test": {

@@ -6,6 +6,7 @@
 import { serveDir } from "@std/http/file-server";
 import * as path from "@std/path";
 import { ac, type ACInvoke, applyNoteUpdate, openNoteInAnki } from "./anki.ts";
+import { applyRestrictionReason } from "./client/apply_policy.ts";
 import type { AnalyzedCard } from "./analyze.ts";
 import type { ReviewItem, ReviewMeta, ReviewPayload } from "./review_api.ts";
 import { suggestedKey, suggestForCard, type Suggestion, type SuggestionCache } from "./suggest.ts";
@@ -38,6 +39,7 @@ export function startServer(options: ServerOptions): Deno.HttpServer {
   function cardPayload(card: AnalyzedCard): ReviewItem {
     const suggestion = suggestions.get(card.note.noteId) ?? null;
     const savedDecision = state.decision(card.note.noteId);
+    const applied = state.applied(card.note.noteId);
     return {
       noteId: card.note.noteId,
       verdict: card.verdict,
@@ -74,7 +76,7 @@ export function startServer(options: ServerOptions): Deno.HttpServer {
         resolvedBy: savedDecision.resolvedBy,
         decidedAt: savedDecision.decidedAt,
       },
-      applied: state.applied(card.note.noteId),
+      applied: applied === null ? null : { wroteFields: applied.wroteFields },
       fingerprint: state.fingerprint(card.note.noteId),
     };
   }
@@ -139,8 +141,9 @@ export function startServer(options: ServerOptions): Deno.HttpServer {
     }
 
     if (url.pathname === "/api/apply" && request.method === "POST") {
-      if (meta.dryRun) {
-        return json({ error: "This run was started with --dry-run; applying is disabled." }, 400);
+      const restrictionReason = applyRestrictionReason(meta);
+      if (restrictionReason !== undefined) {
+        return json({ error: restrictionReason }, 400);
       }
       const body = await request.json() as { noteIds: number[] };
       const results = [];
@@ -197,6 +200,8 @@ export function startServer(options: ServerOptions): Deno.HttpServer {
         fromKey: card.note.fields.key,
         toKey: set.key ?? card.note.fields.key,
         wroteFields: result.wroteFields,
+        before: result.before,
+        after: result.after,
       });
     }
     return { noteId, ok: result.ok, error: result.error, wroteFields: result.wroteFields };

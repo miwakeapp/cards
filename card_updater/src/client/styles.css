@@ -1184,6 +1184,11 @@ dialog {
   & strong {
     color: var(--ink);
   }
+
+  & .apply-target-query {
+    margin-top: 6px;
+    overflow-wrap: anywhere;
+  }
 }
 
 .apply-results {
