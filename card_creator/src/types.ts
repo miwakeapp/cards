@@ -26,6 +26,9 @@ export interface CardCreationInput {
 /** Card-creation input with the referenced JMDict entry already loaded. */
 export type GenerateFieldsInput = Omit<CardCreationInput, "jmdictId"> & {
   jmdictEntry: JMDictWord;
+
+  /** A reading recovered and validated from source ruby, so the generator need not infer it. */
+  readingFromContext?: string;
 };
 
 /**
@@ -77,8 +80,8 @@ export interface AIGeneratedFields {
   /** Which sense numbers (1-indexed) apply to this usage. Empty = all. */
   applicableSenses: number[];
 
-  /** The correct reading for this context (kana only, no furigana formatting). */
-  reading: string;
+  /** The inferred kana reading, omitted when `readingFromContext` was supplied to the generator. */
+  reading?: string;
 
   /**
    * The plain-text exact substring from the context that corresponds to the recognition target.

@@ -1,0 +1,132 @@
+{
+  "id": "1424660",
+  "kanji": [
+    {
+      "common": true,
+      "text": "中枢",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "ちゅうすう",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "centre"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "center"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "pivot"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "mainstay"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "nucleus"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "hub"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "backbone"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "central figure"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "pillar"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "key person"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "中枢神経系"
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "central nervous system"
+        }
+      ]
+    }
+  ]
+}
