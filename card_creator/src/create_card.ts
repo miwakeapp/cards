@@ -8,6 +8,7 @@ import { unescape } from "@std/html/entities";
 import { renderEntry } from "jmdict_to_html";
 import { formatReadingForAnki } from "jmdict_to_html/format-reading-for-anki";
 import { formatMiwakeKey } from "./keys.ts";
+import { normalizeMinimizedContext } from "./minimized_context.ts";
 import type {
   AIGeneratedFields,
   CardCreationInput,
@@ -136,32 +137,6 @@ function differsOnlyByKanaScript(left: string, right: string): boolean {
   return left !== right && normalizeKanaScript(left) === normalizeKanaScript(right);
 }
 
-function normalizeContextForComparison(context: string): string {
-  return context
-    .replace(/<[^>]+>/g, "")
-    .replace(/\[[^\]]+\]/g, "")
-    .replace(/\s+/g, "")
-    .trim();
-}
-
-function postProcessMinimizedContext(
-  fullContext: string,
-  minimizedContext: string | null,
-): string | null {
-  if (minimizedContext === null) {
-    return null;
-  }
-
-  const normalizedFull = normalizeContextForComparison(fullContext);
-  const normalizedMinimized = normalizeContextForComparison(minimizedContext);
-
-  if (normalizedMinimized === "" || normalizedMinimized === normalizedFull) {
-    return null;
-  }
-
-  return minimizedContext;
-}
-
 function escapeHTML(text: string): string {
   return text
     .replaceAll("&", "&amp;")
@@ -271,7 +246,7 @@ export async function createCard(options: CreateCardOptions): Promise<MiwakeCard
   const sourceText = aiFields.cleanedSource ?? input.source ?? null;
   const sourceURL = aiFields.sourceURLIsPublic ? (input.sourceURL ?? null) : null;
   const source = formatSourceHTML(sourceText, sourceURL);
-  const minimizedContext = postProcessMinimizedContext(
+  const minimizedContext = normalizeMinimizedContext(
     processedContext,
     aiFields.minimizedContext,
   );

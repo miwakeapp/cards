@@ -5,6 +5,7 @@
 // Core card creation
 export { createCard } from "./create_card.ts";
 export type { CreateCardOptions } from "./create_card.ts";
+export { needsAIMinimizedContext, normalizeMinimizedContext } from "./minimized_context.ts";
 
 // Types
 export type {
