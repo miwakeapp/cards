@@ -10,6 +10,7 @@ import { openai } from "@ai-sdk/openai";
 import { z } from "zod";
 import type { AIGeneratedFields, GenerateFieldsInput } from "./types.ts";
 import { FEW_SHOT_EXAMPLES } from "./few_shot_examples.ts";
+import { MINIMIZED_CONTEXT_LENGTH_THRESHOLD } from "./minimized_context.ts";
 
 /**
  * Supported AI model IDs.
@@ -111,7 +112,7 @@ Your task is to analyze a Japanese word usage in context and generate appropriat
    - Maximum: 8 characters total
 
 4. minimizedContext:
-   - If >50 characters, create a SHORT, self-contained sentence
+   - If >${MINIMIZED_CONTEXT_LENGTH_THRESHOLD} characters, create a SHORT, self-contained sentence
    - Return null if the result would be substantially the same as the full context
    - Return null if the only difference would be removing furigana, ruby, or other markup
    - CUT trailing clauses after the core point:
