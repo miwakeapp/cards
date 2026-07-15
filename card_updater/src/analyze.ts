@@ -11,6 +11,7 @@ import {
   canonicalEntryHTML,
   type DiffSegment,
   diffSegments,
+  diffSenseSegments,
   type ParsedEntry,
   parseRenderedEntry,
   type SenseAlignment,
@@ -334,7 +335,7 @@ function buildSenseViews(
     return {
       number: sense.number,
       text: sense.text,
-      segments: pair?.changed ? diffSegments(pair.old.text, pair.new.text) : undefined,
+      segments: pair?.changed ? diffSenseSegments(pair.old, pair.new) : undefined,
       fromOldSense: pair !== undefined && pair.old.number !== sense.number
         ? pair.old.number
         : undefined,
@@ -378,7 +379,7 @@ function buildChangeChips(
       chips.push({
         kind: "sense-edited",
         label: moved ? `S${pair.old.number}→S${pair.new.number}` : `S${pair.new.number}`,
-        segments: diffSegments(pair.old.text, pair.new.text),
+        segments: diffSenseSegments(pair.old, pair.new),
       });
     } else if (moved) {
       chips.push({

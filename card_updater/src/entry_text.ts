@@ -1,7 +1,7 @@
 /**
  * Text-level understanding of rendered dictionary-entry HTML (the `Dictionary entry` card
- * field): parsing into forms/senses, encoding-insensitive normalization, word-level diffing,
- * and alignment of old senses to new ones.
+ * field): parsing into forms/senses, encoding-insensitive normalization, semantic diffing, and
+ * alignment of old senses to new ones.
  *
  * Parsing works on the semantic HTML produced by `jmdict_to_html`'s `renderEntry`, both current
  * output and the older variants stored on existing cards (which may differ in entity encoding).
@@ -337,6 +337,166 @@ export function diffSegments(oldText: string, newText: string): DiffSegment[] {
   }
 
   return segments;
+}
+
+interface SenseTextChunk {
+  kind: "detail" | "gloss";
+  text: string;
+  separator: string;
+}
+
+const CHUNK_FUZZY_MATCH_THRESHOLD = 0.5;
+const EXACT_CHUNK_MATCH_SCORE = 1_000_000;
+const ENGLISH_GLUE_WORDS = new Set([
+  "a",
+  "an",
+  "and",
+  "as",
+  "at",
+  "be",
+  "for",
+  "from",
+  "in",
+  "of",
+  "on",
+  "or",
+  "the",
+  "to",
+  "with",
+]);
+
+/**
+ * Diffs a parsed sense without matching common words across unrelated glosses.
+ *
+ * Exact glosses and metadata blocks are aligned first. Changed blocks with meaningful token
+ * overlap retain a word-level diff; unrelated blocks are inserted or deleted as a whole.
+ */
+export function diffSenseSegments(oldSense: ParsedSense, newSense: ParsedSense): DiffSegment[] {
+  const oldChunks = senseTextChunks(oldSense);
+  const newChunks = senseTextChunks(newSense);
+  const scores: Float64Array[] = Array.from(
+    { length: oldChunks.length + 1 },
+    () => new Float64Array(newChunks.length + 1),
+  );
+
+  for (let oldIndex = oldChunks.length - 1; oldIndex >= 0; --oldIndex) {
+    for (let newIndex = newChunks.length - 1; newIndex >= 0; --newIndex) {
+      const pairScore = chunkMatchScore(oldChunks[oldIndex], newChunks[newIndex]);
+      scores[oldIndex][newIndex] = Math.max(
+        scores[oldIndex + 1][newIndex],
+        scores[oldIndex][newIndex + 1],
+        pairScore + scores[oldIndex + 1][newIndex + 1],
+      );
+    }
+  }
+
+  const segments: DiffSegment[] = [];
+  const push = (type: DiffSegmentType, text: string) => {
+    if (!text) {
+      return;
+    }
+    const last = segments.at(-1);
+    if (last?.type === type) {
+      last.text += text;
+    } else {
+      segments.push({ type, text });
+    }
+  };
+  const append = (additionalSegments: DiffSegment[]) => {
+    for (const segment of additionalSegments) {
+      push(segment.type, segment.text);
+    }
+  };
+
+  let oldIndex = 0;
+  let newIndex = 0;
+  while (oldIndex < oldChunks.length && newIndex < newChunks.length) {
+    const oldChunk = oldChunks[oldIndex];
+    const newChunk = newChunks[newIndex];
+    const pairScore = chunkMatchScore(oldChunk, newChunk);
+    if (
+      Number.isFinite(pairScore) &&
+      pairScore + scores[oldIndex + 1][newIndex + 1] === scores[oldIndex][newIndex]
+    ) {
+      if (oldChunk.text === newChunk.text) {
+        push("same", oldChunk.text);
+      } else {
+        append(diffSegments(oldChunk.text, newChunk.text));
+      }
+      append(diffSegments(oldChunk.separator, newChunk.separator));
+      ++oldIndex;
+      ++newIndex;
+    } else if (scores[oldIndex + 1][newIndex] >= scores[oldIndex][newIndex + 1]) {
+      push("del", oldChunk.text + oldChunk.separator);
+      ++oldIndex;
+    } else {
+      push("ins", newChunk.text + newChunk.separator);
+      ++newIndex;
+    }
+  }
+  while (oldIndex < oldChunks.length) {
+    const chunk = oldChunks[oldIndex++];
+    push("del", chunk.text + chunk.separator);
+  }
+  while (newIndex < newChunks.length) {
+    const chunk = newChunks[newIndex++];
+    push("ins", chunk.text + chunk.separator);
+  }
+
+  return segments;
+}
+
+function senseTextChunks(sense: ParsedSense): SenseTextChunk[] {
+  const blocks = sense.text.split(" · ");
+  const glossBlock = sense.glosses.join("; ");
+  const glossBlockIndex = sense.glosses.length === 0 ? -1 : blocks.indexOf(glossBlock);
+  const chunks: SenseTextChunk[] = [];
+
+  for (let blockIndex = 0; blockIndex < blocks.length; ++blockIndex) {
+    const blockSeparator = blockIndex === blocks.length - 1 ? "" : " · ";
+    if (blockIndex !== glossBlockIndex) {
+      chunks.push({ kind: "detail", text: blocks[blockIndex], separator: blockSeparator });
+      continue;
+    }
+
+    for (let glossIndex = 0; glossIndex < sense.glosses.length; ++glossIndex) {
+      chunks.push({
+        kind: "gloss",
+        text: sense.glosses[glossIndex],
+        separator: glossIndex === sense.glosses.length - 1 ? blockSeparator : "; ",
+      });
+    }
+  }
+
+  return chunks;
+}
+
+function chunkMatchScore(oldChunk: SenseTextChunk, newChunk: SenseTextChunk): number {
+  if (oldChunk.kind !== newChunk.kind) {
+    return Number.NEGATIVE_INFINITY;
+  }
+  if (oldChunk.text === newChunk.text) {
+    return EXACT_CHUNK_MATCH_SCORE;
+  }
+  if (!hasMeaningfulTokenOverlap(oldChunk.text, newChunk.text)) {
+    return Number.NEGATIVE_INFINITY;
+  }
+
+  const score = similarity(oldChunk.text.toLowerCase(), newChunk.text.toLowerCase());
+  return score >= CHUNK_FUZZY_MATCH_THRESHOLD ? score : Number.NEGATIVE_INFINITY;
+}
+
+function hasMeaningfulTokenOverlap(a: string, b: string): boolean {
+  const meaningfulA = new Set(
+    tokenize(a.toLowerCase()).filter((token) => {
+      const normalized = token.trim();
+      return /[\p{L}\p{N}]/u.test(normalized) && !ENGLISH_GLUE_WORDS.has(normalized);
+    }),
+  );
+  return tokenize(b.toLowerCase()).some((token) => {
+    const normalized = token.trim();
+    return /[\p{L}\p{N}]/u.test(normalized) && meaningfulA.has(normalized);
+  });
 }
 
 /** Dice coefficient over token sets; 0 (disjoint) to 1 (identical). */
