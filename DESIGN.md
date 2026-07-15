@@ -97,7 +97,7 @@ After that setup is complete, the unobtrusive indicator changes color. From now 
 
   - This is extracted from the content being read ✨ automatically. It will at least be a single full sentence, but if the AI judges that more context is necessary, it can expand to two or three sentences. (See [expanding unhelpful context](#expanding-unhelpful-context).)
 
-  - If the original context included furigana, they are preserved (although translated to Anki's `[]`-suffix microsyntax).
+  - If the original context included furigana, they are preserved (although translated to Anki's `[]`-suffix microsyntax). Additionally, many books substitute full-sized kana in place of small kana in furigana position (as a kind of poor-man's `text-transform: full-size-kana`); the software corrects this back as part of the extraction and translation.
 
   - Sample: `これまでずっと<mark>殺伐</mark>とした最前線でのみ暮らし、ＳＡＯを──いや 全[すべ]てのＭＭＯＲＰＧをリソースの奪い合いとしか理解していなかった俺にとって、彼らのやり取りは 微[ほほ] 笑[え]ましく、そして 眩[まぶ]しいものに映った。`
 
@@ -394,13 +394,9 @@ Every card in this situation requires a hint, such as 蟹のはさみ or はさ�
 
 [包む](https://takoboto.jp/?w=1584060), usually つつむ, and [包む](https://takoboto.jp/?w=2831360), read くるむ, are harder: the entries overlap in both spelling and meaning. Context or source furigana may identify the entry, but some unannotated uses will remain ambiguous. These cards still always require a hint. If a semantic hint cannot distinguish them, the hint must include the reading; this is a justified exception to the general preference against front-side furigana.
 
-[ちゃうちゃう](https://takoboto.jp/?w=2113530) ("that's not true!") and [チャウチャウ](https://takoboto.jp/?w=2864887) ("chow chow") are a weaker version of this problem because their normal spellings use different kana scripts. JMDict also includes the katakana spelling as a search-only form of the first entry, so a popup search for チャウチャウ can still find both. Context should rank the intended one, while the JMDict ID keeps the stored cards and rendered entries separate; there is no reason to merge them into one dictionary entry.
-
 ### Selecting a spelling within one entry
 
 One JMDict entry can contain several kanji and kana spellings. This does not require separate sense selection: the exact spelling the user chose becomes the recognition target, so cards for 鋏 and ハサミ can share entry 1573820 and the same applicable senses while remaining distinct cards. JMDict's `appliesToKanji` and `appliesToKana` restrictions should filter out senses and readings that are invalid for the selected spelling before contextual inference begins.
-
-This is intentionally different from normal inflection. A spelling variant changes what the learner sees on the front and therefore changes the key; a conjugated or derived form in the source changes only the substring marked in the context.
 
 ### Selecting a reading within one entry
 

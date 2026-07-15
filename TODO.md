@@ -41,3 +41,7 @@
 
 - Document a small, non-destructive manual smoke procedure for AI providers and AnkiConnect after major dependency upgrades. CI can validate types and mocked behavior but cannot exercise credentials, provider responses, or a live Anki collection.
 - Validate the downloaded `jmdict-simplified` schema before replacing the local dictionary, and record stronger source identity such as the exact asset name or input hash in the checked-in snapshot metadata. The downloader intentionally follows current releases, while the TypeScript types update independently.
+
+## Features
+
+- Implement the full-size to small-size kana translation described in DESIGN.md.
