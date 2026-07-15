@@ -5,6 +5,7 @@ import {
   canonicalEntryHTML,
   decodeHTMLEntities,
   diffSegments,
+  diffSenseSegments,
   parseRenderedEntry,
 } from "../src/entry_text.ts";
 import { makeWord } from "./fixtures.ts";
@@ -71,6 +72,65 @@ Deno.test("diffSegments: word-level with CJK characters", () => {
   const jaSegments = diffSegments("魂の番", "魂の相棒");
   assertEquals(jaSegments.some((s) => s.type === "same" && s.text.includes("魂の")), true);
   assertEquals(jaSegments.some((s) => s.type === "del" && s.text === "番"), true);
+});
+
+Deno.test("diffSenseSegments: aligns glosses before diffing words", () => {
+  const oldSense = {
+    number: 1,
+    text: "to plan; to intend; to aspire to; to set aims (sights on)",
+    glosses: ["to plan", "to intend", "to aspire to", "to set aims (sights on)"],
+  };
+  const newSense = {
+    number: 1,
+    text: "intransitive · to aspire to; to aim for; to intend; to resolve",
+    glosses: ["to aspire to", "to aim for", "to intend", "to resolve"],
+  };
+  const segments = diffSenseSegments(oldSense, newSense);
+
+  assertEquals(segments, [
+    { type: "del", text: "to plan; to intend; " },
+    { type: "ins", text: "intransitive · " },
+    { type: "same", text: "to aspire to; " },
+    { type: "del", text: "to set aims (sights on)" },
+    { type: "ins", text: "to aim for; to intend; to resolve" },
+  ]);
+  assertEquals(
+    segments.filter((segment) => segment.type !== "ins").map((segment) => segment.text).join(""),
+    oldSense.text,
+  );
+  assertEquals(
+    segments.filter((segment) => segment.type !== "del").map((segment) => segment.text).join(""),
+    newSense.text,
+  );
+});
+
+Deno.test("diffSenseSegments: retains word-level detail within related glosses", () => {
+  const oldSense = {
+    number: 1,
+    text: "to scoop; to ladle out",
+    glosses: ["to scoop", "to ladle out"],
+  };
+  const newSense = {
+    number: 1,
+    text: "to scoop; to ladle up",
+    glosses: ["to scoop", "to ladle up"],
+  };
+
+  assertEquals(diffSenseSegments(oldSense, newSense), [
+    { type: "same", text: "to scoop; to ladle " },
+    { type: "del", text: "out" },
+    { type: "ins", text: "up" },
+  ]);
+});
+
+Deno.test("diffSenseSegments: punctuation alone does not relate glosses", () => {
+  const oldSense = { number: 1, text: "foo (bar)", glosses: ["foo (bar)"] };
+  const newSense = { number: 1, text: "baz (qux)", glosses: ["baz (qux)"] };
+
+  assertEquals(diffSenseSegments(oldSense, newSense), [
+    { type: "del", text: "foo (bar)" },
+    { type: "ins", text: "baz (qux)" },
+  ]);
 });
 
 Deno.test("alignSenses: exact, renumbered, fuzzy, added, removed", () => {
