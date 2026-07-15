@@ -51,6 +51,10 @@ const FURIGANA_TEST_IDS = new Set([
 const CARD_CREATOR_TEST_IDS = new Set([
   "1414110", // 大小
   "1209590", // 瓦解
+  "1322660", // 社, source ruby is ambiguous between repeated occurrences
+  "1416140", // 叩きつける, source ruby on an inflected form
+  "1424660", // 中枢, source ruby uses full-size kana
+  "1574430", // 餃子, source ruby uses a search-only reading
 ]);
 
 // IDs used by card_creator few-shot examples

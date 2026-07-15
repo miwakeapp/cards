@@ -7,6 +7,7 @@ import type { JMDictWord } from "data";
 import { unescape } from "@std/html/entities";
 import { renderEntry } from "jmdict_to_html";
 import { formatReadingForAnki } from "jmdict_to_html/format-reading-for-anki";
+import { prepareContextRuby, resolveContextReading } from "./context_reading.ts";
 import { formatMiwakeKey } from "./keys.ts";
 import { normalizeMinimizedContext } from "./minimized_context.ts";
 import type {
@@ -64,56 +65,31 @@ function assertPlainTarget(target: string, fieldName: string): void {
   }
 }
 
-/**
- * Converts HTML <ruby> tags to Anki furigana format and wraps target in <mark>.
- * Also extracts furigana from context if present over the target word.
- *
- * Handles both single-reading ruby (`<ruby>瓦解<rt>がかい</rt></ruby>`)
- * and per-kanji ruby (`<ruby>瓦<rt>が</rt>解<rt>かい</rt></ruby>`).
- */
-function processContext(
+/** Wraps the target occurrence in `<mark>`, accounting for Anki-style ruby. */
+function markContextTarget(
   context: string,
   recognitionTarget: string,
   targetInContext: string,
-): { processedContext: string; contextReading: string | null } {
-  let contextReading: string | null = null;
-
-  // Extract reading for recognition target from ruby annotations.
-  const rubyTagPattern = /<ruby>((?:[^<]+<rt>[^<]+<\/rt>)+)<\/ruby>/g;
-  for (const match of context.matchAll(rubyTagPattern)) {
-    const inner = match[1];
-    const baseText = inner.replace(/<rt>[^<]+<\/rt>/g, "");
-    if (baseText === recognitionTarget) {
-      contextReading = [...inner.matchAll(/<rt>([^<]+)<\/rt>/g)]
-        .map((m) => m[1])
-        .join("");
-      break;
+): string {
+  let processed = context;
+  // Wrap target in <mark>. Use a furigana-aware pattern that matches the target
+  // even when bracket annotations are interspersed (e.g. "瓦解" → " 瓦[が] 解[かい]").
+  if (!processed.includes("<mark>")) {
+    for (const markTarget of new Set([targetInContext, recognitionTarget])) {
+      const chars = [...markTarget];
+      const furiganaAwarePattern = chars
+        .map((c) => `${RegExp.escape(c)}(?:\\[[^\\]]+\\])?`)
+        .join("\\s?");
+      const pattern = new RegExp(`(${furiganaAwarePattern})`, "g");
+      const marked = processed.replace(pattern, "<mark>$1</mark>");
+      if (marked !== processed) {
+        processed = marked;
+        break;
+      }
     }
   }
 
-  // Convert all <ruby> tags to Anki bracket format: "X[Y]" or "X[Y] Z[W]".
-  let processed = context.replace(
-    rubyTagPattern,
-    (_match, inner: string) =>
-      [...inner.matchAll(/([^<]+)<rt>([^<]+)<\/rt>/g)]
-        .map(([, base, reading]) => `${base}[${reading}]`)
-        .join(" "),
-  );
-
-  // Wrap target in <mark>. Use a furigana-aware pattern that matches the target
-  // even when bracket annotations are interspersed (e.g. "瓦解" → " 瓦[が] 解[かい]").
-  const markTarget = processed.includes(targetInContext) ? targetInContext : recognitionTarget;
-
-  if (!processed.includes("<mark>")) {
-    const chars = [...markTarget];
-    const furiganaAwarePattern = chars
-      .map((c) => `${RegExp.escape(c)}(?:\\[[^\\]]+\\])?`)
-      .join("\\s?");
-    const pattern = new RegExp(`(${furiganaAwarePattern})`, "g");
-    processed = processed.replace(pattern, "<mark>$1</mark>");
-  }
-
-  return { processedContext: processed, contextReading };
+  return processed;
 }
 
 /**
@@ -175,6 +151,12 @@ export async function createCard(options: CreateCardOptions): Promise<MiwakeCard
   const { input, jmdictEntry, generateFields } = options;
   assertPlainTarget(input.recognitionTarget, "recognitionTarget");
   const inputContext = normalizeNonBreakingSpaces(input.context);
+  const preparedContextRuby = prepareContextRuby(
+    inputContext,
+    input.recognitionTarget,
+    jmdictEntry,
+  );
+  const readingFromContext = preparedContextRuby.reading ?? undefined;
 
   // Generate AI fields
   const aiFields = await generateFields({
@@ -183,6 +165,7 @@ export async function createCard(options: CreateCardOptions): Promise<MiwakeCard
     jmdictEntry,
     source: input.source,
     sourceURL: input.sourceURL,
+    readingFromContext,
   });
 
   assertPlainTarget(aiFields.targetInContext, "targetInContext");
@@ -195,11 +178,18 @@ export async function createCard(options: CreateCardOptions): Promise<MiwakeCard
     : input.recognitionTarget;
 
   // Process the context HTML (needs targetInContext from AI fields)
-  const { processedContext, contextReading } = processContext(
-    inputContext,
+  let processedContext = markContextTarget(
+    preparedContextRuby.context,
     recognitionTarget,
     targetInContext,
   );
+  const contextReading = resolveContextReading(
+    processedContext,
+    preparedContextRuby,
+    recognitionTarget,
+    jmdictEntry,
+  );
+  processedContext = contextReading.context;
 
   // Post-process hints
   let hint = aiFields.hint;
@@ -216,18 +206,17 @@ export async function createCard(options: CreateCardOptions): Promise<MiwakeCard
     hint = null;
   }
 
-  // Determine the reading to use
-  // Priority: context furigana > AI-determined reading
-  const readingKana = contextReading ?? aiFields.reading;
+  const readingKana = contextReading.reading ?? aiFields.reading;
 
-  // Format reading with precise furigana placement
   let reading: string | null = null;
   if (containsKanji(recognitionTarget)) {
+    if (readingKana === undefined) {
+      throw new Error(`No reading was supplied for ${JSON.stringify(recognitionTarget)}`);
+    }
     reading = await formatReadingForAnki(jmdictEntry.id, recognitionTarget, readingKana);
     // Fallback if formatReadingForAnki returns null (not in furigana database)
     if (reading === null) {
-      // Simple fallback: just append reading in brackets
-      reading = `${recognitionTarget}[${readingKana}]`;
+      reading = contextReading.formattedReading ?? `${recognitionTarget}[${readingKana}]`;
     }
   }
 

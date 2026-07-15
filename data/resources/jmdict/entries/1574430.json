@@ -1,0 +1,99 @@
+{
+  "id": "1574430",
+  "kanji": [
+    {
+      "common": true,
+      "text": "餃子",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "ギョーザ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "チャオズ",
+      "tags": [
+        "rk"
+      ],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "ぎょうざ",
+      "tags": [
+        "sk"
+      ],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "ギョウザ",
+      "tags": [
+        "sk"
+      ],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [
+        "food"
+      ],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [
+        {
+          "lang": "chi",
+          "full": true,
+          "wasei": false,
+          "text": "jiǎozi"
+        }
+      ],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "gyoza"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "pot sticker"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": "explanation",
+          "text": "crescent-shaped pan-fried dumplings stuffed with minced pork and vegetables"
+        }
+      ]
+    }
+  ]
+}

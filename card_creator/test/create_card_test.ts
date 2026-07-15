@@ -173,16 +173,6 @@ Deno.test("createCard: normalizes nonbreaking spaces in HTML context", async () 
 Deno.test("createCard: reading has furigana for kanji words", async () => {
   const jmdictEntry = await preextractedJMDictEntry("1414110");
 
-  const mockAIFields: AIGeneratedFields = {
-    applicableSenses: [1],
-    reading: "だいしょう",
-    hint: null,
-    targetInContext: "大小",
-    minimizedContext: null,
-    cleanedSource: null,
-    sourceURLIsPublic: false,
-  };
-
   const input: CardCreationInput = {
     context: "大小の違い",
     jmdictId: "1414110",
@@ -192,7 +182,18 @@ Deno.test("createCard: reading has furigana for kanji words", async () => {
   const card = await createCard({
     input,
     jmdictEntry,
-    generateFields: createMockGenerator(mockAIFields),
+    generateFields: (input) => {
+      assertEquals(input.readingFromContext, undefined);
+      return Promise.resolve({
+        applicableSenses: [1],
+        reading: "だいしょう",
+        hint: null,
+        targetInContext: "大小",
+        minimizedContext: null,
+        cleanedSource: null,
+        sourceURLIsPublic: false,
+      });
+    },
   });
 
   assertEquals(card.reading, "大[だい] 小[しょう]");
@@ -354,6 +355,37 @@ Deno.test("createCard: marks conjugated form using targetInContext", async () =>
   assertEquals(card.fullContext.includes("後ろめたい"), false);
 });
 
+Deno.test("createCard: marks a conjugated form containing source ruby", async () => {
+  // ソードアート・オンライン2 annotates only the inflected verb's kanji stem.
+  const jmdictEntry = await preextractedJMDictEntry("1416140");
+  const card = await createCard({
+    input: {
+      context:
+        "地面に<ruby><rb>叩</rb><rt>たた</rt></ruby>きつけられたピナは、首を上げ、つぶらな青い<ruby><rb>瞳</rb><rt>ひとみ</rt></ruby>でシリカを見つめた。",
+      jmdictId: "1416140",
+      recognitionTarget: "叩きつける",
+    },
+    jmdictEntry,
+    generateFields: (input) => {
+      assertEquals(input.readingFromContext, "たたきつける");
+      return Promise.resolve({
+        applicableSenses: [],
+        targetInContext: "叩きつけられた",
+        hint: null,
+        minimizedContext: null,
+        cleanedSource: null,
+        sourceURLIsPublic: false,
+      });
+    },
+  });
+
+  assertEquals(
+    card.fullContext,
+    "地面に<mark>叩[たた]きつけられた</mark>ピナは、首を上げ、つぶらな青い 瞳[ひとみ]でシリカを見つめた。",
+  );
+  assertEquals(card.reading, "叩[たた]きつける");
+});
+
 Deno.test("createCard: converts single-reading ruby to bracket format with mark", async () => {
   const jmdictEntry = await preextractedJMDictEntry("1414110");
 
@@ -364,15 +396,17 @@ Deno.test("createCard: converts single-reading ruby to bracket format with mark"
       recognitionTarget: "大小",
     },
     jmdictEntry,
-    generateFields: createMockGenerator({
-      applicableSenses: [],
-      reading: "だいしょう",
-      targetInContext: "大小",
-      hint: null,
-      minimizedContext: null,
-      cleanedSource: null,
-      sourceURLIsPublic: false,
-    }),
+    generateFields: (input) => {
+      assertEquals(input.readingFromContext, "だいしょう");
+      return Promise.resolve({
+        applicableSenses: [],
+        targetInContext: "大小",
+        hint: null,
+        minimizedContext: null,
+        cleanedSource: null,
+        sourceURLIsPublic: false,
+      });
+    },
   });
 
   assertEquals(card.fullContext, "この箱の<mark>大小[だいしょう]</mark>によって値段が変わる。");
@@ -390,10 +424,133 @@ Deno.test("createCard: converts per-kanji ruby to bracket format with mark", asy
       recognitionTarget: "瓦解",
     },
     jmdictEntry,
+    generateFields: (input) => {
+      assertEquals(input.readingFromContext, "がかい");
+      return Promise.resolve({
+        applicableSenses: [],
+        targetInContext: "瓦解",
+        hint: null,
+        minimizedContext: null,
+        cleanedSource: null,
+        sourceURLIsPublic: false,
+      });
+    },
+  });
+
+  assertEquals(
+    card.fullContext,
+    "いろいろな人間のルールが自分のなかで<mark>瓦[が] 解[かい]</mark>していく。",
+  );
+  assertEquals(card.reading, "瓦[が] 解[かい]");
+});
+
+Deno.test("createCard: corrects full-size kana in context ruby", async () => {
+  // 羊をめぐる冒険 annotates 中枢 as ちゆうすう in the source ebook.
+  const jmdictEntry = await preextractedJMDictEntry("1424660");
+
+  const card = await createCard({
+    input: {
+      context:
+        "要するに彼は東亜の農政の<ruby>中<rt>ちゆう</rt>枢<rt>すう</rt></ruby>から追放されたのだ。",
+      jmdictId: "1424660",
+      recognitionTarget: "中枢",
+    },
+    jmdictEntry,
+    generateFields: (input) => {
+      assertEquals(input.readingFromContext, "ちゅうすう");
+      return Promise.resolve({
+        applicableSenses: [],
+        targetInContext: "中枢",
+        hint: null,
+        minimizedContext: null,
+        cleanedSource: null,
+        sourceURLIsPublic: false,
+      });
+    },
+  });
+
+  assertEquals(
+    card.fullContext,
+    "要するに彼は東亜の農政の<mark>中[ちゅう] 枢[すう]</mark>から追放されたのだ。",
+  );
+  assertEquals(card.reading, "中[ちゅう] 枢[すう]");
+});
+
+Deno.test("createCard: accepts a search-only JMDict reading from context ruby", async () => {
+  // わたし、定時で帰ります。 uses JMDict's search-only ぎょうざ reading.
+  const jmdictEntry = await preextractedJMDictEntry("1574430");
+
+  const card = await createCard({
+    input: {
+      context:
+        "結衣は画面をじっと見つめると、横で<ruby><rb>餃</rb><rt>ぎょう</rt><rb>子</rb><rt>ざ</rt></ruby>を食べている常連のおじさんに尋ねた。",
+      jmdictId: "1574430",
+      recognitionTarget: "餃子",
+    },
+    jmdictEntry,
+    generateFields: (input) => {
+      assertEquals(input.readingFromContext, "ぎょうざ");
+      return Promise.resolve({
+        applicableSenses: [],
+        targetInContext: "餃子",
+        hint: null,
+        minimizedContext: null,
+        cleanedSource: null,
+        sourceURLIsPublic: false,
+      });
+    },
+  });
+
+  assertEquals(
+    card.fullContext,
+    "結衣は画面をじっと見つめると、横で<mark>餃[ぎょう] 子[ざ]</mark>を食べている常連のおじさんに尋ねた。",
+  );
+  assertEquals(card.reading, "餃[ぎょう] 子[ざ]");
+});
+
+Deno.test("createCard: requests a reading when source ruby could belong to another occurrence", async () => {
+  // 阪急電車 contains both the compound 神社 and the ruby-annotated noun お社.
+  const jmdictEntry = await preextractedJMDictEntry("1322660");
+
+  const card = await createCard({
+    input: {
+      context: "もともと神社だった土地を買ってお<ruby>社<rt>やしろ</rt></ruby>を屋上に移した。",
+      jmdictId: "1322660",
+      recognitionTarget: "社",
+    },
+    jmdictEntry,
+    generateFields: (input) => {
+      assertEquals(input.readingFromContext, undefined);
+      return Promise.resolve({
+        applicableSenses: [],
+        reading: "やしろ",
+        targetInContext: "社",
+        hint: null,
+        minimizedContext: null,
+        cleanedSource: null,
+        sourceURLIsPublic: false,
+      });
+    },
+  });
+
+  assertEquals(card.reading, "社[やしろ]");
+});
+
+Deno.test("createCard: adds missing separators before inline ruby annotations", async () => {
+  const jmdictEntry = await preextractedJMDictEntry("1414110");
+
+  const card = await createCard({
+    input: {
+      context:
+        "<ruby>藁<rt>わら</rt></ruby>と、地面に<ruby>叩<rt>たた</rt></ruby>きつけ、青い <ruby>瞳<rt>ひとみ</rt></ruby>で大小を見る。",
+      jmdictId: "1414110",
+      recognitionTarget: "大小",
+    },
+    jmdictEntry,
     generateFields: createMockGenerator({
       applicableSenses: [],
-      reading: "がかい",
-      targetInContext: "瓦解",
+      reading: "だいしょう",
+      targetInContext: "大小",
       hint: null,
       minimizedContext: null,
       cleanedSource: null,
@@ -403,33 +560,35 @@ Deno.test("createCard: converts per-kanji ruby to bracket format with mark", asy
 
   assertEquals(
     card.fullContext,
-    "いろいろな人間のルールが自分のなかで<mark>瓦[が] 解[かい]</mark>していく。",
+    "藁[わら]と、地面に 叩[たた]きつけ、青い 瞳[ひとみ]で<mark>大小</mark>を見る。",
   );
 });
 
-Deno.test("createCard: extracts reading from per-kanji ruby", async () => {
+Deno.test("createCard: rejects context ruby absent from JMDict", async () => {
   const jmdictEntry = await preextractedJMDictEntry("1209590");
 
-  const card = await createCard({
-    input: {
-      context: "<ruby>瓦<rt>が</rt>解<rt>かい</rt></ruby>する。",
-      jmdictId: "1209590",
-      recognitionTarget: "瓦解",
-    },
-    jmdictEntry,
-    generateFields: createMockGenerator({
-      applicableSenses: [],
-      reading: "wrong",
-      targetInContext: "瓦解",
-      hint: null,
-      minimizedContext: null,
-      cleanedSource: null,
-      sourceURLIsPublic: false,
-    }),
-  });
-
-  // Context reading (がかい) should override AI reading ("wrong")
-  assertEquals(card.reading, "瓦[が] 解[かい]");
+  await assertRejects(
+    () =>
+      createCard({
+        input: {
+          context: "<ruby>瓦<rt>かわら</rt>解<rt>とけ</rt></ruby>する。",
+          jmdictId: "1209590",
+          recognitionTarget: "瓦解",
+        },
+        jmdictEntry,
+        generateFields: createMockGenerator({
+          applicableSenses: [],
+          reading: "がかい",
+          targetInContext: "瓦解",
+          hint: null,
+          minimizedContext: null,
+          cleanedSource: null,
+          sourceURLIsPublic: false,
+        }),
+      }),
+    Error,
+    'Context ruby reading "かわらとけ" does not match a JMDict reading',
+  );
 });
 
 Deno.test("createCard: marks plain target when no ruby present", async () => {

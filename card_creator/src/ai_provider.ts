@@ -30,16 +30,11 @@ export const DEFAULT_MODEL_ID: ModelId = "claude-opus-4-8";
 /**
  * Schema for AI-generated card fields.
  */
-const aiFieldsSchema = z.object({
+const commonAIFieldsSchema = {
   applicableSenses: z
     .array(z.number())
     .describe(
       "1-indexed sense numbers that apply to this usage. Empty array if ALL senses apply.",
-    ),
-  reading: z
-    .string()
-    .describe(
-      "The correct kana reading for the recognition target in this context. Just the kana, no kanji.",
     ),
   targetInContext: z
     .string()
@@ -65,7 +60,22 @@ const aiFieldsSchema = z.object({
   sourceURLIsPublic: z
     .boolean()
     .describe("Whether the source URL appears to be publicly accessible and permanent."),
-});
+};
+
+function aiFieldsSchema(needsReading: boolean) {
+  return z.object({
+    ...commonAIFieldsSchema,
+    ...(needsReading
+      ? {
+        reading: z
+          .string()
+          .describe(
+            "The correct kana reading for the recognition target in this context. Just the kana, no kanji.",
+          ),
+      }
+      : {}),
+  });
+}
 
 /**
  * Gets the appropriate model instance for the given model ID.
@@ -86,8 +96,25 @@ function getModel(modelId: ModelId): LanguageModel {
 /**
  * The system prompt for card field generation.
  */
-const SYSTEM_PROMPT =
-  `You are an expert Japanese language learning assistant helping create Anki flashcards.
+function systemPrompt(needsReading: boolean): string {
+  const additionalRules = [
+    ...(needsReading
+      ? [
+        `reading: The kana reading for this context. Preserve the script (hiragana/katakana) of any kana already in the recognition target. For example, if the target is "ハンダ付け", return "ハンダづけ" (keeping ハンダ as katakana), not "はんだづけ".`,
+      ]
+      : []),
+    "cleanedSource: Extract book/work title from messy page titles. Remove site names, reader app cruft.",
+    "sourceURLIsPublic: false for reader apps, temporary URLs, auth-required; true for permanent public URLs.",
+    `targetInContext: The exact substring of the context that corresponds to the recognition target.
+   - If the target appears literally in the context, return it unchanged: "増幅" → "増幅"
+   - If the target is conjugated/inflected, return the inflected form: "後ろめたい" → "後ろめたさ", "浮かぶ" → "浮かんだ"
+   - Return ONLY the word itself, not auxiliary verbs or grammatical attachments:
+     * "はしゃぐ" in "はしゃいでいる" → "はしゃいで" (not "はしゃいでいる" — いる is a separate element)
+     * "噛み締める" in "噛み締められる" → "噛み締められる" (potential is part of the verb)
+   - Must be a literal substring of the context`,
+  ].map((rule, index) => `${index + 5}. ${rule}`).join("\n\n");
+
+  return `You are an expert Japanese language learning assistant helping create Anki flashcards.
 
 Your task is to analyze a Japanese word usage in context and generate appropriate flashcard fields.
 
@@ -127,19 +154,8 @@ Your task is to analyze a Japanese word usage in context and generate appropriat
    - MUST wrap recognition target in <mark></mark> tags
    - Keep balanced 「」 when target is in dialogue; never return unmatched quote brackets
 
-5. reading: The kana reading for this context. Preserve the script (hiragana/katakana) of any kana already in the recognition target. For example, if the target is "ハンダ付け", return "ハンダづけ" (keeping ハンダ as katakana), not "はんだづけ".
-
-6. cleanedSource: Extract book/work title from messy page titles. Remove site names, reader app cruft.
-
-7. sourceURLIsPublic: false for reader apps, temporary URLs, auth-required; true for permanent public URLs.
-
-8. targetInContext: The exact substring of the context that corresponds to the recognition target.
-   - If the target appears literally in the context, return it unchanged: "増幅" → "増幅"
-   - If the target is conjugated/inflected, return the inflected form: "後ろめたい" → "後ろめたさ", "浮かぶ" → "浮かんだ"
-   - Return ONLY the word itself, not auxiliary verbs or grammatical attachments:
-     * "はしゃぐ" in "はしゃいでいる" → "はしゃいで" (not "はしゃいでいる" — いる is a separate element)
-     * "噛み締める" in "噛み締められる" → "噛み締められる" (potential is part of the verb)
-   - Must be a literal substring of the context`;
+${additionalRules}`;
+}
 
 /**
  * Formats an input for the user prompt.
@@ -172,9 +188,12 @@ function buildFewShotMessages(
       role: "user",
       content: formatUserPrompt(example.input),
     });
+    const output = actualInput.readingFromContext === undefined
+      ? example.output
+      : withoutReading(example.output);
     messages.push({
       role: "assistant",
-      content: JSON.stringify(example.output),
+      content: JSON.stringify(output),
     });
   }
 
@@ -187,6 +206,13 @@ function buildFewShotMessages(
   return messages;
 }
 
+function withoutReading(
+  fields: AIGeneratedFields,
+): Omit<AIGeneratedFields, "reading"> {
+  const { reading: _reading, ...fieldsWithoutReading } = fields;
+  return fieldsWithoutReading;
+}
+
 /**
  * Generates AI-powered fields for a Miwake card.
  */
@@ -195,13 +221,14 @@ export async function generateCardFields(
   modelId: ModelId,
 ): Promise<AIGeneratedFields> {
   const model = getModel(modelId);
+  const needsReading = input.readingFromContext === undefined;
 
   const result = await generateText({
     model,
-    output: Output.object({ schema: aiFieldsSchema }),
-    system: SYSTEM_PROMPT,
+    output: Output.object({ schema: aiFieldsSchema(needsReading) }),
+    system: systemPrompt(needsReading),
     messages: buildFewShotMessages(input),
   });
 
-  return result.output;
+  return result.output as AIGeneratedFields;
 }
