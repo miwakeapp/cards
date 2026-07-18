@@ -7,9 +7,9 @@ import type {
   Tag,
   Xref,
 } from "@scriptin/jmdict-simplified-types";
-import { iso6392BTo1 } from "iso-639-2";
 import { equal } from "@std/assert";
 
+import { resolveJMDictLanguage } from "./jmdict_language.ts";
 import {
   field as expandField,
   misc as expandMisc,
@@ -225,15 +225,15 @@ function renderPartOfSpeechItem(tag: string): string {
 }
 
 function renderLanguageSource(source: JMdictLanguageSource): string {
-  const base = escapeText(describeLanguage(source.lang));
+  const language = resolveJMDictLanguage(source.lang);
+  const base = escapeText(language.englishName);
   const qualifiers: string[] = [];
   if (source.wasei) {
     qualifiers.push("wasei");
   }
   // We intentionally drop the "full" flag to keep the rendered text concise.
   const qualifierText = qualifiers.length > 0 ? ` (${qualifiers.join(", ")})` : "";
-  const languageTag = iso6392BTo1[source.lang]!;
-  const suffix = source.text ? `: ${renderLanguageSpan(source.text, languageTag)}` : "";
+  const suffix = source.text ? `: ${renderLanguageSpan(source.text, language.bcp47Tag)}` : "";
   return `<li class="lang-${source.lang}">${base}${qualifierText}${suffix}</li>`;
 }
 
@@ -303,11 +303,6 @@ function renderLanguageSpan(text: string, lang: string): string {
 
 function renderJapaneseSpan(text: string): string {
   return renderLanguageSpan(text, "ja");
-}
-
-function describeLanguage(code: string): string {
-  const formatter = new Intl.DisplayNames(["en"], { type: "language" });
-  return formatter.of(iso6392BTo1[code])!;
 }
 
 function wrapJapaneseText(text: string): string {
