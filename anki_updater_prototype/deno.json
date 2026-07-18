@@ -1,9 +1,12 @@
 {
   "tasks": {
-    "doc:check": "deno doc --lint jlpt/create_from_csv.ts jlpt/recover_resolved_from_report.ts jlpt/report_unresolved_csv.ts jlpt/report_vocab_appearances.ts leech/create_batch.ts leech/prepare_batch.ts shared/miwake_model/setup_miwake_model.ts",
+    "doc:check": "deno doc --lint animecards/apply.ts animecards/prepare.ts jlpt/create_from_csv.ts jlpt/recover_resolved_from_report.ts jlpt/report_unresolved_csv.ts jlpt/report_vocab_appearances.ts shared/miwake_model/setup_miwake_model.ts",
+    "animecards:prepare": "deno run --allow-net --allow-read --allow-write=generated animecards/prepare.ts",
+    "animecards:restore-context": "deno run --env-file=../.env --allow-net --allow-env --allow-read --allow-write=generated --allow-sys=hostname animecards/restore_context.ts",
+    "animecards:enrich": "deno run --env-file=../.env --allow-net --allow-env --allow-read --allow-write=generated --allow-sys=hostname animecards/enrich.ts",
+    "animecards:apply": "deno run --allow-net --allow-read --allow-write=generated animecards/apply.ts",
+    "animecards:report": "deno run --allow-read --allow-write=generated animecards/report.ts",
     "setup-miwake-model": "deno run --allow-net --allow-read shared/miwake_model/setup_miwake_model.ts",
-    "prepare-leech-batch": "deno run --env-file=../.env --allow-net --allow-read --allow-write=leech --allow-env --allow-sys=hostname leech/prepare_batch.ts",
-    "create-leech-batch": "deno run --env-file=../.env --allow-net --allow-read --allow-env --allow-sys=hostname leech/create_batch.ts",
     "create-from-csv": "deno run --env-file=../.env --allow-net --allow-read --allow-env --allow-sys=hostname jlpt/create_from_csv.ts",
     "report-unresolved-csv": "deno run --allow-read --allow-write jlpt/report_unresolved_csv.ts",
     "recover-resolved-from-report": "deno run --allow-read --allow-write jlpt/recover_resolved_from_report.ts",
