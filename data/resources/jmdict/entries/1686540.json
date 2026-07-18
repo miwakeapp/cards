@@ -1,0 +1,62 @@
+{
+  "id": "1686540",
+  "kanji": [
+    {
+      "common": false,
+      "text": "種付け",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "種付",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "種つけ",
+      "tags": [
+        "sK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "たねつけ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "mating"
+        }
+      ]
+    }
+  ]
+}

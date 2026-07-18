@@ -5,6 +5,7 @@ const generatedDirectory = join(packageDirectory, "generated");
 const jmdictResourcesDirectory = join(packageDirectory, "resources", "jmdict");
 
 // Tests substitute only the compact checked furigana fixture; all other data remains canonical.
+/** Canonical paths to downloaded, generated, and checked-in data resources. */
 export const resourcePaths = {
   jmdict: join(generatedDirectory, "jmdict_eng.json"),
   jmdictFurigana: join(generatedDirectory, "jmdict_furigana.json"),

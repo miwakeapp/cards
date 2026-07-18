@@ -12,6 +12,7 @@ const expectedBCCWJFieldCount = 80;
 const positiveIntegerRegex = /^[1-9]\d*$/;
 const positiveNumberRegex = /^(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?$/;
 
+/** Parses and validates one NWJC surface 1-gram row. */
 export function parseNWJCRow(line: string, lineNumber: number): {
   surface: string;
   count: number;
@@ -26,6 +27,7 @@ export function parseNWJCRow(line: string, lineNumber: number): {
   };
 }
 
+/** Validates that a BCCWJ header uses the supported LUW2 schema. */
 export function validateBCCWJHeader(line: string): void {
   const columns = line.split("\t");
   if (
@@ -36,6 +38,7 @@ export function validateBCCWJHeader(line: string): void {
   }
 }
 
+/** Parses and validates one BCCWJ LUW2 row. */
 export function parseBCCWJRow(line: string, lineNumber: number): {
   lemma: string;
   totalPMW: number;
