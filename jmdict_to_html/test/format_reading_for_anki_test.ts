@@ -61,3 +61,14 @@ Deno.test("formatReadingForAnki: handles hiragana-katakana swapped surface forms
     "エンジ 色[いろ]",
   );
 });
+
+Deno.test("formatReadingForAnki: uses an imported search-only kanji spelling", async () => {
+  assertEquals(
+    await formatReadingForAnki("1686540", "種つけ", "たねつけ"),
+    "種[たね]つけ",
+  );
+  assertEquals(
+    await formatReadingForAnki("0000000", "種つけ", "たねつけ"),
+    null,
+  );
+});

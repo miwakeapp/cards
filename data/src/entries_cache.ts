@@ -4,4 +4,5 @@
 
 import type { JMDictEntries } from "./mod.ts";
 
+/** Memoized full-dictionary load shared with the downloader. */
 export const entriesCache: { promise: Promise<JMDictEntries> | null } = { promise: null };

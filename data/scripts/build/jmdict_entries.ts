@@ -40,6 +40,7 @@ const FURIGANA_TEST_IDS = new Set([
   "1413260", // 大学生
   "1591900", // きれい
   "1374550", // すごい
+  "1686540", // 種つけ, search-only kanji spelling restored during furigana import
   "1049180", // コーヒー
   "1080510", // テレビ
   "1000100", // ＡＢＣ順

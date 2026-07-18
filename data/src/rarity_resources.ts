@@ -2,12 +2,16 @@ import { DatabaseSync } from "node:sqlite";
 import { normalizeRarityTerm } from "./rarity_normalization.ts";
 import { resourcePaths } from "./resource_paths.ts";
 
+/** Filename of the generated SQLite rarity database. */
 export const RARITY_DATABASE_FILENAME = "rarity.sqlite3";
+/** Schema version stored in the rarity database's `user_version`. */
 export const RARITY_DATABASE_VERSION = 1;
+/** Inserts or accumulates an NWJC surface count. */
 export const UPSERT_NWJC_SQL = `
   INSERT INTO nwjc_surface_1gram (term, count) VALUES (?, ?)
   ON CONFLICT (term) DO UPDATE SET count = count + excluded.count
 `;
+/** Inserts or accumulates a BCCWJ lemma frequency. */
 export const UPSERT_BCCWJ_SQL = `
   INSERT INTO bccwj_luw2_lemma (term, total_pmw) VALUES (?, ?)
   ON CONFLICT (term) DO UPDATE SET total_pmw = total_pmw + excluded.total_pmw
@@ -23,12 +27,17 @@ interface DatabaseState {
   bccwjStatement: ReturnType<DatabaseSync["prepare"]>;
 }
 
+/** Lazily opened lookups over the generated rarity database. */
 export interface RarityResourceLookup {
+  /** Looks up an NWJC surface count and its corpus token total. */
   nwjcSurface1GramHit(target: string): Promise<{ count: number; tokenTotal: number } | null>;
+  /** Looks up a BCCWJ LUW2 lemma frequency per million words. */
   bccwjLUW2LemmaHit(target: string): Promise<{ totalPMW: number } | null>;
+  /** Closes the database if it was opened. */
   close(): Promise<void>;
 }
 
+/** Initializes an empty rarity database with the current schema. */
 export function initializeRarityDatabase(database: DatabaseSync): void {
   database.exec(`
     PRAGMA user_version = ${RARITY_DATABASE_VERSION};
@@ -46,6 +55,7 @@ export function initializeRarityDatabase(database: DatabaseSync): void {
   `);
 }
 
+/** Creates lazy rarity-resource lookups for a SQLite database path. */
 export function createRarityResourceLookup(databasePath: string): RarityResourceLookup {
   let statePromise: Promise<DatabaseState> | undefined;
 

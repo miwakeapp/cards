@@ -6,9 +6,12 @@
     "./rarity": "./src/rarity.ts"
   },
   "tasks": {
-    "doc:check": "deno doc --lint src/mod.ts src/download.ts src/rarity.ts scripts/download/jmdict.ts scripts/download/furigana.ts scripts/download/nwjc.ts scripts/download/bccwj.ts scripts/build/jmdict_entries.ts scripts/build/jmdict_tags.ts scripts/build/jmdict_furigana_fixture.ts scripts/build/rarity.ts",
+    "doc:check": "deno doc --lint src scripts",
     "download:jmdict": "deno run --allow-net --allow-read=./generated --allow-write=./generated scripts/download/jmdict.ts",
-    "download:furigana": "deno run --allow-net --allow-read=./generated --allow-write=./generated scripts/download/furigana.ts",
+    "download:furigana": {
+      "command": "deno run --allow-net --allow-read=./generated --allow-write=./generated scripts/download/furigana.ts",
+      "dependencies": ["download:jmdict"]
+    },
     "download:nwjc": "deno run --allow-net=github.com,raw.githubusercontent.com --allow-write=./generated scripts/download/nwjc.ts",
     "download:bccwj": "deno run --allow-net=repository.ninjal.ac.jp --allow-write=./generated scripts/download/bccwj.ts",
     "build:jmdict:entries": "deno run --allow-read=./generated/jmdict_eng.json,../card_creator_evals/inputs,./resources/jmdict/entries --allow-write=./resources/jmdict scripts/build/jmdict_entries.ts",
@@ -23,7 +26,7 @@
     "build:rarity": "deno run --allow-read=./generated --allow-write=./generated scripts/build/rarity.ts",
     "update:jmdict": {
       "command": "deno task build:jmdict",
-      "dependencies": ["download:jmdict", "download:furigana"]
+      "dependencies": ["download:furigana"]
     },
     "update:rarity": {
       "command": "deno task build:rarity",

@@ -1,5 +1,7 @@
 import * as path from "@std/path";
+import type { JMdict } from "@scriptin/jmdict-simplified-types";
 import { resourcePaths } from "../../src/resource_paths.ts";
+import { importFurigana } from "./furigana_import.ts";
 
 const furiganaURL = "https://jisho.hlorenzi.com/furigana.txt";
 const outputFilename = resourcePaths.jmdictFurigana;
@@ -26,77 +28,17 @@ for await (const chunk of response.body!.pipeThrough(new TextDecoderStream())) {
   }
 }
 
-const lines = text.split("\n");
-console.log(`Downloaded ${charactersRead} characters, ${lines.length} lines. Processing...`);
+console.log(`Downloaded ${charactersRead} characters. Processing...`);
 
-function toAnkiFormat(wordDotted: string, readingDotted: string): string {
-  const wordParts = wordDotted.split(".");
-  const readingParts = readingDotted.split(".");
-
-  if (wordParts.length !== readingParts.length) {
-    throw new Error(
-      `Mismatched parts: ${wordDotted} (${wordParts.length}) vs ${readingDotted} (${readingParts.length})`,
-    );
-  }
-
-  let result = "";
-  for (let i = 0; i < wordParts.length; i++) {
-    const wordPart = wordParts[i];
-    const readingPart = readingParts[i];
-
-    if (wordPart !== readingPart) {
-      // Needs furigana - add space before if not at the start
-      if (result.length > 0) {
-        result += " ";
-      }
-      result += `${wordPart}[${readingPart}]`;
-    } else {
-      // Same text - append directly without brackets
-      result += wordPart;
-    }
-  }
-
-  return result;
-}
-
-// Build the lookup object
-const furiganaData: Record<string, string> = {};
-let processedCount = 0;
-let skippedCount = 0;
-
-for (const line of lines) {
-  if (!line.trim()) continue;
-
-  const parts = line.split(";");
-  if (parts.length !== 3) {
-    console.log(`Skipping line because it doesn't have 3 parts: ${line}`);
-    skippedCount++;
-    continue;
-  }
-
-  const [id, wordDotted, readingDotted] = parts;
-
-  // Remove dots to get the actual word and reading
-  const word = wordDotted.replace(/\./g, "");
-  const reading = readingDotted.replace(/\./g, "");
-
-  try {
-    const ankiFormat = toAnkiFormat(wordDotted, readingDotted);
-    const key = `${id}|${word}|${reading}`;
-    furiganaData[key] = ankiFormat;
-    processedCount++;
-  } catch (e) {
-    console.error(`Error processing line: ${line}`);
-    console.error(e);
-    skippedCount++;
-  }
-}
-
-console.log(`Processed ${processedCount} entries, skipped ${skippedCount}`);
-if (processedCount < 500_000 || skippedCount > processedCount / 100) {
-  throw new Error(
-    `Implausible furigana data: processed ${processedCount} entries and skipped ${skippedCount}`,
-  );
+const jmdict = JSON.parse(await Deno.readTextFile(resourcePaths.jmdict)) as JMdict;
+const { data: furiganaData, stats } = importFurigana(text, jmdict.words);
+console.log(
+  `Imported ${stats.sourceRows} source rows and derived ` +
+    `${stats.derivedSearchOnlyKanjiRows} search-only kanji rows; ` +
+    `${stats.unresolvedSearchOnlyKanjiRows} could not be transferred safely.`,
+);
+if (stats.sourceRows < 500_000) {
+  throw new Error(`Implausible furigana data: imported only ${stats.sourceRows} source rows`);
 }
 
 const json = JSON.stringify(furiganaData);
