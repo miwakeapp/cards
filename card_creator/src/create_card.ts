@@ -5,6 +5,7 @@
 
 import type { JMDictWord } from "data";
 import { unescape } from "@std/html/entities";
+import { toHiragana } from "japanese_text";
 import { renderEntry } from "jmdict_to_html";
 import { formatReadingForAnki } from "jmdict_to_html/format-reading-for-anki";
 import { prepareContextRuby, resolveContextReading } from "./context_reading.ts";
@@ -99,18 +100,8 @@ function containsKanji(text: string): boolean {
   return /\p{Script=Han}/v.test(text);
 }
 
-function normalizeKanaScript(text: string): string {
-  return [...text].map((char) => {
-    const codePoint = char.codePointAt(0)!;
-    if (codePoint >= 0x30A1 && codePoint <= 0x30F6) {
-      return String.fromCodePoint(codePoint - 0x60);
-    }
-    return char;
-  }).join("");
-}
-
 function differsOnlyByKanaScript(left: string, right: string): boolean {
-  return left !== right && normalizeKanaScript(left) === normalizeKanaScript(right);
+  return left !== right && toHiragana(left) === toHiragana(right);
 }
 
 function escapeHTML(text: string): string {

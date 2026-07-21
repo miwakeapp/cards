@@ -444,6 +444,124 @@ Deno.test("createCard: converts per-kanji ruby to bracket format with mark", asy
   assertEquals(card.reading, "瓦[が] 解[かい]");
 });
 
+Deno.test("createCard: converts adjacent source ruby for one word", async () => {
+  // 容疑者Xの献身 represents 微塵 using two adjacent `<ruby>` elements.
+  const jmdictEntry = await preextractedJMDictEntry("1486050");
+
+  const card = await createCard({
+    input: {
+      context:
+        "あの男は<ruby>微<rt>み</rt></ruby><ruby>塵<rt>じん</rt></ruby>も疑っちゃいなかった。",
+      jmdictId: "1486050",
+      recognitionTarget: "微塵",
+    },
+    jmdictEntry,
+    generateFields: (input) => {
+      assertEquals(input.readingFromContext, "みじん");
+      return Promise.resolve({
+        applicableSenses: [],
+        targetInContext: "微塵",
+        hint: null,
+        minimizedContext: null,
+        cleanedSource: null,
+        sourceURLIsPublic: false,
+      });
+    },
+  });
+
+  assertEquals(
+    card.fullContext,
+    "あの男は<mark>微[み] 塵[じん]</mark>も疑っちゃいなかった。",
+  );
+  assertEquals(card.reading, "微[み] 塵[じん]");
+});
+
+Deno.test("createCard: validates a partially annotated source reading", async () => {
+  // 舟を編む annotates 焚 but leaves the second kanji in 焚き火 unannotated.
+  const jmdictEntry = await preextractedJMDictEntry("1504680");
+
+  const card = await createCard({
+    input: {
+      context: "<ruby>焚<rt>た</rt></ruby>き火を囲む。",
+      jmdictId: "1504680",
+      recognitionTarget: "焚き火",
+    },
+    jmdictEntry,
+    generateFields: (input) => {
+      assertEquals(input.readingFromContext, "たきび");
+      return Promise.resolve({
+        applicableSenses: [],
+        targetInContext: "焚き火",
+        hint: null,
+        minimizedContext: null,
+        cleanedSource: null,
+        sourceURLIsPublic: false,
+      });
+    },
+  });
+
+  assertEquals(card.fullContext, "<mark>焚[た]き火</mark>を囲む。");
+  assertEquals(card.reading, "焚[た]き 火[び]");
+});
+
+Deno.test("createCard: corrects full-size kana in partial source ruby", async () => {
+  // 容疑者Xの献身 leaves 症 unannotated and spells small っ as full-sized つ.
+  const jmdictEntry = await preextractedJMDictEntry("2434300");
+
+  const card = await createCard({
+    input: {
+      context: "<ruby>潔<rt>けつ</rt></ruby><ruby>癖<rt>ぺき</rt></ruby>症ではない。",
+      jmdictId: "2434300",
+      recognitionTarget: "潔癖症",
+    },
+    jmdictEntry,
+    generateFields: (input) => {
+      assertEquals(input.readingFromContext, "けっぺきしょう");
+      return Promise.resolve({
+        applicableSenses: [],
+        targetInContext: "潔癖症",
+        hint: null,
+        minimizedContext: null,
+        cleanedSource: null,
+        sourceURLIsPublic: false,
+      });
+    },
+  });
+
+  assertEquals(card.fullContext, "<mark>潔[けっ] 癖[ぺき]症</mark>ではない。");
+  assertEquals(card.reading, "潔[けっ] 癖[ぺき] 症[しょう]");
+});
+
+Deno.test("createCard: uses hiragana ruby to identify a katakana JMDict reading", async () => {
+  // 舟を編む follows the usual publisher convention of hiragana ruby. JMDict intentionally uses
+  // katakana for this Chinese loanword's canonical kana form, as do Japanese dictionaries.
+  const jmdictEntry = await preextractedJMDictEntry("1533460");
+
+  const card = await createCard({
+    input: {
+      context: "<ruby>面<rt>めん</rt>子<rt>つ</rt></ruby>を保つ。",
+      jmdictId: "1533460",
+      recognitionTarget: "面子",
+    },
+    jmdictEntry,
+    generateFields: (input) => {
+      assertEquals(input.readingFromContext, "メンツ");
+      return Promise.resolve({
+        applicableSenses: [],
+        targetInContext: "面子",
+        hint: null,
+        minimizedContext: null,
+        cleanedSource: null,
+        sourceURLIsPublic: false,
+      });
+    },
+  });
+
+  assertEquals(card.fullContext, "<mark>面[めん] 子[つ]</mark>を保つ。");
+  // Keep the source's ruby in context, but use JMDict's canonical script for the card reading.
+  assertEquals(card.reading, "面[メン] 子[ツ]");
+});
+
 Deno.test("createCard: corrects full-size kana in context ruby", async () => {
   // 羊をめぐる冒険 annotates 中枢 as ちゆうすう in the source ebook.
   const jmdictEntry = await preextractedJMDictEntry("1424660");
@@ -587,7 +705,7 @@ Deno.test("createCard: rejects context ruby absent from JMDict", async () => {
         }),
       }),
     Error,
-    'Context ruby reading "かわらとけ" does not match a JMDict reading',
+    'Context ruby "瓦[かわら] 解[とけ]" does not match a JMDict reading',
   );
 });
 

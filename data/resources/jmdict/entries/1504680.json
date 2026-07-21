@@ -1,0 +1,100 @@
+{
+  "id": "1504680",
+  "kanji": [
+    {
+      "common": false,
+      "text": "焚き火",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "たき火",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "焚火",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "たきび",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "open-air fire (e.g. for garden refuse)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "bonfire"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "campfire"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "open fire (e.g. in a kitchen)"
+        }
+      ]
+    }
+  ]
+}
