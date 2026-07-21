@@ -47,7 +47,7 @@ const [front, back, stylesPrefix] = await Promise.all([
 
 // Card-level styling: prefix for card chrome, then append shared minimal.css from disk.
 const minimalCSSPath = new URL(
-  "../../../html_dictionary_previewer/src/styles/minimal.css",
+  "../../../html_dictionary_previewer/src/client/styles/minimal.css",
   import.meta.url,
 );
 const minimalCSS = await Deno.readTextFile(minimalCSSPath);
