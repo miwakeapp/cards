@@ -9,7 +9,7 @@ import {
 } from "./resource_manifest.ts";
 import { resourcePaths } from "./resource_paths.ts";
 
-/** Mutable upstream source used to build Miwake's furigana lookup. */
+/** Mutable upstream source used to build Miwake Cards' furigana lookup. */
 const FURIGANA_URL = "https://jisho.hlorenzi.com/furigana.txt";
 const FURIGANA_FORMAT_VERSION = 4;
 const MAX_SOURCE_BYTES = 128 * 1024 * 1024;

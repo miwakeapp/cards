@@ -5,7 +5,7 @@ This package is a saved-work scratchpad for recurring or potentially reusable An
 ## Workflows
 
 - `shared/` contains reusable AnkiConnect, Miwake note-model, and JMDict resolution code.
-- `animecards/` contains the reviewable, in-place Animecards → Miwake conversion workflow.
+- `animecards/` contains the reviewable, in-place Animecards → Miwake card conversion workflow.
 - `jlpt/` contains the JLPT CSV import workflow and its source CSV data.
 
 ## Common Tasks

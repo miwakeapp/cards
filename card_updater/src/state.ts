@@ -144,7 +144,7 @@ export class ReviewState {
   #persistDecisions(): Promise<void> {
     return writeJSONFile(DECISIONS_PATH, {
       description:
-        "Review decisions from the Miwake card updater. Entries are dropped automatically when the underlying card or dictionary entry changes.",
+        "Review decisions from the Miwake Cards updater. Entries are dropped automatically when the underlying card or dictionary entry changes.",
       decisions: Object.fromEntries(this.#decisions),
     });
   }

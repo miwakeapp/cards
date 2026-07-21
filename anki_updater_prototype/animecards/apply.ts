@@ -164,7 +164,7 @@ async function main(): Promise<void> {
   }
   if (!exactStringSet(targetModelFields, MIWAKE_FIELD_NAMES)) {
     throw new Error(
-      `Target model ${manifest.targetModel} no longer has the expected Miwake fields.`,
+      `Target model ${manifest.targetModel} no longer has the expected Miwake Card fields.`,
     );
   }
 

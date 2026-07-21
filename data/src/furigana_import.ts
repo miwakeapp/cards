@@ -74,7 +74,7 @@ function toAnkiFormat(segments: readonly Segment[]): string {
 }
 
 /**
- * Builds Miwake's exact furigana lookup from Lorenzi's Jisho output.
+ * Builds Miwake Cards' exact furigana lookup from Lorenzi's Jisho output.
  */
 export function importFurigana(source: string): Record<string, string> {
   const data: Record<string, string> = {};

@@ -1,6 +1,6 @@
 # Card Creator
 
-Creates complete Miwake card fields from a recognition target, its context, and a JMDict entry. Card construction is independent of any particular AI provider: callers supply the function that generates the inferred fields.
+Creates complete Miwake Card fields from a recognition target, its context, and a JMDict entry. Card construction is independent of any particular AI provider: callers supply the function that generates the inferred fields.
 
 ```ts
 import { createCard } from "card_creator";
@@ -15,7 +15,7 @@ const card = await createCard({
 
 `card_creator/ai` contains the supported model IDs and canonical AI field generator. It reads the corresponding provider API key from the environment when a model is used. See the repository `.env.sample` for the supported variables.
 
-`card_creator/keys` is the lightweight entrypoint for parsing and formatting Miwake keys. Consumers that only need key handling should use that subpath so they do not load card rendering or AI dependencies.
+`card_creator/keys` is the lightweight entrypoint for parsing and formatting Miwake Card keys. Consumers that only need key handling should use that subpath so they do not load card rendering or AI dependencies.
 
 Card construction uses JMDict furigana data from the `data` package. Download the full local resource with:
 

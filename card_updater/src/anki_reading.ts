@@ -1,6 +1,6 @@
 import { formatReadingForAnki } from "jmdict_to_html/format-reading-for-anki";
 
-/** Parses the strict Anki bracket syntax emitted by Miwake and verifies its surface spelling. */
+/** Parses the strict Anki bracket syntax emitted by Miwake Cards and verifies its surface spelling. */
 export function parseAnkiReading(
   field: string,
   expectedSurface: string,

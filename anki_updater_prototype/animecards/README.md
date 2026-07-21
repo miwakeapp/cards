@@ -1,4 +1,4 @@
-# Animecards → Miwake conversion
+# Animecards → Miwake card conversion
 
 This workflow converts reviewable Animecards notes in place. A note is eligible only when all of the following are true:
 
@@ -9,7 +9,7 @@ This workflow converts reviewable Animecards notes in place. A note is eligible 
 - its reading is unique, or the existing Animecards `Reading` field identifies it;
 - the exact or inflected target can be located unambiguously in the sentence;
 - its full context can be checked and, when necessary, restored against source material;
-- the resulting Miwake key does not already exist.
+- the resulting Miwake Card key does not already exist.
 
 The converter uses the shared tokenizer/deinflector to locate common conjugated forms for highlighting. Single-sense cards with short contexts use no AI. Longer contexts use the canonical `card_creator` prompt only for minimized context generation. The code retains the multi-sense enrichment path for future validation, but preparation deliberately keeps it disabled for this initial pass. Cases that cannot be validated against JMDict or the EPUB source are recorded instead of being guessed.
 

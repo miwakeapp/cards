@@ -1,4 +1,4 @@
-// Async access to Miwake's checked-in and locally generated language resources.
+// Async access to Miwake Cards' checked-in and locally generated language resources.
 
 import type { JMdict } from "@scriptin/jmdict-simplified-types";
 import { entriesCache } from "./entries_cache.ts";

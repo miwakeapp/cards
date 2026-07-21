@@ -402,7 +402,7 @@ async function main(): Promise<void> {
         converted.candidate.jmdictId !== candidate.jmdictId ||
         converted.candidate.target.fields.Key !== candidate.target.fields.Key
       ) {
-        throw new Error("Restored context changed the resolved JMDict entry or Miwake key.");
+        throw new Error("Restored context changed the resolved JMDict entry or Miwake Card key.");
       }
       converted.candidate.approved = candidate.approved;
       manifest.candidates[candidateIndexes.get(candidate.noteId)!] = converted.candidate;

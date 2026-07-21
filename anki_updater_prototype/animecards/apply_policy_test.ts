@@ -62,7 +62,7 @@ Deno.test("preflightCandidate rejects another candidate claiming the same key", 
     await preflightCandidate(await candidate(), sourceNote(), [42, 43]),
     {
       status: "rejected",
-      error: "Miwake key is already used or claimed by note(s) 43.",
+      error: "Miwake Card key is already used or claimed by note(s) 43.",
     },
   );
 });

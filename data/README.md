@@ -1,6 +1,6 @@
 # Data
 
-Data access and generation package for Miwake. Checked resources live under `resources/`; large downloads, derived databases, and test scratch data live under the ignored `generated/` directory.
+Data access and generation package for Miwake Cards. Checked resources live under `resources/`; large downloads, derived databases, and test scratch data live under the ignored `generated/` directory.
 
 ## Checked-in JMDict data
 

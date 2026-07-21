@@ -1,6 +1,6 @@
 # HTML Dictionary Previewer
 
-Displays the checked-in JMDict sample entries using the available Miwake dictionary styles. It is a local visual-development tool for `jmdict_to_html`, not a deployed application.
+Displays the checked-in JMDict sample entries using the available Miwake Cards dictionary styles. It is a local visual-development tool for `jmdict_to_html`, not a deployed application.
 
 ```sh
 deno task --cwd html_dictionary_previewer dev

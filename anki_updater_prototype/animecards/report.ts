@@ -163,7 +163,7 @@ export function buildConversionReport(manifest: ConversionManifest): string {
   }
 
   const lines = [
-    "# Animecards → Miwake conversion audit",
+    "# Animecards → Miwake card conversion audit",
     "",
     `- Manifest generated: ${manifest.generatedAt}`,
     `- Query: ${inlineCode(manifest.query)}`,
