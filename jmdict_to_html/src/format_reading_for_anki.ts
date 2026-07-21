@@ -1,18 +1,9 @@
 import { jmdictFurigana } from "data";
+import { toHiragana } from "japanese_text";
 
 let kanaNormalizedFurigana:
   | { source: Record<string, string>; values: Map<string, string | null> }
   | undefined;
-
-function normalizeKanaScript(text: string): string {
-  return [...text].map((char) => {
-    const codePoint = char.codePointAt(0)!;
-    if (codePoint >= 0x30A1 && codePoint <= 0x30F6) {
-      return String.fromCodePoint(codePoint - 0x60);
-    }
-    return char;
-  }).join("");
-}
 
 function getKanaNormalizedFurigana(
   furigana: Record<string, string>,
@@ -23,14 +14,14 @@ function getKanaNormalizedFurigana(
       const [jmdictId, word, reading] = key.split("|");
       const normalizedKey = [
         jmdictId,
-        normalizeKanaScript(word),
-        normalizeKanaScript(reading),
+        toHiragana(word),
+        toHiragana(reading),
       ].join("|");
       const existing = values.get(normalizedKey);
       if (existing === undefined) {
         values.set(normalizedKey, value);
       } else if (
-        existing !== null && normalizeKanaScript(existing) !== normalizeKanaScript(value)
+        existing !== null && toHiragana(existing) !== toHiragana(value)
       ) {
         values.set(normalizedKey, null);
       }
@@ -63,7 +54,7 @@ function applyKanaScriptFromWord(formattedReading: string, word: string): string
     }
 
     const wordChar = wordChars[wordIndex++];
-    if (wordChar && normalizeKanaScript(char) === normalizeKanaScript(wordChar)) {
+    if (wordChar && toHiragana(char) === toHiragana(wordChar)) {
       result += wordChar;
     } else {
       result += char;
@@ -106,8 +97,8 @@ export async function formatReadingForAnki(
 
   const normalizedKey = [
     jmdictId,
-    normalizeKanaScript(word),
-    normalizeKanaScript(reading),
+    toHiragana(word),
+    toHiragana(reading),
   ].join("|");
   const kanaSwapped = getKanaNormalizedFurigana(furigana).get(normalizedKey);
   if (kanaSwapped !== undefined && kanaSwapped !== null) {

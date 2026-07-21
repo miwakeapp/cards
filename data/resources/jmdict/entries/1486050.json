@@ -1,0 +1,105 @@
+{
+  "id": "1486050",
+  "kanji": [
+    {
+      "common": true,
+      "text": "微塵",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "みじん",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "びじん",
+      "tags": [
+        "ok"
+      ],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "particle"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "atom"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "little piece"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n",
+        "adj-no"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [
+        "used with neg. verb, often as 微塵も〜ない"
+      ],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "not at all"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "not the slightest"
+        }
+      ]
+    }
+  ]
+}

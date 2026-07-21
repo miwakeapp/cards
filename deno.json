@@ -1,6 +1,7 @@
 {
   "workspace": [
     "./data",
+    "./japanese_text",
     "./jmdict_to_html",
     "./html_dictionary_previewer",
     "./card_creator",

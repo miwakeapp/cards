@@ -57,6 +57,10 @@ const CARD_CREATOR_TEST_IDS = new Set([
   "1322660", // 社, source ruby is ambiguous between repeated occurrences
   "1416140", // 叩きつける, source ruby on an inflected form
   "1424660", // 中枢, source ruby uses full-size kana
+  "1486050", // 微塵, source ebook uses adjacent ruby elements
+  "1504680", // 焚き火, source ebook partially annotates the spelling
+  "1533460", // 面子, source ruby uses hiragana for a katakana reading
+  "2434300", // 潔癖症, source ebook uses full-size kana in partial ruby
   "1574430", // 餃子, source ruby uses a search-only reading
 ]);
 

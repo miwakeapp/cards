@@ -1,6 +1,10 @@
 import type { JMDictWord } from "data";
+import { toHiragana } from "japanese_text";
 
-const SMALL_TO_LARGE_KANA: Readonly<Record<string, string>> = {
+// Source ebooks occasionally use a large kana where JMDict has the corresponding small kana.
+// Keep this correction local to ruby validation: large kana can be legitimate in other contexts,
+// and we only accept the substitution from source large kana to canonical JMDict small kana.
+const LARGE_HIRAGANA_BY_SMALL_HIRAGANA: Readonly<Record<string, string>> = {
   ぁ: "あ",
   ぃ: "い",
   ぅ: "う",
@@ -13,22 +17,11 @@ const SMALL_TO_LARGE_KANA: Readonly<Record<string, string>> = {
   ゎ: "わ",
   ゕ: "か",
   ゖ: "け",
-  ァ: "ア",
-  ィ: "イ",
-  ゥ: "ウ",
-  ェ: "エ",
-  ォ: "オ",
-  ャ: "ヤ",
-  ュ: "ユ",
-  ョ: "ヨ",
-  ッ: "ツ",
-  ヮ: "ワ",
-  ヵ: "カ",
-  ヶ: "ケ",
 };
 
 interface RubyComponent {
   base: string;
+  reading: string;
   targetStart: number;
   readingStart: number;
   readingLength: number;
@@ -36,7 +29,7 @@ interface RubyComponent {
 
 interface ContextRubyReading {
   annotation: string;
-  reading: string;
+  reading: string | null;
   components: RubyComponent[];
 }
 
@@ -62,6 +55,19 @@ const rubyComponentPattern = /(?:<rb>)?([^<]+)(?:<\/rb>)?<rt>([^<]+)<\/rt>/g;
 
 function containsKanji(text: string): boolean {
   return /\p{Script=Han}/v.test(text);
+}
+
+const SMALL_HIRAGANA_BY_LARGE_HIRAGANA = new Map(
+  Object.entries(LARGE_HIRAGANA_BY_SMALL_HIRAGANA).map(([small, large]) => [large, small]),
+);
+
+function sourceReadingPattern(text: string): string {
+  return [...toHiragana(text)].map((character) => {
+    const small = SMALL_HIRAGANA_BY_LARGE_HIRAGANA.get(character);
+    return small === undefined
+      ? RegExp.escape(character)
+      : `(?:${RegExp.escape(character)}|${RegExp.escape(small)})`;
+  }).join("");
 }
 
 function applicableReadings(entry: JMDictWord, recognitionTarget: string): string[] {
@@ -91,7 +97,11 @@ function isFullSizeKanaVersion(source: string, canonical: string): boolean {
   let changed = false;
   for (let index = 0; index < sourceCharacters.length; ++index) {
     if (sourceCharacters[index] === canonicalCharacters[index]) continue;
-    if (SMALL_TO_LARGE_KANA[canonicalCharacters[index]] !== sourceCharacters[index]) return false;
+    if (
+      LARGE_HIRAGANA_BY_SMALL_HIRAGANA[canonicalCharacters[index]] !== sourceCharacters[index]
+    ) {
+      return false;
+    }
     changed = true;
   }
   return changed;
@@ -101,27 +111,33 @@ function parseContextRubyReading(
   annotation: string,
   recognitionTarget: string,
 ): ContextRubyReading | null {
-  const componentPattern = /(^| )([^ <>\[\]]+)\[([^\]]+)\]/gu;
+  // Ebook markup may represent a compound either as one `<ruby>` containing
+  // several `<rt>` elements or as adjacent `<ruby>` elements. The latter
+  // becomes `微[み]塵[じん]` before Anki spacing is normalized, so component
+  // parsing must not require an already-inserted separator.
+  const componentPattern = /([^ <>\[\]]+)\[([^\]]+)\]/gu;
   const matches = [...annotation.matchAll(componentPattern)];
   if (matches.length === 0) return null;
 
   let targetIndex = 0;
   const readingCharacters: string[] = [];
   const components: RubyComponent[] = [];
+  let complete = true;
 
   for (const match of matches) {
-    const base = match[2];
-    const reading = match[3];
+    const base = match[1];
+    const reading = match[2];
     const baseIndex = recognitionTarget.indexOf(base, targetIndex);
     if (baseIndex === -1) return null;
 
     const unannotated = recognitionTarget.slice(targetIndex, baseIndex);
-    if (containsKanji(unannotated)) return null;
+    if (containsKanji(unannotated)) complete = false;
     readingCharacters.push(...unannotated);
 
     const componentReading = [...reading];
     components.push({
       base,
+      reading,
       targetStart: baseIndex,
       readingStart: readingCharacters.length,
       readingLength: componentReading.length,
@@ -131,14 +147,69 @@ function parseContextRubyReading(
   }
 
   const unannotatedSuffix = recognitionTarget.slice(targetIndex);
-  if (containsKanji(unannotatedSuffix)) return null;
+  if (containsKanji(unannotatedSuffix)) complete = false;
   readingCharacters.push(...unannotatedSuffix);
 
   return {
     annotation,
-    reading: readingCharacters.join(""),
+    reading: complete ? readingCharacters.join("") : null,
     components,
   };
+}
+
+/**
+ * Builds the regex fragment for a recognition-target portion that has no source ruby.
+ *
+ * Kana must occur literally in the JMDict reading, while each unannotated kanji stands for one
+ * or more unknown kana. For example, the unannotated `き火` in `焚[た]き火` becomes `き[ぁ-ゖー]+`.
+ * The completed pattern is accepted only when it matches exactly one applicable JMDict reading.
+ */
+function unannotatedTargetReadingPattern(text: string): string {
+  return [...toHiragana(text)].map((character) =>
+    containsKanji(character) ? "[ぁ-ゖー]+" : RegExp.escape(character)
+  ).join("");
+}
+
+function partialRubyReadingPattern(
+  contextRuby: ContextRubyReading,
+  recognitionTarget: string,
+  captureComponents = false,
+): RegExp {
+  let targetIndex = 0;
+  let pattern = "";
+  for (const component of contextRuby.components) {
+    pattern += unannotatedTargetReadingPattern(
+      recognitionTarget.slice(targetIndex, component.targetStart),
+    );
+    const readingPattern = sourceReadingPattern(component.reading);
+    pattern += captureComponents ? `(${readingPattern})` : readingPattern;
+    targetIndex = component.targetStart + component.base.length;
+  }
+  pattern += unannotatedTargetReadingPattern(recognitionTarget.slice(targetIndex));
+  return new RegExp(`^${pattern}$`, captureComponents ? "du" : "u");
+}
+
+function canonicalComponentReadings(
+  contextRuby: ContextRubyReading,
+  recognitionTarget: string,
+  canonicalReading: string,
+): string[] {
+  const match = partialRubyReadingPattern(contextRuby, recognitionTarget, true).exec(
+    toHiragana(canonicalReading),
+  );
+  if (match?.indices === undefined) {
+    throw new Error(
+      `Canonical reading ${JSON.stringify(canonicalReading)} no longer matches context ruby ` +
+        JSON.stringify(contextRuby.annotation),
+    );
+  }
+
+  return contextRuby.components.map((_component, index) => {
+    const indices = match.indices![index + 1];
+    if (indices === undefined) throw new Error("Missing context-ruby capture group.");
+    const [start, end] = indices;
+    return canonicalReading.slice(start, end);
+  });
 }
 
 function formatRecognitionTargetFromContextRuby(
@@ -171,26 +242,53 @@ function findJMDictReading(
   const readings = applicableReadings(entry, recognitionTarget);
   if (readings.includes(sourceReading)) return sourceReading;
 
+  // Ruby is a pronunciation annotation, not necessarily an attestation of the word's canonical
+  // kana spelling. Publishers normally use hiragana ruby even when JMDict intentionally uses
+  // katakana for a loanword. Return the original JMDict form after comparing pronunciations.
+  const kanaNormalizedMatches = readings.filter((reading) =>
+    toHiragana(reading) === toHiragana(sourceReading)
+  );
+  if (kanaNormalizedMatches.length === 1) return kanaNormalizedMatches[0];
+
   const normalizedMatches = readings.filter((reading) =>
-    isFullSizeKanaVersion(sourceReading, reading)
+    isFullSizeKanaVersion(
+      toHiragana(sourceReading),
+      toHiragana(reading),
+    )
   );
   if (normalizedMatches.length === 1) return normalizedMatches[0];
 
   return null;
 }
 
-function resolveJMDictReading(
-  sourceReading: string,
+function findJMDictReadingForContextRuby(
+  contextRuby: ContextRubyReading,
+  recognitionTarget: string,
+  entry: JMDictWord,
+): string | null {
+  if (contextRuby.reading !== null) {
+    return findJMDictReading(contextRuby.reading, recognitionTarget, entry);
+  }
+
+  const pattern = partialRubyReadingPattern(contextRuby, recognitionTarget);
+  const matches = applicableReadings(entry, recognitionTarget).filter((reading) =>
+    pattern.test(toHiragana(reading))
+  );
+  return matches.length === 1 ? matches[0] : null;
+}
+
+function resolveJMDictReadingForContextRuby(
+  contextRuby: ContextRubyReading,
   recognitionTarget: string,
   entry: JMDictWord,
 ): string {
-  const reading = findJMDictReading(sourceReading, recognitionTarget, entry);
+  const reading = findJMDictReadingForContextRuby(contextRuby, recognitionTarget, entry);
   if (reading !== null) return reading;
 
   const readings = applicableReadings(entry, recognitionTarget);
   const available = readings.length === 0 ? "(none)" : readings.join(", ");
   throw new Error(
-    `Context ruby reading ${JSON.stringify(sourceReading)} does not match a JMDict reading ` +
+    `Context ruby ${JSON.stringify(contextRuby.annotation)} does not match a JMDict reading ` +
       `applicable to ${JSON.stringify(recognitionTarget)} in entry ${entry.id}: ${available}`,
   );
 }
@@ -203,6 +301,28 @@ function countOccurrences(text: string, searchValue: string): number {
     index += searchValue.length;
   }
   return count;
+}
+
+function parseMarkedContextRubyReading(
+  annotation: string,
+  recognitionTarget: string,
+  sourceAnnotations: Iterable<SourceRubyAnnotation>,
+): ContextRubyReading | null {
+  const matchingAnnotations = [
+    ...new Set(
+      [...sourceAnnotations]
+        .map(({ formatted }) => formatted)
+        .filter((formatted) => annotation.includes(formatted)),
+    ),
+  ];
+  if (matchingAnnotations.length > 0) {
+    const parsed = parseContextRubyReading(
+      matchingAnnotations.join(" "),
+      recognitionTarget,
+    );
+    if (parsed !== null) return { ...parsed, annotation };
+  }
+  return parseContextRubyReading(annotation, recognitionTarget);
 }
 
 /** Converts source ruby and recovers a reading only when its occurrence is unambiguous. */
@@ -229,7 +349,25 @@ export function prepareContextRuby(
   );
   plainContext += context.slice(sourceIndex);
 
-  const candidates: string[] = [];
+  const candidates = new Set<string>();
+  const annotatedTargetPattern = new RegExp(
+    [...recognitionTarget]
+      .map((character) => `${RegExp.escape(character)}(?:\\[[^\\]]+\\])?`)
+      .join("\\s*"),
+    "gu",
+  );
+  const annotatedTargetMatches = [...convertedContext.matchAll(annotatedTargetPattern)];
+  if (annotatedTargetMatches.length === 1) {
+    const contextRuby = parseContextRubyReading(
+      annotatedTargetMatches[0][0],
+      recognitionTarget,
+    );
+    if (contextRuby !== null) {
+      const reading = findJMDictReadingForContextRuby(contextRuby, recognitionTarget, entry);
+      if (reading !== null) candidates.add(reading);
+    }
+  }
+
   for (const { formatted, surface } of annotations) {
     // A matching ruby annotation is not necessarily the card target. Only use
     // it before target identification when that surface occurs once in the
@@ -238,35 +376,45 @@ export function prepareContextRuby(
 
     const contextRuby = parseContextRubyReading(formatted, recognitionTarget);
     if (contextRuby === null) continue;
-    const reading = findJMDictReading(contextRuby.reading, recognitionTarget, entry);
+    const reading = findJMDictReadingForContextRuby(contextRuby, recognitionTarget, entry);
     // A mismatching annotation may belong to another word. If it is later
     // marked as the target, `resolveContextReading()` reports the mismatch.
-    if (reading !== null) candidates.push(reading);
+    if (reading !== null) candidates.add(reading);
   }
 
   return {
     context: convertedContext,
     annotations,
-    reading: candidates.length === 1 ? candidates[0] : null,
+    reading: candidates.size === 1 ? candidates.values().next().value! : null,
   };
 }
 
 function rewriteContextRuby(
   contextRuby: ContextRubyReading,
+  recognitionTarget: string,
   canonicalReading: string,
 ): string {
-  if (contextRuby.reading === canonicalReading) return contextRuby.annotation;
+  if (
+    contextRuby.reading !== null &&
+    toHiragana(contextRuby.reading) === toHiragana(canonicalReading)
+  ) {
+    return contextRuby.annotation;
+  }
 
-  const canonicalCharacters = [...canonicalReading];
+  const componentReadings = canonicalComponentReadings(
+    contextRuby,
+    recognitionTarget,
+    canonicalReading,
+  );
   let componentIndex = 0;
   return contextRuby.annotation.replace(
-    /(^| )([^ <>\[\]]+)\[([^\]]+)\]/gu,
-    (_whole, separator: string, base: string) => {
-      const component = contextRuby.components[componentIndex++];
-      const reading = canonicalCharacters
-        .slice(component.readingStart, component.readingStart + component.readingLength)
-        .join("");
-      return `${separator}${base}[${reading}]`;
+    /([^ <>\[\]]+)\[([^\]]+)\]/gu,
+    (_whole, base: string, sourceReading: string) => {
+      const canonicalComponentReading = componentReadings[componentIndex++];
+      const reading = toHiragana(sourceReading) === toHiragana(canonicalComponentReading)
+        ? sourceReading
+        : canonicalComponentReading;
+      return `${base}[${reading}]`;
     },
   );
 }
@@ -304,7 +452,11 @@ export function resolveContextReading(
     (whole, annotation: string) => {
       if (!annotation.includes("[")) return whole;
 
-      const contextRuby = parseContextRubyReading(annotation, recognitionTarget);
+      const contextRuby = parseMarkedContextRubyReading(
+        annotation,
+        recognitionTarget,
+        preparedContextRuby.annotations,
+      );
       if (contextRuby === null) {
         throw new Error(
           `Could not derive a complete reading for ${JSON.stringify(recognitionTarget)} ` +
@@ -312,14 +464,20 @@ export function resolveContextReading(
         );
       }
 
-      const reading = resolveJMDictReading(contextRuby.reading, recognitionTarget, entry);
-      resolvedReadings.add(reading);
-      formattedReading ??= formatRecognitionTargetFromContextRuby(
+      const reading = resolveJMDictReadingForContextRuby(
         contextRuby,
         recognitionTarget,
-        reading,
+        entry,
       );
-      return `<mark>${rewriteContextRuby(contextRuby, reading)}</mark>`;
+      resolvedReadings.add(reading);
+      if (contextRuby.reading !== null) {
+        formattedReading ??= formatRecognitionTargetFromContextRuby(
+          contextRuby,
+          recognitionTarget,
+          reading,
+        );
+      }
+      return `<mark>${rewriteContextRuby(contextRuby, recognitionTarget, reading)}</mark>`;
     },
   );
 
