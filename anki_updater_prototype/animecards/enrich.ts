@@ -41,16 +41,12 @@ function enrichedManifestPath(manifestPath: string): string {
 
 function parseArguments(args: string[]): Options {
   const flags = parseArgs(args, {
-    string: ["output", "cache", "model", "limit", "concurrency"],
-    unknown: (argument) => {
-      if (!argument.startsWith("-")) return true;
-      throw new Error(`Unknown argument: ${argument}`);
-    },
+    string: ["_", "output", "cache", "model", "limit", "concurrency"],
   });
-  if (flags._.length !== 1) {
-    throw new Error("Exactly one conversion manifest path is required.");
+  const [manifestPath] = flags._;
+  if (manifestPath === undefined) {
+    throw new Error("A conversion manifest path is required.");
   }
-  const manifestPath = String(flags._[0]);
   const model = flags.model ?? DEFAULT_MODEL_ID;
   if (!MODEL_IDS.includes(model as ModelId)) {
     throw new Error(`Unknown model: ${model}. Available: ${MODEL_IDS.join(", ")}`);

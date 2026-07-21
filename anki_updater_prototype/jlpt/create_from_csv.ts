@@ -15,6 +15,7 @@
  *   deno task create-from-csv <file.csv> [--model=claude-opus-4-8] [--dry-run]
  */
 
+import { parseArgs } from "@std/cli/parse-args";
 import { parse as parseCSV } from "@std/csv";
 import { createCard, type MiwakeCard } from "card_creator";
 import { DEFAULT_MODEL_ID, generateCardFields, MODEL_IDS, type ModelId } from "card_creator/ai";
@@ -28,24 +29,19 @@ import {
 
 // --- CLI args ---
 
-let csvFile: string | undefined;
-let modelId: ModelId = DEFAULT_MODEL_ID;
-let dryRun = false;
+const args = parseArgs(Deno.args, {
+  boolean: ["dry-run"],
+  string: ["_", "model"],
+});
+const [csvFile] = args._;
+const modelId = (args.model ?? DEFAULT_MODEL_ID) as ModelId;
 
-for (const arg of Deno.args) {
-  if (arg === "--dry-run") {
-    dryRun = true;
-  } else if (arg.startsWith("--model=")) {
-    const m = arg.slice("--model=".length);
-    if (!MODEL_IDS.includes(m as ModelId)) {
-      console.error(`Unknown model: ${m}. Available: ${MODEL_IDS.join(", ")}`);
-      Deno.exit(1);
-    }
-    modelId = m as ModelId;
-  } else if (!arg.startsWith("--")) {
-    csvFile = arg;
-  }
+if (!MODEL_IDS.includes(modelId)) {
+  console.error(`Unknown model: ${modelId}. Available: ${MODEL_IDS.join(", ")}`);
+  Deno.exit(1);
 }
+
+const dryRun = args["dry-run"];
 
 if (!csvFile) {
   console.error("Usage: create_from_csv.ts <file.csv> [--model=...] [--dry-run]");

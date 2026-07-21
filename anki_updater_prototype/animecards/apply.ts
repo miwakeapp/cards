@@ -38,15 +38,12 @@ export interface ApplyOptions {
 export function parseApplyArguments(args: string[]): ApplyOptions {
   const flags = parseArgs(args, {
     boolean: ["write", "reset"],
-    string: ["limit", "log", "anki-connect-url"],
+    string: ["_", "limit", "log", "anki-connect-url"],
     default: { "anki-connect-url": DEFAULT_ANKI_CONNECT_URL },
-    unknown: (argument) => {
-      if (!argument.startsWith("-")) return true;
-      throw new Error(`Unknown argument: ${argument}`);
-    },
   });
-  if (flags._.length !== 1) {
-    throw new Error("Exactly one conversion manifest path is required.");
+  const [manifestPath] = flags._;
+  if (manifestPath === undefined) {
+    throw new Error("A conversion manifest path is required.");
   }
   let limit: number | undefined;
   if (flags.limit !== undefined) {
@@ -57,7 +54,7 @@ export function parseApplyArguments(args: string[]): ApplyOptions {
   }
   const date = new Date().toISOString().slice(0, 10);
   return {
-    manifestPath: String(flags._[0]),
+    manifestPath,
     write: flags.write,
     reset: flags.reset,
     limit,

@@ -335,7 +335,7 @@ function renderHeader(): void {
     else if (decision === "reject") ++counts.reject;
   }
 
-  const jmdictVersion = meta.jmdict.remote ?? meta.jmdict.local;
+  const jmdictVersion = meta.jmdict.current;
   const furiganaVersion = meta.furigana.current;
   const furiganaSummary = `furigana ${furiganaVersion.entryCount.toLocaleString()} records`;
   const brandSub = element("brandSub");

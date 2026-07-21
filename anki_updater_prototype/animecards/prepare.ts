@@ -77,13 +77,7 @@ function parseArguments(args: string[]): Options {
       "target-model": "Miwake",
       "anki-connect-url": DEFAULT_ANKI_CONNECT_URL,
     },
-    unknown: (argument) => {
-      throw new Error(`Unknown argument: ${argument}`);
-    },
   });
-  if (flags._.length > 0) {
-    throw new Error(`Unexpected arguments: ${flags._.join(" ")}`);
-  }
 
   const sourceModel = flags["source-model"];
   const date = new Date().toISOString().slice(0, 10);

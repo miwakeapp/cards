@@ -354,17 +354,13 @@ export function buildConversionReport(manifest: ConversionManifest): string {
 
 async function main(): Promise<void> {
   const flags = parseArgs(Deno.args, {
-    string: ["output"],
-    unknown: (argument) => {
-      if (!argument.startsWith("-")) return true;
-      throw new Error(`Unknown argument: ${argument}`);
-    },
+    string: ["_", "output"],
   });
-  if (flags._.length !== 1) {
+  const [manifestPath] = flags._;
+  if (manifestPath === undefined) {
     throw new Error("Usage: deno task animecards:report MANIFEST.json [--output=REPORT.md]");
   }
 
-  const manifestPath = String(flags._[0]);
   const reportPath = flags.output ?? defaultReportPath(manifestPath);
   const deferredContextsPath = defaultDeferredContextsPath(manifestPath);
   const manifest = JSON.parse(await Deno.readTextFile(manifestPath)) as ConversionManifest;

@@ -1,4 +1,4 @@
-import { assertEquals, assertThrows } from "@std/assert";
+import { assertEquals } from "@std/assert";
 import { parseApplyArguments } from "./apply.ts";
 
 Deno.test("parseApplyArguments accepts the required manifest positional argument", () => {
@@ -20,10 +20,12 @@ Deno.test("parseApplyArguments accepts an explicit scheduling reset", () => {
   assertEquals(options.write, true);
 });
 
-Deno.test("parseApplyArguments rejects unknown flags", () => {
-  assertThrows(
-    () => parseApplyArguments(["generated/conversion.json", "--surprise"]),
-    Error,
-    "Unknown argument: --surprise",
-  );
+Deno.test("parseApplyArguments ignores unrecognized arguments", () => {
+  const options = parseApplyArguments([
+    "generated/conversion.json",
+    "extra.json",
+    "--surprise",
+  ]);
+
+  assertEquals(options.manifestPath, "generated/conversion.json");
 });

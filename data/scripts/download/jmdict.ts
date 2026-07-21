@@ -5,16 +5,12 @@
 //   deno task download:jmdict
 //   deno task download:jmdict --force
 
+import { parseArgs } from "@std/cli/parse-args";
 import { ensureLatestJMDict } from "../../src/jmdict_download.ts";
 
-let force = false;
-for (const arg of Deno.args) {
-  if (arg === "--force") {
-    force = true;
-  } else {
-    console.error(`Unknown argument: ${arg}`);
-    Deno.exit(1);
-  }
-}
+const args = parseArgs(Deno.args, {
+  boolean: ["force"],
+});
 
-await ensureLatestJMDict({ force, log: (message) => console.log(message) });
+const result = await ensureLatestJMDict({ force: args.force });
+console.log(`JMDict ${result.action} (${result.current.version}, ${result.current.dictDate}).`);
