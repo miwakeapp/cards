@@ -21,11 +21,12 @@
 :root {
   --hint-color: rgb(100 100 100);
   --source-color: rgb(140 140 140);
+}
 
-  &.night-mode {
-    --hint-color: rgb(200 200 200);
-    --source-color: rgb(160 160 160);
-  }
+/* https://docs.ankiweb.net/templates/styling.html#night-mode */
+.nightMode {
+  --hint-color: rgb(200 200 200);
+  --source-color: rgb(160 160 160);
 }
 
 body {
@@ -91,6 +92,9 @@ button.expando {
   border: 1px solid currentColor;
   border-radius: 999px;
   background: none;
+
+  /* Override the user-agent button foreground so expandos follow the card text color. */
+  color: inherit;
   cursor: pointer;
   opacity: 0.5;
   width: 1.6rem;

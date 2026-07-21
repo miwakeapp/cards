@@ -6,7 +6,8 @@
   --default-font-size: 18px;
   --link-color: rgb(29 78 137);
 
-  :root.night-mode & {
+  /* https://docs.ankiweb.net/templates/styling.html#night-mode */
+  .nightMode & {
     --background-color: rgb(0 0 0);
     --text-color: rgb(255 255 255);
     --secondary-text-color: color-mix(in srgb, var(--text-color), rgb(0 0 0) 40%);
