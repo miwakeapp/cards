@@ -2,6 +2,11 @@
 
 <div id="dictionary-entry" class="miwake-dictionary-entry">
 {{Dictionary entry}}
+<button id="toggle-hidden-readings" class="expando" aria-expanded="false" aria-label="Show hidden readings">
+  <svg viewBox="0 0 16 16" aria-hidden="true">
+    <path d="M6 4l4 4-4 4" />
+  </svg>
+</button>
 </div>
 
 <div id="context" lang="ja">
@@ -24,49 +29,40 @@
 {{/Source}}
 
 <script type="module">
+// NOTE: Any JS here needs to be idempotent to handle Anki re-running it, e.g. after the card is edited.
 const key = "{{Key}}";
 const sensesForThisCard = key.split("|")[2]?.trim().split(",").map(Number);
 
 const senseEls = document.querySelectorAll(".senses > li");
-if (!sensesForThisCard) {
-  for (const senseEl of senseEls) {
-    senseEl.classList.add("relevant");
-  }
-} else {
-  for (const relevantSense of sensesForThisCard) {
-    const senseElIndex = relevantSense - 1;
-    senseEls[senseElIndex].classList.add("relevant");
-  }
+for (const [i, senseEl] of senseEls.entries()) {
+  senseEl.classList.toggle("relevant", !sensesForThisCard || sensesForThisCard.includes(i + 1));
 }
 
 const dictEntryEl = document.querySelector("#dictionary-entry");
-const hiddenReadings = dictEntryEl.querySelectorAll(".tag-sK, .tag-sk");
-if (hiddenReadings.length > 0) {
-  const toggleBtn = document.createElement("button");
-  toggleBtn.id = "toggle-hidden-readings";
-  toggleBtn.className = "expando";
-  toggleBtn.setAttribute("aria-expanded", "false");
-  toggleBtn.setAttribute("aria-label", "Show hidden readings");
-  toggleBtn.innerHTML =
-    `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4l4 4-4 4" /></svg>`;
-  dictEntryEl.append(toggleBtn);
+const toggleHiddenReadingsEl = document.querySelector("#toggle-hidden-readings");
+dictEntryEl.classList.remove("show-hidden-readings");
+toggleHiddenReadingsEl.setAttribute("aria-expanded", "false");
+toggleHiddenReadingsEl.onclick = () => {
+  const expanded = toggleHiddenReadingsEl.getAttribute("aria-expanded") === "false";
 
-  toggleBtn.addEventListener("click", () => {
-    const newExpanded = toggleBtn.getAttribute("aria-expanded") === "false";
-
-    toggleBtn.setAttribute("aria-expanded", newExpanded);
-    dictEntryEl.classList.toggle("show-hidden-readings", newExpanded);
-  });
-}
+  toggleHiddenReadingsEl.setAttribute("aria-expanded", expanded);
+  dictEntryEl.classList.toggle("show-hidden-readings", expanded);
+};
 
 const toggleContextEl = document.querySelector("#toggle-context");
 const minimizedContextEl = document.querySelector("#minimized-context");
-const fullContextEl = document.querySelector("#full-context");
-toggleContextEl?.addEventListener("click", () => {
-  const newExpanded = toggleContextEl.getAttribute("aria-expanded") === "false";
+if (toggleContextEl) {
+  const fullContextEl = document.querySelector("#full-context");
+  toggleContextEl.setAttribute("aria-expanded", "false");
+  minimizedContextEl.hidden = false;
+  fullContextEl.hidden = true;
 
-  toggleContextEl.setAttribute("aria-expanded", newExpanded);
-  minimizedContextEl.hidden = newExpanded;
-  fullContextEl.hidden = !newExpanded;
-});
+  toggleContextEl.onclick = () => {
+    const expanded = toggleContextEl.getAttribute("aria-expanded") === "false";
+
+    toggleContextEl.setAttribute("aria-expanded", expanded);
+    minimizedContextEl.hidden = expanded;
+    fullContextEl.hidden = !expanded;
+  };
+}
 </script>

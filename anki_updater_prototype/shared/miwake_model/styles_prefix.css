@@ -122,9 +122,14 @@ button.expando {
 }
 
 #toggle-hidden-readings {
+  display: none;
   order: 1;
   flex-basis: auto;
   margin-left: 0.5rem;
+
+  #dictionary-entry:has(.tag-sK, .tag-sk) > & {
+    display: inline-flex;
+  }
 }
 
 /* Override minimal.css's `display: none` on search-only forms */
