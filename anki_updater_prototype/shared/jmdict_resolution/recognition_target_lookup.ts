@@ -69,6 +69,15 @@ function unique<T>(values: Iterable<T>): T[] {
   return [...new Set(values)];
 }
 
+function tokenLookupForm(token: KuromojiToken): string {
+  return token.basic_form === "*" ? token.surface_form : token.basic_form;
+}
+
+function isInflectionContinuation(token: KuromojiToken): boolean {
+  return token.pos === "助詞" || token.pos === "助動詞" ||
+    isAuxiliaryVerbSuffix(token) || isSuruVerb(token);
+}
+
 function surfaceSuffixCandidates(surface: string): string[] {
   return [
     "である",
@@ -357,4 +366,90 @@ export async function deriveLookupSpellings(
   ];
 
   return unique(candidates).filter((candidate) => candidate !== recognitionTarget);
+}
+
+/**
+ * Finds the surface form(s) in a sentence that deinflect to a dictionary spelling.
+ *
+ * Exact occurrences are returned immediately. Otherwise, tokenizer spans are tested with the
+ * same deinflection rules as `deriveLookupSpellings()`. Multiple distinct results are retained so
+ * callers can decline ambiguous conversions instead of guessing which occurrence to highlight.
+ */
+export async function findSurfaceFormsForLookupSpelling(
+  sentence: string,
+  lookupSpelling: string,
+): Promise<string[]> {
+  const tokenizer = await kuromojiTokenizer();
+  const tokens = tokenizer.tokenize(sentence);
+  const exactMatches = findMatchingTokenSpans(tokens, lookupSpelling);
+  if (exactMatches.length > 0) {
+    return unique(
+      exactMatches.map((match) => match.tokens.map((token) => token.surface_form).join("")),
+    );
+  }
+  // Kuromoji sometimes treats a valid multi-character word plus an adjacent suffix as one token
+  // (e.g. `色とりどり` or `安全圏内`). The already-resolved JMDict entry makes a literal fallback
+  // safe for nontrivial spellings, while excluding dangerous one-character substrings such as
+  // `生` inside `生活`.
+  if ([...lookupSpelling].length >= 2 && sentence.includes(lookupSpelling)) {
+    return [lookupSpelling];
+  }
+
+  const lookupTokens = tokenizer.tokenize(lookupSpelling);
+  const sequenceMatches: string[] = [];
+  if (lookupTokens.length > 0) {
+    for (let start = 0; start + lookupTokens.length <= tokens.length; ++start) {
+      const matchesLookupTokens = lookupTokens.every((lookupToken, offset) =>
+        tokenLookupForm(tokens[start + offset]) === tokenLookupForm(lookupToken)
+      );
+      if (!matchesLookupTokens) {
+        continue;
+      }
+
+      let endExclusive = start + lookupTokens.length;
+      while (endExclusive < tokens.length && isInflectionContinuation(tokens[endExclusive])) {
+        ++endExclusive;
+      }
+      sequenceMatches.push(
+        tokens.slice(start, endExclusive).map((token) => token.surface_form).join(""),
+      );
+    }
+  }
+  if (sequenceMatches.length > 0) {
+    return unique(sequenceMatches);
+  }
+
+  const matches: string[] = [];
+
+  for (let start = 0; start < tokens.length; ++start) {
+    if (isFunctionToken(tokens[start])) {
+      continue;
+    }
+
+    let maximumEnd = start + 1;
+    while (maximumEnd < tokens.length && maximumEnd < start + 8) {
+      const token = tokens[maximumEnd];
+      if (!isInflectionContinuation(token)) {
+        break;
+      }
+      ++maximumEnd;
+    }
+
+    // Prefer the complete inflected form, then shorten only if a trailing function token changes
+    // the lookup result. This includes `て`/`た` and passive suffixes, but excludes aspectual verbs
+    // such as the `きた` in `潤ってきた`.
+    for (let endExclusive = maximumEnd; endExclusive > start; --endExclusive) {
+      const span = tokens.slice(start, endExclusive);
+      const derived = [
+        ...deriveCandidatesFromSpan(span),
+        ...deriveTrailingSuruCandidates(tokens, { tokens: span, endExclusive }),
+      ];
+      if (derived.includes(lookupSpelling)) {
+        matches.push(span.map((token) => token.surface_form).join(""));
+        break;
+      }
+    }
+  }
+
+  return unique(matches);
 }

@@ -1,7 +1,10 @@
 import { assertEquals } from "@std/assert";
 import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
 import { normalizeRecognitionTarget, resolveCSVRows } from "./csv_resolution.ts";
-import { deriveLookupSpellings } from "./recognition_target_lookup.ts";
+import {
+  deriveLookupSpellings,
+  findSurfaceFormsForLookupSpelling,
+} from "./recognition_target_lookup.ts";
 
 function jmdictWord(
   kanji: Array<{ text: string; common?: boolean }>,
@@ -46,6 +49,45 @@ Deno.test("deriveLookupSpellings resolves inflected verbs", async () => {
   );
 
   assertEquals(candidates, ["潤う"]);
+});
+
+Deno.test("findSurfaceFormsForLookupSpelling locates inflected context targets", async () => {
+  assertEquals(
+    await findSurfaceFormsForLookupSpelling(
+      "この国は、昔から貿易によって潤ってきた。",
+      "潤う",
+    ),
+    ["潤って"],
+  );
+});
+
+Deno.test("findSurfaceFormsForLookupSpelling reports distinct ambiguous forms", async () => {
+  assertEquals(
+    await findSurfaceFormsForLookupSpelling("水で潤って、さらに油で潤った。", "潤う"),
+    ["潤って", "潤った"],
+  );
+});
+
+Deno.test("findSurfaceFormsForLookupSpelling inflects the final verb in an expression", async () => {
+  assertEquals(
+    await findSurfaceFormsForLookupSpelling("悪魔は腹を抱えて笑っている。", "腹を抱える"),
+    ["腹を抱えて"],
+  );
+  assertEquals(
+    await findSurfaceFormsForLookupSpelling("白と黒が混じり合った。", "混じり合う"),
+    ["混じり合った"],
+  );
+});
+
+Deno.test("findSurfaceFormsForLookupSpelling does not match inside a larger token", async () => {
+  assertEquals(await findSurfaceFormsForLookupSpelling("生活を改善する。", "生"), []);
+});
+
+Deno.test("findSurfaceFormsForLookupSpelling accepts multi-character words inside compounds", async () => {
+  assertEquals(await findSurfaceFormsForLookupSpelling("色とりどりの切手。", "とりどり"), [
+    "とりどり",
+  ]);
+  assertEquals(await findSurfaceFormsForLookupSpelling("安全圏内だった。", "安全圏"), ["安全圏"]);
 });
 
 Deno.test("deriveLookupSpellings resolves conjunctive verb stems", async () => {
