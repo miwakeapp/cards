@@ -21,7 +21,7 @@
   --dialect-background-color: green;
 
   /* Night mode colors */
-  :root.night-mode & {
+  .nightMode & {
     --background-color: rgb(34 34 34);
     --text-color: rgb(255 255 255);
     --link-color: rgb(119 200 216);

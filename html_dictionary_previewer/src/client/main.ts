@@ -62,7 +62,9 @@ function render(entries: PreviewEntry[]): void {
 
 function renderStyles(): void {
   ensureDictionaryStylesheet(styleSelect.value);
-  document.documentElement.classList.toggle("night-mode", nightModeInput.checked);
+
+  // https://docs.ankiweb.net/templates/styling.html#night-mode
+  document.body.classList.toggle("nightMode", nightModeInput.checked);
 }
 
 function ensureDictionaryStylesheet(href: string): void {
