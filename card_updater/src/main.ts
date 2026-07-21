@@ -18,7 +18,7 @@ import { DEFAULT_MODEL_ID, MODEL_IDS, type ModelId } from "card_creator/ai";
 import { allJMDictEntries } from "data";
 import { createACInvoke, DEFAULT_ANKI_CONNECT_URL, fetchMiwakeNotes } from "./anki.ts";
 import { analyzeCard, type AnalyzedCard } from "./analyze.ts";
-import { ensureLatestJMDict } from "data/download";
+import { ensureLatestFurigana, ensureLatestJMDict } from "data/download";
 import { startServer } from "./server.ts";
 import { loadSuggestionCache, ReviewState, saveSuggestionCache } from "./state.ts";
 import { suggestForCard, type Suggestion } from "./suggest.ts";
@@ -35,13 +35,14 @@ interface Options {
   ankiConnectURL: string;
   dryRun: boolean;
   offline: boolean;
+  acceptLargeFuriganaChange: boolean;
   skipAI: boolean;
   openBrowser: boolean;
 }
 
 function parseArguments(args: string[]): Options {
   const flags = parseArgs(args, {
-    boolean: ["dry-run", "offline", "skip-ai", "open"],
+    boolean: ["dry-run", "offline", "accept-large-furigana-change", "skip-ai", "open"],
     negatable: ["open"],
     string: ["query", "model", "limit", "port", "anki-connect-url"],
     default: {
@@ -73,6 +74,7 @@ function parseArguments(args: string[]): Options {
     ankiConnectURL: validateAnkiConnectURL(flags["anki-connect-url"]),
     dryRun: flags["dry-run"],
     offline: flags.offline,
+    acceptLargeFuriganaChange: flags["accept-large-furigana-change"],
     skipAI: flags["skip-ai"],
     openBrowser: flags.open,
   };
@@ -102,7 +104,7 @@ function positiveInteger(value: unknown, flag: string): number {
 function exitWithUsage(message: string): never {
   console.error(message);
   console.error(
-    "Usage: deno task update:cards [--query=...] [--limit=N] [--model=...] [--port=N] [--anki-connect-url=URL] [--dry-run] [--offline] [--skip-ai] [--no-open]",
+    "Usage: deno task update:cards [--query=...] [--limit=N] [--model=...] [--port=N] [--anki-connect-url=URL] [--dry-run] [--offline] [--accept-large-furigana-change] [--skip-ai] [--no-open]",
   );
   Deno.exit(1);
 }
@@ -188,6 +190,17 @@ const jmdict = await ensureLatestJMDict({
   offline: options.offline,
   log: (message) => console.error(message),
 });
+console.error("Checking furigana data...");
+const furiganaUpdate = await ensureLatestFurigana({
+  offline: options.offline,
+  acceptLargeChange: options.acceptLargeFuriganaChange,
+});
+console.error(
+  `Furigana ${furiganaUpdate.action} (${furiganaUpdate.current.entryCount} records).`,
+);
+console.error("Loading local JMDict...");
+const entries = await allJMDictEntries();
+console.error(`Loaded ${entries.size} JMDict entries.`);
 
 console.error(`Querying Anki at ${options.ankiConnectURL}: ${options.query}`);
 const notes = await fetchMiwakeNotes(options.query, {
@@ -197,15 +210,14 @@ const notes = await fetchMiwakeNotes(options.query, {
 });
 console.error(`Fetched ${notes.length} Miwake notes.`);
 
-console.error("Loading local JMDict...");
-const entries = await allJMDictEntries();
-console.error(`Loaded ${entries.size} JMDict entries.`);
-
 console.error("Analyzing cards...");
-const cards = notes.map((note) => {
+const cards = await Promise.all(notes.map((note) => {
   const jmdictId = note.fields.key.split("|")[1]?.trim();
-  return analyzeCard(note, jmdictId === undefined ? undefined : entries.get(jmdictId));
-});
+  return analyzeCard(
+    note,
+    jmdictId === undefined ? undefined : entries.get(jmdictId),
+  );
+}));
 
 const counts = { unchanged: 0, normalize: 0, routine: 0, retarget: 0, exception: 0 };
 for (const card of cards) {
@@ -234,6 +246,7 @@ startServer({
     dryRun: options.dryRun,
     modelId: options.modelId,
     jmdict,
+    furigana: furiganaUpdate,
     scannedCount: cards.length,
   },
   port: options.port,

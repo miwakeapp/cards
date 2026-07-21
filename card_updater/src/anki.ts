@@ -143,12 +143,15 @@ export async function fetchMiwakeNotes(
 export interface NoteFieldUpdate {
   noteId: number;
   /** Values the fields must still have for the update to proceed. */
-  expect: { key: string; dictionaryEntry: string; hint: string };
+  expect: { key: string; reading: string; dictionaryEntry: string; hint: string };
   /** New field values; only present keys are written. */
-  set: { key?: string; dictionaryEntry?: string; hint?: string };
+  set: { key?: string; reading?: string; dictionaryEntry?: string; hint?: string };
 }
 
-export type AppliedFieldValues = Pick<MiwakeNoteFields, "key" | "dictionaryEntry" | "hint">;
+export type AppliedFieldValues = Pick<
+  MiwakeNoteFields,
+  "key" | "reading" | "dictionaryEntry" | "hint"
+>;
 
 export type ApplyResult =
   | {
@@ -187,6 +190,9 @@ export async function applyNoteUpdate(
   if (snapshot.fields.key !== update.expect.key) {
     mismatches.push("Key");
   }
+  if (snapshot.fields.reading !== update.expect.reading) {
+    mismatches.push("Reading");
+  }
   if (snapshot.fields.dictionaryEntry.trim() !== update.expect.dictionaryEntry.trim()) {
     mismatches.push("Dictionary entry");
   }
@@ -204,11 +210,13 @@ export async function applyNoteUpdate(
 
   const before = {
     key: snapshot.fields.key,
+    reading: snapshot.fields.reading,
     dictionaryEntry: snapshot.fields.dictionaryEntry,
     hint: snapshot.fields.hint,
   };
   const after = {
     key: update.set.key ?? before.key,
+    reading: update.set.reading ?? before.reading,
     dictionaryEntry: update.set.dictionaryEntry ?? before.dictionaryEntry,
     hint: update.set.hint ?? before.hint,
   };
@@ -217,7 +225,13 @@ export async function applyNoteUpdate(
   if (update.set.key !== undefined && update.set.key !== snapshot.fields.key) {
     fields[FIELD_NAMES.key] = update.set.key;
   }
-  if (update.set.dictionaryEntry !== undefined) {
+  if (update.set.reading !== undefined && update.set.reading !== snapshot.fields.reading) {
+    fields[FIELD_NAMES.reading] = update.set.reading;
+  }
+  if (
+    update.set.dictionaryEntry !== undefined &&
+    update.set.dictionaryEntry !== snapshot.fields.dictionaryEntry
+  ) {
     fields[FIELD_NAMES.dictionaryEntry] = update.set.dictionaryEntry;
   }
   if (update.set.hint !== undefined && update.set.hint !== snapshot.fields.hint) {

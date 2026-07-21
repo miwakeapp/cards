@@ -45,6 +45,10 @@ const REASON_LABELS: Record<string, { title: string; explain?: string }> = {
     title: "Same senses, new numbers",
     explain: "The targeted sense text is unchanged but moved; the key is rewritten to follow it.",
   },
+  "furigana-placement": {
+    title: "Furigana boundaries updated",
+    explain: "The pronunciation is unchanged; only which characters carry each reading changed.",
+  },
   "target-changed": { title: "Targeted sense text changed" },
   "target-gone": { title: "Targeted sense no longer exists" },
   "all-senses-reshaped": { title: "Card tests all senses; the entry changed shape" },
@@ -61,6 +65,7 @@ const ROUTINE_GROUP_ORDER: string[] = [
   "targets-intact",
   "target-metadata",
   "targets-renumbered",
+  "furigana-placement",
 ];
 
 /* ---------- helpers ---------- */
@@ -144,6 +149,17 @@ function furiganaToRuby(escapedText: string): string {
     /(?:^|[  ])([^  \[\]]+)\[([^\]]+)\]/g,
     (_match, base, reading) => `<ruby>${base}<rt>${reading}</rt></ruby>`,
   );
+}
+
+function readingTransitionHTML(item: ReviewItem): string {
+  if (item.proposedReading === null) return "";
+  return `
+    <div class="reading-transition">
+      <span class="reading-label">Reading</span>
+      <span lang="ja">${renderContextHTML(item.currentReading)}</span>
+      <span class="key-arrow">→</span>
+      <span lang="ja" class="reading-new">${renderContextHTML(item.proposedReading)}</span>
+    </div>`;
 }
 
 /** Client-side mirror of card_creator's `formatMiwakeKey`, for live key previews. */
@@ -320,14 +336,22 @@ function renderHeader(): void {
   }
 
   const jmdictVersion = meta.jmdict.remote ?? meta.jmdict.local;
+  const furiganaVersion = meta.furigana.current;
+  const furiganaSummary = `furigana ${furiganaVersion.entryCount.toLocaleString()} records`;
   const brandSub = element("brandSub");
   brandSub.textContent =
     `${ankiTargetLabel()} · ${meta.scannedCount.toLocaleString()} cards scanned · ${meta.counts.unchanged.toLocaleString()} already current · ` +
     `JMDict ${jmdictVersion?.version ?? "?"} (${jmdictVersion?.dictDate ?? "?"})` +
+    ` · ${furiganaSummary}` +
     (meta.dryRun ? " · dry run" : "") +
     (meta.limit === undefined ? "" : " · limited scan");
   brandSub.title =
-    `AnkiConnect: ${meta.ankiConnectURL}\nProfile: ${meta.ankiProfile}\nQuery: ${meta.query}`;
+    `AnkiConnect: ${meta.ankiConnectURL}\nProfile: ${meta.ankiProfile}\nQuery: ${meta.query}\n` +
+    `Furigana: ${furiganaVersion.entryCount.toLocaleString()} records, ` +
+    `format ${furiganaVersion.formatVersion} (${meta.furigana.action})` +
+    (furiganaVersion.lastModified
+      ? `\nFurigana source modified: ${furiganaVersion.lastModified}`
+      : "");
 
   const bar = element("progressBar");
   bar.innerHTML = "";
@@ -572,6 +596,7 @@ function renderFocusCard(): void {
       : keyDiffHTML(item.key, newKey)
   }</span>
       </div>
+      ${readingTransitionHTML(item)}
       <div class="evidence">
         <div class="evidence-label">Mined context</div>
         <div class="evidence-context" lang="ja">${
@@ -795,8 +820,8 @@ function renderRoutine(): void {
   const held = list.filter((item) => effectiveDecision(item) === "hold").length;
   banner.innerHTML = `
     <div class="banner">
-      <div class="banner-text"><strong>${list.length} cards staged</strong> for a dictionary-HTML refresh.
-        The chips show exactly what changed — skim and hold anything that looks off.
+      <div class="banner-text"><strong>${list.length} cards staged</strong> for a managed-field refresh.
+        The chips show the dictionary or Reading changes — skim and hold anything that looks off.
         ${held ? `<span class="chip chip-warn">${held} held</span>` : ""}</div>
       <button id="stageAllButton" ${held === 0 ? "disabled" : ""}>Stage all</button>
     </div>`;
@@ -880,6 +905,8 @@ function chipHTML(chip: ChangeChip): string {
     body = `<b>${escapeHTML(chip.label)}</b> ${segmentsSnippetHTML(chip.segments)}`;
   } else if (chip.kind === "form-added" || chip.kind === "form-removed") {
     body = `${chip.label} <span lang="ja">${escapeHTML(chip.text)}</span>`;
+  } else if (chip.kind === "reading") {
+    body = `<b>reading</b> <span lang="ja">${renderContextHTML(chip.text ?? "")}</span>`;
   } else if (chip.label) {
     body = `<b>${escapeHTML(chip.label)}</b> ${escapeHTML(truncate(chip.text ?? "", 42))}`;
   } else {
@@ -946,7 +973,7 @@ function routineRow(item: ReviewItem): HTMLDivElement {
 }
 
 function routineDetail(item: ReviewItem): string {
-  const lines = item.changeChips.map((chip) => `
+  const lines = item.changeChips.filter((chip) => chip.kind !== "reading").map((chip) => `
     <div class="detail-change-line">
       <span class="line-label">${escapeHTML(chip.label)}</span>
       <span>${chip.segments ? segmentsHTML(chip.segments) : escapeHTML(chip.text ?? "")}</span>
@@ -958,7 +985,7 @@ function routineDetail(item: ReviewItem): string {
     : "";
   return `
     <div class="row-detail">
-      <div class="detail-changes">${proposedKeyLine}${lines}</div>
+      <div class="detail-changes">${proposedKeyLine}${readingTransitionHTML(item)}${lines}</div>
       <details>
         <summary>Show full entries (targeted senses highlighted)</summary>
         <div class="entries-compare">
@@ -1070,6 +1097,7 @@ function openApplyDialog(): void {
     exception: 0,
   };
   for (const item of targets) ++counts[item.verdict];
+  const readingUpdates = targets.filter((item) => item.proposedReading !== null).length;
 
   summary.innerHTML = `
     This writes to <strong>${escapeHTML(ankiTargetLabel())}</strong> via
@@ -1082,9 +1110,22 @@ function openApplyDialog(): void {
       ? `<li><strong>${counts.retarget}</strong> re-targeted (key/hint/entry)</li>`
       : ""
   }
-      ${counts.routine ? `<li><strong>${counts.routine}</strong> routine entry refreshes</li>` : ""}
+      ${
+    counts.routine
+      ? `<li><strong>${counts.routine}</strong> routine managed-field refreshes</li>`
+      : ""
+  }
       ${
     counts.normalize ? `<li><strong>${counts.normalize}</strong> encoding normalizations</li>` : ""
+  }
+      ${
+    readingUpdates
+      ? `<li><strong>${readingUpdates}</strong> ${
+        readingUpdates === 1
+          ? "includes a reviewed Reading boundary update"
+          : "include reviewed Reading boundary updates"
+      }</li>`
+      : ""
   }
     </ul>
     Each note is re-checked against its analysis snapshot right before writing; anything that

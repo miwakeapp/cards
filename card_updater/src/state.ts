@@ -41,9 +41,11 @@ export interface AppliedRecord {
 export function cardFingerprint(card: AnalyzedCard): Promise<string> {
   return sha256OfJSON([
     card.note.fields.key,
+    card.note.fields.reading,
     card.note.fields.hint,
     card.note.fields.dictionaryEntry,
     card.latestEntryHTML,
+    card.proposedReading,
     card.note.fields.fullContext,
   ]);
 }

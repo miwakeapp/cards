@@ -445,6 +445,41 @@ section[id] {
   }
 }
 
+.reading-transition {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 20px 12px;
+  color: var(--muted);
+  font-size: 13px;
+
+  & .reading-label {
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  & .key-arrow {
+    color: var(--faint);
+  }
+
+  & .reading-new {
+    color: var(--ink);
+  }
+
+  & ruby {
+    font-family: var(--serif-ja);
+    font-size: 15px;
+  }
+
+  & rt {
+    font-size: 9px;
+  }
+}
+
+.detail-changes .reading-transition {
+  padding: 2px 0;
+}
+
 .evidence {
   margin: 0 20px;
   background: var(--paper);

@@ -6,7 +6,10 @@
   },
   "test": {
     "permissions": {
-      "read": ["../data/resources/jmdict/tags.json"]
+      "read": [
+        "../data/resources/jmdict/tags.json",
+        "../data/test/fixtures/jmdict_furigana.json"
+      ]
     }
   },
   "compilerOptions": {
