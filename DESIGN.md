@@ -329,15 +329,15 @@ Creating a card requires choosing several related but independent things: the re
 
 The cases below cover each point at which the simple one-spelling, one-entry, one-sense, one-reading path can branch. Before using AI, the program should apply JMDict's spelling and reading restrictions to eliminate structurally impossible combinations. AI should resolve the remaining contextual ambiguity. When the available data is still insufficient, the program should make its best supported choice and flag the card as suboptimal instead of adding an interactive clarification step to the mining flow.
 
-| Ambiguity                               | How the card represents the choice                                               |
-| --------------------------------------- | -------------------------------------------------------------------------------- |
-| Several senses in one entry             | Sense numbers in the **Key**, plus a **Hint** when disambiguation is useful      |
-| Several entries with distinct meanings  | JMDict ID in the **Key**, plus a required **Hint**                               |
-| Equivalent senses split across entries  | One semantic anchor, with equivalent references supplying accepted readings     |
-| Several spellings for one entry         | Recognition target at the start of the **Key**                                   |
-| Several readings for one spelling       | Dominant reading, or multiple forms in **Reading**                               |
-| Several possible word boundaries        | Prefer the longest JMDict expression supported by the context                    |
-| Insufficient dictionary data or context | Best supported choice, plus a persistent suboptimal-card flag                    |
+| Ambiguity                               | How the card represents the choice                                          |
+| --------------------------------------- | --------------------------------------------------------------------------- |
+| Several senses in one entry             | Sense numbers in the **Key**, plus a **Hint** when disambiguation is useful |
+| Several entries with distinct meanings  | JMDict ID in the **Key**, plus a required **Hint**                          |
+| Equivalent senses split across entries  | One semantic anchor, with equivalent references supplying accepted readings |
+| Several spellings for one entry         | Recognition target at the start of the **Key**                              |
+| Several readings for one spelling       | Dominant reading, or multiple forms in **Reading**                          |
+| Several possible word boundaries        | Prefer the longest JMDict expression supported by the context               |
+| Insufficient dictionary data or context | Best supported choice, plus a persistent suboptimal-card flag               |
 
 ### Selecting senses within one entry
 
