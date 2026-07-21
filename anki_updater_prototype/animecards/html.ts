@@ -25,7 +25,7 @@ export function normalizePlainText(html: string): string {
 
 /**
  * Removes Animecards presentation markup while retaining ruby annotations and meaningful line
- * breaks for Miwake's context processor.
+ * breaks for Miwake Cards' context processor.
  */
 export function normalizeContextHTML(html: string): string {
   return html

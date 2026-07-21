@@ -1,6 +1,6 @@
 # Rarity Score
 
-Scores the rarity of a Miwake recognition target on a fixed scale from `0` (most common) to `100` (rarest). Scores are primarily intended for sorting recognition targets from common to rare. This is a corpus-frequency heuristic, not a percentile, probability, or linear measure of difficulty.
+Scores the rarity of a Miwake Card recognition target on a fixed scale from `0` (most common) to `100` (rarest). Scores are primarily intended for sorting recognition targets from common to rare. This is a corpus-frequency heuristic, not a percentile, probability, or linear measure of difficulty.
 
 ```ts
 import { scoreRecognitionTarget } from "rarity_score";

@@ -192,7 +192,7 @@ async function main(): Promise<void> {
   );
   if (missingTargetFields.length > 0 || unexpectedTargetFields.length > 0) {
     throw new Error(
-      `Target model ${options.targetModel} fields do not match Miwake. Missing: ${
+      `Target model ${options.targetModel} fields do not match the Miwake Card format. Missing: ${
         missingTargetFields.join(", ") || "none"
       }; unexpected: ${unexpectedTargetFields.join(", ") || "none"}`,
     );

@@ -1,5 +1,5 @@
 /**
- * Parsing and formatting of Miwake card keys.
+ * Parsing and formatting of Miwake Card keys.
  *
  * Key format: `spelling | jmdictId` (all senses apply) or `spelling | jmdictId | 2,3`
  * (only the listed 1-indexed senses apply).
@@ -14,7 +14,7 @@ export interface MiwakeKey {
   senseNumbers: number[] | null;
 }
 
-/** Parses a Miwake key, returning `null` when its syntax or sense list is invalid. */
+/** Parses a Miwake Card key, returning `null` when its syntax or sense list is invalid. */
 export function parseMiwakeKey(text: string): MiwakeKey | null {
   const parts = text.split("|").map((part) => part.trim());
   if (parts.length !== 2 && parts.length !== 3) {

@@ -20,7 +20,7 @@ Some workflows call AI providers. Copy `.env.sample` to `.env` and add only the 
 
 | Package                                                     | Purpose                                                                                    |
 | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| [`card_creator`](./card_creator/)                           | Constructs Miwake card fields and provides the canonical AI field generator.               |
+| [`card_creator`](./card_creator/)                           | Constructs Miwake Card fields and provides the canonical AI field generator.               |
 | [`card_creator_evals`](./card_creator_evals/)               | Runs and reviews AI card-creation evals.                                                   |
 | [`card_updater`](./card_updater/)                           | Reviews and applies changes caused by new JMDict revisions.                                |
 | [`data`](./data/)                                           | Owns JMDict and rarity resource access, provenance, downloads, and checked-in samples.     |

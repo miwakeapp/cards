@@ -1,4 +1,4 @@
-/** Client for the Miwake card-updater review app. All data comes from the local server. */
+/** Client for the Miwake Cards updater review app. All data comes from the local server. */
 
 import type { ChangeChip, SenseView, Verdict } from "../analyze.ts";
 import type { DiffSegment } from "../entry_text.ts";
@@ -53,7 +53,7 @@ const REASON_LABELS: Record<string, { title: string; explain?: string }> = {
   "target-gone": { title: "Targeted sense no longer exists" },
   "all-senses-reshaped": { title: "Card tests all senses; the entry changed shape" },
   "entry-deleted": { title: "JMDict entry no longer exists" },
-  "invalid-key": { title: "Key is not a valid Miwake key" },
+  "invalid-key": { title: "Key is not a valid Miwake Card key" },
   "spelling-removed": { title: "Spelling removed from the entry" },
   "stored-entry-missing": { title: "Card has no stored dictionary entry" },
   "stored-entry-unparseable": { title: "Stored dictionary entry is unparseable" },

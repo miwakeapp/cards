@@ -15,7 +15,7 @@ export interface FuriganaResourceRecord {
   lastModified?: string;
   /** Number of lookup records installed. */
   entryCount: number;
-  /** Version of Miwake's source-to-JSON conversion contract. */
+  /** Version of Miwake Cards' source-to-JSON conversion contract. */
   formatVersion: number;
 }
 

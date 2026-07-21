@@ -1,5 +1,5 @@
 /**
- * card_creator module - Creates Miwake flashcards from context and JMDict entries.
+ * card_creator module - Creates Miwake cards from context and JMDict entries.
  */
 
 // Core card creation

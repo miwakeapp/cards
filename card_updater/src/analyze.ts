@@ -101,7 +101,7 @@ export async function analyzeCard(
   if (parsedKey === null) {
     return exceptional(note, null, {
       reason: "invalid-key",
-      detail: "The Key field does not match the Miwake key format.",
+      detail: "The Key field does not match the Miwake Card key format.",
     });
   }
 
@@ -130,7 +130,8 @@ export async function analyzeCard(
   if (oldParsed.senses.length === 0) {
     return exceptional(note, parsedKey, {
       reason: "stored-entry-unparseable",
-      detail: "The stored Dictionary entry does not look like Miwake-rendered JMDict HTML.",
+      detail:
+        "The stored Dictionary entry does not look like JMDict HTML rendered by Miwake Cards.",
       latestWord,
       latestEntryHTML,
     });

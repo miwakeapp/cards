@@ -68,7 +68,7 @@ export async function preflightCandidate(
   if (conflictingIds.length > 0) {
     return {
       status: "rejected",
-      error: `Miwake key is already used or claimed by note(s) ${conflictingIds.join(", ")}.`,
+      error: `Miwake Card key is already used or claimed by note(s) ${conflictingIds.join(", ")}.`,
     };
   }
   return { status: "ready" };

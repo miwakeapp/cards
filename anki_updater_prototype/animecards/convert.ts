@@ -260,7 +260,7 @@ async function formatNotationMarkerReading(
   return fallback;
 }
 
-/** Builds the deterministic portion of a Miwake conversion for one single-card Animecards note. */
+/** Builds the deterministic portion of a Miwake card conversion for one single-card Animecards note. */
 export async function convertAnimecardsNote(
   note: AnkiNoteInfo,
   options: {

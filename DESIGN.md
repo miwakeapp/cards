@@ -302,24 +302,24 @@ While doing the semi-manual workflow, I noticed that precisely placing furigana 
 
 The next step is to improve the automation of the above process, in a way that generates code which will be useful in the long term.
 
-The key insight here is in the final Miwake product, the card-generation process's input will be:
+The key insight here is in the final Miwake Cards product, the card-generation process's input will be:
 
 - Context
   - This will generally be larger than a sentence (e.g., a page of text?) in the final product, since the final product needs to intelligently determine the appropriate amount of context and minimal context.
   - The format will be HTML.
   - It will include furigana (as `<ruby>`), sometimes even over the recognition target.
 - The recognition target
-  - This will be identified as a JMDict entry that the user picks out from the Miwake popover interface.
+  - This will be identified as a JMDict entry that the user picks out from the Miwake Cards popover interface.
 - Source and source URL
 
-My existing Animecards contain at least the context and recognition target, and so if we build a tool that takes these inputs as part of the eventual full Miwake pipeline, it can be repurposed to automate the leech regeneration process.
+My existing Animecards contain at least the context and recognition target, and so if we build a tool that takes these inputs as part of the eventual full Miwake Cards pipeline, it can be repurposed to automate the leech regeneration process.
 
 There's a small wrinkle here where my OCD would be best satisfied by some tweaks:
 
 - The existing Animecards contain, in many cases, truncated context, as I was trying to reproduce the minimized context experience within that workflow. It'd be ideal to search out the original full context.
 - Relatedly, the existing Animecards do not contain source information.
 
-Subsequent revisions of this semi-automated card generation tool could work to trawl through epub files and fix these deficiencies. The full-context extraction might even provide good testing for the eventual Miwake experience of identifying the correct full context. (E.g. in cases where it's more than a single sentence.) However, that code would largely be throwaway, since it would not contribute to the final Miwake product.
+Subsequent revisions of this semi-automated card generation tool could work to trawl through epub files and fix these deficiencies. The full-context extraction might even provide good testing for the eventual Miwake Cards experience of identifying the correct full context. (E.g. in cases where it's more than a single sentence.) However, that code would largely be throwaway, since it would not contribute to the final Miwake Cards product.
 
 TODO: continue roadmap.
 
