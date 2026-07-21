@@ -118,6 +118,8 @@ async function downloadRelease(release: LatestRelease): Promise<void> {
 export interface EnsureLatestResult {
   /** The action taken after comparing local and remote data. */
   action: "downloaded" | "already-current" | "offline" | "check-failed";
+  /** The installed version used after this operation. */
+  current: JMDictVersion;
   /** The local version before downloading, or the version used when no download occurred. */
   local: JMDictVersion | null;
   /** The latest remote version when a release check succeeded. */
@@ -132,10 +134,9 @@ export interface EnsureLatestResult {
  * `force`, the latest release is downloaded even when the local copy already matches it.
  */
 export async function ensureLatestJMDict(
-  { offline = false, force = false, log = () => {} }: {
+  { offline = false, force = false }: {
     offline?: boolean;
     force?: boolean;
-    log?: (message: string) => void;
   } = {},
 ): Promise<EnsureLatestResult> {
   const local = await localJMDictVersion();
@@ -143,8 +144,7 @@ export async function ensureLatestJMDict(
     if (local === null) {
       throw new Error(`No local JMDict at ${jmdictPath}, and offline mode was requested.`);
     }
-    log(`Using local JMDict ${local.version} (${local.dictDate}) without checking for updates.`);
-    return { action: "offline", local };
+    return { action: "offline", current: local, local };
   }
 
   let release: LatestRelease;
@@ -155,28 +155,16 @@ export async function ensureLatestJMDict(
     if (local === null) {
       throw new Error(`No local JMDict and the release check failed: ${message}`);
     }
-    log(
-      `JMDict release check failed (${message}); using local ${local.version} (${local.dictDate}).`,
-    );
-    return { action: "check-failed", local, error: message };
+    return { action: "check-failed", current: local, local, error: message };
   }
 
   const remote = release.version;
   const alreadyCurrent = local !== null && local.version === remote.version &&
     local.dictDate === remote.dictDate;
   if (alreadyCurrent && !force) {
-    log(`Local JMDict ${local.version} (${local.dictDate}) is already the latest release.`);
-    return { action: "already-current", local, remote };
+    return { action: "already-current", current: local, local, remote };
   }
 
-  log(
-    local === null
-      ? `Downloading JMDict ${remote.version} (${remote.dictDate})...`
-      : alreadyCurrent
-      ? `Re-downloading JMDict ${remote.version} (${remote.dictDate})...`
-      : `Updating JMDict ${local.version} (${local.dictDate}) → ${remote.version} (${remote.dictDate})...`,
-  );
   await downloadRelease(release);
-  log("JMDict download complete.");
-  return { action: "downloaded", local, remote };
+  return { action: "downloaded", current: remote, local, remote };
 }

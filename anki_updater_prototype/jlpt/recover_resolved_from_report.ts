@@ -5,6 +5,7 @@
  *   deno task recover-resolved-from-report <input-report.csv> <recovered.csv> <remaining-report.csv>
  */
 
+import { parseArgs } from "@std/cli/parse-args";
 import { parse as parseCSV } from "@std/csv";
 import { allJMDictEntries } from "data";
 import {
@@ -13,7 +14,8 @@ import {
   resolveCSVRows,
 } from "../shared/jmdict_resolution/csv_resolution.ts";
 
-const [inputReportPath, recoveredPath, remainingReportPath] = Deno.args;
+const args = parseArgs(Deno.args, { string: ["_"] });
+const [inputReportPath, recoveredPath, remainingReportPath] = args._;
 
 if (!inputReportPath || !recoveredPath || !remainingReportPath) {
   console.error(

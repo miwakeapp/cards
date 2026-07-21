@@ -7,31 +7,27 @@
  *   deno task report-vocab-appearances <file-or-directory> <output.csv> [--min=1]
  */
 
+import { parseArgs } from "@std/cli/parse-args";
 import { parse as parseCSV } from "@std/csv";
 import * as path from "@std/path";
 import { allJMDictEntries } from "data";
 import { type CSVRow, resolveCSVRows } from "../shared/jmdict_resolution/csv_resolution.ts";
 
-let inputPath: string | undefined;
-let outputPath: string | undefined;
-let minAppearances = 1;
+const {
+  _: [inputPath, outputPath],
+  min: minAppearances,
+} = parseArgs(Deno.args, {
+  string: ["_"],
+  default: { min: 1 },
+});
 
-for (const arg of Deno.args) {
-  if (arg.startsWith("--min=")) {
-    const parsed = Number.parseInt(arg.slice("--min=".length), 10);
-    if (!Number.isSafeInteger(parsed) || parsed < 1) {
-      console.error(`Invalid --min value: ${arg}`);
-      Deno.exit(1);
-    }
-    minAppearances = parsed;
-  } else if (!inputPath) {
-    inputPath = arg;
-  } else if (!outputPath) {
-    outputPath = arg;
-  } else {
-    console.error(`Unexpected argument: ${arg}`);
-    Deno.exit(1);
-  }
+if (
+  typeof minAppearances !== "number" ||
+  !Number.isSafeInteger(minAppearances) ||
+  minAppearances < 1
+) {
+  console.error(`Invalid --min value: ${minAppearances}`);
+  Deno.exit(1);
 }
 
 if (!inputPath || !outputPath) {

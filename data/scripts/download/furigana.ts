@@ -5,23 +5,15 @@
 //   deno task download:furigana --force
 //   deno task download:furigana --accept-large-change
 
+import { parseArgs } from "@std/cli/parse-args";
 import { ensureLatestFurigana } from "../../src/furigana_download.ts";
 
-let force = false;
-let acceptLargeChange = false;
-for (const arg of Deno.args) {
-  if (arg === "--force") {
-    force = true;
-  } else if (arg === "--accept-large-change") {
-    acceptLargeChange = true;
-  } else {
-    console.error(`Unknown argument: ${arg}`);
-    Deno.exit(1);
-  }
-}
+const args = parseArgs(Deno.args, {
+  boolean: ["force", "accept-large-change"],
+});
 
 const result = await ensureLatestFurigana({
-  force,
-  acceptLargeChange,
+  force: args.force,
+  acceptLargeChange: args["accept-large-change"],
 });
 console.log(`Furigana ${result.action} (${result.current.entryCount} records).`);

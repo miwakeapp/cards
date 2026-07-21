@@ -52,15 +52,7 @@ function parseArguments(args: string[]): Options {
       "anki-connect-url": DEFAULT_ANKI_CONNECT_URL,
       open: true,
     },
-    unknown: (arg) => exitWithUsage(`Unknown argument: ${arg}`),
   });
-
-  // Arguments after a literal `--` bypass the `unknown` callback; reject them rather than
-  // silently ignoring flags. (`deno task` needs no `--` — everything after the task name is
-  // passed through as-is.)
-  if (flags._.length > 0) {
-    exitWithUsage(`Unexpected arguments: ${flags._.join(" ")} — pass flags directly, without --`);
-  }
 
   if (!(MODEL_IDS as readonly string[]).includes(flags.model)) {
     exitWithUsage(`--model must be one of: ${MODEL_IDS.join(", ")}`);
@@ -186,10 +178,9 @@ const invoke = createACInvoke(options.ankiConnectURL);
 const ankiProfile = await invoke<string>("getActiveProfile");
 console.error(`Connected to Anki profile "${ankiProfile}" at ${options.ankiConnectURL}.`);
 
-const jmdict = await ensureLatestJMDict({
-  offline: options.offline,
-  log: (message) => console.error(message),
-});
+console.error("Checking JMDict data...");
+const jmdict = await ensureLatestJMDict({ offline: options.offline });
+console.error(`JMDict ${jmdict.action} (${jmdict.current.version}, ${jmdict.current.dictDate}).`);
 console.error("Checking furigana data...");
 const furiganaUpdate = await ensureLatestFurigana({
   offline: options.offline,

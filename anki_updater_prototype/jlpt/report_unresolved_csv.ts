@@ -5,6 +5,7 @@
  *   deno task report-unresolved-csv <file-or-directory> <output.csv>
  */
 
+import { parseArgs } from "@std/cli/parse-args";
 import { parse as parseCSV } from "@std/csv";
 import * as path from "@std/path";
 import { allJMDictEntries } from "data";
@@ -14,7 +15,8 @@ import {
   resolveCSVRows,
 } from "../shared/jmdict_resolution/csv_resolution.ts";
 
-const [inputPath, outputPath] = Deno.args;
+const args = parseArgs(Deno.args, { string: ["_"] });
+const [inputPath, outputPath] = args._;
 
 if (!inputPath || !outputPath) {
   console.error("Usage: report_unresolved_csv.ts <file-or-directory> <output.csv>");
