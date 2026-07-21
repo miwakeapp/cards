@@ -1,4 +1,4 @@
-import type { EnsureLatestResult } from "data/download";
+import type { EnsureLatestFuriganaResult, EnsureLatestResult } from "data/download";
 import type { ModelId } from "card_creator/ai";
 import type { ChangeChip, SenseView, Verdict } from "./analyze.ts";
 import type { AppliedRecord, DecisionRecord } from "./state.ts";
@@ -13,6 +13,7 @@ export interface ReviewMeta {
   dryRun: boolean;
   modelId: ModelId;
   jmdict: EnsureLatestResult;
+  furigana: EnsureLatestFuriganaResult;
   scannedCount: number;
   counts: Record<Verdict, number>;
 }
@@ -39,6 +40,8 @@ export interface ReviewItem {
   mappedTargetSenses: number[];
   removedSenses: Array<{ number: number; text: string; wasTargeted: boolean }>;
   proposedKey: string | null;
+  currentReading: string;
+  proposedReading: string | null;
   needsAI: boolean;
   senseViews: SenseView[];
   changeChips: ChangeChip[];

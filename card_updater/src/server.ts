@@ -65,6 +65,8 @@ export function startServer(options: ServerOptions): Deno.HttpServer {
         wasTargeted: card.targetSenseNumbers.includes(sense.number),
       })) ?? [],
       proposedKey: card.proposedKey,
+      currentReading: card.note.fields.reading,
+      proposedReading: card.proposedReading,
       needsAI: card.needsAI,
       senseViews: card.senseViews,
       changeChips: card.changeChips,
@@ -185,6 +187,7 @@ export function startServer(options: ServerOptions): Deno.HttpServer {
       noteId,
       expect: {
         key: card.note.fields.key,
+        reading: card.note.fields.reading,
         dictionaryEntry: card.note.fields.dictionaryEntry,
         hint: card.note.fields.hint,
       },
@@ -210,7 +213,9 @@ export function startServer(options: ServerOptions): Deno.HttpServer {
   function resolveApply(
     card: AnalyzedCard,
     record: DecisionRecord | null,
-  ): { set: { key?: string; dictionaryEntry?: string; hint?: string } } | { error: string } {
+  ):
+    | { set: { key?: string; reading?: string; dictionaryEntry?: string; hint?: string } }
+    | { error: string } {
     const effective = record?.decision ?? impliedDecision(card);
     if (effective !== "accept") {
       return { error: `Not accepted (${effective === "none" ? "undecided" : effective}).` };
@@ -228,6 +233,7 @@ export function startServer(options: ServerOptions): Deno.HttpServer {
           dictionaryEntry: card.latestEntryHTML,
           key: suggestedKey(card, record.senses),
           hint: record.hint ?? "",
+          ...(card.proposedReading === null ? {} : { reading: card.proposedReading }),
         },
       };
     }
@@ -237,6 +243,7 @@ export function startServer(options: ServerOptions): Deno.HttpServer {
         set: {
           dictionaryEntry: card.latestEntryHTML,
           ...(card.proposedKey === null ? {} : { key: card.proposedKey }),
+          ...(card.proposedReading === null ? {} : { reading: card.proposedReading }),
         },
       };
     }

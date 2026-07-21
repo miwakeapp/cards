@@ -6,6 +6,7 @@
 import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
 import { renderEntry } from "jmdict_to_html";
 import type { MiwakeNoteSnapshot } from "./anki.ts";
+import { recomputeAnkiReading } from "./anki_reading.ts";
 import {
   alignSenses,
   canonicalEntryHTML,
@@ -38,6 +39,7 @@ export type ChangeChipKind =
   | "sense-moved"
   | "sense-added"
   | "sense-removed"
+  | "reading"
   | "formatting";
 
 export interface ChangeChip {
@@ -82,6 +84,8 @@ export interface AnalyzedCard {
   mappedTargetSenses: number[];
   /** Key rewrite that preserves targeting (renumber case), or `null`. */
   proposedKey: string | null;
+  /** Furigana-boundary rewrite that preserves the stored pronunciation, or `null`. */
+  proposedReading: string | null;
   /** Sense list for the review UI (new senses annotated, removed ones appended). */
   senseViews: SenseView[];
   removedTargetedSenses: number[];
@@ -89,10 +93,10 @@ export interface AnalyzedCard {
   needsAI: boolean;
 }
 
-export function analyzeCard(
+export async function analyzeCard(
   note: MiwakeNoteSnapshot,
   latestWord: JMdictWord | undefined,
-): AnalyzedCard {
+): Promise<AnalyzedCard> {
   const parsedKey = parseMiwakeKey(note.fields.key);
   if (parsedKey === null) {
     return exceptional(note, null, {
@@ -148,6 +152,14 @@ export function analyzeCard(
     latestWord.kana.some((form) => form.text === parsedKey.recognitionTarget);
 
   const alignment = alignSenses(oldParsed.senses, newParsed.senses);
+  const proposedReading = await analyzeReading(note, parsedKey);
+  const changeChips = buildChangeChips(oldParsed, newParsed, alignment);
+  if (changeChips.length === 0 && storedEntryHTML !== latestEntryHTML.trim()) {
+    changeChips.push({ kind: "formatting", label: "", text: "formatting-only difference" });
+  }
+  if (proposedReading !== null) {
+    changeChips.push({ kind: "reading", label: "reading", text: proposedReading });
+  }
   const base = {
     note,
     parsedKey,
@@ -159,15 +171,24 @@ export function analyzeCard(
     targetSenseNumbers,
     mappedTargetSenses: mappedTargets(alignment, targetSenseNumbers),
     proposedKey: null as string | null,
+    proposedReading,
     senseViews: buildSenseViews(alignment, newParsed, targetSenseNumbers),
     removedTargetedSenses: alignment.removedSenses
       .filter((sense) => targetSenseNumbers.includes(sense.number))
       .map((sense) => sense.number),
-    changeChips: buildChangeChips(oldParsed, newParsed, alignment),
+    changeChips,
     needsAI: false,
   };
 
   if (storedEntryHTML === latestEntryHTML.trim()) {
+    if (proposedReading !== null) {
+      return {
+        ...base,
+        verdict: "routine",
+        reason: "furigana-placement",
+        detail: "The pronunciation is unchanged; only its furigana boundaries were updated.",
+      };
+    }
     return {
       ...base,
       verdict: "unchanged",
@@ -177,6 +198,15 @@ export function analyzeCard(
   }
 
   if (canonicalEntryHTML(storedEntryHTML) === canonicalEntryHTML(latestEntryHTML)) {
+    if (proposedReading !== null) {
+      return {
+        ...base,
+        verdict: "routine",
+        reason: "furigana-placement",
+        detail:
+          "The pronunciation is unchanged; furigana boundaries moved and the dictionary HTML needs only normalization.",
+      };
+    }
     return {
       ...base,
       verdict: "normalize",
@@ -308,11 +338,31 @@ function exceptional(
     targetSenseNumbers: [],
     mappedTargetSenses: [],
     proposedKey: null,
+    proposedReading: null,
     senseViews: [],
     removedTargetedSenses: [],
     changeChips: [],
     needsAI: false,
   };
+}
+
+async function analyzeReading(
+  note: MiwakeNoteSnapshot,
+  parsedKey: MiwakeKey,
+): Promise<string | null> {
+  const recognitionTarget = note.fields.recognitionTarget || parsedKey.recognitionTarget;
+  if (
+    note.fields.reading === "" || !/\p{Script=Han}/v.test(recognitionTarget)
+  ) {
+    return null;
+  }
+
+  const result = await recomputeAnkiReading(
+    note.fields.reading,
+    recognitionTarget,
+    parsedKey.jmdictId,
+  );
+  return result === note.fields.reading ? null : result;
 }
 
 function mappedTargets(alignment: SenseAlignment, targetSenseNumbers: number[]): number[] {
@@ -403,10 +453,6 @@ function buildChangeChips(
       label: `−S${sense.number}`,
       text: sense.glosses[0] ?? sense.text,
     });
-  }
-
-  if (chips.length === 0) {
-    chips.push({ kind: "formatting", label: "", text: "formatting-only difference" });
   }
 
   return chips;
