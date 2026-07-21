@@ -2,6 +2,7 @@
 
 import type { JMdict } from "@scriptin/jmdict-simplified-types";
 import { entriesCache } from "./entries_cache.ts";
+import { furiganaCache } from "./furigana_cache.ts";
 import type { JMDictWord } from "./jmdict_types.ts";
 import { resourcePaths } from "./resource_paths.ts";
 
@@ -16,10 +17,9 @@ export type JMDictFurigana = Record<string, string>;
 /** Map of JMDict entry ID to entry data. */
 export type JMDictEntries = Map<string, JMDictWord>;
 
-// Module-level promises for deduplication (the full-dictionary one lives in
-// `entries_cache.ts` so the download module can reset it)
+// Module-level promises for deduplication. Mutable-resource caches live in separate internal
+// modules so their downloaders can invalidate them without exposing cache management publicly.
 let tagsPromise: Promise<JMDictTags> | null = null;
-let furiganaPromise: Promise<JMDictFurigana> | null = null;
 const preextractedEntryPromises = new Map<string, Promise<JMDictWord>>();
 
 /**
@@ -41,13 +41,13 @@ export function jmdictTags(): Promise<JMDictTags> {
  * Safe to call multiple times concurrently - will deduplicate requests.
  */
 export function jmdictFurigana(): Promise<JMDictFurigana> {
-  if (!furiganaPromise) {
-    furiganaPromise = (async () => {
+  if (!furiganaCache.promise) {
+    furiganaCache.promise = (async () => {
       const content = await Deno.readTextFile(resourcePaths.jmdictFurigana);
       return JSON.parse(content) as JMDictFurigana;
     })();
   }
-  return furiganaPromise;
+  return furiganaCache.promise;
 }
 
 /**

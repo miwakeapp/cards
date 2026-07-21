@@ -4,9 +4,10 @@ const packageDirectory = resolve(import.meta.dirname!, "..");
 const generatedDirectory = join(packageDirectory, "generated");
 const jmdictResourcesDirectory = join(packageDirectory, "resources", "jmdict");
 
-// Tests substitute only the compact checked furigana fixture; all other data remains canonical.
+// Tests may temporarily substitute compact resources; production always uses these defaults.
 /** Canonical paths to downloaded, generated, and checked-in data resources. */
 export const resourcePaths = {
+  runtimeManifest: join(generatedDirectory, "manifest.json"),
   jmdict: join(generatedDirectory, "jmdict_eng.json"),
   jmdictFurigana: join(generatedDirectory, "jmdict_furigana.json"),
   rarityDatabase: join(generatedDirectory, "rarity.sqlite3"),
