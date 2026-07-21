@@ -1,23 +1,28 @@
 {
-  "id": "2116100",
+  "id": "1399910",
   "kanji": [
     {
       "common": false,
-      "text": "土いじり",
+      "text": "かき集める",
       "tags": []
     },
     {
       "common": false,
-      "text": "土弄り",
+      "text": "掻き集める",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "搔き集める",
       "tags": [
-        "rK"
+        "sK"
       ]
     }
   ],
   "kana": [
     {
       "common": false,
-      "text": "つちいじり",
+      "text": "かきあつめる",
       "tags": [],
       "appliesToKanji": [
         "*"
@@ -27,37 +32,8 @@
   "sense": [
     {
       "partOfSpeech": [
-        "n"
-      ],
-      "appliesToKanji": [
-        "*"
-      ],
-      "appliesToKana": [
-        "*"
-      ],
-      "related": [
-        [
-          "土遊び"
-        ]
-      ],
-      "antonym": [],
-      "field": [],
-      "dialect": [],
-      "misc": [],
-      "info": [],
-      "languageSource": [],
-      "gloss": [
-        {
-          "lang": "eng",
-          "gender": null,
-          "type": null,
-          "text": "playing with dirt"
-        }
-      ]
-    },
-    {
-      "partOfSpeech": [
-        "n"
+        "v1",
+        "vt"
       ],
       "appliesToKanji": [
         "*"
@@ -77,13 +53,19 @@
           "lang": "eng",
           "gender": null,
           "type": null,
-          "text": "gardening"
+          "text": "to gather up"
         },
         {
           "lang": "eng",
           "gender": null,
           "type": null,
-          "text": "farming (as a hobby)"
+          "text": "to scrape up together"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to rake"
         }
       ]
     }

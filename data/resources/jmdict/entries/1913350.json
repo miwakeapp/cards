@@ -1,60 +1,59 @@
 {
-  "id": "2116100",
+  "id": "1913350",
   "kanji": [
     {
       "common": false,
-      "text": "土いじり",
+      "text": "ヤブ蚊",
       "tags": []
     },
     {
       "common": false,
-      "text": "土弄り",
+      "text": "やぶ蚊",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "薮蚊",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "藪蚊",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "豹脚蚊",
       "tags": [
-        "rK"
+        "oK"
       ]
     }
   ],
   "kana": [
     {
       "common": false,
-      "text": "つちいじり",
+      "text": "やぶか",
       "tags": [],
       "appliesToKanji": [
         "*"
       ]
+    },
+    {
+      "common": false,
+      "text": "やぶっか",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "ヤブカ",
+      "tags": [],
+      "appliesToKanji": []
     }
   ],
   "sense": [
-    {
-      "partOfSpeech": [
-        "n"
-      ],
-      "appliesToKanji": [
-        "*"
-      ],
-      "appliesToKana": [
-        "*"
-      ],
-      "related": [
-        [
-          "土遊び"
-        ]
-      ],
-      "antonym": [],
-      "field": [],
-      "dialect": [],
-      "misc": [],
-      "info": [],
-      "languageSource": [],
-      "gloss": [
-        {
-          "lang": "eng",
-          "gender": null,
-          "type": null,
-          "text": "playing with dirt"
-        }
-      ]
-    },
     {
       "partOfSpeech": [
         "n"
@@ -77,13 +76,13 @@
           "lang": "eng",
           "gender": null,
           "type": null,
-          "text": "gardening"
+          "text": "Aedes (genus of mosquitoes)"
         },
         {
           "lang": "eng",
           "gender": null,
           "type": null,
-          "text": "farming (as a hobby)"
+          "text": "striped mosquito"
         }
       ]
     }

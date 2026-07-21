@@ -12,7 +12,7 @@ Download the latest JMDict and furigana data and rebuild the checked-in subset w
 deno task --cwd data update:jmdict
 ```
 
-`update:jmdict` downloads its two independent inputs in parallel and then runs `build:jmdict`. The build refreshes the selected entries and tag descriptions, records the source revision in `resources/jmdict/snapshot.json`, and reduces the full furigana data to the relevant test records. Run `build:jmdict` directly to rebuild from existing local inputs. Commit the resulting checked-in resource changes together.
+`update:jmdict` refreshes the independent JMDict and furigana sources, then runs `build:jmdict`. The build refreshes the selected entries and tag descriptions, records the source revision in `resources/jmdict/snapshot.json`, and reduces the full furigana data to the relevant test records. Run `build:jmdict` directly to rebuild from existing local inputs. Commit the resulting checked-in resource changes together.
 
 The JMDict snapshot is derived from [jmdict-simplified](https://github.com/scriptin/jmdict-simplified), which packages the Electronic Dictionary Research and Development Group's JMDict data under the [Creative Commons Attribution-ShareAlike 4.0 license](https://github.com/scriptin/jmdict-simplified/blob/master/LICENSE.txt). The small checked-in furigana fixture is extracted from [Lorenzi's Jisho](https://jisho.hlorenzi.com/); the full download remains local.
 
@@ -31,6 +31,14 @@ The primary source is the National Institute for Japanese Language and Linguisti
 The generated resources also include the National Institute for Japanese Language and Linguistics, Center for Corpus Development, [BCCWJ LUW2 frequency list](https://repository.ninjal.ac.jp/records/3231), Version 1.1, licensed under [CC BY-NC-ND 3.0](https://creativecommons.org/licenses/by-nc-nd/3.0/).
 
 Like the JMDict updater, the NWJC download task follows the current upstream file instead of pinning a source revision. The BCCWJ download uses the checksummed Version 1.1 artifact above. The resource builder validates both downloaded schemas before replacing the existing database. Downloaded source data and generated lookup resources remain local and are not committed.
+
+## Runtime resource manifest
+
+The installed furigana resource is recorded in `generated/manifest.json`, including its source, retrieval time, HTTP validators, entry count, and conversion format. JMDict carries its own version header, while `resources/jmdict/snapshot.json` records the provenance of the small checked-in test subset.
+
+The furigana updater makes a conditional request using the installed ETag and Last-Modified value, then parses and validates any new UTF-8 candidate before atomically replacing the active lookup. It rejects oversized input, unsafe markup or control characters, malformed data, conflicting duplicate records, and unexpectedly large semantic changes. Any failure stops the updater; use `--offline` explicitly to skip the update check.
+
+Use `--accept-large-change` only after inspecting an upstream delta that intentionally exceeds the guardrail. Changes to existing cards still pass through `card_updater` review before Anki is modified.
 
 ## ZIP extraction
 
