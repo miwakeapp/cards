@@ -295,7 +295,7 @@ function nextUndecidedRetarget(afterNoteId: number | null): ReviewItem | undefin
   const list = retargetItems();
   const startIndex = list.findIndex((item) => item.noteId === afterNoteId);
   const rotated = [...list.slice(startIndex + 1), ...list.slice(0, startIndex + 1)];
-  return rotated.find((item) => !item.decision && !item.applied);
+  return rotated.find((item) => item.noteId !== afterNoteId && !item.decision && !item.applied);
 }
 
 function getWorking(item: ReviewItem): WorkingSelection {
