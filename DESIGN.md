@@ -332,7 +332,8 @@ The cases below cover each point at which the simple one-spelling, one-entry, on
 | Ambiguity                               | How the card represents the choice                                          |
 | --------------------------------------- | --------------------------------------------------------------------------- |
 | Several senses in one entry             | Sense numbers in the **Key**, plus a **Hint** when disambiguation is useful |
-| Several entries for one spelling        | JMDict ID in the **Key**, plus a required **Hint**                          |
+| Several entries with distinct meanings  | JMDict ID in the **Key**, plus a required **Hint**                          |
+| Equivalent senses split across entries  | One semantic anchor, with equivalent references supplying accepted readings |
 | Several spellings for one entry         | Recognition target at the start of the **Key**                              |
 | Several readings for one spelling       | Dominant reading, or multiple forms in **Reading**                          |
 | Several possible word boundaries        | Prefer the longest JMDict expression supported by the context               |
@@ -393,6 +394,14 @@ Different JMDict entries can share the exact same spelling. [はさみ meaning p
 Every card in this situation requires a hint, such as 蟹のはさみ or はさみで切る, even when no conflicting card currently exists in the deck. Otherwise the first card becomes unfair as soon as the second is added. This requirement is nonlocal: card creation must search the whole JMDict for other entries containing the same recognition target before deciding whether a hint is optional.
 
 [包む](https://takoboto.jp/?w=1584060), usually つつむ, and [包む](https://takoboto.jp/?w=2831360), read くるむ, are harder: the entries overlap in both spelling and meaning. Context or source furigana may identify the entry, but some unannotated uses will remain ambiguous. These cards still always require a hint. If a semantic hint cannot distinguish them, the hint must include the reading; this is a justified exception to the general preference against front-side furigana.
+
+#### Equivalent senses split across entries
+
+A different case arises when JMDict divides what is pedagogically one meaning across entries whose relevant distinction is their reading. [後々 read あとあと](https://www.edrdg.org/jmwsgi/entr.py?svc=jmdict&g=1578610.1~2098131) and [後々 read のちのち](https://www.edrdg.org/jmwsgi/entr.py?svc=jmdict&g=2841372.1~2099180), for example, currently have the same "future; distant future" sense and the same part-of-speech information. A learner shown unannotated 後々 should recognize that shared meaning while treating either sufficiently-supported pronunciation as acceptable. Separate cards or a hint that artificially selects one entry would test JMDict's lexicographic partition instead of native-text recognition.
+
+The card should retain one entry and sense as its primary semantic anchor while recording the other equivalent entry and sense as provenance. Its **Reading** may then contain accepted readings supported by any of those references. Duplicate detection and hint generation should operate on the equivalence group: the equivalent entries should not produce duplicate cards, and no hint is needed merely to distinguish identical meanings. When JMDict updates, maintenance tooling must revalidate the equivalence and request review if the referenced senses have diverged.
+
+Matching English glosses are not enough to establish equivalence automatically. Readings can differ in register, distribution, or contextual suitability even when JMDict does not encode that distinction clearly, so equivalence groups must be explicitly curated or reviewed. End-to-end support for readings sourced from equivalent entries depends on general multiple-reading support and is tracked in [issue #18](https://github.com/miwakeapp/cards/issues/18).
 
 ### Selecting a spelling within one entry
 
