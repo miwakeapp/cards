@@ -72,3 +72,12 @@ Deno.test("formatReadingForAnki: uses an imported search-only kanji spelling", a
     null,
   );
 });
+
+Deno.test("formatReadingForAnki: rejects ambiguous kana-normalized records", async () => {
+  assertEquals(
+    await formatReadingForAnki("1913350", "やぶ蚊", "やぶっか"),
+    "やぶ 蚊[っか]",
+  );
+  // Upstream data fix: https://github.com/hlorenzi/jisho-open/pull/6
+  assertEquals(await formatReadingForAnki("1913350", "ヤブ蚊", "やぶっか"), null);
+});

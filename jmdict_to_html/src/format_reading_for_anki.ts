@@ -1,6 +1,8 @@
 import { jmdictFurigana } from "data";
 
-let kanaNormalizedFurigana: Map<string, string> | null = null;
+let kanaNormalizedFurigana:
+  | { source: Record<string, string>; values: Map<string, string | null> }
+  | undefined;
 
 function normalizeKanaScript(text: string): string {
   return [...text].map((char) => {
@@ -12,9 +14,11 @@ function normalizeKanaScript(text: string): string {
   }).join("");
 }
 
-function getKanaNormalizedFurigana(furigana: Record<string, string>): Map<string, string> {
-  if (kanaNormalizedFurigana === null) {
-    kanaNormalizedFurigana = new Map();
+function getKanaNormalizedFurigana(
+  furigana: Record<string, string>,
+): Map<string, string | null> {
+  if (kanaNormalizedFurigana?.source !== furigana) {
+    const values = new Map<string, string | null>();
     for (const [key, value] of Object.entries(furigana)) {
       const [jmdictId, word, reading] = key.split("|");
       const normalizedKey = [
@@ -22,10 +26,18 @@ function getKanaNormalizedFurigana(furigana: Record<string, string>): Map<string
         normalizeKanaScript(word),
         normalizeKanaScript(reading),
       ].join("|");
-      kanaNormalizedFurigana.set(normalizedKey, value);
+      const existing = values.get(normalizedKey);
+      if (existing === undefined) {
+        values.set(normalizedKey, value);
+      } else if (
+        existing !== null && normalizeKanaScript(existing) !== normalizeKanaScript(value)
+      ) {
+        values.set(normalizedKey, null);
+      }
     }
+    kanaNormalizedFurigana = { source: furigana, values };
   }
-  return kanaNormalizedFurigana;
+  return kanaNormalizedFurigana.values;
 }
 
 function applyKanaScriptFromWord(formattedReading: string, word: string): string {
@@ -98,7 +110,7 @@ export async function formatReadingForAnki(
     normalizeKanaScript(reading),
   ].join("|");
   const kanaSwapped = getKanaNormalizedFurigana(furigana).get(normalizedKey);
-  if (kanaSwapped !== undefined) {
+  if (kanaSwapped !== undefined && kanaSwapped !== null) {
     return applyKanaScriptFromWord(kanaSwapped, word);
   }
 
