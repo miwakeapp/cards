@@ -1,5 +1,6 @@
 import { unescape } from "@std/html/entities";
 import * as path from "@std/path";
+import { formatSourceHTML } from "card_creator";
 import { normalizePlainText } from "./html.ts";
 import type { SourceResolution } from "./types.ts";
 
@@ -28,25 +29,10 @@ const PRIVATE_SOURCE_HOSTS = new Set([
 ]);
 const TEMPORARY_QUERY_PARAMETER_PATTERN = /^(?:auth|expires?|signature|token)$/iu;
 
-function escapeHTML(value: string): string {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;");
-}
-
-/** Formats the conversion-specific semantic citation stored on a Miwake card. */
-export function formatSourceCitation(source: SourceResolution): string {
+/** Formats the resolved source for storage on a Miwake card. */
+export function formatResolvedSourceHTML(source: SourceResolution): string {
   if (source.name === null) return "";
-  const lang = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(source.name)
-    ? "ja"
-    : "en";
-  const label = escapeHTML(source.name);
-  if (source.urlIsPublic && source.url !== null) {
-    return `<cite lang="${lang}"><a href="${escapeHTML(source.url)}">${label}</a></cite>`;
-  }
-  return `<cite lang="${lang}">${label}</cite>`;
+  return formatSourceHTML(source.name, source.urlIsPublic ? source.url : null)!;
 }
 
 export function searchableEPUBText(html: string): string {

@@ -30,7 +30,7 @@ function candidate(): ConversionCandidate {
         "Full context": "物の<mark>大小</mark>を比べた後も、話は長く続いた。",
         "Minimized context": "",
         "Dictionary entry": "entry",
-        Source: '<cite lang="en">Test</cite>',
+        Source: '<span lang="en">Test</span>',
       },
     },
   };

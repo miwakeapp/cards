@@ -20,7 +20,7 @@ import {
 import {
   analyzeEPUBContext,
   type EPUBSourceCorpus,
-  formatSourceCitation,
+  formatResolvedSourceHTML,
   resolveSource,
 } from "./source.ts";
 import {
@@ -446,7 +446,7 @@ export async function convertAnimecardsNote(
       "Full context": card.fullContext,
       "Minimized context": card.minimizedContext ?? "",
       "Dictionary entry": card.dictionaryEntry,
-      "Source": formatSourceCitation(sourceResolution),
+      "Source": formatResolvedSourceHTML(sourceResolution),
     };
 
     return {
