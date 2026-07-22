@@ -9,7 +9,7 @@ import {
   findUniqueEPUBContext,
   findUniqueEPUBSource,
   formatRelevantQuotedEPUBContext,
-  formatSourceCitation,
+  formatResolvedSourceHTML,
   isPublicSourceURL,
   quotedEPUBContextNeedsRelevanceSelection,
   resolveSource,
@@ -38,27 +38,36 @@ Deno.test("public source URL classification is conservative", () => {
   assertEquals(isPublicSourceURL("https://example.com/file?token=secret"), false);
 });
 
-Deno.test("Animecards sources use conversion-specific cite markup", () => {
+Deno.test("Animecards sources use Miwake Source markup", () => {
   assertEquals(
-    formatSourceCitation({
+    formatResolvedSourceHTML({
       name: "舟を編む",
       method: "source-field",
       url: "https://reader.miwake.app/b?id=15",
       urlIsPublic: false,
     }),
-    '<cite lang="ja">舟を編む</cite>',
+    '<span lang="ja">『舟を編む』</span>',
   );
   assertEquals(
-    formatSourceCitation({
+    formatResolvedSourceHTML({
+      name: "NHKニュース",
+      method: "source-field",
+      url: "https://www3.nhk.or.jp/news/article?a=1&b=2",
+      urlIsPublic: true,
+    }),
+    '<a lang="ja" href="https://www3.nhk.or.jp/news/article?a=1&amp;b=2">「NHKニュース」</a>',
+  );
+  assertEquals(
+    formatResolvedSourceHTML({
       name: "News & Notes",
       method: "source-field",
       url: "https://example.com/article?a=1&b=2",
       urlIsPublic: true,
     }),
-    '<cite lang="en"><a href="https://example.com/article?a=1&amp;b=2">News &amp; Notes</a></cite>',
+    '<a lang="en" href="https://example.com/article?a=1&amp;b=2">News &amp; Notes</a>',
   );
   assertEquals(
-    formatSourceCitation({
+    formatResolvedSourceHTML({
       name: null,
       method: "none",
       url: null,

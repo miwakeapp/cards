@@ -11,6 +11,7 @@ import { formatReadingForAnki } from "jmdict_to_html/format-reading-for-anki";
 import { prepareContextRuby, resolveContextReading } from "./context_reading.ts";
 import { formatMiwakeKey } from "./keys.ts";
 import { normalizeMinimizedContext } from "./minimized_context.ts";
+import { formatSourceHTML } from "./source.ts";
 import type {
   AIGeneratedFields,
   CardCreationInput,
@@ -102,37 +103,6 @@ function containsKanji(text: string): boolean {
 
 function differsOnlyByKanaScript(left: string, right: string): boolean {
   return left !== right && toHiragana(left) === toHiragana(right);
-}
-
-function escapeHTML(text: string): string {
-  return text
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;");
-}
-
-function inferSourceLanguage(sourceText: string): "ja" | "en" {
-  return /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/v.test(sourceText) ? "ja" : "en";
-}
-
-function formatSourceHTML(
-  sourceText: string | null,
-  sourceURL: string | null,
-): string | null {
-  if (sourceText === null && sourceURL === null) {
-    return null;
-  }
-
-  const label = sourceText ?? sourceURL!;
-  const lang = inferSourceLanguage(label);
-  const escapedLabel = escapeHTML(label);
-
-  if (sourceURL === null) {
-    return `<span lang="${lang}">${escapedLabel}</span>`;
-  }
-
-  return `<a href="${escapeHTML(sourceURL)}" lang="${lang}">${escapedLabel}</a>`;
 }
 
 /**

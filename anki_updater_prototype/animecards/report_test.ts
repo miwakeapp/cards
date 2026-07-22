@@ -39,7 +39,7 @@ Deno.test("buildConversionReport groups exact final source HTML strings", () => 
         fullContextResolution: { status: "restored", method: "exact" },
         minimizedContextResolution: { status: "not-needed" },
         senseResolution: { status: "not-needed" },
-        target: { fields: { Source: '<cite lang="ja">舟を編む</cite>', Key: "舟 | 1" } },
+        target: { fields: { Source: '<span lang="ja">『舟を編む』</span>', Key: "舟 | 1" } },
       },
       {
         noteId: 2,
@@ -77,7 +77,7 @@ Deno.test("buildConversionReport groups exact final source HTML strings", () => 
         original: { fields: {} },
         target: {
           fields: {
-            Source: '<cite lang="ja">容疑者Xの献身</cite>',
+            Source: '<span lang="ja">『容疑者Xの献身』</span>',
             Key: "微塵 | 1486050",
           },
         },
@@ -105,7 +105,7 @@ Deno.test("buildConversionReport groups exact final source HTML strings", () => 
         original: { fields: {} },
         target: {
           fields: {
-            Source: '<cite lang="ja">虐殺器官</cite>',
+            Source: '<span lang="ja">『虐殺器官』</span>',
             Key: "衝撃波 | 2655780",
           },
         },

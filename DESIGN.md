@@ -113,13 +113,13 @@ After that setup is complete, the unobtrusive indicator changes color. From now 
 
   - `<span lang="en">GPT 5.5 Thinking</span>`, for an AI-generated example sentence
 
-  - `『<cite lang="ja">虐殺器官</cite>』`, for a Japanese book title
+  - `<span lang="ja">『虐殺器官』</span>`, for a Japanese book title
 
-  - `「<a lang="ja" href="https://news.web.nhk/newsweb/na/na-k10015175781000"><cite>羽田空港 C滑走路で路面剥離 閉鎖し修復作業 再開午後6時ごろ</cite></a>」`, for a Japanese article title
+  - `<a lang="ja" href="https://news.web.nhk/newsweb/na/na-k10015175781000">「羽田空港 C滑走路で路面剥離 閉鎖し修復作業 再開午後6時ごろ」</a>`, for a Japanese article title
 
-  - `<a lang="en" href="https://tatoeba.org/en/sentences/show/76039">Tatoeba</a>`, for sentence from the Tatoeba project
+  - `<a lang="en" href="https://tatoeba.org/en/sentences/show/76039">Tatoeba</a>`, for a sentence from the Tatoeba project
 
-  When mining in a browser extension, we can anticipate using heuristics and AI ✨ to trim and improve the `<title>` of the page being mined, e.g. `ソードアート・オンライン2 アインクラッド (電撃文庫) | Miwake Reader` becomes `『<cite lang="ja">ソードアート・オンライン2 アインクラッド</cite>』`.
+  When mining in a browser extension, we can anticipate using heuristics and AI ✨ to trim and improve the `<title>` of the page being mined, e.g. `ソードアート・オンライン2 アインクラッド (電撃文庫) | Miwake Reader` becomes `<span lang="ja">『ソードアート・オンライン2 アインクラッド』</span>`.
 
 #### The displayed cards
 

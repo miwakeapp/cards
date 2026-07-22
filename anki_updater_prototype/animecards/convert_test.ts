@@ -88,7 +88,7 @@ Deno.test("convertAnimecardsNote deterministically converts and highlights an in
   assertEquals(result.candidate.target.fields["Full context"], "<mark>たべて</mark>いる。");
   assertEquals(result.candidate.target.fields["Hint"], "");
   assertEquals(result.candidate.target.fields["Minimized context"], "");
-  assertEquals(result.candidate.target.fields["Source"], '<cite lang="en">Test Book</cite>');
+  assertEquals(result.candidate.target.fields["Source"], '<span lang="en">Test Book</span>');
   assertEquals(result.candidate.original.cards, [99]);
 });
 
@@ -391,7 +391,7 @@ Deno.test("convertAnimecardsNote cleans reader sources and records private URLs"
   assert(result.candidate);
   assertEquals(result.candidate.approved, false);
   assertEquals(result.candidate.fullContextResolution, { status: "source-unavailable" });
-  assertEquals(result.candidate.target.fields.Source, '<cite lang="ja">舟を編む</cite>');
+  assertEquals(result.candidate.target.fields.Source, '<span lang="ja">『舟を編む』</span>');
   assertEquals(result.candidate.sourceResolution, {
     name: "舟を編む",
     method: "source-field",
@@ -428,7 +428,7 @@ Deno.test("convertAnimecardsNote recovers a missing source from the EPUB corpus"
 
   assert(result.candidate);
   assertEquals(result.candidate.approved, true);
-  assertEquals(result.candidate.target.fields.Source, '<cite lang="ja">テスト小説</cite>');
+  assertEquals(result.candidate.target.fields.Source, '<span lang="ja">『テスト小説』</span>');
   assertEquals(result.candidate.sourceResolution.method, "epub");
 });
 

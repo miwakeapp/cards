@@ -226,7 +226,7 @@ Deno.test("createCard: source uses span when URL is not public", async () => {
     generateFields: createMockGenerator(mockAIFields),
   });
 
-  assertEquals(card.source, `<span lang="ja">テスト本</span>`);
+  assertEquals(card.source, `<span lang="ja">『テスト本』</span>`);
 });
 
 Deno.test("createCard: source uses link when URL is public", async () => {
@@ -258,7 +258,7 @@ Deno.test("createCard: source uses link when URL is public", async () => {
 
   assertEquals(
     card.source,
-    `<a href="https://www3.nhk.or.jp/news/article" lang="ja">NHKニュース</a>`,
+    `<a lang="ja" href="https://www3.nhk.or.jp/news/article">「NHKニュース」</a>`,
   );
 });
 
@@ -289,6 +289,37 @@ Deno.test("createCard: English source is marked with lang=en", async () => {
   });
 
   assertEquals(card.source, `<span lang="en">Tatoeba</span>`);
+});
+
+Deno.test("createCard: English public source is linked without quotation marks", async () => {
+  const jmdictEntry = await preextractedJMDictEntry("1414110");
+
+  const input: CardCreationInput = {
+    context: "テスト",
+    jmdictId: "1414110",
+    recognitionTarget: "大小",
+    source: "Tatoeba",
+    sourceURL: "https://tatoeba.org/en/sentences/show/76039",
+  };
+
+  const card = await createCard({
+    input,
+    jmdictEntry,
+    generateFields: createMockGenerator({
+      applicableSenses: [1],
+      reading: "だいしょう",
+      hint: null,
+      targetInContext: "大小",
+      minimizedContext: null,
+      cleanedSource: null,
+      sourceURLIsPublic: true,
+    }),
+  });
+
+  assertEquals(
+    card.source,
+    `<a lang="en" href="https://tatoeba.org/en/sentences/show/76039">Tatoeba</a>`,
+  );
 });
 
 // Snapshot test for full card structure
