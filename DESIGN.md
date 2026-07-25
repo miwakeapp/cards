@@ -81,7 +81,7 @@ After that setup is complete, the unobtrusive indicator changes color. From now 
 
 - **Recognition target**: what is shown on the front of the card, containing just the spelling targeted for recognition.
 
-  - For cases where the word is always used in a certain pattern, we can ✨ automatically add the appropriate prefix or suffix. Example: [うつつを抜かす](https://takoboto.jp/?w=2033950) can become 〜にうつつを抜かす in this field, as there is enough information in the dictionary entry to assemble this.
+  - For cases where the word is always used in a certain pattern, we can ✨ automatically add the appropriate prefix or suffix. Example: [うつつを抜かす](https://takoboto.jp/?w=2033950) can become ～にうつつを抜かす in this field, as there is enough information in the dictionary entry to assemble this.
 
   - This generally never contains furigana, even for cases where the originally mined text used furigana and the word is highly ambiguous. (Such as 番 being either ばん or つがい.) Instead, the hint field can contain appropriate context, including furigana if necessary.
 
@@ -451,7 +451,11 @@ The popup should therefore search for all matches beginning at the selected text
 
 The recognition target is normally a dictionary form, but the literal text in the source may be conjugated, inflected, or derived. For example, a card for 後ろめたい may come from 後ろめたさ, and a card for 頭をよぎる may come from 頭をよぎった. The program should keep the dictionary form as the recognition target and key, while separately identifying the exact `targetInContext` so it can mark the correct source substring.
 
-This matching must account for ordinary conjugation and derivation without swallowing unrelated auxiliaries or nearby text. The clicked occurrence normally identifies which source substring is being mined; if that is still ambiguous, the program should use its best match and flag the card as suboptimal rather than interrupting the flow.
+If the context contains several occurrences derived from the same recognition target, the program should mark all of them. There is no need to guess which occurrence prompted the card, since every occurrence reinforces the same recognition target and dictionary entry. For example, a card whose recognition target is 頼る should render:
+
+> 同じように、<mark>頼った</mark>り<mark>頼られた</mark>りすればいいと思うよ。
+
+This matching must account for ordinary conjugation and derivation without swallowing unrelated auxiliaries or nearby text. The clicked occurrence normally identifies which source substring is being mined. If it remains ambiguous whether a candidate substring is actually derived from the recognition target, the program should use its best-supported set of matches and flag the card as suboptimal rather than interrupting the flow.
 
 ### Expanding unhelpful context
 

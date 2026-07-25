@@ -31,6 +31,9 @@ export function normalizeContextHTML(html: string): string {
   return html
     .replace(MEDIA_PATTERN, "")
     .replace(/<br\s*\/?>/giu, "<br>")
+    // Animecards can retain visual ebook line wraps in the middle of a word. A break directly
+    // between two kanji is never useful context structure and prevents target highlighting.
+    .replace(/(?<=\p{Script=Han})\s*<br>\s*(?=\p{Script=Han})/gu, "")
     .replace(PRESENTATIONAL_TAG_PATTERN, "")
     .replace(/[\u00a0\u202f]/gu, " ")
     .trim();
@@ -83,7 +86,17 @@ export function readingFieldCandidates(readingHTML: string): string[] {
 export function parseRecognitionTargetField(
   targetHTML: string,
 ): { text: string; hasHint: boolean } {
-  const plain = normalizePlainText(targetHTML);
+  // Recognition-target markup is inline presentation, so adjacent elements must remain adjacent.
+  // In particular, mining tools sometimes wrap each kanji separately (`<a>出</a><a>端</a>` or
+  // `<ruby>暗</ruby><ruby>礁</ruby>`); treating tag boundaries as word breaks invents spaces that
+  // occur in neither the Animecard spelling nor its source sentence.
+  const plain = decodeHTML(
+    targetHTML
+      .replace(RUBY_READING_PATTERN, "")
+      .replace(/<br\s*\/?>/giu, " ")
+      .replace(ALL_TAG_PATTERN, "")
+      .replace(MEDIA_PATTERN, " "),
+  ).replace(/\s+/gu, " ").trim();
   const annotations = [...plain.matchAll(/\[([^\]]+)\]/gu)];
   const hasHint = annotations.some((match) =>
     !/^[\p{Script=Hiragana}\p{Script=Katakana}ー・]+$/v.test(match[1].replace(/\s+/gu, ""))

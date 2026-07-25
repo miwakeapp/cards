@@ -30,6 +30,7 @@ async function candidate(): Promise<ConversionCandidate> {
     keyRecognitionTarget: "ねこ",
     readingKana: "ねこ",
     sourceResolution: { name: null, method: "none", url: null, urlIsPublic: false },
+    targetInContextResolution: { method: "deterministic", surface: "ねこ" },
     fullContextResolution: { status: "source-unavailable" },
     minimizedContextResolution: { status: "not-needed" },
     senseResolution: { status: "not-needed" },

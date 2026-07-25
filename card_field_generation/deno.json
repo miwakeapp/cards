@@ -1,0 +1,12 @@
+{
+  "name": "card_field_generation",
+  "exports": {
+    ".": "./src/mod.ts"
+  },
+  "imports": {
+    "zod": "npm:zod@^4.1.13"
+  },
+  "tasks": {
+    "doc:check": "deno doc --lint src/mod.ts"
+  }
+}

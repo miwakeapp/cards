@@ -4,7 +4,7 @@
  * 1. Downloads the latest JMDict release (when newer than the local copy).
  * 2. Fetches all updatable cards from Anki (read-only).
  * 3. Classifies each card by how much attention its update needs.
- * 4. Pre-works the ambiguous ones with AI (the same prompt that creates cards).
+ * 4. Pre-works the ambiguous ones with AI.
  * 5. Serves the review app, persisting decisions as they are made.
  * 6. Applies accepted updates to Anki when the reviewer says so.
  *
@@ -14,7 +14,7 @@
  */
 
 import { parseArgs } from "@std/cli/parse-args";
-import { DEFAULT_MODEL_ID, MODEL_IDS, type ModelId } from "card_creator/ai";
+import { DEFAULT_MODEL_ID, MODEL_IDS, type ModelId } from "card_field_generation";
 import { allJMDictEntries } from "data";
 import { createACInvoke, DEFAULT_ANKI_CONNECT_URL, fetchMiwakeNotes } from "./anki.ts";
 import { analyzeCard, type AnalyzedCard } from "./analyze.ts";

@@ -17,8 +17,6 @@ import {
   parseRenderedEntry,
   type SenseAlignment,
 } from "./entry_text.ts";
-// Deliberately `card_creator/keys`, not the package root: the analysis engine must not pull in
-// the AI SDK (which reads env at import time).
 import { formatMiwakeKey, type MiwakeKey, parseMiwakeKey } from "card_creator/keys";
 
 /**
@@ -148,9 +146,8 @@ export async function analyzeCard(
     });
   }
 
-  const spellingInLatest =
-    latestWord.kanji.some((form) => form.text === parsedKey.recognitionTarget) ||
-    latestWord.kana.some((form) => form.text === parsedKey.recognitionTarget);
+  const spellingInLatest = latestWord.kanji.some((form) => form.text === parsedKey.spelling) ||
+    latestWord.kana.some((form) => form.text === parsedKey.spelling);
 
   const alignment = alignSenses(oldParsed.senses, newParsed.senses);
   const proposedReading = await analyzeReading(note, parsedKey);
@@ -221,7 +218,7 @@ export async function analyzeCard(
       ...base,
       verdict: "exception",
       reason: "spelling-removed",
-      detail: `The spelling "${parsedKey.recognitionTarget}" is no longer a form of this entry.`,
+      detail: `The spelling "${parsedKey.spelling}" is no longer a form of this entry.`,
     };
   }
 
@@ -263,7 +260,7 @@ export async function analyzeCard(
     renumberedTargets.every((pair) => pair !== undefined)
   ) {
     const proposedKey = formatMiwakeKey(
-      parsedKey.recognitionTarget,
+      parsedKey.spelling,
       parsedKey.jmdictId,
       renumberedTargets.map((pair) => pair!.new.number),
       newParsed.senses.length,
@@ -351,19 +348,40 @@ async function analyzeReading(
   note: MiwakeNoteSnapshot,
   parsedKey: MiwakeKey,
 ): Promise<string | null> {
-  const recognitionTarget = note.fields.recognitionTarget || parsedKey.recognitionTarget;
+  const recognitionTarget = note.fields.recognitionTarget || parsedKey.spelling;
+  let lookupSpelling = recognitionTarget;
+  let readingPrefix = "";
+  let readingSuffix = "";
+  let reading = note.fields.reading;
   if (
-    note.fields.reading === "" || !/\p{Script=Han}/v.test(recognitionTarget)
+    recognitionTarget === `～${parsedKey.spelling}` &&
+    reading.startsWith("～")
+  ) {
+    lookupSpelling = parsedKey.spelling;
+    readingPrefix = "～";
+    reading = reading.slice(1);
+  } else if (
+    recognitionTarget === `${parsedKey.spelling}～` &&
+    reading.endsWith("～")
+  ) {
+    lookupSpelling = parsedKey.spelling;
+    readingSuffix = "～";
+    reading = reading.slice(0, -1);
+  }
+  if (
+    reading === "" || !/\p{Script=Han}/v.test(lookupSpelling)
   ) {
     return null;
   }
 
   const result = await recomputeAnkiReading(
-    note.fields.reading,
-    recognitionTarget,
+    reading,
+    lookupSpelling,
     parsedKey.jmdictId,
   );
-  return result === note.fields.reading ? null : result;
+  if (result === null) return null;
+  const decoratedResult = `${readingPrefix}${result}${readingSuffix}`;
+  return decoratedResult === note.fields.reading ? null : decoratedResult;
 }
 
 function mappedTargets(alignment: SenseAlignment, targetSenseNumbers: number[]): number[] {

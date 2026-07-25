@@ -1,21 +1,7 @@
-/**
- * card_creator module - Creates Miwake cards from context and JMDict entries.
- */
-
-// Core card creation
+/** Deterministically renders validated semantic content as a complete Miwake Card. */
 export { createCard } from "./create_card.ts";
-export type { CreateCardOptions } from "./create_card.ts";
-export { needsAIMinimizedContext, normalizeMinimizedContext } from "./minimized_context.ts";
-export { formatSourceHTML } from "./source.ts";
+export { formatReadingForAnki } from "./format_reading_for_anki.ts";
+export type { CardSource, CreateCardInput, MiwakeCard } from "./types.ts";
 
-// Types
-export type {
-  AIGeneratedFields,
-  CardCreationInput,
-  GenerateFieldsInput,
-  MiwakeCard,
-} from "./types.ts";
-
-// Card keys
 export { formatMiwakeKey, parseMiwakeKey } from "./keys.ts";
 export type { MiwakeKey } from "./keys.ts";

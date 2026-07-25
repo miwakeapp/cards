@@ -1,6 +1,6 @@
 import { unescape } from "@std/html/entities";
 import * as path from "@std/path";
-import { formatSourceHTML } from "card_creator";
+import type { CardSource } from "card_creator";
 import { normalizePlainText } from "./html.ts";
 import type { SourceResolution } from "./types.ts";
 
@@ -17,7 +17,7 @@ export interface EPUBParagraph {
 
 export interface EPUBContextMatch {
   source: string;
-  paragraph: EPUBParagraph;
+  paragraphs: EPUBParagraph[];
   window: EPUBParagraph[];
 }
 
@@ -29,10 +29,27 @@ const PRIVATE_SOURCE_HOSTS = new Set([
 ]);
 const TEMPORARY_QUERY_PARAMETER_PATTERN = /^(?:auth|expires?|signature|token)$/iu;
 
-/** Formats the resolved source for storage on a Miwake card. */
-export function formatResolvedSourceHTML(source: SourceResolution): string {
-  if (source.name === null) return "";
-  return formatSourceHTML(source.name, source.urlIsPublic ? source.url : null)!;
+/** Best-effort language classification for unstructured legacy source labels. */
+export function inferLegacySourceLanguage(sourceText: string): "ja" | "en" {
+  return /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/v.test(sourceText) ? "ja" : "en";
+}
+
+/** Adapts an audited Animecards source resolution to deterministic `card_creator` input. */
+export function cardSourceFromResolution(source: SourceResolution): CardSource | undefined {
+  if (source.name === null) return undefined;
+  // EPUBs in this corpus are Japanese works even when a particular title is written in Latin
+  // characters. Unstructured legacy fields have no such provenance, so use a script heuristic.
+  const lang = source.method === "epub" ? "ja" : inferLegacySourceLanguage(source.name);
+  // Animecards source labels are book/work titles. Preserve any explicit Japanese title
+  // punctuation in a legacy field; otherwise add book-title punctuation here, at the caller layer.
+  const text = lang === "ja" && !/^(?:『.*』|「.*」)$/u.test(source.name)
+    ? `『${source.name}』`
+    : source.name;
+  return {
+    text,
+    lang,
+    ...(source.urlIsPublic && source.url !== null ? { url: source.url } : {}),
+  };
 }
 
 export function searchableEPUBText(html: string): string {
@@ -58,7 +75,7 @@ function extractParagraphs(xhtml: string, document: string): EPUBParagraph[] {
   for (const match of xhtml.matchAll(/<p\b[^>]*>(.*?)<\/p>/gisu)) {
     const html = cleanEPUBHTML(match[1]);
     const plainText = searchableEPUBText(html);
-    if (plainText.length < 2) continue;
+    if (!plainText) continue;
     paragraphs.push({ html, plainText, document, index: paragraphs.length });
   }
   return paragraphs;
@@ -99,7 +116,26 @@ export async function loadEPUBSourceCorpus(directory: string): Promise<EPUBSourc
   return { sources };
 }
 
-/** Finds one exact EPUB paragraph occurrence and returns its surrounding paragraph window. */
+function joinedParagraphText(paragraphs: readonly EPUBParagraph[]): string {
+  return paragraphs.map((paragraph) => paragraph.plainText).join("");
+}
+
+function paragraphSpanAt(
+  paragraphs: readonly EPUBParagraph[],
+  start: number,
+  end: number,
+): EPUBParagraph[] {
+  const result: EPUBParagraph[] = [];
+  let offset = 0;
+  for (const paragraph of paragraphs) {
+    const paragraphEnd = offset + paragraph.plainText.length;
+    if (paragraphEnd > start && offset < end) result.push(paragraph);
+    offset = paragraphEnd;
+  }
+  return result;
+}
+
+/** Finds one exact EPUB occurrence, including across adjacent paragraphs, and returns its window. */
 export function findUniqueEPUBContext(
   corpus: EPUBSourceCorpus,
   contextHTML: string,
@@ -111,17 +147,24 @@ export function findUniqueEPUBContext(
   const matches: EPUBContextMatch[] = [];
   for (const source of corpus.sources) {
     if (sourceName !== undefined && source.name !== sourceName) continue;
-    for (const paragraph of source.paragraphs ?? []) {
-      if (
-        !paragraph.plainText.includes(context) ||
-        paragraph.plainText.indexOf(context) !== paragraph.plainText.lastIndexOf(context)
-      ) continue;
-      const window = (source.paragraphs ?? []).filter((candidate) =>
-        candidate.document === paragraph.document &&
-        candidate.index >= paragraph.index - 3 &&
-        candidate.index <= paragraph.index + 3
-      );
-      matches.push({ source: source.name, paragraph, window });
+    const paragraphsByDocument = Map.groupBy(
+      source.paragraphs ?? [],
+      (paragraph) => paragraph.document,
+    );
+    for (const documentParagraphs of paragraphsByDocument.values()) {
+      documentParagraphs.sort((left, right) => left.index - right.index);
+      const documentText = joinedParagraphText(documentParagraphs);
+      let start = documentText.indexOf(context);
+      while (start !== -1) {
+        const paragraphs = paragraphSpanAt(documentParagraphs, start, start + context.length);
+        const firstIndex = paragraphs[0].index;
+        const lastIndex = paragraphs.at(-1)!.index;
+        const window = documentParagraphs.filter((paragraph) =>
+          paragraph.index >= firstIndex - 3 && paragraph.index <= lastIndex + 3
+        );
+        matches.push({ source: source.name, paragraphs, window });
+        start = documentText.indexOf(context, start + 1);
+      }
     }
   }
   return matches.length === 1 ? matches[0] : null;
@@ -165,6 +208,23 @@ function tokenizeEPUBHTML(html: string): HTMLToken[] {
 
 /** Re-extracts a unique plain-text substring from EPUB HTML, retaining source-authored ruby. */
 export function extractEPUBHTMLSubstring(html: string, plainText: string): string | null {
+  const paragraphMatches = [...html.matchAll(/<p\b[^>]*>(.*?)<\/p>/gisu)];
+  if (
+    paragraphMatches.length > 0 &&
+    html.replace(/<p\b[^>]*>.*?<\/p>/gisu, "").trim() === ""
+  ) {
+    const paragraphs = paragraphMatches.map((match, index) => {
+      const paragraphHTML = cleanEPUBHTML(match[1]);
+      return {
+        html: paragraphHTML,
+        plainText: searchableEPUBText(paragraphHTML),
+        document: "extracted-context",
+        index,
+      };
+    });
+    return extractEPUBHTMLFromParagraphs(paragraphs, plainText);
+  }
+
   const needle = searchableEPUBText(plainText);
   if (!needle) return null;
   const tokens = tokenizeEPUBHTML(html);
@@ -189,8 +249,53 @@ export function extractEPUBHTMLSubstring(html: string, plainText: string): strin
   return tokens.slice(firstToken, lastToken + 1).map((token) => token.html).join("").trim();
 }
 
+/** Re-extracts source HTML while representing every crossed EPUB paragraph semantically. */
+export function extractEPUBHTMLFromParagraphs(
+  paragraphs: readonly EPUBParagraph[],
+  plainText: string,
+): string | null {
+  const needle = searchableEPUBText(plainText);
+  const haystack = joinedParagraphText(paragraphs);
+  const start = haystack.indexOf(needle);
+  if (!needle || start === -1 || start !== haystack.lastIndexOf(needle)) return null;
+  const end = start + needle.length;
+
+  const extracted: string[] = [];
+  let offset = 0;
+  for (const paragraph of paragraphs) {
+    const paragraphEnd = offset + paragraph.plainText.length;
+    if (paragraphEnd > start && offset < end) {
+      const localStart = Math.max(0, start - offset);
+      const localEnd = Math.min(paragraph.plainText.length, end - offset);
+      const html = extractEPUBHTMLSubstring(
+        paragraph.html,
+        paragraph.plainText.slice(localStart, localEnd),
+      );
+      if (html === null) return null;
+      extracted.push(html);
+    }
+    offset = paragraphEnd;
+  }
+  if (extracted.length === 0) return null;
+  return extracted.length === 1
+    ? extracted[0]
+    : extracted.map((html) => `<p>${html}</p>`).join("\n\n");
+}
+
+/** Plain text covered by an EPUB context match, without synthetic paragraph separators. */
+export function epubContextPlainText(match: EPUBContextMatch): string {
+  return joinedParagraphText(match.paragraphs);
+}
+
 export function EPUBBracketsAreBalanced(text: string): boolean {
-  const pairs: Record<string, string> = { "「": "」", "『": "』", "（": "）", "【": "】" };
+  const pairs: Record<string, string> = {
+    "「": "」",
+    "『": "』",
+    "〈": "〉",
+    "《": "》",
+    "（": "）",
+    "【": "】",
+  };
   const closing = new Set(Object.values(pairs));
   const stack: string[] = [];
   for (const character of text) {
@@ -203,7 +308,12 @@ export function EPUBBracketsAreBalanced(text: string): boolean {
   return stack.length === 0;
 }
 
-const JAPANESE_QUOTE_PAIRS: Readonly<Record<string, string>> = { "「": "」", "『": "』" };
+const JAPANESE_QUOTE_PAIRS: Readonly<Record<string, string>> = {
+  "「": "」",
+  "『": "』",
+  "〈": "〉",
+  "《": "》",
+};
 // Japanese publishing convention represents an omission with two U+2026 leaders.
 const JAPANESE_ELLIPSIS = "……";
 const MAX_ADDED_CONTEXT_CHARACTERS = 200;
@@ -371,38 +481,97 @@ export function hasCompleteContextBoundaries(paragraph: string, excerpt: string)
   const start = paragraph.indexOf(excerpt);
   if (start === -1 || start !== paragraph.lastIndexOf(excerpt)) return false;
   const end = start + excerpt.length;
-  const leftComplete = start === 0 || /[。！？!?」』「『]/u.test(paragraph[start - 1]);
-  const rightComplete = end === paragraph.length || /[。！？!?」』]/u.test(excerpt.at(-1) ?? "");
+  const leftComplete = start === 0 ||
+    /[。！？!?」』〉》「『〈《]/u.test(paragraph[start - 1]) ||
+    /^[「『〈《]/u.test(excerpt);
+  const rightComplete = end === paragraph.length ||
+    /[。！？!?」』〉》]/u.test(excerpt.at(-1) ?? "");
   return leftComplete && rightComplete && EPUBBracketsAreBalanced(excerpt);
 }
 
 /** Expands an excerpt to its containing source sentence without model judgment. */
 export function expandEPUBContextToSentence(
-  paragraph: EPUBParagraph,
+  paragraphs: readonly EPUBParagraph[],
   contextHTML: string,
 ): string | null {
   const excerpt = searchableEPUBText(contextHTML);
-  const start = paragraph.plainText.indexOf(excerpt);
-  if (start === -1 || start !== paragraph.plainText.lastIndexOf(excerpt)) return null;
+  const passageText = joinedParagraphText(paragraphs);
+  const start = passageText.indexOf(excerpt);
+  if (start === -1 || start !== passageText.lastIndexOf(excerpt)) return null;
   const originalEnd = start + excerpt.length;
 
   let sentenceStart = 0;
   for (let index = start - 1; index >= 0; --index) {
-    if (/[。！？!?」』「『]/u.test(paragraph.plainText[index])) {
+    if (/[。！？!?」』〉》「『〈《]/u.test(passageText[index])) {
       sentenceStart = index + 1;
       break;
     }
   }
-  let sentenceEnd = paragraph.plainText.length;
-  for (let index = originalEnd; index < paragraph.plainText.length; ++index) {
-    if (/[。！？!?]/u.test(paragraph.plainText[index])) {
+  let sentenceEnd = passageText.length;
+  for (let index = originalEnd; index < passageText.length; ++index) {
+    if (/[。！？!?]/u.test(passageText[index])) {
       sentenceEnd = index + 1;
       break;
     }
   }
-  const expanded = paragraph.plainText.slice(sentenceStart, sentenceEnd);
+  const expanded = passageText.slice(sentenceStart, sentenceEnd);
   if (expanded.length <= excerpt.length || !EPUBBracketsAreBalanced(expanded)) return null;
-  return extractEPUBHTMLSubstring(paragraph.html, expanded);
+  return extractEPUBHTMLFromParagraphs(paragraphs, expanded);
+}
+
+function sentenceStart(text: string, index: number): number {
+  for (let cursor = index - 1; cursor >= 0; --cursor) {
+    if (/[。！？!?]/u.test(text[cursor])) return cursor + 1;
+  }
+  return 0;
+}
+
+function sentenceEnd(text: string, index: number): number {
+  for (let cursor = index; cursor < text.length; ++cursor) {
+    if (/[。！？!?]/u.test(text[cursor])) return cursor + 1;
+  }
+  return text.length;
+}
+
+const MAX_TARGET_EXPANSION_ADDED_CHARACTERS = 200;
+
+/**
+ * Expands an Animecards excerpt just far enough to include a uniquely located target in the same
+ * EPUB paragraph. This repairs excerpts that stop before the mined word or accidentally retain the
+ * preceding sentence, while keeping the result contiguous and source-faithful. If the excerpt is
+ * implausibly far from the mined word, the word's complete source sentence is more useful than
+ * hundreds of characters of intervening text.
+ */
+export function expandEPUBContextToIncludeTarget(
+  paragraphs: readonly EPUBParagraph[],
+  contextHTML: string,
+  targetSurface: string,
+): string | null {
+  const passageText = joinedParagraphText(paragraphs);
+  const excerpt = searchableEPUBText(contextHTML);
+  const excerptStart = passageText.indexOf(excerpt);
+  const targetStart = passageText.indexOf(targetSurface);
+  if (
+    excerptStart === -1 || excerptStart !== passageText.lastIndexOf(excerpt) ||
+    targetStart === -1 || targetStart !== passageText.lastIndexOf(targetSurface)
+  ) {
+    return null;
+  }
+
+  const excerptEnd = excerptStart + excerpt.length;
+  const targetEnd = targetStart + targetSurface.length;
+  const start = sentenceStart(passageText, Math.min(excerptStart, targetStart));
+  const end = sentenceEnd(passageText, Math.max(excerptEnd, targetEnd));
+  const expanded = passageText.slice(start, end);
+  if (!expanded.includes(excerpt) || !expanded.includes(targetSurface)) return null;
+  if (expanded.length - excerpt.length > MAX_TARGET_EXPANSION_ADDED_CHARACTERS) {
+    const targetSentence = passageText.slice(
+      sentenceStart(passageText, targetStart),
+      sentenceEnd(passageText, targetEnd),
+    );
+    return extractEPUBHTMLFromParagraphs(paragraphs, targetSentence);
+  }
+  return extractEPUBHTMLFromParagraphs(paragraphs, expanded);
 }
 
 /**
@@ -414,15 +583,16 @@ export function expandEPUBContextToSentence(
  * quote from a paragraph whose internal sentence punctuation prevents sentence-only balancing.
  */
 export function expandEPUBContextToBalancedParagraphEnd(
-  paragraph: EPUBParagraph,
+  paragraphs: readonly EPUBParagraph[],
   contextHTML: string,
 ): string | null {
+  const passageText = joinedParagraphText(paragraphs);
   const excerpt = searchableEPUBText(contextHTML);
-  const start = paragraph.plainText.indexOf(excerpt);
-  if (start === -1 || start !== paragraph.plainText.lastIndexOf(excerpt)) return null;
-  const remainder = paragraph.plainText.slice(start + excerpt.length);
-  if (!/^[」』]+$/u.test(remainder) || !EPUBBracketsAreBalanced(paragraph.plainText)) return null;
-  return extractEPUBHTMLSubstring(paragraph.html, paragraph.plainText);
+  const start = passageText.indexOf(excerpt);
+  if (start === -1 || start !== passageText.lastIndexOf(excerpt)) return null;
+  const remainder = passageText.slice(start + excerpt.length);
+  if (!/^[」』〉》]+$/u.test(remainder) || !EPUBBracketsAreBalanced(passageText)) return null;
+  return extractEPUBHTMLFromParagraphs(paragraphs, passageText);
 }
 
 export type EPUBContextAnalysis =
@@ -439,10 +609,10 @@ export function analyzeEPUBContext(
   const match = findUniqueEPUBContext(corpus, contextHTML, sourceName);
   if (match === null) return { status: "not-found" };
   const excerpt = searchableEPUBText(contextHTML);
-  if (!hasCompleteContextBoundaries(match.paragraph.plainText, excerpt)) {
+  if (!hasCompleteContextBoundaries(epubContextPlainText(match), excerpt)) {
     return { status: "cut-off", match };
   }
-  const restored = extractEPUBHTMLSubstring(match.paragraph.html, excerpt);
+  const restored = extractEPUBHTMLFromParagraphs(match.paragraphs, excerpt);
   return restored === null
     ? { status: "cut-off", match }
     : { status: "complete", match, contextHTML: restored };

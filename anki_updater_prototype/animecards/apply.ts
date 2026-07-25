@@ -26,6 +26,8 @@ export interface ApplyOptions {
   write: boolean;
   /** Whether converted cards should be reset to Anki's new queue. */
   reset: boolean;
+  /** Tags to add to converted notes. */
+  tags: string[];
   /** Optional maximum number of approved candidates to process. */
   limit: number | undefined;
   /** Append-only result log used during writes. */
@@ -38,7 +40,8 @@ export interface ApplyOptions {
 export function parseApplyArguments(args: string[]): ApplyOptions {
   const flags = parseArgs(args, {
     boolean: ["write", "reset"],
-    string: ["_", "limit", "log", "anki-connect-url"],
+    string: ["_", "limit", "log", "anki-connect-url", "tag"],
+    collect: ["tag"],
     default: { "anki-connect-url": DEFAULT_ANKI_CONNECT_URL },
   });
   const [manifestPath] = flags._;
@@ -53,10 +56,16 @@ export function parseApplyArguments(args: string[]): ApplyOptions {
     }
   }
   const date = new Date().toISOString().slice(0, 10);
+  const tags = flags.tag ?? [];
+  const invalidTag = tags.find((tag) => tag.length === 0 || /\s/u.test(tag));
+  if (invalidTag !== undefined) {
+    throw new Error(`--tag values must be nonempty Anki tags without whitespace: ${invalidTag}`);
+  }
   return {
     manifestPath,
     write: flags.write,
     reset: flags.reset,
+    tags: [...new Set(tags)],
     limit,
     logPath: flags.log ??
       path.join(import.meta.dirname!, "..", "generated", `animecards-apply-${date}.jsonl`),
@@ -103,7 +112,7 @@ async function main(): Promise<void> {
   } catch (error) {
     console.error(error instanceof Error ? error.message : String(error));
     console.error(
-      "Usage: deno task animecards:apply MANIFEST.json [--limit=N] [--log=PATH] [--anki-connect-url=URL] [--reset] [--write]",
+      "Usage: deno task animecards:apply MANIFEST.json [--limit=N] [--log=PATH] [--anki-connect-url=URL] [--tag=TAG]... [--reset] [--write]",
     );
     Deno.exit(1);
   }
@@ -234,10 +243,12 @@ async function main(): Promise<void> {
   let rejected = 0;
   for (const candidate of candidates) {
     const key = candidate.target.fields["Key"];
+    const targetTags = [...new Set([...candidate.original.tags, ...options.tags])];
     const result = await preflightCandidate(
       candidate,
       currentById.get(candidate.noteId),
       [...(targetIdsByKey.get(key) ?? []), ...(candidateIdsByKey.get(key) ?? [])],
+      targetTags,
     );
     if (result.status === "ready") {
       ready.push(candidate);
@@ -259,7 +270,7 @@ async function main(): Promise<void> {
     console.error(
       `Dry run only. Re-run with --write to perform the in-place conversions${
         resetCount > 0 ? ` and reset ${resetCount} cards` : ""
-      }.`,
+      }${options.tags.length > 0 ? ` and add tag(s) ${options.tags.join(", ")}` : ""}.`,
     );
     return;
   }
@@ -275,12 +286,14 @@ async function main(): Promise<void> {
   let reset = 0;
   let failed = 0;
   for (const candidate of ready) {
+    const targetTags = [...new Set([...candidate.original.tags, ...options.tags])];
     const logBase = {
       at: new Date().toISOString(),
       noteId: candidate.noteId,
       key: candidate.target.fields["Key"],
       original: candidate.original,
       target: candidate.target,
+      targetTags,
     };
     try {
       await invoke("updateNoteModel", {
@@ -288,11 +301,16 @@ async function main(): Promise<void> {
           id: candidate.noteId,
           modelName: candidate.target.modelName,
           fields: candidate.target.fields,
-          tags: candidate.original.tags,
+          tags: targetTags,
         },
       });
       const [updated] = await fetchNoteInfos([candidate.noteId], invoke);
-      const verification = await preflightCandidate(candidate, updated, [candidate.noteId]);
+      const verification = await preflightCandidate(
+        candidate,
+        updated,
+        [candidate.noteId],
+        targetTags,
+      );
       if (verification.status !== "already-applied") {
         throw new Error(
           verification.status === "rejected"

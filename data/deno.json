@@ -12,13 +12,18 @@
     "download:nwjc": "deno run --allow-net=github.com,raw.githubusercontent.com --allow-write=./generated scripts/download/nwjc.ts",
     "download:bccwj": "deno run --allow-net=repository.ninjal.ac.jp --allow-write=./generated scripts/download/bccwj.ts",
     "build:jmdict:entries": "deno run --allow-read=./generated/jmdict_eng.json,../card_creator_evals/inputs,./resources/jmdict/entries --allow-write=./resources/jmdict scripts/build/jmdict_entries.ts",
+    "build:jmdict:readings": "deno run --allow-read=./generated/jmdict_eng.json --allow-write=./generated/jmdict_readings.json scripts/build/jmdict_readings.ts",
     "build:jmdict:tags": "deno run --allow-read=./generated/jmdict_eng.json --allow-write=./resources/jmdict/tags.json scripts/build/jmdict_tags.ts",
     "build:jmdict:furigana-fixture": {
       "command": "deno run --allow-read=./resources/jmdict/entries,./generated/jmdict_furigana.json --allow-write=./test/fixtures/jmdict_furigana.json scripts/build/jmdict_furigana_fixture.ts",
       "dependencies": ["build:jmdict:entries"]
     },
     "build:jmdict": {
-      "dependencies": ["build:jmdict:tags", "build:jmdict:furigana-fixture"]
+      "dependencies": [
+        "build:jmdict:tags",
+        "build:jmdict:readings",
+        "build:jmdict:furigana-fixture"
+      ]
     },
     "build:rarity": "deno run --allow-read=./generated --allow-write=./generated scripts/build/rarity.ts",
     "update:jmdict": {
@@ -36,6 +41,7 @@
         "./resources/jmdict",
         "./generated/test",
         "./test/fixtures/jmdict_furigana.json",
+        "./test/fixtures/jmdict_readings.json",
         "../card_creator_evals/inputs"
       ],
       "write": ["./generated/test"]

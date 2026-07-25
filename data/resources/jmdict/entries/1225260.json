@@ -1,0 +1,75 @@
+{
+  "id": "1225260",
+  "kanji": [
+    {
+      "common": false,
+      "text": "紛い",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "擬い",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "贋い",
+      "tags": [
+        "iK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "まがい",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "n-suf"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "imitation"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "sham"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "-like"
+        }
+      ]
+    }
+  ]
+}

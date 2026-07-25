@@ -1,4 +1,4 @@
-import type { AIGeneratedFields, EvalGolden, EvalInput, EvalOutput } from "../types.ts";
+import type { EvalGolden, EvalInput, EvalOutput, GeneratedCardFields } from "../types.ts";
 
 interface Example {
   input: EvalInput;
@@ -11,7 +11,7 @@ interface RunInfo {
   modelIds: string[];
 }
 
-const FIELD_NAMES: Array<keyof AIGeneratedFields> = [
+const FIELD_NAMES: Array<keyof GeneratedCardFields> = [
   "applicableSenses",
   "reading",
   "hint",

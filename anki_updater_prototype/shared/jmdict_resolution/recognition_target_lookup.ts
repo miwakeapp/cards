@@ -1,5 +1,6 @@
 import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
 import * as path from "@std/path";
+import { toHiragana } from "japanese_text";
 import kuromoji from "kuromoji";
 import { createRequire } from "node:module";
 
@@ -22,6 +23,13 @@ interface KuromojiTokenizer {
 interface MatchingTokenSpan {
   tokens: KuromojiToken[];
   endExclusive: number;
+}
+
+export interface SurfaceFormLookupOptions {
+  /** JMDict part-of-speech tags for the already-selected entry. */
+  partOfSpeech?: Iterable<string>;
+  /** Allows a one-character target inside a larger token when stronger source evidence exists. */
+  allowSingleCharacterSubstring?: boolean;
 }
 
 const require = createRequire(import.meta.url);
@@ -67,6 +75,244 @@ function isFunctionToken(token: KuromojiToken): boolean {
 
 function unique<T>(values: Iterable<T>): T[] {
   return [...new Set(values)];
+}
+
+function ichidanSurfaceForms(dictionaryForm: string, includeDerivedForms = true): string[] {
+  if (!dictionaryForm.endsWith("る")) return [dictionaryForm];
+  const stem = dictionaryForm.slice(0, -1);
+  const forms = [
+    dictionaryForm,
+    `${stem}て`,
+    `${stem}た`,
+    `${stem}ない`,
+    `${stem}なかった`,
+    `${stem}なく`,
+    `${stem}なければ`,
+    `${stem}れば`,
+    `${stem}ろ`,
+    `${stem}よう`,
+    stem,
+  ];
+  if (includeDerivedForms) {
+    for (const derived of [`${stem}られる`, `${stem}させる`]) {
+      forms.push(...ichidanSurfaceForms(derived, false));
+    }
+  }
+  return forms;
+}
+
+const GODAN_ROWS: Record<string, { a: string; i: string; e: string; o: string }> = {
+  う: { a: "わ", i: "い", e: "え", o: "お" },
+  く: { a: "か", i: "き", e: "け", o: "こ" },
+  ぐ: { a: "が", i: "ぎ", e: "げ", o: "ご" },
+  す: { a: "さ", i: "し", e: "せ", o: "そ" },
+  つ: { a: "た", i: "ち", e: "て", o: "と" },
+  ぬ: { a: "な", i: "に", e: "ね", o: "の" },
+  ぶ: { a: "ば", i: "び", e: "べ", o: "ぼ" },
+  む: { a: "ま", i: "み", e: "め", o: "も" },
+  る: { a: "ら", i: "り", e: "れ", o: "ろ" },
+};
+
+function godanTeAndPast(end: string): [string, string] | null {
+  if (["う", "つ", "る"].includes(end)) return ["って", "った"];
+  if (["む", "ぶ", "ぬ"].includes(end)) return ["んで", "んだ"];
+  if (end === "く") return ["いて", "いた"];
+  if (end === "ぐ") return ["いで", "いだ"];
+  if (end === "す") return ["して", "した"];
+  return null;
+}
+
+function godanSurfaceForms(dictionaryForm: string): string[] {
+  const end = dictionaryForm.at(-1)!;
+  const row = GODAN_ROWS[end];
+  const teAndPast = godanTeAndPast(end);
+  if (row === undefined || teAndPast === null) return [dictionaryForm];
+  const stem = dictionaryForm.slice(0, -1);
+  const aStem = `${stem}${row.a}`;
+  const iStem = `${stem}${row.i}`;
+  const eStem = `${stem}${row.e}`;
+  const forms = [
+    dictionaryForm,
+    `${stem}${teAndPast[0]}`,
+    `${stem}${teAndPast[1]}`,
+    `${aStem}ない`,
+    `${aStem}なかった`,
+    `${aStem}なく`,
+    `${aStem}ず`,
+    `${aStem}ぬ`,
+    `${eStem}ば`,
+    eStem,
+    `${stem}${row.o}う`,
+    iStem,
+  ];
+  // Potential, passive, and causative forms conjugate as ichidan verbs. Expanding those bases
+  // catches chains such as `紡ぎ出せなかった` and `叩きのめされた` without trusting the
+  // tokenizer to segment the compound consistently.
+  for (const derived of [`${eStem}る`, `${aStem}れる`, `${aStem}せる`]) {
+    forms.push(...ichidanSurfaceForms(derived, false));
+  }
+  // `行く`-style verbs use the geminated te/past forms despite their `く` ending. Including both
+  // possibilities is safe because the result still has to occur literally in the source.
+  if (end === "く") forms.push(`${stem}って`, `${stem}った`);
+  return forms;
+}
+
+function suruSurfaceForms(dictionaryForm: string): string[] {
+  if (!dictionaryForm.endsWith("する")) return [dictionaryForm];
+  const stem = dictionaryForm.slice(0, -"する".length);
+  const forms = [
+    dictionaryForm,
+    `${stem}して`,
+    `${stem}した`,
+    `${stem}しない`,
+    `${stem}しなかった`,
+    `${stem}しなく`,
+    `${stem}すれば`,
+    `${stem}しろ`,
+    `${stem}せよ`,
+    `${stem}せず`,
+    `${stem}せぬ`,
+    `${stem}し`,
+  ];
+  for (const derived of [`${stem}される`, `${stem}させる`]) {
+    forms.push(...ichidanSurfaceForms(derived, false));
+  }
+  return forms;
+}
+
+function adjectiveSurfaceForms(dictionaryForm: string): string[] {
+  if (!dictionaryForm.endsWith("い")) return [dictionaryForm];
+  const stem = dictionaryForm.slice(0, -1);
+  const forms = [
+    dictionaryForm,
+    `${stem}く`,
+    `${stem}かった`,
+    `${stem}くない`,
+    `${stem}くなかった`,
+    `${stem}くなく`,
+    `${stem}ければ`,
+    `${stem}さ`,
+    `${stem}み`,
+  ];
+  // Some fixed negative expressions are tagged as i-adjectives in JMDict even though their
+  // literary `ず`/`ぬ` forms expose the underlying verb, e.g. `そぐわない` → `そぐわず`.
+  if (dictionaryForm.endsWith("ない")) {
+    const negativeStem = dictionaryForm.slice(0, -"ない".length);
+    forms.push(`${negativeStem}ず`, `${negativeStem}ぬ`);
+  }
+  return forms;
+}
+
+interface TargetDrivenSurfaceForms {
+  forms: string[];
+  /** Conjunctive stems whose literal occurrence may instead be part of another lexical item. */
+  conjunctiveStems: Set<string>;
+}
+
+function targetDrivenSurfaceForms(
+  lookupSpelling: string,
+  partOfSpeech: Iterable<string> | undefined,
+): TargetDrivenSurfaceForms {
+  const tags = new Set(partOfSpeech ?? []);
+  const forms = [lookupSpelling];
+  const conjunctiveStems = new Set<string>();
+  if ([...tags].some((tag) => tag.startsWith("v5"))) {
+    forms.push(...godanSurfaceForms(lookupSpelling));
+    const row = GODAN_ROWS[lookupSpelling.at(-1)!];
+    if (row !== undefined) {
+      conjunctiveStems.add(toHiragana(`${lookupSpelling.slice(0, -1)}${row.i}`));
+    }
+  }
+  if ([...tags].some((tag) => tag === "v1" || tag.startsWith("v1-"))) {
+    forms.push(...ichidanSurfaceForms(lookupSpelling));
+    if (lookupSpelling.endsWith("る")) {
+      conjunctiveStems.add(toHiragana(lookupSpelling.slice(0, -1)));
+    }
+  }
+  if ([...tags].some((tag) => tag === "vs" || tag.startsWith("vs-"))) {
+    forms.push(...suruSurfaceForms(lookupSpelling));
+    if (lookupSpelling.endsWith("する")) {
+      conjunctiveStems.add(
+        toHiragana(`${lookupSpelling.slice(0, -"する".length)}し`),
+      );
+    }
+  }
+  if (tags.has("adj-i")) {
+    forms.push(...adjectiveSurfaceForms(lookupSpelling));
+  }
+  return {
+    forms: unique(forms).sort((left, right) => right.length - left.length),
+    conjunctiveStems,
+  };
+}
+
+function literalSurfaceMatches(
+  sentence: string,
+  surfaceForms: Iterable<string>,
+  allowSingleCharacterSubstring: boolean,
+): string[] {
+  const normalizedSentence = toHiragana(sentence);
+  const matches: Array<{ start: number; end: number; surface: string }> = [];
+  for (const form of surfaceForms) {
+    if ([...form].length < 2 && !allowSingleCharacterSubstring) continue;
+    const normalizedForm = toHiragana(form);
+    let start = normalizedSentence.indexOf(normalizedForm);
+    while (start !== -1) {
+      const end = start + normalizedForm.length;
+      matches.push({ start, end, surface: sentence.slice(start, end) });
+      start = normalizedSentence.indexOf(normalizedForm, start + 1);
+    }
+  }
+  // Prefer the longest valid conjugation at each occurrence. This keeps `たべて` instead of the
+  // bare conjunctive stem `たべ`, while still retaining genuinely distinct occurrences.
+  return unique(
+    matches
+      .filter((match) =>
+        !matches.some((other) => other.start === match.start && other.end > match.end)
+      )
+      .sort((left, right) => left.start - right.start)
+      .map((match) => match.surface),
+  );
+}
+
+/**
+ * A bare conjunctive stem is unsafe when the same characters are a strict substring of one
+ * tokenizer token. For example, `食べ` is a valid inflection of `食べる`, but the occurrence in
+ * `食べ物` belongs to a different lexical item. Exact-token stems such as `剥き出し`, and stems
+ * crossing an unreliable token boundary such as `憑き` in `憑きもの`, remain available.
+ *
+ * Since callers mark every occurrence of a returned surface, one embedded occurrence makes that
+ * surface ambiguous even when another occurrence is independently valid.
+ */
+function stemHasEmbeddedOccurrence(
+  sentence: string,
+  surface: string,
+  tokens: readonly KuromojiToken[],
+): boolean {
+  const tokenRanges: Array<{ start: number; end: number }> = [];
+  let tokenStart = 0;
+  for (const token of tokens) {
+    const tokenEnd = tokenStart + token.surface_form.length;
+    tokenRanges.push({ start: tokenStart, end: tokenEnd });
+    tokenStart = tokenEnd;
+  }
+
+  for (
+    let start = sentence.indexOf(surface);
+    start !== -1;
+    start = sentence.indexOf(surface, start + 1)
+  ) {
+    const end = start + surface.length;
+    if (
+      tokenRanges.some((token) =>
+        token.start <= start && end <= token.end &&
+        (token.start < start || end < token.end)
+      )
+    ) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function tokenLookupForm(token: KuromojiToken): string {
@@ -378,20 +624,62 @@ export async function deriveLookupSpellings(
 export async function findSurfaceFormsForLookupSpelling(
   sentence: string,
   lookupSpelling: string,
+  options: SurfaceFormLookupOptions = {},
 ): Promise<string[]> {
-  const tokenizer = await kuromojiTokenizer();
-  const tokens = tokenizer.tokenize(sentence);
+  const targetDrivenForms = targetDrivenSurfaceForms(
+    lookupSpelling,
+    options.partOfSpeech,
+  );
+  let targetDrivenMatches = literalSurfaceMatches(
+    sentence,
+    targetDrivenForms.forms,
+    options.allowSingleCharacterSubstring === true,
+  );
+  const unsafeConjunctiveSurfaces = new Set<string>();
+  let tokenizer: KuromojiTokenizer | undefined;
+  let tokens: KuromojiToken[] | undefined;
+  if (
+    targetDrivenMatches.some((surface) =>
+      targetDrivenForms.conjunctiveStems.has(toHiragana(surface))
+    )
+  ) {
+    tokenizer = await kuromojiTokenizer();
+    const sentenceTokens = tokenizer.tokenize(sentence);
+    tokens = sentenceTokens;
+    targetDrivenMatches = targetDrivenMatches.filter((surface) => {
+      if (
+        targetDrivenForms.conjunctiveStems.has(toHiragana(surface)) &&
+        stemHasEmbeddedOccurrence(sentence, surface, sentenceTokens)
+      ) {
+        unsafeConjunctiveSurfaces.add(surface);
+        return false;
+      }
+      return true;
+    });
+  }
+  if (targetDrivenMatches.length > 0) return targetDrivenMatches;
+
+  const safeSurfaceMatches = (surfaces: Iterable<string>): string[] =>
+    unique(surfaces).filter((surface) => !unsafeConjunctiveSurfaces.has(surface));
+
+  tokenizer ??= await kuromojiTokenizer();
+  tokens ??= tokenizer.tokenize(sentence);
   const exactMatches = findMatchingTokenSpans(tokens, lookupSpelling);
   if (exactMatches.length > 0) {
-    return unique(
+    const safeMatches = safeSurfaceMatches(
       exactMatches.map((match) => match.tokens.map((token) => token.surface_form).join("")),
     );
+    if (safeMatches.length > 0) return safeMatches;
   }
   // Kuromoji sometimes treats a valid multi-character word plus an adjacent suffix as one token
   // (e.g. `色とりどり` or `安全圏内`). The already-resolved JMDict entry makes a literal fallback
   // safe for nontrivial spellings, while excluding dangerous one-character substrings such as
   // `生` inside `生活`.
-  if ([...lookupSpelling].length >= 2 && sentence.includes(lookupSpelling)) {
+  if (
+    [...lookupSpelling].length >= 2 &&
+    sentence.includes(lookupSpelling) &&
+    !unsafeConjunctiveSurfaces.has(lookupSpelling)
+  ) {
     return [lookupSpelling];
   }
 
@@ -416,7 +704,8 @@ export async function findSurfaceFormsForLookupSpelling(
     }
   }
   if (sequenceMatches.length > 0) {
-    return unique(sequenceMatches);
+    const safeMatches = safeSurfaceMatches(sequenceMatches);
+    if (safeMatches.length > 0) return safeMatches;
   }
 
   const matches: string[] = [];
@@ -451,5 +740,5 @@ export async function findSurfaceFormsForLookupSpelling(
     }
   }
 
-  return unique(matches);
+  return safeSurfaceMatches(matches);
 }

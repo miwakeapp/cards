@@ -12,7 +12,7 @@ Download the latest JMDict and furigana data and rebuild the checked-in subset w
 deno task --cwd data update:jmdict
 ```
 
-`update:jmdict` refreshes the independent JMDict and furigana sources, then runs `build:jmdict`. The build refreshes the selected entries and tag descriptions, records the source revision in `resources/jmdict/snapshot.json`, and reduces the full furigana data to the relevant test records. Run `build:jmdict` directly to rebuild from existing local inputs. Commit the resulting checked-in resource changes together.
+`update:jmdict` refreshes the independent JMDict and furigana sources, then runs `build:jmdict`. The build refreshes the selected entries and tag descriptions, records the source revision in `resources/jmdict/snapshot.json`, builds the compact runtime spelling-to-readings index, and reduces the full furigana data to the relevant test records. Run `build:jmdict` directly to rebuild from existing local inputs. Commit the resulting checked-in resource changes together.
 
 The JMDict snapshot is derived from [jmdict-simplified](https://github.com/scriptin/jmdict-simplified), which packages the Electronic Dictionary Research and Development Group's JMDict data under the [Creative Commons Attribution-ShareAlike 4.0 license](https://github.com/scriptin/jmdict-simplified/blob/master/LICENSE.txt). The small checked-in furigana fixture is extracted from [Lorenzi's Jisho](https://jisho.hlorenzi.com/); the full download remains local.
 

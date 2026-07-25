@@ -18,9 +18,16 @@
 import { parseArgs } from "@std/cli/parse-args";
 import { parse as parseCSV } from "@std/csv";
 import { createCard, type MiwakeCard } from "card_creator";
-import { DEFAULT_MODEL_ID, generateCardFields, MODEL_IDS, type ModelId } from "card_creator/ai";
 import { allJMDictEntries } from "data";
+import {
+  DEFAULT_MODEL_ID,
+  generateCardFields,
+  MODEL_IDS,
+  type ModelId,
+} from "card_field_generation";
+import { inferLegacySourceLanguage } from "../animecards/source.ts";
 import { ac } from "../shared/anki_connect.ts";
+import { markContextTargets } from "../shared/mark_context.ts";
 import {
   type CSVRow,
   formatResolutionIssue,
@@ -96,15 +103,34 @@ for (const { row, entry, recognitionTarget: cardTarget } of resolved) {
     console.error(`\nGenerating card for: ${row.recognitionTarget} → ${cardTarget}`);
   }
 
-  const card = await createCard({
-    input: {
-      context: row.sentence,
-      jmdictId: entry.id,
-      recognitionTarget: cardTarget,
-      source: row.source || undefined,
-    },
+  const fields = await generateCardFields({
+    context: row.sentence,
+    recognitionTarget: cardTarget,
     jmdictEntry: entry,
-    generateFields: (input) => generateCardFields(input, modelId),
+    source: row.source || undefined,
+  }, modelId);
+  const recognitionTarget = cardTarget;
+  const applicableSenseNumbers = fields.applicableSenses.length === 0 ||
+      fields.applicableSenses.length === entry.sense.length
+    ? undefined
+    : fields.applicableSenses;
+  const card = await createCard({
+    jmdictEntry: entry,
+    recognitionTarget,
+    ...(entry.kanji.some(({ text }) => text === recognitionTarget)
+      ? { kanaReading: fields.reading }
+      : {}),
+    applicableSenseNumbers,
+    hint: applicableSenseNumbers !== undefined &&
+        fields.hint?.includes(recognitionTarget)
+      ? fields.hint
+      : undefined,
+    fullContext: markContextTargets(row.sentence, [fields.targetInContext]),
+    minimizedContext: fields.minimizedContext === null ? undefined : fields.minimizedContext,
+    source: row.source === "" ? undefined : {
+      text: fields.cleanedSource ?? row.source,
+      lang: inferLegacySourceLanguage(fields.cleanedSource ?? row.source),
+    },
   });
 
   cards.push({ row, card });

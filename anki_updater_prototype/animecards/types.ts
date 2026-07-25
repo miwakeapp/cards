@@ -1,4 +1,4 @@
-export const CONVERSION_MANIFEST_VERSION = 7;
+export const CONVERSION_MANIFEST_VERSION = 9;
 
 export interface AnkiFieldValue {
   value: string;
@@ -48,6 +48,10 @@ export type FullContextResolution =
   | { status: "restored"; method: "ai"; model: string; generatedAt: string }
   | { status: "failed"; model: string; attemptedAt: string; error: string };
 
+export type TargetInContextResolution =
+  | { method: "deterministic"; surface: string; additionalSurfaces?: string[] }
+  | { method: "ai"; surface: string; model: string; generatedAt: string };
+
 export interface OriginalNoteSnapshot {
   modelName: string;
   tags: string[];
@@ -61,10 +65,15 @@ export interface ConversionCandidate {
   /** False for an automatic deferral or a manual hold; omitted by `apply`. */
   approved: boolean;
   jmdictId: string;
+  /** Current rendered display target, including automatic or user-edited `～` notation. */
   recognitionTarget: string;
+  /** Exact undecorated JMDict spelling used in the key and passed to Card Creator. */
   keyRecognitionTarget: string;
+  /** Explicit notation retained from the source Animecard, if any. */
+  recognitionTargetOverride?: string;
   readingKana: string;
   sourceResolution: SourceResolution;
+  targetInContextResolution: TargetInContextResolution;
   fullContextResolution: FullContextResolution;
   minimizedContextResolution: MinimizedContextResolution;
   senseResolution: SenseResolution;

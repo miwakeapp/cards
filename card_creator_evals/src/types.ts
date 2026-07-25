@@ -2,9 +2,9 @@
  * Types used by the eval system - shared between scripts and the viewer.
  */
 
-import type { AIGeneratedFields } from "card_creator";
+import type { GeneratedCardFields } from "card_field_generation";
 
-export type { AIGeneratedFields };
+export type { GeneratedCardFields };
 
 /**
  * An eval input - the data we feed to the AI for testing.
@@ -23,7 +23,7 @@ export interface EvalInput {
  */
 export interface EvalGolden {
   inputId: string;
-  aiFields: AIGeneratedFields;
+  aiFields: GeneratedCardFields;
 }
 
 /**
@@ -33,7 +33,7 @@ export interface EvalOutput {
   inputId: string;
   model: string;
   timestamp: string;
-  aiFields: AIGeneratedFields;
+  aiFields: GeneratedCardFields;
 }
 
 /**

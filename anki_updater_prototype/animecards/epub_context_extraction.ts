@@ -2,9 +2,9 @@ import { anthropic } from "@ai-sdk/anthropic";
 import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
 import { generateText, type LanguageModel } from "ai";
-import type { ModelId } from "card_creator/ai";
+import type { ModelId } from "card_field_generation";
 
-export const EPUB_CONTEXT_PROMPT_VERSION = 1;
+export const EPUB_CONTEXT_PROMPT_VERSION = 2;
 /** Bump when either the selection prompt or its deterministic validation contract changes. */
 export const EPUB_RELEVANCE_SELECTION_VERSION = 2;
 

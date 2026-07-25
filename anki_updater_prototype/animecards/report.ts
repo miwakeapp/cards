@@ -120,6 +120,8 @@ export function buildConversionReport(manifest: ConversionManifest): string {
   const sourcedCount =
     candidates.filter((candidate) => candidate.sourceResolution.name !== null).length;
   const sourceMethodCounts = new Map<string, number>();
+  const targetResolutionCounts = new Map<string, number>();
+  const targetResolutionModelCounts = new Map<string, number>();
   const fullContextCounts = new Map<string, number>();
   const fullContextModelCounts = new Map<string, number>();
   const minimizationCounts = new Map<string, number>();
@@ -130,9 +132,23 @@ export function buildConversionReport(manifest: ConversionManifest): string {
     candidate.minimizedContextResolution.status === "failed" ||
     candidate.senseResolution.status === "failed"
   );
+  const aiResolvedTargets = candidates.filter((candidate) =>
+    candidate.targetInContextResolution.method === "ai"
+  );
   for (const candidate of candidates) {
     const method = candidate.sourceResolution.method;
     sourceMethodCounts.set(method, (sourceMethodCounts.get(method) ?? 0) + 1);
+    const targetResolution = candidate.targetInContextResolution;
+    targetResolutionCounts.set(
+      targetResolution.method,
+      (targetResolutionCounts.get(targetResolution.method) ?? 0) + 1,
+    );
+    if (targetResolution.method === "ai") {
+      targetResolutionModelCounts.set(
+        targetResolution.model,
+        (targetResolutionModelCounts.get(targetResolution.model) ?? 0) + 1,
+      );
+    }
     const fullContext = candidate.fullContextResolution;
     const fullContextLabel = fullContext.status === "restored"
       ? `${fullContext.status}/${fullContext.method}`
@@ -174,6 +190,13 @@ export function buildConversionReport(manifest: ConversionManifest): string {
     `- Candidates without a source: ${candidates.length - sourcedCount}`,
     `- Source methods: ${
       [...sourceMethodCounts].map(([method, count]) => `${method}=${count}`).join(", ")
+    }`,
+    `- Target-in-context resolution: ${
+      [...targetResolutionCounts].map(([method, count]) => `${method}=${count}`).join(", ")
+    }`,
+    `- Target-in-context AI models: ${
+      [...targetResolutionModelCounts].map(([model, count]) => `${model}=${count}`).join(", ") ||
+      "none"
     }`,
     `- Full-context AI models: ${
       [...fullContextModelCounts].map(([model, count]) => `${model}=${count}`).join(", ") ||
@@ -223,6 +246,26 @@ export function buildConversionReport(manifest: ConversionManifest): string {
       } | ${noteIds} |`,
     );
   }
+
+  lines.push(
+    "",
+    "## AI-resolved target surfaces",
+    "",
+    aiResolvedTargets.length === 1
+      ? "1 candidate uses an AI-selected literal target substring."
+      : `${aiResolvedTargets.length} candidates use AI-selected literal target substrings.`,
+    "",
+    "| Note ID | Recognition target | Source surface | Model | Full context |",
+    "| ---: | --- | --- | --- | --- |",
+    ...aiResolvedTargets.map((candidate) => {
+      const resolution = candidate.targetInContextResolution;
+      return `| ${candidate.noteId} | ${inlineCode(candidate.recognitionTarget)} | ${
+        inlineCode(resolution.surface)
+      } | ${resolution.method === "ai" ? resolution.model : ""} | ${
+        inlineCode(abbreviated(contextText(candidate.target.fields["Full context"] ?? "")))
+      } |`;
+    }),
+  );
 
   const sentenceField = manifest.sourceFields.sentence;
   const contextChanges = candidates.map((candidate) => {

@@ -1,6 +1,6 @@
-# Card Creator Evals
+# Card-Field Generation Evals
 
-Evaluates `card_creator`'s AI-generated fields against a checked-in set of contexts and reviewed goldens. Inputs and goldens are source material; model run results are local artifacts stored under `generated/runs/`.
+Evaluates `card_field_generation`'s combined AI prompt against a checked-in set of contexts and reviewed goldens. Inputs and goldens are source material; model run results are local artifacts stored under `generated/runs/`.
 
 Run every configured model, or select one:
 

@@ -1,4 +1,4 @@
-import "../../data/test/use_furigana_fixture.ts";
+import "../../data/test/use_jmdict_fixtures.ts";
 
 import { assertEquals } from "@std/assert";
 import { parseAnkiReading, recomputeAnkiReading } from "../src/anki_reading.ts";

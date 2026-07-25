@@ -46,9 +46,9 @@ export function startServer(options: ServerOptions): Deno.HttpServer {
       reason: card.reason,
       detail: card.detail,
       word: card.note.fields.recognitionTarget ||
-        card.parsedKey?.recognitionTarget || card.note.fields.key,
+        card.parsedKey?.spelling || card.note.fields.key,
       key: card.note.fields.key,
-      recognitionTarget: card.parsedKey?.recognitionTarget ?? null,
+      recognitionTarget: card.parsedKey?.spelling ?? null,
       jmdictId: card.parsedKey?.jmdictId ?? null,
       hint: card.note.fields.hint,
       fullContext: card.note.fields.fullContext,

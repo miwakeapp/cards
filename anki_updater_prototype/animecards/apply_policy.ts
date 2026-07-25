@@ -22,10 +22,11 @@ function arraysEqual<T>(left: T[], right: T[]): boolean {
 export function isAppliedCandidate(
   candidate: ConversionCandidate,
   current: AnkiNoteInfo,
+  expectedTags: readonly string[] = candidate.original.tags,
 ): boolean {
   return current.modelName === candidate.target.modelName &&
     recordsEqual(noteFieldValues(current), candidate.target.fields) &&
-    arraysEqual([...current.tags].sort(), [...candidate.original.tags].sort()) &&
+    arraysEqual([...current.tags].sort(), [...expectedTags].sort()) &&
     arraysEqual(
       [...current.cards].sort((left, right) => left - right),
       [...candidate.original.cards].sort((left, right) => left - right),
@@ -37,11 +38,12 @@ export async function preflightCandidate(
   candidate: ConversionCandidate,
   current: AnkiNoteInfo | undefined,
   targetNoteIdsWithKey: number[],
+  expectedTags: readonly string[] = candidate.original.tags,
 ): Promise<PreflightResult> {
   if (current === undefined || !current.noteId) {
     return { status: "rejected", error: "Note no longer exists." };
   }
-  if (isAppliedCandidate(candidate, current)) {
+  if (isAppliedCandidate(candidate, current, expectedTags)) {
     return { status: "already-applied" };
   }
   if (current.modelName !== candidate.original.modelName) {

@@ -1,21 +1,16 @@
 {
-  "id": "2643730",
+  "id": "2548280",
   "kanji": [
     {
       "common": false,
-      "text": "えんじ色",
-      "tags": []
-    },
-    {
-      "common": false,
-      "text": "臙脂色",
+      "text": "のしのしと歩く",
       "tags": []
     }
   ],
   "kana": [
     {
       "common": false,
-      "text": "えんじいろ",
+      "text": "のしのしとあるく",
       "tags": [],
       "appliesToKanji": [
         "*"
@@ -25,7 +20,9 @@
   "sense": [
     {
       "partOfSpeech": [
-        "n"
+        "exp",
+        "v5k",
+        "vi"
       ],
       "appliesToKanji": [
         "*"
@@ -45,13 +42,13 @@
           "lang": "eng",
           "gender": null,
           "type": null,
-          "text": "dark red"
+          "text": "to walk heavily and clumsily"
         },
         {
           "lang": "eng",
           "gender": null,
           "type": null,
-          "text": "deep red"
+          "text": "to lumber"
         }
       ]
     }

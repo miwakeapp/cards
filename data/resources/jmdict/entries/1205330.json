@@ -1,38 +1,33 @@
 {
-  "id": "1913350",
+  "id": "1205330",
   "kanji": [
     {
       "common": false,
-      "text": "ヤブ蚊",
+      "text": "かっこ悪い",
       "tags": []
     },
     {
       "common": false,
-      "text": "やぶ蚊",
+      "text": "カッコ悪い",
       "tags": []
     },
     {
       "common": false,
-      "text": "薮蚊",
+      "text": "格好悪い",
       "tags": []
     },
     {
       "common": false,
-      "text": "藪蚊",
-      "tags": []
-    },
-    {
-      "common": false,
-      "text": "豹脚蚊",
+      "text": "恰好悪い",
       "tags": [
-        "oK"
+        "sK"
       ]
     }
   ],
   "kana": [
     {
       "common": false,
-      "text": "やぶか",
+      "text": "かっこわるい",
       "tags": [],
       "appliesToKanji": [
         "*"
@@ -40,23 +35,17 @@
     },
     {
       "common": false,
-      "text": "やぶっか",
+      "text": "かっこうわるい",
       "tags": [],
       "appliesToKanji": [
-        "*"
+        "格好悪い"
       ]
-    },
-    {
-      "common": false,
-      "text": "ヤブカ",
-      "tags": [],
-      "appliesToKanji": []
     }
   ],
   "sense": [
     {
       "partOfSpeech": [
-        "n"
+        "adj-i"
       ],
       "appliesToKanji": [
         "*"
@@ -76,13 +65,25 @@
           "lang": "eng",
           "gender": null,
           "type": null,
-          "text": "Aedes (genus of mosquitoes)"
+          "text": "unattractive"
         },
         {
           "lang": "eng",
           "gender": null,
           "type": null,
-          "text": "striped mosquito"
+          "text": "ugly"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "unstylish"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "uncool"
         }
       ]
     }

@@ -2,7 +2,7 @@
 
 This repository is a highly in-progress set of utilities for creating, managing, and updating my personal collection of Japanese vocabulary flashcards. The plan is to slowly evolve it into one or more reusable tools, packaged in a way that makes sense for a broader audience of people who have flashcard philosophies and Japanese learning levels similar to mine.
 
-For now, most of the vision is documented in [DESIGN.md](./DESIGN.md).
+For now, most of the vision is documented in [DESIGN.md](./DESIGN.md). [EXTENSION-BRAINSTORMING.md](./EXTENSION-BRAINSTORMING.md) sketches how a browser extension could resolve captured page evidence into deterministic `card_creator` input.
 
 This project was started in 2025-11, when AI agents were less capable. Right now me and my agents are going through what's been created so far to set the stage for some more ambitious zero-shot prompts that might complete the project in a more end-to-end way.
 
@@ -20,8 +20,9 @@ Some workflows call AI providers. Copy `.env.sample` to `.env` and add only the 
 
 | Package                                                     | Purpose                                                                                    |
 | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| [`card_creator`](./card_creator/)                           | Constructs Miwake Card fields and provides the canonical AI field generator.               |
-| [`card_creator_evals`](./card_creator_evals/)               | Runs and reviews AI card-creation evals.                                                   |
+| [`card_creator`](./card_creator/)                           | Deterministically validates and renders fully decided Miwake Card fields.                  |
+| [`card_field_generation`](./card_field_generation/)         | Owns the shared, evaluated AI prompt for unresolved card fields.                           |
+| [`card_creator_evals`](./card_creator_evals/)               | Runs and reviews the shared AI card-field evals.                                           |
 | [`card_updater`](./card_updater/)                           | Reviews and applies changes caused by new JMDict revisions.                                |
 | [`data`](./data/)                                           | Owns JMDict and rarity resource access, provenance, downloads, and checked-in samples.     |
 | [`html_dictionary_previewer`](./html_dictionary_previewer/) | Visually compares dictionary-entry styles against checked-in sample entries.               |
