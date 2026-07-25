@@ -5,8 +5,11 @@
 // `data/download` export (e.g. the card updater refreshes the dictionary before scanning).
 
 import * as path from "@std/path";
+import type { JMdict } from "@scriptin/jmdict-simplified-types";
 import { unzipSync } from "fflate";
 import { entriesCache } from "./entries_cache.ts";
+import { buildJMDictReadings } from "./jmdict_readings.ts";
+import { jmdictReadingsCache } from "./jmdict_readings_cache.ts";
 import { resourcePaths } from "./resource_paths.ts";
 
 const RELEASES_URL = "https://api.github.com/repos/scriptin/jmdict-simplified/releases/latest";
@@ -108,10 +111,16 @@ async function downloadRelease(release: LatestRelease): Promise<void> {
   await Deno.mkdir(path.dirname(jmdictPath), { recursive: true });
   const temporaryPath = `${jmdictPath}.download`;
   await Deno.writeFile(temporaryPath, unzipped[0]);
+  const jmdict = JSON.parse(new TextDecoder().decode(unzipped[0])) as JMdict;
+  const readings = buildJMDictReadings(jmdict.words);
+  const temporaryReadingsPath = `${resourcePaths.jmdictReadings}.download`;
+  await Deno.writeTextFile(temporaryReadingsPath, JSON.stringify(readings) + "\n");
   await Deno.rename(temporaryPath, jmdictPath);
+  await Deno.rename(temporaryReadingsPath, resourcePaths.jmdictReadings);
 
   // A caller may have already read the old file through `allJMDictEntries()`.
   entriesCache.promise = null;
+  jmdictReadingsCache.promise = null;
 }
 
 /** The result of checking or updating the local JMDict data. */

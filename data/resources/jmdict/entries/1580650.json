@@ -1,0 +1,96 @@
+{
+  "id": "1580650",
+  "kanji": [
+    {
+      "common": true,
+      "text": "人々",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "人びと",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "人人",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "ひとびと",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "people"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "men and women"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "each person"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "everybody"
+        }
+      ]
+    }
+  ]
+}

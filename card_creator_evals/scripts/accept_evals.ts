@@ -8,8 +8,8 @@
 
 import { parseArgs } from "@std/cli/parse-args";
 import * as path from "@std/path";
-import { MODEL_IDS, type ModelId } from "card_creator/ai";
 import type { EvalGolden, EvalOutput } from "../src/types.ts";
+import { MODEL_IDS, type ModelId } from "card_field_generation";
 
 const BASE_DIR = path.resolve(import.meta.dirname!, "..");
 const GOLDENS_DIR = path.join(BASE_DIR, "goldens");

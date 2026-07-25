@@ -1,0 +1,77 @@
+{
+  "id": "1313600",
+  "kanji": [
+    {
+      "common": false,
+      "text": "事も無げに",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "事もなげに",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "こともなげに",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adv"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "casually"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "nonchalantly"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "easily"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "without difficulty"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "as if nothing had happened"
+        }
+      ]
+    }
+  ]
+}

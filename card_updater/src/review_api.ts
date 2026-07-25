@@ -1,5 +1,5 @@
 import type { EnsureLatestFuriganaResult, EnsureLatestResult } from "data/download";
-import type { ModelId } from "card_creator/ai";
+import type { ModelId } from "card_field_generation";
 import type { ChangeChip, SenseView, Verdict } from "./analyze.ts";
 import type { AppliedRecord, DecisionRecord } from "./state.ts";
 import type { Suggestion } from "./suggest.ts";

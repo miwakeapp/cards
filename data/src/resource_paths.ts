@@ -9,6 +9,7 @@ const jmdictResourcesDirectory = join(packageDirectory, "resources", "jmdict");
 export const resourcePaths = {
   runtimeManifest: join(generatedDirectory, "manifest.json"),
   jmdict: join(generatedDirectory, "jmdict_eng.json"),
+  jmdictReadings: join(generatedDirectory, "jmdict_readings.json"),
   jmdictFurigana: join(generatedDirectory, "jmdict_furigana.json"),
   rarityDatabase: join(generatedDirectory, "rarity.sqlite3"),
   nwjcSurface1Gram: join(generatedDirectory, "nwjc", "NWJC-surface-1gram.txt"),

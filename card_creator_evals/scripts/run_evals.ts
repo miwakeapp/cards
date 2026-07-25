@@ -8,14 +8,14 @@
 
 import { parseArgs } from "@std/cli/parse-args";
 import * as path from "@std/path";
+import { generateCardFields, MODEL_IDS, type ModelId } from "card_field_generation";
 import { preextractedJMDictEntry } from "data";
-import { generateCardFields, MODEL_IDS, type ModelId } from "card_creator/ai";
 import type {
-  AIGeneratedFields,
   EvalDiff,
   EvalGolden,
   EvalInput,
   EvalOutput,
+  GeneratedCardFields,
 } from "../src/types.ts";
 
 const BASE_DIR = path.resolve(import.meta.dirname!, "..");
@@ -73,7 +73,7 @@ function computeDiffs(golden: EvalGolden | null, current: EvalOutput): EvalDiff[
   }
 
   const diffs: EvalDiff[] = [];
-  const fieldsToCompare: (keyof AIGeneratedFields)[] = [
+  const fieldsToCompare: (keyof GeneratedCardFields)[] = [
     "applicableSenses",
     "reading",
     "targetInContext",

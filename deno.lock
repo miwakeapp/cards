@@ -1,6 +1,8 @@
 {
   "version": "5",
   "specifiers": {
+    "jsr:@b-fuze/deno-dom@~0.1.56": "0.1.56",
+    "jsr:@denosaurs/plug@1.1.0": "1.1.0",
     "jsr:@std/assert@^1.0.16": "1.0.19",
     "jsr:@std/assert@^1.0.19": "1.0.19",
     "jsr:@std/async@^1.4.0": "1.5.0",
@@ -9,8 +11,11 @@
     "jsr:@std/cli@^1.0.32": "1.0.32",
     "jsr:@std/csv@^1.0.6": "1.0.6",
     "jsr:@std/data-structures@^1.1.0": "1.1.1",
+    "jsr:@std/encoding@1": "1.0.11",
     "jsr:@std/encoding@^1.0.11": "1.0.11",
+    "jsr:@std/fmt@1": "1.0.10",
     "jsr:@std/fmt@^1.0.10": "1.0.10",
+    "jsr:@std/fs@1": "1.0.24",
     "jsr:@std/fs@^1.0.24": "1.0.24",
     "jsr:@std/html@^1.0.5": "1.0.7",
     "jsr:@std/html@^1.0.7": "1.0.7",
@@ -19,6 +24,7 @@
     "jsr:@std/internal@^1.0.14": "1.0.14",
     "jsr:@std/media-types@^1.1.0": "1.1.0",
     "jsr:@std/net@^1.0.6": "1.0.6",
+    "jsr:@std/path@1": "1.1.6",
     "jsr:@std/path@^1.1.2": "1.1.6",
     "jsr:@std/path@^1.1.5": "1.1.6",
     "jsr:@std/path@^1.1.6": "1.1.6",
@@ -27,7 +33,6 @@
     "jsr:@std/testing@^1.0.16": "1.0.19",
     "npm:@ai-sdk/anthropic@^4.0.11": "4.0.12_zod@4.4.3",
     "npm:@ai-sdk/google@^4.0.12": "4.0.12_zod@4.4.3",
-    "npm:@ai-sdk/openai@4.0.11": "4.0.11_zod@4.4.3",
     "npm:@ai-sdk/openai@^4.0.11": "4.0.11_zod@4.4.3",
     "npm:@scriptin/jmdict-simplified-types@^3.6.1": "3.6.1",
     "npm:@types/node@^24.13.3": "24.13.3",
@@ -35,10 +40,26 @@
     "npm:fflate@~0.8.2": "0.8.3",
     "npm:iso-639-2@*": "3.0.2",
     "npm:kuromoji@~0.1.2": "0.1.2",
+    "npm:parse5@^8.0.1": "8.0.1",
     "npm:yanki-connect@^4.0.6": "4.0.6",
     "npm:zod@^4.1.13": "4.4.3"
   },
   "jsr": {
+    "@b-fuze/deno-dom@0.1.56": {
+      "integrity": "8030e2dc1d8750f1682b53462ab893d9c3470f2287feecbe22f44a88c54ab148",
+      "dependencies": [
+        "jsr:@denosaurs/plug"
+      ]
+    },
+    "@denosaurs/plug@1.1.0": {
+      "integrity": "eb2f0b7546c7bca2000d8b0282c54d50d91cf6d75cb26a80df25a6de8c4bc044",
+      "dependencies": [
+        "jsr:@std/encoding@1",
+        "jsr:@std/fmt@1",
+        "jsr:@std/fs@1",
+        "jsr:@std/path@1"
+      ]
+    },
     "@std/assert@1.0.19": {
       "integrity": "eaada96ee120cb980bc47e040f82814d786fe8162ecc53c91d8df60b8755991e",
       "dependencies": [
@@ -54,7 +75,7 @@
     "@std/cli@1.0.32": {
       "integrity": "188b3a100d6202d64e3f5bd3d799c7fa4f6d77f92cc65eb7f641c1fa0aa92a66",
       "dependencies": [
-        "jsr:@std/fmt",
+        "jsr:@std/fmt@^1.0.10",
         "jsr:@std/internal@^1.0.14"
       ]
     },
@@ -87,9 +108,9 @@
       "integrity": "1c0473590d5e5b75b30b2be4833c08047dd799aeea35624fd34ec58d67fc9240",
       "dependencies": [
         "jsr:@std/cli@^1.0.31",
-        "jsr:@std/encoding",
-        "jsr:@std/fmt",
-        "jsr:@std/fs",
+        "jsr:@std/encoding@^1.0.11",
+        "jsr:@std/fmt@^1.0.10",
+        "jsr:@std/fs@^1.0.24",
         "jsr:@std/html@^1.0.7",
         "jsr:@std/media-types",
         "jsr:@std/net",
@@ -124,7 +145,7 @@
         "jsr:@std/assert@^1.0.19",
         "jsr:@std/async",
         "jsr:@std/data-structures",
-        "jsr:@std/fs",
+        "jsr:@std/fs@^1.0.24",
         "jsr:@std/internal@^1.0.14",
         "jsr:@std/path@^1.1.5"
       ]
@@ -241,6 +262,9 @@
     "doublearray@0.0.2": {
       "integrity": "sha512-aw55FtZzT6AmiamEj2kvmR6BuFqvYgKZUkfQ7teqVRNqD5UE0rw8IeW/3gieHNKQ5sPuDKlljWEn4bzv5+1bHw=="
     },
+    "entities@8.0.0": {
+      "integrity": "sha512-zwfzJecQ/Uej6tusMqwAqU/6KL2XaB2VZ2Jg54Je6ahNBGNH6Ek6g3jjNCF0fG9EWQKGZNddNjU5F1ZQn/sBnA=="
+    },
     "eventsource-parser@3.1.0": {
       "integrity": "sha512-kJezFj9YFAMLeORyi7aCLxLbD5/qWMQnoMVlVPyHIll7lgRJCc3JVln9Vgl9nwQi0YkMnhdGTMNn7CkRRAptMg=="
     },
@@ -295,6 +319,12 @@
         "wsl-utils"
       ]
     },
+    "parse5@8.0.1": {
+      "integrity": "sha512-z1e/HMG90obSGeidlli3hj7cbocou0/wa5HacvI3ASx34PecNjNQeaHNo5WIZpWofN9kgkqV1q5YvXe3F0FoPw==",
+      "dependencies": [
+        "entities"
+      ]
+    },
     "powershell-utils@0.1.0": {
       "integrity": "sha512-dM0jVuXJPsDN6DvRpea484tCUaMiXWjuCn++HGTqUWzGDjv5tZkEZldAJ/UMlqRYGFrD/etByo4/xOuC/snX2A=="
     },
@@ -330,6 +360,7 @@
   },
   "workspace": {
     "dependencies": [
+      "jsr:@b-fuze/deno-dom@~0.1.56",
       "jsr:@std/assert@^1.0.16",
       "jsr:@std/cli@^1.0.32",
       "jsr:@std/csv@^1.0.6",
@@ -347,10 +378,11 @@
       "npm:ai@^7.0.20",
       "npm:fflate@~0.8.2",
       "npm:iso-639-2@*",
-      "npm:kuromoji@~0.1.2"
+      "npm:kuromoji@~0.1.2",
+      "npm:parse5@^8.0.1"
     ],
     "members": {
-      "card_creator": {
+      "anki_updater_prototype": {
         "dependencies": [
           "npm:zod@^4.1.13"
         ]
@@ -358,6 +390,11 @@
       "card_creator_evals": {
         "dependencies": [
           "npm:yanki-connect@^4.0.6"
+        ]
+      },
+      "card_field_generation": {
+        "dependencies": [
+          "npm:zod@^4.1.13"
         ]
       },
       "data": {

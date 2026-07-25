@@ -1,6 +1,7 @@
 import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
-import { createCard, formatMiwakeKey, needsAIMinimizedContext } from "card_creator";
-import { formatReadingForAnki } from "jmdict_to_html/format-reading-for-anki";
+import { createCard, type MiwakeCard } from "card_creator";
+import { toHiragana } from "japanese_text";
+import { markContextTargets, markedContextHasRuby } from "../shared/mark_context.ts";
 import {
   deriveLookupSpellings,
   findEntriesBySpelling,
@@ -8,6 +9,11 @@ import {
   type SpellingIndex,
 } from "../shared/jmdict_resolution/recognition_target_lookup.ts";
 import { normalizeRecognitionTarget } from "../shared/jmdict_resolution/csv_resolution.ts";
+import {
+  applyDisplayTargetOverride,
+  hasBoundaryNotation,
+  normalizeNotationMarkers,
+} from "./display_target.ts";
 import {
   contextPlainText,
   extractJMDictIDs,
@@ -17,10 +23,14 @@ import {
   parseRecognitionTargetField,
   readingFieldCandidates,
 } from "./html.ts";
+import { needsAIMinimizedContext } from "card_field_generation";
 import {
   analyzeEPUBContext,
+  cardSourceFromResolution,
+  type EPUBContextMatch,
+  epubContextPlainText,
   type EPUBSourceCorpus,
-  formatResolvedSourceHTML,
+  expandEPUBContextToIncludeTarget,
   resolveSource,
 } from "./source.ts";
 import {
@@ -31,6 +41,7 @@ import {
   snapshotNote,
   type SourceFieldMapping,
   type SourceResolution,
+  type TargetInContextResolution,
 } from "./types.ts";
 
 export const MIWAKE_FIELD_NAMES = [
@@ -44,9 +55,21 @@ export const MIWAKE_FIELD_NAMES = [
   "Source",
 ] as const;
 
+export interface UnresolvedTargetInContext {
+  context: string;
+  entry: JMdictWord;
+  reading?: string;
+  recognitionTarget: string;
+  sourceResolution: SourceResolution;
+}
+
 type ConversionResult =
   | { candidate: ConversionCandidate; skipped?: never }
-  | { candidate?: never; skipped: SkippedNote };
+  | {
+    candidate?: never;
+    skipped: SkippedNote;
+    unresolvedTargetInContext?: UnresolvedTargetInContext;
+  };
 
 function skip(noteId: number, word: string, reason: string, detail?: string): ConversionResult {
   return { skipped: { noteId, word, reason, detail } };
@@ -56,15 +79,69 @@ function fieldValue(note: AnkiNoteInfo, fieldName: string | null): string {
   return fieldName === null ? "" : note.fields[fieldName]?.value ?? "";
 }
 
-function normalizeNotationMarkers(target: string): string {
-  return target.replace(/^[~〜]+|[~〜]+$/gu, (markers) => "～".repeat(markers.length));
-}
-
 function entrySpellings(entry: JMdictWord): string[] {
   return [
     ...entry.kanji.map((item) => item.text),
     ...entry.kana.map((item) => item.text),
   ];
+}
+
+interface SurfaceFormMatches {
+  surfaces: string[];
+  byLookupSpelling: Array<{
+    lookupSpelling: string;
+    surfaces: string[];
+  }>;
+}
+
+function sourceOrthographyScore(spelling: string, surface: string): number {
+  const spellingCharacters = [...spelling];
+  const surfaceCharacters = [...surface];
+  let score = 0;
+  for (let i = 0; i < Math.min(spellingCharacters.length, surfaceCharacters.length); ++i) {
+    if (spellingCharacters[i] === surfaceCharacters[i]) {
+      score += 2;
+    } else if (toHiragana(spellingCharacters[i]) === toHiragana(surfaceCharacters[i])) {
+      score += 1;
+    }
+  }
+  return score;
+}
+
+/**
+ * Preserves kana script from an inflected source form in the corresponding dictionary spelling.
+ *
+ * For example, `グズる` matched against `ぐずった` becomes `ぐずる`. Characters changed by
+ * inflection are left alone; only aligned characters that differ solely by kana script transfer.
+ */
+function transferSourceKanaScript(spelling: string, surface: string): string {
+  const spellingCharacters = [...spelling];
+  const surfaceCharacters = [...surface];
+  for (let i = 0; i < Math.min(spellingCharacters.length, surfaceCharacters.length); ++i) {
+    if (
+      spellingCharacters[i] !== surfaceCharacters[i] &&
+      toHiragana(spellingCharacters[i]) === toHiragana(surfaceCharacters[i])
+    ) {
+      spellingCharacters[i] = surfaceCharacters[i];
+    }
+  }
+  return spellingCharacters.join("");
+}
+
+function recognitionTargetFromSource(
+  matches: SurfaceFormMatches,
+  fallback: string,
+): string {
+  const candidates = matches.byLookupSpelling.flatMap(({ lookupSpelling, surfaces }) =>
+    surfaces.map((surface) => ({
+      spelling: lookupSpelling,
+      surface,
+      score: sourceOrthographyScore(lookupSpelling, surface),
+    }))
+  );
+  candidates.sort((left, right) => right.score - left.score);
+  const best = candidates[0];
+  return best === undefined ? fallback : transferSourceKanaScript(best.spelling, best.surface);
 }
 
 async function resolveEntry(
@@ -78,7 +155,7 @@ async function resolveEntry(
   | {
     entry: JMdictWord;
     recognitionTarget: string;
-    keyRecognitionTargetOverride: string | null;
+    recognitionTargetOverride: string | undefined;
   }
   | { reason: string; detail?: string }
 > {
@@ -114,27 +191,19 @@ async function resolveEntry(
   }
 
   const spellings = entrySpellings(entry);
-  const hasNotationMarker = (word.startsWith("～") || word.endsWith("～")) &&
+  const hasNotationMarker = hasBoundaryNotation(word) &&
     spellings.some((spelling) => word.includes(spelling));
   const normalizedTarget = await normalizeRecognitionTarget(context, word, entry);
-  const recognitionTarget = hasNotationMarker ||
-      spellings.some((spelling) => kanaScriptsMatch(spelling, word))
-    ? word
-    : normalizedTarget;
-  const keyRecognitionTargetOverride = hasNotationMarker ? normalizedTarget : null;
-  if (
-    !spellings.includes(recognitionTarget) &&
-    !spellings.some((spelling) => kanaScriptsMatch(spelling, recognitionTarget)) &&
-    !hasNotationMarker
-  ) {
+  const recognitionTarget = spellings.includes(word) ? word : normalizedTarget;
+  const recognitionTargetOverride = hasNotationMarker ? word : undefined;
+  if (!spellings.includes(recognitionTarget)) {
     return { reason: "jmdict-target-mismatch", detail: entry.id };
   }
 
   if (!spellings.includes(word)) {
     const derived = await deriveLookupSpellings(context, word);
     const defensible = derived.some((spelling) => spellings.includes(spelling)) ||
-      spellings.some((spelling) => word.includes(spelling)) ||
-      spellings.some((spelling) => kanaScriptsMatch(spelling, word));
+      spellings.some((spelling) => word.includes(spelling));
     if (!defensible) {
       return {
         reason: "jmdict-target-mismatch",
@@ -143,21 +212,19 @@ async function resolveEntry(
     }
   }
 
-  return { entry, recognitionTarget, keyRecognitionTargetOverride };
+  return { entry, recognitionTarget, recognitionTargetOverride };
 }
 
 function applicableReadings(entry: JMdictWord, recognitionTarget: string): string[] {
-  const containsKanji = /\p{Script=Han}/v.test(recognitionTarget);
-  const applicableKanji = entry.kanji
-    .map((item) => item.text)
-    .filter((spelling) => recognitionTarget.includes(spelling));
+  const usesReadingField = entry.kanji.some(({ text }) => text === recognitionTarget);
+  if (!usesReadingField) {
+    return entry.kana.some(({ text }) => text === recognitionTarget) ? [recognitionTarget] : [];
+  }
+
   const readings = entry.kana
     .filter((item) =>
-      entry.kanji.length === 0 ||
-      !containsKanji ||
       item.appliesToKanji.includes("*") ||
-      item.appliesToKanji.includes(recognitionTarget) ||
-      applicableKanji.some((spelling) => item.appliesToKanji.includes(spelling))
+      item.appliesToKanji.includes(recognitionTarget)
     )
     .map((item) => item.text);
   return [...new Set(readings)];
@@ -196,7 +263,12 @@ function chooseReading(
     matching.length > 1 &&
     matching.every((reading) => kanaScriptsMatch(reading, matching[0]))
   ) {
-    return { reading: matching[0] };
+    const scores = matching.map((reading) => sourceOrthographyScore(reading, recognitionTarget));
+    const highestScore = Math.max(...scores);
+    const closestToTarget = matching.filter((_, index) => scores[index] === highestScore);
+    if (closestToTarget.length === 1) {
+      return { reading: closestToTarget[0] };
+    }
   }
   if (readings.length === 1) {
     return { reading: readings[0] };
@@ -208,56 +280,6 @@ function chooseReading(
       existingCandidates.join(", ") || "empty"
     }`,
   };
-}
-
-function inflectionStemSpellings(entry: JMdictWord, reading: string): string[] {
-  const partOfSpeech = new Set(entry.sense.flatMap((sense) => sense.partOfSpeech));
-  const stems: string[] = [];
-  const godanEndings: Record<string, string> = {
-    う: "い",
-    く: "き",
-    ぐ: "ぎ",
-    す: "し",
-    つ: "ち",
-    ぬ: "に",
-    ぶ: "び",
-    む: "み",
-    る: "り",
-  };
-  if ([...partOfSpeech].some((value) => value.startsWith("v5"))) {
-    const ending = reading.at(-1)!;
-    const replacement = godanEndings[ending];
-    if (replacement !== undefined) {
-      stems.push(`${reading.slice(0, -1)}${replacement}`);
-    }
-  }
-  if (partOfSpeech.has("v1") && reading.endsWith("る")) {
-    stems.push(reading.slice(0, -1));
-  }
-  if (partOfSpeech.has("adj-i") && reading.endsWith("い")) {
-    stems.push(reading.slice(0, -1));
-  }
-  return stems;
-}
-
-async function formatNotationMarkerReading(
-  entry: JMdictWord,
-  recognitionTarget: string,
-  reading: string,
-  fallback: string | null,
-): Promise<string | null> {
-  if (!recognitionTarget.startsWith("～") && !recognitionTarget.endsWith("～")) return fallback;
-  const containedSpellings = entrySpellings(entry)
-    .filter((spelling) => /\p{Script=Han}/v.test(spelling) && recognitionTarget.includes(spelling))
-    .sort((left, right) => right.length - left.length);
-  for (const spelling of containedSpellings) {
-    const formatted = await formatReadingForAnki(entry.id, spelling, reading);
-    if (formatted !== null) return recognitionTarget.replace(spelling, formatted);
-    if (/^\p{Script=Han}+$/v.test(spelling)) {
-      return recognitionTarget.replace(spelling, `${spelling}[${reading}]`);
-    }
-  }
-  return fallback;
 }
 
 /** Builds the deterministic portion of a Miwake card conversion for one single-card Animecards note. */
@@ -277,6 +299,11 @@ export async function convertAnimecardsNote(
       html: string;
       resolution: FullContextResolution;
       sourceResolution: SourceResolution;
+    };
+    targetInContextOverride?: {
+      surface: string;
+      model: string;
+      generatedAt: string;
     };
   },
 ): Promise<ConversionResult> {
@@ -311,6 +338,7 @@ export async function convertAnimecardsNote(
   }
 
   let contextHTML = options.contextOverride?.html ?? originalContextHTML;
+  let epubContextMatch: EPUBContextMatch | null = null;
   let fullContextResolution: FullContextResolution = options.contextOverride?.resolution ?? {
     status: "source-unavailable",
   };
@@ -320,6 +348,7 @@ export async function convertAnimecardsNote(
       originalContextHTML,
       sourceResolution.name,
     );
+    if (analysis.status !== "not-found") epubContextMatch = analysis.match;
     if (analysis.status === "complete") {
       contextHTML = normalizeContextHTML(analysis.contextHTML);
       fullContextResolution = { status: "restored", method: "exact" };
@@ -328,7 +357,7 @@ export async function convertAnimecardsNote(
     }
   }
 
-  const context = contextPlainText(contextHTML);
+  let context = contextPlainText(contextHTML);
   if (!context) {
     return skip(note.noteId, word, "empty-sentence");
   }
@@ -344,87 +373,206 @@ export async function convertAnimecardsNote(
   if (!("entry" in resolution)) {
     return skip(note.noteId, word, resolution.reason, resolution.detail);
   }
-  const { entry, recognitionTarget, keyRecognitionTargetOverride } = resolution;
+  const { entry, recognitionTargetOverride } = resolution;
+  let { recognitionTarget } = resolution;
   if (entry.sense.length !== 1 && options.includeMultipleSenses !== true) {
     return skip(note.noteId, word, "multiple-jmdict-senses", String(entry.sense.length));
   }
-  const readingResult = chooseReading(
+  let readings = applicableReadings(entry, recognitionTarget);
+  let readingResult = chooseReading(
     entry,
     recognitionTarget,
     fieldValue(note, options.sourceFields.reading),
   );
-  if (!("reading" in readingResult)) {
-    return skip(note.noteId, word, readingResult.reason, readingResult.detail);
+  if (readings.length === 0) {
+    return skip(note.noteId, word, "no-applicable-reading");
   }
 
-  async function findSurfaceForms(lookupSpellings: Iterable<string>): Promise<string[]> {
-    const found: string[] = [];
+  async function findSurfaceForms(
+    lookupSpellings: Iterable<string>,
+    sentence = context,
+    allowSingleCharacterSubstring = false,
+  ): Promise<SurfaceFormMatches> {
+    const surfaces: string[] = [];
+    const byLookupSpelling: SurfaceFormMatches["byLookupSpelling"] = [];
+    const partOfSpeech = new Set(entry.sense.flatMap((sense) => sense.partOfSpeech));
     for (const lookupSpelling of new Set(lookupSpellings)) {
-      found.push(...await findSurfaceFormsForLookupSpelling(context, lookupSpelling));
+      const found = await findSurfaceFormsForLookupSpelling(sentence, lookupSpelling, {
+        partOfSpeech,
+        allowSingleCharacterSubstring,
+      });
+      if (found.length > 0) {
+        byLookupSpelling.push({ lookupSpelling, surfaces: found });
+        surfaces.push(...found);
+      }
     }
-    return [...new Set(found)];
+    return {
+      surfaces: [...new Set(surfaces)],
+      byLookupSpelling,
+    };
   }
-  let surfaceForms = await findSurfaceForms([recognitionTarget]);
-  if (
-    surfaceForms.length === 0 &&
-    (recognitionTarget.startsWith("～") || recognitionTarget.endsWith("～"))
-  ) {
-    surfaceForms = await findSurfaceForms([recognitionTarget.replace(/^～|～$/gu, "")]);
+  let surfaceMatches = await findSurfaceForms([recognitionTarget]);
+  if (surfaceMatches.surfaces.length === 0) {
+    surfaceMatches = await findSurfaceForms(readings);
   }
-  if (surfaceForms.length === 0) {
-    surfaceForms = await findSurfaceForms([readingResult.reading]);
+  if (surfaceMatches.surfaces.length === 0) {
+    surfaceMatches = await findSurfaceForms(entrySpellings(entry));
   }
-  if (surfaceForms.length === 0) {
-    surfaceForms = await findSurfaceForms(entrySpellings(entry));
+  if (surfaceMatches.surfaces.length === 0 && epubContextMatch !== null) {
+    const sourceSurfaceMatches = await findSurfaceForms(
+      [recognitionTarget, ...readings, ...entrySpellings(entry)],
+      epubContextPlainText(epubContextMatch),
+      true,
+    );
+    if (sourceSurfaceMatches.surfaces.length === 1) {
+      const recoveredContextHTML = expandEPUBContextToIncludeTarget(
+        epubContextMatch.paragraphs,
+        originalContextHTML,
+        sourceSurfaceMatches.surfaces[0],
+      );
+      if (recoveredContextHTML !== null) {
+        contextHTML = normalizeContextHTML(recoveredContextHTML);
+        context = contextPlainText(contextHTML);
+        surfaceMatches = sourceSurfaceMatches;
+        fullContextResolution = { status: "restored", method: "exact" };
+      }
+    }
   }
-  if (surfaceForms.length === 0) {
-    surfaceForms = await findSurfaceForms(inflectionStemSpellings(entry, readingResult.reading));
-  }
-  const uniqueSurfaceForms = surfaceForms;
-  if (uniqueSurfaceForms.length === 0) {
-    return skip(note.noteId, word, "target-not-found-in-sentence", recognitionTarget);
-  }
-  if (uniqueSurfaceForms.length > 1) {
+  recognitionTarget = recognitionTargetFromSource(surfaceMatches, recognitionTarget);
+  if (!entrySpellings(entry).includes(recognitionTarget)) {
     return skip(
       note.noteId,
       word,
-      "ambiguous-target-in-sentence",
-      uniqueSurfaceForms.join(", "),
+      "jmdict-target-mismatch",
+      `recognitionTarget ${JSON.stringify(recognitionTarget)} is not among the ` +
+        `jmdictEntry.kanji spellings or jmdictEntry.kana readings in jmdictEntry with id ` +
+        `${JSON.stringify(entry.id)}`,
     );
   }
+  readings = applicableReadings(entry, recognitionTarget);
+  readingResult = chooseReading(
+    entry,
+    recognitionTarget,
+    fieldValue(note, options.sourceFields.reading),
+  );
+  if (readings.length === 0) {
+    return skip(note.noteId, word, "no-applicable-reading");
+  }
+  let surfaceForms = surfaceMatches.surfaces;
+  let targetInContextResolution: TargetInContextResolution | null = null;
+  if (surfaceForms.length === 0 && options.targetInContextOverride !== undefined) {
+    const surface = options.targetInContextOverride.surface;
+    if (
+      surface.length === 0 || !context.includes(surface)
+    ) {
+      return skip(
+        note.noteId,
+        word,
+        "invalid-ai-target-in-context",
+        surface || "empty target",
+      );
+    }
+    surfaceForms = [surface];
+    targetInContextResolution = {
+      method: "ai",
+      surface,
+      model: options.targetInContextOverride.model,
+      generatedAt: options.targetInContextOverride.generatedAt,
+    };
+  }
+  const uniqueSurfaceForms = surfaceForms;
+  if (uniqueSurfaceForms.length === 0) {
+    return {
+      skipped: {
+        noteId: note.noteId,
+        word,
+        reason: "target-not-found-in-sentence",
+        detail: recognitionTarget,
+      },
+      unresolvedTargetInContext: {
+        context,
+        entry,
+        ...("reading" in readingResult ? { reading: readingResult.reading } : {}),
+        recognitionTarget,
+        sourceResolution,
+      },
+    };
+  }
+  targetInContextResolution ??= uniqueSurfaceForms.length > 1
+    ? {
+      method: "deterministic",
+      surface: uniqueSurfaceForms[0],
+      additionalSurfaces: uniqueSurfaceForms.slice(1),
+    }
+    : {
+      method: "deterministic",
+      surface: uniqueSurfaceForms[0],
+    };
 
   try {
-    const card = await createCard({
-      input: {
-        context: contextHTML,
-        jmdictId: entry.id,
-        recognitionTarget,
-        source: sourceResolution.name ?? undefined,
-        sourceURL: sourceResolution.url ?? undefined,
-      },
-      jmdictEntry: entry,
-      generateFields: () =>
-        Promise.resolve({
-          applicableSenses: [],
-          reading: readingResult.reading,
-          targetInContext: uniqueSurfaceForms[0],
-          hint: null,
-          minimizedContext: null,
-          cleanedSource: null,
-          sourceURLIsPublic: sourceResolution.urlIsPublic,
-        }),
-    });
-
-    if (!card.fullContext.includes("<mark>")) {
-      return skip(note.noteId, word, "failed-to-highlight-target", uniqueSurfaceForms[0]);
-    }
-    const formattedReading = await formatNotationMarkerReading(
-      entry,
-      card.recognitionTarget,
-      readingResult.reading,
-      card.reading,
+    const markedContext = markContextTargets(
+      contextHTML,
+      uniqueSurfaceForms as [string, ...string[]],
     );
-    const keyRecognitionTarget = keyRecognitionTargetOverride ?? card.recognitionTarget;
+    const usesReadingField = entry.kanji.some(({ text }) => text === recognitionTarget);
+    const renderCard = (reading: string | undefined) =>
+      createCard({
+        jmdictEntry: entry,
+        recognitionTarget,
+        ...(usesReadingField ? { kanaReading: reading } : {}),
+        fullContext: markedContext,
+        source: cardSourceFromResolution(sourceResolution),
+      });
+
+    let selectedReading: string;
+    let card: MiwakeCard;
+    if (!usesReadingField) {
+      selectedReading = recognitionTarget;
+      card = await renderCard(undefined);
+    } else if (markedContextHasRuby(markedContext)) {
+      const attempts = await Promise.all(readings.map(async (reading) => {
+        try {
+          return { reading, card: await renderCard(reading), error: undefined };
+        } catch (error) {
+          return { reading, card: undefined, error };
+        }
+      }));
+      const contextCompatible = attempts.filter(({ card, error }) =>
+        card !== undefined ||
+        (error instanceof Error &&
+          error.message.startsWith("No furigana placement data exists"))
+      );
+      const preferredReading = "reading" in readingResult ? readingResult.reading : undefined;
+      const selected = contextCompatible.length === 1
+        ? contextCompatible[0]
+        : contextCompatible.find(({ reading }) => reading === preferredReading);
+      if (selected === undefined) {
+        if (contextCompatible.length > 1) {
+          return skip(
+            note.noteId,
+            word,
+            "ambiguous-reading",
+            `Source ruby matches: ${contextCompatible.map(({ reading }) => reading).join(", ")}`,
+          );
+        }
+        throw attempts[0]?.error ?? new Error("No reading agrees with the marked source ruby");
+      }
+      selectedReading = selected.reading;
+      card = selected.card ?? await renderCard(selected.reading);
+    } else {
+      if (!("reading" in readingResult)) {
+        return skip(note.noteId, word, readingResult.reason, readingResult.detail);
+      }
+      selectedReading = readingResult.reading;
+      card = await renderCard(selectedReading);
+    }
+
+    const displayTarget = applyDisplayTargetOverride(
+      card,
+      recognitionTarget,
+      recognitionTargetOverride,
+    );
+    const keyRecognitionTarget = recognitionTarget;
     const sameSpellingEntries = findEntriesBySpelling(
       options.spellingIndex,
       keyRecognitionTarget,
@@ -439,14 +587,14 @@ export async function convertAnimecardsNote(
     }
 
     const targetFields = {
-      "Key": formatMiwakeKey(keyRecognitionTarget, entry.id, [], entry.sense.length),
-      "Recognition target": card.recognitionTarget,
-      "Reading": formattedReading ?? "",
+      "Key": card.key,
+      "Recognition target": displayTarget.recognitionTarget,
+      "Reading": displayTarget.reading ?? "",
       "Hint": card.hint ?? "",
       "Full context": card.fullContext,
       "Minimized context": card.minimizedContext ?? "",
       "Dictionary entry": card.dictionaryEntry,
-      "Source": formatResolvedSourceHTML(sourceResolution),
+      "Source": card.source ?? "",
     };
 
     return {
@@ -454,10 +602,12 @@ export async function convertAnimecardsNote(
         noteId: note.noteId,
         approved: fullContextResolution.status !== "source-unavailable",
         jmdictId: entry.id,
-        recognitionTarget: card.recognitionTarget,
+        recognitionTarget: displayTarget.recognitionTarget,
         keyRecognitionTarget,
-        readingKana: readingResult.reading,
+        ...(recognitionTargetOverride === undefined ? {} : { recognitionTargetOverride }),
+        readingKana: selectedReading,
         sourceResolution,
+        targetInContextResolution,
         fullContextResolution,
         minimizedContextResolution: needsAIMinimizedContext(card.fullContext)
           ? { status: "pending" }

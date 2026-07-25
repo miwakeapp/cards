@@ -17,7 +17,7 @@ Deno.test("defaultReportPath replaces the manifest extension", () => {
 
 Deno.test("buildConversionReport groups exact final source HTML strings", () => {
   const manifest = {
-    version: 7,
+    version: 8,
     generatedAt: "2026-07-15T00:00:00.000Z",
     query: 'note:"Animecards"',
     sourceModel: "Animecards",
@@ -36,6 +36,12 @@ Deno.test("buildConversionReport groups exact final source HTML strings", () => 
           url: "https://reader.miwake.app/b?id=15",
           urlIsPublic: false,
         },
+        targetInContextResolution: {
+          method: "ai",
+          surface: "舟",
+          model: "gemini-3.5-flash",
+          generatedAt: "2026-07-22T00:00:00.000Z",
+        },
         fullContextResolution: { status: "restored", method: "exact" },
         minimizedContextResolution: { status: "not-needed" },
         senseResolution: { status: "not-needed" },
@@ -48,6 +54,7 @@ Deno.test("buildConversionReport groups exact final source HTML strings", () => 
         keyRecognitionTarget: "本",
         readingKana: "ほん",
         sourceResolution: { name: null, method: "none", url: null, urlIsPublic: false },
+        targetInContextResolution: { method: "deterministic", surface: "本" },
         fullContextResolution: { status: "source-unavailable" },
         minimizedContextResolution: { status: "pending" },
         senseResolution: { status: "pending" },
@@ -66,6 +73,7 @@ Deno.test("buildConversionReport groups exact final source HTML strings", () => 
           url: null,
           urlIsPublic: false,
         },
+        targetInContextResolution: { method: "deterministic", surface: "微塵" },
         fullContextResolution: {
           status: "failed",
           model: "gemini-3.5-flash",
@@ -94,6 +102,7 @@ Deno.test("buildConversionReport groups exact final source HTML strings", () => 
           url: null,
           urlIsPublic: false,
         },
+        targetInContextResolution: { method: "deterministic", surface: "衝撃波" },
         fullContextResolution: { status: "restored", method: "exact" },
         minimizedContextResolution: {
           status: "failed",
@@ -123,6 +132,8 @@ Deno.test("buildConversionReport groups exact final source HTML strings", () => 
   assertStringIncludes(report, "ai-enrichment-failed");
   assertStringIncludes(report, "Failed AI enrichments: 1");
   assertStringIncludes(report, "private or temporary/unlinked");
+  assertStringIncludes(report, "Target-in-context resolution: ai=1");
+  assertStringIncludes(report, "| 1 | `～舟` | `舟` | gemini-3.5-flash |");
   assertStringIncludes(report, "| 1 | `～舟` | `舟` | `舟 \\| 1` |");
   assertStringIncludes(report, "| 1 | `multiple-jmdict-ids` |");
 

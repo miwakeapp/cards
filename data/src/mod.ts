@@ -3,6 +3,8 @@
 import type { JMdict } from "@scriptin/jmdict-simplified-types";
 import { entriesCache } from "./entries_cache.ts";
 import { furiganaCache } from "./furigana_cache.ts";
+import type { JMDictReadings } from "./jmdict_readings.ts";
+import { jmdictReadingsCache } from "./jmdict_readings_cache.ts";
 import type { JMDictWord } from "./jmdict_types.ts";
 import { resourcePaths } from "./resource_paths.ts";
 
@@ -48,6 +50,22 @@ export function jmdictFurigana(): Promise<JMDictFurigana> {
     })();
   }
   return furiganaCache.promise;
+}
+
+/**
+ * Returns the applicable JMDict kana readings for a kanji spelling.
+ *
+ * The compact index supports validation of incidental source ruby without loading the complete
+ * dictionary. An absent spelling has no readings.
+ */
+export async function jmdictReadingsForSpelling(spelling: string): Promise<readonly string[]> {
+  if (!jmdictReadingsCache.promise) {
+    jmdictReadingsCache.promise = (async () => {
+      const content = await Deno.readTextFile(resourcePaths.jmdictReadings);
+      return JSON.parse(content) as JMDictReadings;
+    })();
+  }
+  return (await jmdictReadingsCache.promise)[spelling] ?? [];
 }
 
 /**

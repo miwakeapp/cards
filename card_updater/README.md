@@ -15,7 +15,7 @@ The workflow requires a running Anki with AnkiConnect, plus the AI provider cred
 - **Unchanged** — stored dictionary HTML already matches the latest rendering. Not shown.
 - **Normalize** — differs only in entity encoding or whitespace. Applied with everything else, but not surfaced for review.
 - **Routine** — the senses the card tests are unaffected (single-sense entries, changes to other senses or metadata, pure renumberings), or the stored pronunciation is unchanged and only its furigana boundaries moved. Staged to update by default; the app shows a compact diff for each so they can be skimmed and individually held.
-- **Re-target** — a targeted sense changed, moved away, or the entry changed shape under an all-senses card. AI re-runs sense determination using `card_creator`'s canonical prompt with the card's original mined context, and the app presents its selection, an editable hint, and word-level diffs for one-keystroke review.
+- **Re-target** — a targeted sense changed, moved away, or the entry changed shape under an all-senses card. AI runs the shared, evaluated card-field prompt's sense-and-hint operation with the card's original mined context, and the app presents its selection, an editable hint, and word-level diffs for one-keystroke review.
 - **Exception** — deleted entries, removed spellings, unparseable keys, and other structural problems. Listed for manual handling and never overwritten.
 
 Existing hints are never overwritten by default; the AI's hint is offered as an alternative.

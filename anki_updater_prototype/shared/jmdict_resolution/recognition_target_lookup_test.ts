@@ -79,6 +79,141 @@ Deno.test("findSurfaceFormsForLookupSpelling inflects the final verb in an expre
   );
 });
 
+Deno.test("findSurfaceFormsForLookupSpelling is stable across misleading surrounding tokens", async () => {
+  assertEquals(
+    await findSurfaceFormsForLookupSpelling(
+      "のび太は喜び勇んでその帽子をかぶり、",
+      "喜び勇む",
+      { partOfSpeech: ["v5m"] },
+    ),
+    ["喜び勇んで"],
+  );
+  assertEquals(
+    await findSurfaceFormsForLookupSpelling(
+      "皆口をそろえて小鳥がかわいそうだ",
+      "口をそろえる",
+      { partOfSpeech: ["exp", "v1"] },
+    ),
+    ["口をそろえて"],
+  );
+  assertEquals(
+    await findSurfaceFormsForLookupSpelling(
+      "それでも、俺は叩きのめされたよ。",
+      "叩きのめす",
+      { partOfSpeech: ["v5s"] },
+    ),
+    ["叩きのめされた"],
+  );
+});
+
+Deno.test("findSurfaceFormsForLookupSpelling handles compound inflection chains", async () => {
+  assertEquals(
+    await findSurfaceFormsForLookupSpelling(
+      "アレックスを救う言葉を紡ぎ出せなかった。",
+      "紡ぎ出す",
+      { partOfSpeech: ["v5s"] },
+    ),
+    ["紡ぎ出せなかった"],
+  );
+  assertEquals(
+    await findSurfaceFormsForLookupSpelling("女性にいちばんウザがられるタイプだぞ", "ウザがる", {
+      partOfSpeech: ["v5r"],
+    }),
+    ["ウザがられる"],
+  );
+  assertEquals(
+    await findSurfaceFormsForLookupSpelling(
+      "なんかパンダみたいだぞ、クリームを拭き取れよ",
+      "拭き取る",
+      {
+        partOfSpeech: ["v5r"],
+      },
+    ),
+    ["拭き取れ"],
+  );
+});
+
+Deno.test("findSurfaceFormsForLookupSpelling handles suru and fixed negative forms", async () => {
+  assertEquals(
+    await findSurfaceFormsForLookupSpelling("厳しい罰を死者に科してはいない。", "科する", {
+      partOfSpeech: ["vs-s"],
+    }),
+    ["科して"],
+  );
+  assertEquals(
+    await findSurfaceFormsForLookupSpelling(
+      "どうしようもない状況をこよなく愛し、",
+      "こよなく愛する",
+      {
+        partOfSpeech: ["exp", "vs-s"],
+      },
+    ),
+    ["こよなく愛し"],
+  );
+  assertEquals(
+    await findSurfaceFormsForLookupSpelling("ユイ本人は異常など意に介せぬふうで、", "意に介する", {
+      partOfSpeech: ["exp", "vs-s"],
+    }),
+    ["意に介せぬ"],
+  );
+  assertEquals(
+    await findSurfaceFormsForLookupSpelling(
+      "見かけにそぐわず意外と育ちはローカルタイプだ。",
+      "そぐわない",
+      {
+        partOfSpeech: ["adj-i"],
+      },
+    ),
+    ["そぐわず"],
+  );
+});
+
+Deno.test("findSurfaceFormsForLookupSpelling accepts kana-script-only source differences", async () => {
+  assertEquals(
+    await findSurfaceFormsForLookupSpelling(
+      "大使館付のラングレー要員になったアホタレだ",
+      "あほたれ",
+    ),
+    ["アホタレ"],
+  );
+});
+
+Deno.test("findSurfaceFormsForLookupSpelling recognizes conjunctive derivations", async () => {
+  assertEquals(
+    await findSurfaceFormsForLookupSpelling("憑きものがすとんと落ちたみたいに", "憑く", {
+      partOfSpeech: ["v5k"],
+    }),
+    ["憑き"],
+  );
+  assertEquals(
+    await findSurfaceFormsForLookupSpelling("憎悪の表情を剥き出しにした。", "剥き出す", {
+      partOfSpeech: ["v5s"],
+    }),
+    ["剥き出し"],
+  );
+});
+
+Deno.test("findSurfaceFormsForLookupSpelling rejects stems embedded in another lexical item", async () => {
+  assertEquals(
+    await findSurfaceFormsForLookupSpelling("好きな食べ物は寿司だ。", "食べる", {
+      partOfSpeech: ["v1"],
+    }),
+    [],
+  );
+  assertEquals(
+    await findSurfaceFormsForLookupSpelling("食べてから、食べ物を片づけた。", "食べる", {
+      partOfSpeech: ["v1"],
+    }),
+    ["食べて"],
+  );
+  assertEquals(
+    await findSurfaceFormsForLookupSpelling("食べ、好きな食べ物の話をした。", "食べる", {
+      partOfSpeech: ["v1"],
+    }),
+    [],
+  );
+});
+
 Deno.test("findSurfaceFormsForLookupSpelling does not match inside a larger token", async () => {
   assertEquals(await findSurfaceFormsForLookupSpelling("生活を改善する。", "生"), []);
 });

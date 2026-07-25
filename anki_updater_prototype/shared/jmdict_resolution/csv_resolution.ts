@@ -1,4 +1,5 @@
 import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
+import { containsKanji } from "japanese_text";
 import {
   buildSpellingIndex,
   deriveLookupSpellings,
@@ -177,10 +178,6 @@ function containedEntrySpelling(entry: JMdictWord, recognitionTarget: string): s
   return entrySpellings(entry)
     .filter((spelling) => recognitionTarget.includes(spelling))
     .sort((a, b) => b.length - a.length)[0];
-}
-
-function containsKanji(text: string): boolean {
-  return /\p{Script=Han}/u.test(text);
 }
 
 function preferredEntrySpelling(entry: JMdictWord, recognitionTarget: string): string {

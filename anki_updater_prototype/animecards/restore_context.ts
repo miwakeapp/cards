@@ -6,7 +6,7 @@
 
 import { parseArgs } from "@std/cli/parse-args";
 import * as path from "@std/path";
-import { MODEL_IDS, type ModelId } from "card_creator/ai";
+import { MODEL_IDS, type ModelId } from "card_field_generation";
 import { allJMDictEntries } from "data";
 import { buildSpellingIndex } from "../shared/jmdict_resolution/recognition_target_lookup.ts";
 import {
@@ -22,9 +22,10 @@ import { writeConversionAuditArtifacts } from "./report.ts";
 import {
   elideLongQuotedEPUBContext,
   EPUBBracketsAreBalanced,
+  epubContextPlainText,
   expandEPUBContextToBalancedParagraphEnd,
   expandEPUBContextToSentence,
-  extractEPUBHTMLSubstring,
+  extractEPUBHTMLFromParagraphs,
   findUniqueEPUBContext,
   formatRelevantQuotedEPUBContext,
   hasCompleteContextBoundaries,
@@ -228,9 +229,9 @@ async function main(): Promise<void> {
       const inputFingerprint = await fingerprint({
         promptVersion: EPUB_CONTEXT_PROMPT_VERSION,
         model: options.model,
-        word: candidate.recognitionTarget,
+        word: candidate.keyRecognitionTarget,
         originalContext,
-        windowHTML: match.window.map((paragraph) => paragraph.html),
+        windowHTML: match.window.map((paragraph) => `<p>${paragraph.html}</p>`),
       });
       const cacheKey = `${candidate.noteId}:${inputFingerprint}`;
       const cached = cache.get(cacheKey);
@@ -239,10 +240,10 @@ async function main(): Promise<void> {
       let generatedAt: string;
       let resolution: ConversionCandidate["fullContextResolution"];
       const deterministicRecovery = candidate.fullContextResolution.status === "failed"
-        ? (hasCompleteContextBoundaries(match.paragraph.plainText, originalText)
-          ? extractEPUBHTMLSubstring(match.paragraph.html, originalText)
-          : expandEPUBContextToSentence(match.paragraph, originalContext) ??
-            expandEPUBContextToBalancedParagraphEnd(match.paragraph, originalContext))
+        ? (hasCompleteContextBoundaries(epubContextPlainText(match), originalText)
+          ? extractEPUBHTMLFromParagraphs(match.paragraphs, originalText)
+          : expandEPUBContextToSentence(match.paragraphs, originalContext) ??
+            expandEPUBContextToBalancedParagraphEnd(match.paragraphs, originalContext))
         : null;
       if (deterministicRecovery !== null) {
         restoredHTML = deterministicRecovery;
@@ -261,16 +262,15 @@ async function main(): Promise<void> {
         ++reused;
       } else {
         const extracted = await extractFullEPUBContext({
-          windowHTML: match.window.map((paragraph) => paragraph.html),
-          word: candidate.recognitionTarget,
+          windowHTML: match.window.map((paragraph) => `<p>${paragraph.html}</p>`),
+          word: candidate.keyRecognitionTarget,
           originalContext,
         }, options.model);
         const extractedText = searchableEPUBText(extracted);
         if (!extractedText.includes(originalText)) {
           throw new Error("Extracted context does not contain the complete original excerpt.");
         }
-        const windowHTML = match.window.map((paragraph) => paragraph.html).join("<br>");
-        restoredHTML = extractEPUBHTMLSubstring(windowHTML, extractedText) ?? "";
+        restoredHTML = extractEPUBHTMLFromParagraphs(match.window, extractedText) ?? "";
         if (!restoredHTML) {
           throw new Error(
             "Extracted context is not a unique verbatim substring of the EPUB window.",
@@ -282,7 +282,7 @@ async function main(): Promise<void> {
         if (
           extractedText.length <= originalText.length ||
           !EPUBBracketsAreBalanced(extractedText) ||
-          (!isCompleteWithinParagraph && !restoredHTML.includes("<br>"))
+          (!isCompleteWithinParagraph && !restoredHTML.includes("</p>\n\n<p>"))
         ) {
           throw new Error(
             "Extracted context is not a longer, complete, balanced source excerpt.",
@@ -311,7 +311,7 @@ async function main(): Promise<void> {
           selectionVersion: EPUB_RELEVANCE_SELECTION_VERSION,
           stage: "quoted-context-relevance",
           model: options.model,
-          word: candidate.recognitionTarget,
+          word: candidate.keyRecognitionTarget,
           originalContext,
           restoredHTML,
         });
@@ -331,7 +331,7 @@ async function main(): Promise<void> {
           try {
             const selected = await selectRelevantEPUBContext({
               restoredContext: restoredHTML,
-              word: candidate.recognitionTarget,
+              word: candidate.keyRecognitionTarget,
               originalContext,
             }, options.model);
             const relevantHTML = formatRelevantQuotedEPUBContext(
@@ -386,6 +386,9 @@ async function main(): Promise<void> {
           resolution,
           sourceResolution: candidate.sourceResolution,
         },
+        targetInContextOverride: candidate.targetInContextResolution.method === "ai"
+          ? candidate.targetInContextResolution
+          : undefined,
       });
       if (converted.candidate === undefined) {
         throw new Error(

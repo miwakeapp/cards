@@ -10,7 +10,17 @@ import { allJMDictEntries } from "data";
 import { createACInvoke, DEFAULT_ANKI_CONNECT_URL } from "../shared/anki_connect.ts";
 import { buildSpellingIndex } from "../shared/jmdict_resolution/recognition_target_lookup.ts";
 import { ankiSearchValue, fetchNoteInfos } from "./anki.ts";
-import { convertAnimecardsNote, MIWAKE_FIELD_NAMES } from "./convert.ts";
+import {
+  DEFAULT_MODEL_ID,
+  generateCardFields,
+  MODEL_IDS,
+  type ModelId,
+} from "card_field_generation";
+import {
+  convertAnimecardsNote,
+  MIWAKE_FIELD_NAMES,
+  type UnresolvedTargetInContext,
+} from "./convert.ts";
 import { resolveSourceFields } from "./fields.ts";
 import { normalizePlainText } from "./html.ts";
 import { defaultReportPath, writeConversionAuditArtifacts } from "./report.ts";
@@ -31,6 +41,9 @@ interface Options {
   ankiConnectURL: string;
   epubTextsDirectory: string | undefined;
   jmdictOverridesPath: string | undefined;
+  resolveTargetsWithAI: boolean;
+  aiModel: ModelId;
+  targetAICachePath: string;
   fields: {
     word?: string;
     sentence?: string;
@@ -55,7 +68,7 @@ function positiveInteger(value: unknown, flag: string): number {
 
 function parseArguments(args: string[]): Options {
   const flags = parseArgs(args, {
-    boolean: ["no-epub-source-lookup"],
+    boolean: ["no-epub-source-lookup", "resolve-targets-with-ai"],
     string: [
       "query",
       "source-model",
@@ -65,6 +78,8 @@ function parseArguments(args: string[]): Options {
       "anki-connect-url",
       "epub-texts-dir",
       "jmdict-overrides",
+      "ai-model",
+      "target-ai-cache",
       "word-field",
       "sentence-field",
       "glossary-field",
@@ -81,18 +96,26 @@ function parseArguments(args: string[]): Options {
 
   const sourceModel = flags["source-model"];
   const date = new Date().toISOString().slice(0, 10);
+  const output = flags.output ??
+    path.join(import.meta.dirname!, "..", "generated", `animecards-${date}.json`);
+  const aiModel = flags["ai-model"] ?? DEFAULT_MODEL_ID;
+  if (!MODEL_IDS.includes(aiModel as ModelId)) {
+    throw new Error(`Unknown AI model: ${aiModel}. Available: ${MODEL_IDS.join(", ")}`);
+  }
   return {
     query: flags.query ?? `note:${ankiSearchValue(sourceModel)}`,
     sourceModel,
     targetModel: flags["target-model"],
-    output: flags.output ??
-      path.join(import.meta.dirname!, "..", "generated", `animecards-${date}.json`),
+    output,
     limit: flags.limit === undefined ? undefined : positiveInteger(flags.limit, "--limit"),
     ankiConnectURL: flags["anki-connect-url"],
     epubTextsDirectory: flags["no-epub-source-lookup"]
       ? undefined
       : flags["epub-texts-dir"] ?? path.join(import.meta.dirname!, "..", "epub_texts"),
     jmdictOverridesPath: flags["jmdict-overrides"],
+    resolveTargetsWithAI: flags["resolve-targets-with-ai"],
+    aiModel: aiModel as ModelId,
+    targetAICachePath: flags["target-ai-cache"] ?? `${output}.target-ai-cache.jsonl`,
     fields: {
       word: flags["word-field"],
       sentence: flags["sentence-field"],
@@ -102,6 +125,56 @@ function parseArguments(args: string[]): Options {
       sourceURL: flags["source-url-field"],
     },
   };
+}
+
+interface CachedTargetInContext {
+  inputFingerprint: string;
+  model: ModelId;
+  generatedAt: string;
+  surface: string;
+}
+
+async function targetInputFingerprint(
+  request: UnresolvedTargetInContext,
+  model: ModelId,
+): Promise<string> {
+  const value = JSON.stringify({
+    version: 1,
+    model,
+    jmdictId: request.entry.id,
+    recognitionTarget: request.recognitionTarget,
+    reading: request.reading,
+    context: request.context,
+    source: request.sourceResolution,
+  });
+  const digest = new Uint8Array(
+    await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value)),
+  );
+  return [...digest].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+async function loadTargetAICache(filePath: string): Promise<Map<string, CachedTargetInContext>> {
+  let content: string;
+  try {
+    content = await Deno.readTextFile(filePath);
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) return new Map();
+    throw error;
+  }
+  return new Map(
+    content.split("\n").filter(Boolean).map((line) => {
+      const item = JSON.parse(line) as CachedTargetInContext;
+      return [`${item.model}:${item.inputFingerprint}`, item];
+    }),
+  );
+}
+
+async function appendTargetAICache(
+  filePath: string,
+  value: CachedTargetInContext,
+): Promise<void> {
+  await Deno.mkdir(path.dirname(filePath), { recursive: true });
+  await Deno.writeTextFile(filePath, `${JSON.stringify(value)}\n`, { append: true });
 }
 
 function removeDuplicateKeys(
@@ -171,7 +244,7 @@ async function main(): Promise<void> {
   } catch (error) {
     console.error(error instanceof Error ? error.message : String(error));
     console.error(
-      "Usage: deno task animecards:prepare [--limit=N] [--query=...] [--source-model=Animecards] [--target-model=Miwake] [--output=PATH] [--anki-connect-url=URL] [--epub-texts-dir=PATH|--no-epub-source-lookup] [--jmdict-overrides=PATH] [--word-field=NAME] [--sentence-field=NAME] [--glossary-field=NAME] [--reading-field=NAME] [--source-field=NAME] [--source-url-field=NAME]",
+      "Usage: deno task animecards:prepare [--limit=N] [--query=...] [--source-model=Animecards] [--target-model=Miwake] [--output=PATH] [--anki-connect-url=URL] [--epub-texts-dir=PATH|--no-epub-source-lookup] [--jmdict-overrides=PATH] [--resolve-targets-with-ai] [--ai-model=MODEL] [--target-ai-cache=PATH] [--word-field=NAME] [--sentence-field=NAME] [--glossary-field=NAME] [--reading-field=NAME] [--source-field=NAME] [--source-url-field=NAME]",
     );
     Deno.exit(1);
   }
@@ -235,9 +308,15 @@ async function main(): Promise<void> {
 
   const candidates: ConversionCandidate[] = [];
   const skipped: SkippedNote[] = [];
+  const targetAICache = options.resolveTargetsWithAI
+    ? await loadTargetAICache(options.targetAICachePath)
+    : new Map<string, CachedTargetInContext>();
+  let generatedTargetResolutions = 0;
+  let reusedTargetResolutions = 0;
+  let failedTargetResolutions = 0;
   let processed = 0;
   for (const note of notes) {
-    const result = await convertAnimecardsNote(note, {
+    const conversionOptions = {
       sourceModel: options.sourceModel,
       targetModel: options.targetModel,
       sourceFields,
@@ -246,7 +325,56 @@ async function main(): Promise<void> {
       jmdictIdOverride: jmdictOverrides.get(note.noteId),
       epubSourceCorpus,
       includeMultipleSenses: INCLUDE_MULTIPLE_SENSE_ENTRIES,
-    });
+    };
+    let result = await convertAnimecardsNote(note, conversionOptions);
+    if (
+      options.resolveTargetsWithAI &&
+      "unresolvedTargetInContext" in result &&
+      result.unresolvedTargetInContext !== undefined
+    ) {
+      const request = result.unresolvedTargetInContext;
+      const inputFingerprint = await targetInputFingerprint(request, options.aiModel);
+      const cacheKey = `${options.aiModel}:${inputFingerprint}`;
+      let resolved = targetAICache.get(cacheKey);
+      try {
+        if (resolved === undefined) {
+          const generatedAt = new Date().toISOString();
+          // The canonical call also returns sense and minimized-context fields. This pass uses only
+          // `targetInContext`; the normal enrichment stage remains authoritative for the others.
+          const fields = await generateCardFields({
+            context: request.context,
+            recognitionTarget: request.recognitionTarget,
+            jmdictEntry: request.entry,
+            source: request.sourceResolution.name ?? undefined,
+            sourceURL: request.sourceResolution.url ?? undefined,
+            readingFromContext: request.reading,
+          }, options.aiModel);
+          const surface = fields.targetInContext;
+          if (surface.length === 0 || !request.context.includes(surface)) {
+            throw new Error(
+              `AI target is not a literal substring: ${JSON.stringify(surface)}`,
+            );
+          }
+          resolved = { inputFingerprint, model: options.aiModel, generatedAt, surface };
+          await appendTargetAICache(options.targetAICachePath, resolved);
+          targetAICache.set(cacheKey, resolved);
+          ++generatedTargetResolutions;
+        } else {
+          ++reusedTargetResolutions;
+        }
+        result = await convertAnimecardsNote(note, {
+          ...conversionOptions,
+          targetInContextOverride: resolved,
+        });
+      } catch (error) {
+        ++failedTargetResolutions;
+        console.error(
+          `  Target AI failed for ${note.noteId}: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        );
+      }
+    }
     if (result.candidate) {
       candidates.push(result.candidate);
     } else {
@@ -300,6 +428,11 @@ async function main(): Promise<void> {
     sourceCounts.set(method, (sourceCounts.get(method) ?? 0) + 1);
   }
   console.error(`Sources: ${JSON.stringify(Object.fromEntries(sourceCounts))}`);
+  if (options.resolveTargetsWithAI) {
+    console.error(
+      `Target-in-context AI: ${generatedTargetResolutions} generated, ${reusedTargetResolutions} cached, ${failedTargetResolutions} failed.`,
+    );
+  }
   console.error(`Skipped ${skipped.length}: ${JSON.stringify(Object.fromEntries(reasonCounts))}`);
   console.error("Review the manifest, then run animecards:apply without --write first.");
 }

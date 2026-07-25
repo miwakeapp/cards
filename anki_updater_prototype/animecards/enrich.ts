@@ -6,13 +6,15 @@
 
 import { parseArgs } from "@std/cli/parse-args";
 import * as path from "@std/path";
-import { DEFAULT_MODEL_ID, generateCardFields, MODEL_IDS, type ModelId } from "card_creator/ai";
+import { parseMiwakeKey } from "card_creator";
 import { allJMDictEntries } from "data";
 import {
-  applyGeneratedCardFields,
-  needsCardFieldEnrichment,
-  rekeyCachedKey,
-} from "./enrichment.ts";
+  DEFAULT_MODEL_ID,
+  generateCardFields,
+  MODEL_IDS,
+  type ModelId,
+} from "card_field_generation";
+import { applyGeneratedCardFields, needsCardFieldEnrichment } from "./enrichment.ts";
 import { checkpointMatchesInput, createCheckpointManifest } from "./checkpoint.ts";
 import { normalizeContextHTML } from "./html.ts";
 import { writeConversionAuditArtifacts } from "./report.ts";
@@ -86,6 +88,8 @@ interface CachedAIResult {
   inputFingerprint: string;
   model: ModelId;
   key: string;
+  recognitionTarget: string;
+  reading: string;
   hint: string;
   minimizedContext: string;
   minimizedContextResolution: MinimizedContextResolution;
@@ -100,10 +104,10 @@ function enrichmentContext(candidate: ConversionCandidate): string {
 
 async function inputFingerprint(candidate: ConversionCandidate, model: ModelId): Promise<string> {
   const value = JSON.stringify({
-    version: 2,
+    version: 3,
     model,
     jmdictId: candidate.jmdictId,
-    recognitionTarget: candidate.recognitionTarget,
+    recognitionTarget: candidate.keyRecognitionTarget,
     context: enrichmentContext(candidate),
     source: candidate.sourceResolution,
     needsSenseSelection: candidate.senseResolution.status !== "not-needed",
@@ -165,11 +169,20 @@ async function loadCachedResults(
     if (result === undefined || candidate.original.fingerprint !== result.originalFingerprint) {
       continue;
     }
-    const key = rekeyCachedKey(candidate, result.key);
-    if (key === null) continue;
-    candidate.target.fields.Key = key;
+    const parsedKey = parseMiwakeKey(result.key);
+    if (
+      parsedKey === null ||
+      parsedKey.jmdictId !== candidate.jmdictId ||
+      parsedKey.spelling !== candidate.keyRecognitionTarget
+    ) {
+      continue;
+    }
+    candidate.target.fields.Key = result.key;
+    candidate.target.fields["Recognition target"] = result.recognitionTarget;
+    candidate.target.fields.Reading = result.reading;
     candidate.target.fields.Hint = result.hint;
     candidate.target.fields["Minimized context"] = result.minimizedContext;
+    candidate.recognitionTarget = result.recognitionTarget;
     candidate.minimizedContextResolution = result.minimizedContextResolution;
     candidate.senseResolution = result.senseResolution;
     ++loaded;
@@ -223,13 +236,13 @@ async function main(): Promise<void> {
     try {
       const fields = await generateCardFields({
         context,
-        recognitionTarget: candidate.recognitionTarget,
+        recognitionTarget: candidate.keyRecognitionTarget,
         jmdictEntry: entry,
         source: candidate.sourceResolution.name ?? undefined,
         sourceURL: candidate.sourceResolution.url ?? undefined,
         readingFromContext: candidate.readingKana,
       }, options.model);
-      applyGeneratedCardFields(candidate, entry, fields, options.model, attemptedAt);
+      await applyGeneratedCardFields(candidate, entry, fields, options.model, attemptedAt);
       ++generated;
       console.error(`  Generated ${candidate.noteId}: ${candidate.recognitionTarget}`);
     } catch (error) {
@@ -264,6 +277,8 @@ async function main(): Promise<void> {
         inputFingerprint: candidateInputFingerprint,
         model: options.model,
         key: candidate.target.fields.Key,
+        recognitionTarget: candidate.target.fields["Recognition target"],
+        reading: candidate.target.fields.Reading,
         hint: candidate.target.fields.Hint,
         minimizedContext: candidate.target.fields["Minimized context"],
         minimizedContextResolution: candidate.minimizedContextResolution,

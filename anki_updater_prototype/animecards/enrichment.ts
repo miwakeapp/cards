@@ -1,10 +1,8 @@
-import {
-  type AIGeneratedFields,
-  formatMiwakeKey,
-  normalizeMinimizedContext,
-  parseMiwakeKey,
-} from "card_creator";
+import { createCard } from "card_creator";
+import type { GeneratedCardFields } from "card_field_generation";
 import type { JMDictWord } from "data";
+import { applyDisplayTargetOverride } from "./display_target.ts";
+import { cardSourceFromResolution } from "./source.ts";
 import type { ConversionCandidate } from "./types.ts";
 
 /** Whether a candidate still needs the canonical card-field AI call. */
@@ -38,43 +36,30 @@ function normalizedHint(
   return hint;
 }
 
-/** Reuses a cached sense selection while applying the candidate's current key spelling. */
-export function rekeyCachedKey(
-  candidate: ConversionCandidate,
-  cachedKey: string,
-): string | null {
-  const parsed = parseMiwakeKey(cachedKey);
-  if (parsed === null || parsed.jmdictId !== candidate.jmdictId) return null;
-
-  const prefix = `${candidate.keyRecognitionTarget} | ${candidate.jmdictId}`;
-  return parsed.senseNumbers === null ? prefix : `${prefix} | ${parsed.senseNumbers.join(",")}`;
-}
-
-/** Applies only the AI-owned portions of an otherwise deterministic conversion candidate. */
-export function applyGeneratedCardFields(
+/**
+ * Applies AI-owned decisions only after rebuilding the candidate's renderable fields through
+ * `card_creator`.
+ *
+ * The candidate is mutated only after every generated field passes deterministic validation.
+ */
+export async function applyGeneratedCardFields(
   candidate: ConversionCandidate,
   entry: JMDictWord,
-  fields: AIGeneratedFields,
+  fields: GeneratedCardFields,
   model: string,
   generatedAt: string,
-): void {
-  let key = candidate.target.fields.Key;
+): Promise<void> {
+  let applicableSenses: number[] = [];
   let hint = candidate.target.fields.Hint;
   let minimizedContext = candidate.target.fields["Minimized context"];
   let senseResolution = candidate.senseResolution;
   let minimizedContextResolution = candidate.minimizedContextResolution;
 
   if (candidate.senseResolution.status !== "not-needed") {
-    const applicableSenses = validateApplicableSenses(fields.applicableSenses, entry.sense.length);
-    key = formatMiwakeKey(
-      candidate.keyRecognitionTarget,
-      candidate.jmdictId,
-      applicableSenses,
-      entry.sense.length,
-    );
+    applicableSenses = validateApplicableSenses(fields.applicableSenses, entry.sense.length);
     hint = normalizedHint(
       fields.hint,
-      candidate.recognitionTarget,
+      candidate.keyRecognitionTarget,
       applicableSenses,
       entry.sense.length,
     );
@@ -82,20 +67,41 @@ export function applyGeneratedCardFields(
   }
 
   if (candidate.minimizedContextResolution.status !== "not-needed") {
-    const normalized = normalizeMinimizedContext(
-      candidate.target.fields["Full context"],
-      fields.minimizedContext,
-    );
-    if (normalized !== null && !normalized.includes("<mark>")) {
-      throw new Error("AI minimized context does not contain a <mark> target.");
-    }
-    minimizedContext = normalized ?? "";
+    minimizedContext = fields.minimizedContext ?? "";
     minimizedContextResolution = { status: "generated", model, generatedAt };
   }
 
-  candidate.target.fields.Key = key;
-  candidate.target.fields.Hint = hint;
-  candidate.target.fields["Minimized context"] = minimizedContext;
+  const selectedSenses =
+    applicableSenses.length === 0 || applicableSenses.length === entry.sense.length
+      ? undefined
+      : applicableSenses;
+  const card = await createCard({
+    jmdictEntry: entry,
+    recognitionTarget: candidate.keyRecognitionTarget,
+    ...(entry.kanji.some(({ text }) => text === candidate.keyRecognitionTarget)
+      ? { kanaReading: candidate.readingKana }
+      : {}),
+    applicableSenseNumbers: selectedSenses,
+    hint: hint || undefined,
+    fullContext: candidate.target.fields["Full context"],
+    minimizedContext: minimizedContext === "" ? undefined : minimizedContext,
+    source: cardSourceFromResolution(candidate.sourceResolution),
+  });
+  const displayTarget = applyDisplayTargetOverride(
+    card,
+    candidate.keyRecognitionTarget,
+    candidate.recognitionTargetOverride,
+  );
+
+  candidate.target.fields.Key = card.key;
+  candidate.target.fields["Recognition target"] = displayTarget.recognitionTarget;
+  candidate.target.fields.Reading = displayTarget.reading ?? "";
+  candidate.target.fields.Hint = card.hint ?? "";
+  candidate.target.fields["Full context"] = card.fullContext;
+  candidate.target.fields["Minimized context"] = card.minimizedContext ?? "";
+  candidate.target.fields["Dictionary entry"] = card.dictionaryEntry;
+  candidate.target.fields.Source = card.source ?? "";
+  candidate.recognitionTarget = displayTarget.recognitionTarget;
   candidate.senseResolution = senseResolution;
   candidate.minimizedContextResolution = minimizedContextResolution;
 }

@@ -1,0 +1,143 @@
+{
+  "id": "1006690",
+  "kanji": [],
+  "kana": [
+    {
+      "common": false,
+      "text": "そこそこ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adv",
+        "adj-no"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "on-mim"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "reasonably"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "fairly"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "all right"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "moderate"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adv"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "on-mim"
+      ],
+      "info": [
+        "in the form もそこそこに"
+      ],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "hurriedly"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "in a rush"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "having barely finished"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "suf"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "approximately"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "about"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "or so"
+        }
+      ]
+    }
+  ]
+}

@@ -1,13 +1,12 @@
 /**
  * AI re-targeting suggestions for cards whose targeted senses may have changed.
  *
- * Sense and hint determination deliberately reuses `card_creator`'s `generateCardFields` — the
- * same prompt, few-shot examples, and schema that create cards in the first place — fed with the
- * card's original mined context and the NEW JMDict entry. Confidence is then derived
- * deterministically by comparing the AI's choice against the structural sense alignment.
+ * Sense and hint determination uses the shared, evaluated card-field prompt with only those two
+ * outputs enabled. Confidence is derived deterministically by comparing the generated selection
+ * against the structural sense alignment.
  */
 
-import { DEFAULT_MODEL_ID, generateCardFields, type ModelId } from "card_creator/ai";
+import { DEFAULT_MODEL_ID, generateSenseAndHintFields, type ModelId } from "card_field_generation";
 import { formatMiwakeKey } from "card_creator/keys";
 import type { AnalyzedCard } from "./analyze.ts";
 import { sha256OfJSON } from "./hash.ts";
@@ -55,7 +54,7 @@ export function suggestionInputHash(
   ]);
 }
 
-/** Prepares the stored `Full context` field for the card-creation prompt. */
+/** Prepares the stored `Full context` field for the shared sense-and-hint prompt. */
 export function contextForPrompt(fullContext: string): string {
   return fullContext
     .replace(/<\/?mark>/gi, "")
@@ -69,12 +68,12 @@ export async function suggestForCard(
     modelId = DEFAULT_MODEL_ID,
     cache = {},
     force = false,
-    generate = generateCardFields,
+    generate = generateSenseAndHintFields,
   }: {
     modelId?: ModelId;
     cache?: SuggestionCache;
     force?: boolean;
-    generate?: typeof generateCardFields;
+    generate?: typeof generateSenseAndHintFields;
   } = {},
 ): Promise<{ suggestion: Suggestion; cacheEntry: SuggestionCacheEntry }> {
   if (card.latestWord === null || card.newParsed === null) {
@@ -94,10 +93,8 @@ export async function suggestForCard(
   } else {
     const fields = await generate({
       context: contextForPrompt(card.note.fields.fullContext),
-      recognitionTarget: card.parsedKey!.recognitionTarget,
+      recognitionTarget: card.parsedKey!.spelling,
       jmdictEntry: card.latestWord,
-      source: undefined,
-      sourceURL: undefined,
     }, modelId);
     applicableSenses = normalizeSenseSelection(fields.applicableSenses, card);
     aiHint = fields.hint;
@@ -208,7 +205,7 @@ function buildExplanation(
 
 export function suggestedKey(card: AnalyzedCard, senses: number[]): string {
   return formatMiwakeKey(
-    card.parsedKey!.recognitionTarget,
+    card.parsedKey!.spelling,
     card.parsedKey!.jmdictId,
     senses,
     card.newParsed!.senses.length,

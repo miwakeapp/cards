@@ -25,6 +25,13 @@ Deno.test("normalizeContextHTML unwraps presentation without discarding ruby", (
   assertEquals(contextPlainText(normalized), "彼は潤った。");
 });
 
+Deno.test("normalizeContextHTML removes ebook line wraps inside kanji words", () => {
+  assertEquals(
+    normalizeContextHTML("村中が言う。<br><br>胡<br>\n乱な目を向ける。"),
+    "村中が言う。<br><br>胡乱な目を向ける。",
+  );
+});
+
 Deno.test("readingFieldCandidates understands plain and Anki bracket readings", () => {
   assertEquals(readingFieldCandidates("うるおう"), ["うるおう"]);
   assertEquals(readingFieldCandidates("潤[うるお]う"), ["潤[うるお]う", "うるおう"]);
@@ -49,5 +56,16 @@ Deno.test("parseRecognitionTargetField separates spelling and bracketed guidance
   assertEquals(parseRecognitionTargetField("懐 [懐に飛び込んでくる]"), {
     text: "懐",
     hasHint: true,
+  });
+});
+
+Deno.test("parseRecognitionTargetField does not invent spaces between inline elements", () => {
+  assertEquals(parseRecognitionTargetField("<a>出</a><a>端</a>をくじく"), {
+    text: "出端をくじく",
+    hasHint: false,
+  });
+  assertEquals(parseRecognitionTargetField("<ruby>暗</ruby><ruby>礁</ruby>に乗りあげる"), {
+    text: "暗礁に乗りあげる",
+    hasHint: false,
   });
 });

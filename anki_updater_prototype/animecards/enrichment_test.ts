@@ -1,21 +1,20 @@
-import { assertEquals, assertThrows } from "@std/assert";
-import type { JMDictWord } from "data";
-import {
-  applyGeneratedCardFields,
-  needsCardFieldEnrichment,
-  rekeyCachedKey,
-} from "./enrichment.ts";
+import "../../data/test/use_jmdict_fixtures.ts";
+
+import { assertEquals, assertRejects } from "@std/assert";
+import { preextractedJMDictEntry } from "data";
+import { applyGeneratedCardFields, needsCardFieldEnrichment } from "./enrichment.ts";
 import type { ConversionCandidate } from "./types.ts";
 
 function candidate(): ConversionCandidate {
   return {
     noteId: 42,
     approved: true,
-    jmdictId: "1234567",
+    jmdictId: "1414110",
     recognitionTarget: "大小",
     keyRecognitionTarget: "大小",
     readingKana: "だいしょう",
     sourceResolution: { name: "Test", method: "source-field", url: null, urlIsPublic: false },
+    targetInContextResolution: { method: "deterministic", surface: "大小" },
     fullContextResolution: { status: "restored", method: "exact" },
     minimizedContextResolution: { status: "pending" },
     senseResolution: { status: "pending" },
@@ -23,7 +22,7 @@ function candidate(): ConversionCandidate {
     target: {
       modelName: "Miwake",
       fields: {
-        Key: "大小 | 1234567",
+        Key: "大小 | 1414110",
         "Recognition target": "大小",
         Reading: "大[だい] 小[しょう]",
         Hint: "",
@@ -36,11 +35,11 @@ function candidate(): ConversionCandidate {
   };
 }
 
-const entry = { id: "1234567", sense: [{}, {}, {}] } as JMDictWord;
+const entry = await preextractedJMDictEntry("1414110");
 
-Deno.test("applyGeneratedCardFields applies selected senses, hint, and minimized context", () => {
+Deno.test("applyGeneratedCardFields applies selected senses, hint, and minimized context", async () => {
   const value = candidate();
-  applyGeneratedCardFields(
+  await applyGeneratedCardFields(
     value,
     entry,
     {
@@ -55,7 +54,7 @@ Deno.test("applyGeneratedCardFields applies selected senses, hint, and minimized
     "2026-07-18T00:00:00.000Z",
   );
 
-  assertEquals(value.target.fields.Key, "大小 | 1234567 | 2");
+  assertEquals(value.target.fields.Key, "大小 | 1414110 | 2");
   assertEquals(value.target.fields.Hint, "規模大小");
   assertEquals(value.target.fields["Minimized context"], "物の<mark>大小</mark>を比べた。");
   assertEquals(value.senseResolution, {
@@ -67,15 +66,15 @@ Deno.test("applyGeneratedCardFields applies selected senses, hint, and minimized
   assertEquals(needsCardFieldEnrichment(value), false);
 });
 
-Deno.test("applyGeneratedCardFields rejects invalid sense numbers atomically", () => {
+Deno.test("applyGeneratedCardFields rejects invalid sense numbers atomically", async () => {
   const value = candidate();
-  assertThrows(
+  await assertRejects(
     () =>
       applyGeneratedCardFields(
         value,
         entry,
         {
-          applicableSenses: [4],
+          applicableSenses: [7],
           targetInContext: "大小",
           hint: "規模大小",
           minimizedContext: "物の<mark>大小</mark>を比べた。",
@@ -88,7 +87,7 @@ Deno.test("applyGeneratedCardFields rejects invalid sense numbers atomically", (
     Error,
     "invalid applicable senses",
   );
-  assertEquals(value.target.fields.Key, "大小 | 1234567");
+  assertEquals(value.target.fields.Key, "大小 | 1414110");
   assertEquals(value.senseResolution, { status: "pending" });
   assertEquals(value.minimizedContextResolution, { status: "pending" });
 });
@@ -105,13 +104,13 @@ Deno.test("needsCardFieldEnrichment waits for a restored full context", () => {
   assertEquals(needsCardFieldEnrichment(value), false);
 });
 
-Deno.test("applyGeneratedCardFields ignores sense output for single-sense candidates", () => {
+Deno.test("applyGeneratedCardFields ignores sense output for single-sense candidates", async () => {
   const value = candidate();
   value.senseResolution = { status: "not-needed" };
   value.minimizedContextResolution = { status: "not-needed" };
-  applyGeneratedCardFields(
+  await applyGeneratedCardFields(
     value,
-    { ...entry, sense: [{}] } as JMDictWord,
+    { ...entry, sense: [entry.sense[0]] },
     {
       applicableSenses: [99],
       targetInContext: "大小",
@@ -124,21 +123,41 @@ Deno.test("applyGeneratedCardFields ignores sense output for single-sense candid
     "2026-07-18T00:00:00.000Z",
   );
 
-  assertEquals(value.target.fields.Key, "大小 | 1234567");
+  assertEquals(value.target.fields.Key, "大小 | 1414110");
   assertEquals(value.target.fields.Hint, "");
   assertEquals(value.senseResolution, { status: "not-needed" });
   assertEquals(needsCardFieldEnrichment(value), false);
 });
 
-Deno.test("rekeyCachedKey preserves senses but uses the current key spelling", () => {
+Deno.test("applyGeneratedCardFields rerenders affix notation after sense selection", async () => {
+  const degree = await preextractedJMDictEntry("1006690");
   const value = candidate();
-  value.jmdictId = "1339630";
-  value.recognitionTarget = "でたらめ";
-  value.keyRecognitionTarget = "でたらめ";
+  value.jmdictId = degree.id;
+  value.recognitionTarget = "そこそこ";
+  value.keyRecognitionTarget = "そこそこ";
+  value.readingKana = "そこそこ";
+  value.minimizedContextResolution = { status: "not-needed" };
+  value.target.fields.Key = `そこそこ | ${degree.id}`;
+  value.target.fields["Recognition target"] = "そこそこ";
+  value.target.fields.Reading = "";
+  value.target.fields["Full context"] = "<mark>そこそこ</mark>の出来だ。";
 
-  assertEquals(
-    rekeyCachedKey(value, "デタラメ | 1339630 | 2"),
-    "でたらめ | 1339630 | 2",
+  await applyGeneratedCardFields(
+    value,
+    degree,
+    {
+      applicableSenses: [3],
+      targetInContext: "そこそこ",
+      hint: "評価はそこそこ",
+      minimizedContext: null,
+      cleanedSource: null,
+      sourceURLIsPublic: false,
+    },
+    "gemini-3.5-flash",
+    "2026-07-18T00:00:00.000Z",
   );
-  assertEquals(rekeyCachedKey(value, "デタラメ | 9999999 | 2"), null);
+
+  assertEquals(value.target.fields.Key, `そこそこ | ${degree.id} | 3`);
+  assertEquals(value.target.fields["Recognition target"], "～そこそこ");
+  assertEquals(value.recognitionTarget, "～そこそこ");
 });

@@ -1,15 +1,16 @@
 import { assertEquals } from "@std/assert";
 import {
   analyzeEPUBContext,
+  cardSourceFromResolution,
   cleanSourceName,
   elideLongQuotedEPUBContext,
   expandEPUBContextToBalancedParagraphEnd,
+  expandEPUBContextToIncludeTarget,
   extractEPUBHTMLSubstring,
   extractSourceURL,
   findUniqueEPUBContext,
   findUniqueEPUBSource,
   formatRelevantQuotedEPUBContext,
-  formatResolvedSourceHTML,
   isPublicSourceURL,
   quotedEPUBContextNeedsRelevanceSelection,
   resolveSource,
@@ -38,42 +39,74 @@ Deno.test("public source URL classification is conservative", () => {
   assertEquals(isPublicSourceURL("https://example.com/file?token=secret"), false);
 });
 
-Deno.test("Animecards sources use Miwake Source markup", () => {
+Deno.test("Animecards source resolutions include explicit card language and public URLs", () => {
   assertEquals(
-    formatResolvedSourceHTML({
+    cardSourceFromResolution({
       name: "舟を編む",
       method: "source-field",
       url: "https://reader.miwake.app/b?id=15",
       urlIsPublic: false,
     }),
-    '<span lang="ja">『舟を編む』</span>',
+    { text: "『舟を編む』", lang: "ja" },
   );
   assertEquals(
-    formatResolvedSourceHTML({
-      name: "NHKニュース",
+    cardSourceFromResolution({
+      name: "舟を編む",
       method: "source-field",
-      url: "https://www3.nhk.or.jp/news/article?a=1&b=2",
+      url: "https://example.com/books/舟を編む",
       urlIsPublic: true,
     }),
-    '<a lang="ja" href="https://www3.nhk.or.jp/news/article?a=1&amp;b=2">「NHKニュース」</a>',
+    {
+      text: "『舟を編む』",
+      lang: "ja",
+      url: "https://example.com/books/舟を編む",
+    },
   );
   assertEquals(
-    formatResolvedSourceHTML({
+    cardSourceFromResolution({
       name: "News & Notes",
       method: "source-field",
       url: "https://example.com/article?a=1&b=2",
       urlIsPublic: true,
     }),
-    '<a lang="en" href="https://example.com/article?a=1&amp;b=2">News &amp; Notes</a>',
+    {
+      text: "News & Notes",
+      lang: "en",
+      url: "https://example.com/article?a=1&b=2",
+    },
   );
   assertEquals(
-    formatResolvedSourceHTML({
+    cardSourceFromResolution({
+      name: "Nineteen Eighty-Four",
+      method: "epub",
+      url: null,
+      urlIsPublic: false,
+    }),
+    {
+      text: "『Nineteen Eighty-Four』",
+      lang: "ja",
+    },
+  );
+  assertEquals(
+    cardSourceFromResolution({
+      name: "『舟を編む』",
+      method: "source-field",
+      url: null,
+      urlIsPublic: false,
+    }),
+    {
+      text: "『舟を編む』",
+      lang: "ja",
+    },
+  );
+  assertEquals(
+    cardSourceFromResolution({
       name: null,
       method: "none",
       url: null,
       urlIsPublic: false,
     }),
-    "",
+    undefined,
   );
 });
 
@@ -108,8 +141,51 @@ Deno.test("EPUB context lookup returns ruby HTML and a same-document window", ()
     "Book",
   );
 
-  assertEquals(match?.paragraph.html, "完全な<ruby>文<rt>ぶん</rt></ruby>です。");
+  assertEquals(match?.paragraphs, [paragraphs[1]]);
   assertEquals(match?.window.length, 3);
+});
+
+Deno.test("EPUB context lookup and extraction span adjacent semantic paragraphs", () => {
+  const paragraphs = [
+    {
+      html: "「婚活ですよ」",
+      plainText: "「婚活ですよ」",
+      document: "chapter.xhtml",
+      index: 0,
+    },
+    {
+      html: "と<ruby>事<rt>こと</rt></ruby>もなげに答えた。",
+      plainText: "と事もなげに答えた。",
+      document: "chapter.xhtml",
+      index: 1,
+    },
+  ];
+  const context = "「婚活ですよ」<br><br>と事もなげに答えた。";
+  const match = findUniqueEPUBContext(
+    {
+      sources: [{ name: "Book", documents: ["「婚活ですよ」と事もなげに答えた。"], paragraphs }],
+    },
+    context,
+    "Book",
+  );
+
+  assertEquals(match?.paragraphs, paragraphs);
+  const analysis = analyzeEPUBContext(
+    {
+      sources: [{ name: "Book", documents: ["「婚活ですよ」と事もなげに答えた。"], paragraphs }],
+    },
+    context,
+    "Book",
+  );
+  assertEquals(analysis.status, "complete");
+  assertEquals(
+    analysis.status === "complete" ? analysis.contextHTML : null,
+    [
+      "<p>「婚活ですよ」</p>",
+      "",
+      "<p>と<ruby>事<rt>こと</rt></ruby>もなげに答えた。</p>",
+    ].join("\n"),
+  );
 });
 
 Deno.test("EPUB substring extraction restores ruby without including neighboring text", () => {
@@ -119,6 +195,16 @@ Deno.test("EPUB substring extraction restores ruby without including neighboring
       "潤って",
     ),
     "<ruby>潤<rt>うるお</rt></ruby>って",
+  );
+});
+
+Deno.test("EPUB substring extraction strips source paragraph attributes", () => {
+  assertEquals(
+    extractEPUBHTMLSubstring(
+      '<p class="calibre">前の段落。</p><p class="calibre2" id="next">次の段落。</p>',
+      "前の段落。次の段落。",
+    ),
+    "<p>前の段落。</p>\n\n<p>次の段落。</p>",
   );
 });
 
@@ -134,10 +220,85 @@ Deno.test("EPUB context analysis distinguishes complete excerpts from cutoffs", 
   };
   assertEquals(analyzeEPUBContext(corpus, "完全な文です。", "Book"), {
     status: "complete",
-    match: { source: "Book", paragraph, window: [paragraph] },
+    match: { source: "Book", paragraphs: [paragraph], window: [paragraph] },
     contextHTML: "<ruby>完全<rt>かんぜん</rt></ruby>な文です。",
   });
   assertEquals(analyzeEPUBContext(corpus, "完全な文", "Book").status, "cut-off");
+});
+
+Deno.test("EPUB context analysis rejects an unclosed angle-bracket quotation", () => {
+  const paragraph = {
+    html: "〈前文です〉説明して、〈対象の文です。続きです〉",
+    plainText: "〈前文です〉説明して、〈対象の文です。続きです〉",
+    document: "chapter.xhtml",
+    index: 0,
+  };
+  const corpus = {
+    sources: [{ name: "Book", documents: [paragraph.plainText], paragraphs: [paragraph] }],
+  };
+
+  assertEquals(
+    analyzeEPUBContext(corpus, "〈前文です〉説明して、〈対象の文です。", "Book").status,
+    "cut-off",
+  );
+  assertEquals(
+    analyzeEPUBContext(corpus, "〈対象の文です。続きです〉", "Book").status,
+    "complete",
+  );
+});
+
+Deno.test("EPUB context expansion includes a target after a truncated excerpt", () => {
+  const paragraph = {
+    html:
+      "前文。だから読者諸氏が、ここに述べられたことを裁判の証拠品みたいなかたちで、（それがどのような商取引なのか<ruby>見当<rt>けんとう</rt></ruby>もつかないが）使用されることは、お勧めしかねる。後文。",
+    plainText:
+      "前文。だから読者諸氏が、ここに述べられたことを裁判の証拠品みたいなかたちで、（それがどのような商取引なのか見当もつかないが）使用されることは、お勧めしかねる。後文。",
+    document: "chapter.xhtml",
+    index: 0,
+  };
+  assertEquals(
+    expandEPUBContextToIncludeTarget(
+      [paragraph],
+      "だから読者諸氏が、ここに述べられたことを裁判の証拠品みたいなかたちで、",
+      "見当もつかない",
+    ),
+    "だから読者諸氏が、ここに述べられたことを裁判の証拠品みたいなかたちで、（それがどのような商取引なのか<ruby>見当<rt>けんとう</rt></ruby>もつかないが）使用されることは、お勧めしかねる。",
+  );
+});
+
+Deno.test("EPUB context expansion includes an adjacent target sentence", () => {
+  const paragraph = {
+    html:
+      "前文。その間、俺は文字通り一睡もしなかった。<ruby><rb>鉄</rb><rt>てつ</rt><rb>釘</rb><rt>くぎ</rt></ruby>を打たれるような頭痛に襲われた。後文。",
+    plainText:
+      "前文。その間、俺は文字通り一睡もしなかった。鉄釘を打たれるような頭痛に襲われた。後文。",
+    document: "chapter.xhtml",
+    index: 0,
+  };
+  assertEquals(
+    expandEPUBContextToIncludeTarget(
+      [paragraph],
+      "その間、俺は文字通り一睡もしなかった。",
+      "釘",
+    ),
+    "その間、俺は文字通り一睡もしなかった。<ruby><rb>鉄</rb><rt>てつ</rt><rb>釘</rb><rt>くぎ</rt></ruby>を打たれるような頭痛に襲われた。",
+  );
+});
+
+Deno.test("EPUB context expansion omits a distant unrelated excerpt", () => {
+  const interveningText = "関係のない文。".repeat(30);
+  const paragraph = {
+    html:
+      `元の抜粋。${interveningText}その<ruby>生温<rt>なまあたた</rt></ruby>かさが身体に馴染んでいた。`,
+    plainText: `元の抜粋。${interveningText}その生温かさが身体に馴染んでいた。`,
+    document: "chapter.xhtml",
+    index: 0,
+  };
+
+  assertEquals(
+    expandEPUBContextToIncludeTarget([paragraph], "元の抜粋。", "生温かさ"),
+    "その<ruby>生温<rt>なまあたた</rt></ruby>かさが身体に馴染んでいた。",
+  );
 });
 
 Deno.test("EPUB context expansion can recover a balanced quote-final paragraph", () => {
@@ -148,11 +309,11 @@ Deno.test("EPUB context expansion can recover a balanced quote-final paragraph",
     index: 0,
   };
   assertEquals(
-    expandEPUBContextToBalancedParagraphEnd(paragraph, "最後の文"),
+    expandEPUBContextToBalancedParagraphEnd([paragraph], "最後の文"),
     "「前の文。<ruby>最後<rt>さいご</rt></ruby>の文」",
   );
   assertEquals(
-    expandEPUBContextToBalancedParagraphEnd(paragraph, "前の文"),
+    expandEPUBContextToBalancedParagraphEnd([paragraph], "前の文"),
     null,
   );
 });

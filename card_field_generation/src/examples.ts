@@ -3,9 +3,9 @@
  * These examples teach the model the expected patterns and conventions.
  */
 
-import type { AIGeneratedFields } from "./types.ts";
 import type { JMDictWord } from "data";
 import { preextractedJMDictEntry } from "data";
+import type { GeneratedCardFields } from "./generate.ts";
 
 export interface FewShotExample {
   input: {
@@ -15,7 +15,7 @@ export interface FewShotExample {
     source?: string;
     sourceURL?: string;
   };
-  output: AIGeneratedFields;
+  output: GeneratedCardFields;
 }
 
 /**
