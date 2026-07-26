@@ -226,6 +226,81 @@ Deno.test("EPUB context analysis distinguishes complete excerpts from cutoffs", 
   assertEquals(analyzeEPUBContext(corpus, "完全な文", "Book").status, "cut-off");
 });
 
+Deno.test("EPUB context analysis accepts repeated equivalent complete excerpts", () => {
+  const first = {
+    html: "<ruby>同一<rt>どういつ</rt></ruby>の文です。",
+    plainText: "同一の文です。",
+    document: "first.xhtml",
+    index: 0,
+  };
+  const second = { ...first, document: "second.xhtml" };
+  const corpus = {
+    sources: [{
+      name: "Book",
+      documents: [first.plainText, second.plainText],
+      paragraphs: [first, second],
+    }],
+  };
+
+  assertEquals(analyzeEPUBContext(corpus, "同一の文です。", "Book"), {
+    status: "complete",
+    match: { source: "Book", paragraphs: [first], window: [first] },
+    contextHTML: "<ruby>同一<rt>どういつ</rt></ruby>の文です。",
+  });
+});
+
+Deno.test("EPUB context analysis rejects repeated excerpts with different source ruby", () => {
+  const first = {
+    html: "<ruby>同一<rt>どういつ</rt></ruby>の文です。",
+    plainText: "同一の文です。",
+    document: "first.xhtml",
+    index: 0,
+  };
+  const second = {
+    html: "<ruby>同一<rt>おなじ</rt></ruby>の文です。",
+    plainText: "同一の文です。",
+    document: "second.xhtml",
+    index: 0,
+  };
+  const corpus = {
+    sources: [{
+      name: "Book",
+      documents: [first.plainText, second.plainText],
+      paragraphs: [first, second],
+    }],
+  };
+
+  assertEquals(analyzeEPUBContext(corpus, "同一の文です。", "Book"), {
+    status: "not-found",
+  });
+});
+
+Deno.test("EPUB context analysis rejects a complete sentence inside a longer quotation", () => {
+  const quoted = {
+    html: "「前文。対象の文です。後文。」",
+    plainText: "「前文。対象の文です。後文。」",
+    document: "quoted.xhtml",
+    index: 0,
+  };
+  const standalone = {
+    html: "対象の文です。",
+    plainText: "対象の文です。",
+    document: "standalone.xhtml",
+    index: 0,
+  };
+  const corpus = {
+    sources: [{
+      name: "Book",
+      documents: [quoted.plainText, standalone.plainText],
+      paragraphs: [quoted, standalone],
+    }],
+  };
+
+  assertEquals(analyzeEPUBContext(corpus, "対象の文です。", "Book"), {
+    status: "not-found",
+  });
+});
+
 Deno.test("EPUB context analysis rejects an unclosed angle-bracket quotation", () => {
   const paragraph = {
     html: "〈前文です〉説明して、〈対象の文です。続きです〉",
