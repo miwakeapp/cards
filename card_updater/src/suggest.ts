@@ -7,8 +7,10 @@
  */
 
 import { DEFAULT_MODEL_ID, generateSenseAndHintFields, type ModelId } from "card_field_generation";
+import { compatibleSenseNumbersForJMDictUsage } from "card_creator";
 import { formatMiwakeKey } from "card_creator/keys";
 import type { AnalyzedCard } from "./analyze.ts";
+import { parseAnkiReading } from "./anki_reading.ts";
 import { sha256OfJSON } from "./hash.ts";
 
 export type SuggestionConfidence = "high" | "medium" | "low";
@@ -47,6 +49,8 @@ export function suggestionInputHash(
   return sha256OfJSON([
     modelId,
     card.note.fields.key,
+    card.note.fields.recognitionTarget,
+    card.note.fields.reading,
     card.note.fields.hint,
     card.note.fields.dictionaryEntry,
     card.latestEntryHTML,
@@ -76,9 +80,10 @@ export async function suggestForCard(
     generate?: typeof generateSenseAndHintFields;
   } = {},
 ): Promise<{ suggestion: Suggestion; cacheEntry: SuggestionCacheEntry }> {
-  if (card.latestWord === null || card.newParsed === null) {
+  if (card.latestWord === null || card.newParsed === null || card.parsedKey === null) {
     throw new Error(`Card ${card.note.noteId} has no latest entry to suggest against.`);
   }
+  const parsedKey = card.parsedKey;
 
   const inputHash = await suggestionInputHash(card, modelId);
   const cached = cache[String(card.note.noteId)];
@@ -91,12 +96,32 @@ export async function suggestForCard(
     applicableSenses = cached.applicableSenses;
     aiHint = cached.hint;
   } else {
+    const kanaReading = selectedKanaReading(card);
+    const compatibleSenseNumbers = compatibleSenseNumbersForJMDictUsage(
+      card.latestWord,
+      parsedKey.spelling,
+      card.latestWord.kanji.some(({ text }) => text === parsedKey.spelling)
+        ? kanaReading
+        : undefined,
+    );
     const fields = await generate({
       context: contextForPrompt(card.note.fields.fullContext),
-      recognitionTarget: card.parsedKey!.spelling,
+      recognitionTarget: parsedKey.spelling,
       jmdictEntry: card.latestWord,
+      kanaReading,
+      compatibleSenseNumbers,
     }, modelId);
-    applicableSenses = normalizeSenseSelection(fields.applicableSenses, card);
+    if (fields.applicableSenses === null) {
+      throw new Error(
+        `No sense in the latest JMDict entry ${JSON.stringify(card.latestWord.id)} applies to ` +
+          `recognition target ${JSON.stringify(parsedKey.spelling)} in the stored context.`,
+      );
+    }
+    applicableSenses = senseNumbersForKey(
+      fields.applicableSenses,
+      compatibleSenseNumbers,
+      card.newParsed.senses.length,
+    );
     aiHint = fields.hint;
   }
 
@@ -111,12 +136,42 @@ export async function suggestForCard(
   return { suggestion, cacheEntry };
 }
 
-function normalizeSenseSelection(senses: number[], card: AnalyzedCard): number[] {
-  const total = card.newParsed!.senses.length;
-  const valid = [...new Set(senses)]
-    .filter((sense) => Number.isInteger(sense) && sense >= 1 && sense <= total)
-    .sort((a, b) => a - b);
-  return valid.length === total ? [] : valid;
+function selectedKanaReading(card: AnalyzedCard): string {
+  const spelling = card.parsedKey!.spelling;
+  if (card.latestWord!.kana.some(({ text }) => text === spelling)) return spelling;
+
+  const recognitionTarget = card.note.fields.recognitionTarget || spelling;
+  let reading = card.note.fields.reading;
+  if (recognitionTarget === `～${spelling}` && reading.startsWith("～")) {
+    reading = reading.slice(1).trimStart();
+  } else if (recognitionTarget === `${spelling}～` && reading.endsWith("～")) {
+    reading = reading.slice(0, -1).trimEnd();
+  }
+  const readings = parseAnkiReading(reading, spelling);
+  if (readings === null || readings.length !== 1) {
+    throw new Error(
+      `Card ${card.note.noteId} must have exactly one parseable kana reading for recognition ` +
+        `target ${JSON.stringify(spelling)} before sense selection; found ${
+          JSON.stringify(card.note.fields.reading)
+        }`,
+    );
+  }
+  return readings[0];
+}
+
+/**
+ * Adapts the generator's “all compatible senses” shorthand to the key's “all entry senses”
+ * shorthand, retaining explicit numbers when JMDict form restrictions exclude a sense.
+ */
+function senseNumbersForKey(
+  generatedSenseNumbers: number[],
+  compatibleSenseNumbers: number[],
+  totalSenseCount: number,
+): number[] {
+  const selected = generatedSenseNumbers.length === 0
+    ? compatibleSenseNumbers
+    : generatedSenseNumbers;
+  return selected.length === totalSenseCount ? [] : selected;
 }
 
 function buildSuggestion(

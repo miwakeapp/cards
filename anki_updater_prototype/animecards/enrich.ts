@@ -11,6 +11,9 @@ import { allJMDictEntries } from "data";
 import {
   DEFAULT_MODEL_ID,
   generateCardFields,
+  type GeneratedCardFields,
+  type GeneratedSenseAndHint,
+  generateSenseAndHintFields,
   MODEL_IDS,
   type ModelId,
 } from "card_field_generation";
@@ -23,8 +26,10 @@ import {
   type ConversionCandidate,
   type ConversionManifest,
   deferUnavailableSourceContexts,
+  minimizedContextNeedsGeneration,
   type MinimizedContextResolution,
   type SenseResolution,
+  senseResolutionNeedsGeneration,
 } from "./types.ts";
 
 interface Options {
@@ -39,6 +44,13 @@ interface Options {
 function enrichedManifestPath(manifestPath: string): string {
   const extension = path.extname(manifestPath);
   return `${manifestPath.slice(0, -extension.length)}.enriched${extension}`;
+}
+
+/** Whether an AI provider error means later requests in this run cannot presently succeed. */
+export function isAIQuotaError(message: string): boolean {
+  return /(?:spend-based rate limit|exceeded your current quota|insufficient_quota)/iu.test(
+    message,
+  );
 }
 
 function parseArguments(args: string[]): Options {
@@ -102,16 +114,32 @@ function enrichmentContext(candidate: ConversionCandidate): string {
   );
 }
 
+function compatibleSenseNumbersForResolution(
+  resolution: SenseResolution,
+): number[] | undefined {
+  if (resolution.status === "not-needed") return undefined;
+  if (resolution.status === "determined") return resolution.applicableSenses;
+  return resolution.compatibleSenses;
+}
+
 async function inputFingerprint(candidate: ConversionCandidate, model: ModelId): Promise<string> {
+  const senseResolution = candidate.senseResolution;
+  const needsSenseSelection = senseResolutionNeedsGeneration(senseResolution);
+  const compatibleSenseNumbers = compatibleSenseNumbersForResolution(senseResolution);
+  const needsMinimizedContext = minimizedContextNeedsGeneration(
+    candidate.minimizedContextResolution,
+  );
   const value = JSON.stringify({
-    version: 3,
+    version: 10,
     model,
     jmdictId: candidate.jmdictId,
     recognitionTarget: candidate.keyRecognitionTarget,
-    context: enrichmentContext(candidate),
+    senseSelectionContext: needsSenseSelection ? candidate.senseSelectionContext : undefined,
+    cardContext: needsMinimizedContext ? enrichmentContext(candidate) : undefined,
     source: candidate.sourceResolution,
-    needsSenseSelection: candidate.senseResolution.status !== "not-needed",
-    needsMinimizedContext: candidate.minimizedContextResolution.status !== "not-needed",
+    needsSenseSelection,
+    compatibleSenseNumbers,
+    needsMinimizedContext,
   });
   const digest = new Uint8Array(
     await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value)),
@@ -230,24 +258,54 @@ async function main(): Promise<void> {
     const candidate = candidates[candidateIndex];
     const entry = entries.get(candidate.jmdictId);
     if (entry === undefined) throw new Error(`JMDict entry ${candidate.jmdictId} is missing.`);
-    const context = enrichmentContext(candidate);
+    const cardContext = enrichmentContext(candidate);
     const candidateInputFingerprint = await inputFingerprint(candidate, options.model);
     const attemptedAt = new Date().toISOString();
+    const compatibleSenseNumbers = compatibleSenseNumbersForResolution(
+      candidate.senseResolution,
+    );
+    const needsMinimizedContext = minimizedContextNeedsGeneration(
+      candidate.minimizedContextResolution,
+    );
     try {
-      const fields = await generateCardFields({
-        context,
+      const sharedGenerationInput = {
         recognitionTarget: candidate.keyRecognitionTarget,
         jmdictEntry: entry,
-        source: candidate.sourceResolution.name ?? undefined,
-        sourceURL: candidate.sourceResolution.url ?? undefined,
-        readingFromContext: candidate.readingKana,
-      }, options.model);
+        kanaReading: candidate.readingKana,
+      };
+      const sensePromise = senseResolutionNeedsGeneration(candidate.senseResolution)
+        ? generateSenseAndHintFields({
+          ...sharedGenerationInput,
+          context: candidate.senseSelectionContext,
+          compatibleSenseNumbers: candidate.senseResolution.compatibleSenses,
+        }, options.model)
+        : undefined;
+      const cardFieldsPromise = needsMinimizedContext
+        ? generateCardFields({
+          ...sharedGenerationInput,
+          ...(compatibleSenseNumbers === undefined ? {} : { compatibleSenseNumbers }),
+          context: cardContext,
+          source: candidate.sourceResolution.name ?? undefined,
+          sourceURL: candidate.sourceResolution.url ?? undefined,
+        }, options.model)
+        : undefined;
+      const [senseFields, cardFields] = await Promise.all([sensePromise, cardFieldsPromise]);
+      let fields: GeneratedCardFields | GeneratedSenseAndHint;
+      if (senseFields !== undefined && cardFields !== undefined) {
+        fields = { ...cardFields, ...senseFields };
+      } else if (senseFields !== undefined) {
+        fields = senseFields;
+      } else if (cardFields !== undefined) {
+        fields = cardFields;
+      } else {
+        throw new Error("Candidate was scheduled without any pending AI-owned fields.");
+      }
       await applyGeneratedCardFields(candidate, entry, fields, options.model, attemptedAt);
       ++generated;
       console.error(`  Generated ${candidate.noteId}: ${candidate.recognitionTarget}`);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      if (candidate.minimizedContextResolution.status !== "not-needed") {
+      if (needsMinimizedContext) {
         candidate.minimizedContextResolution = {
           status: "failed",
           model: options.model,
@@ -255,19 +313,20 @@ async function main(): Promise<void> {
           error: message,
         };
       }
-      if (candidate.senseResolution.status !== "not-needed") {
+      if (senseResolutionNeedsGeneration(candidate.senseResolution)) {
         candidate.senseResolution = {
           status: "failed",
           model: options.model,
           attemptedAt,
           error: message,
+          compatibleSenses: candidate.senseResolution.compatibleSenses,
         };
       }
       ++failed;
       console.error(`  Failed ${candidate.noteId}: ${message}`);
-      if (/spend-based rate limit/iu.test(message)) {
+      if (isAIQuotaError(message)) {
         rateLimited = true;
-        console.error("  Spend-rate limit reached; leaving unscheduled candidates pending.");
+        console.error("  AI provider quota reached; leaving unscheduled candidates pending.");
       }
     }
     cacheWrite = cacheWrite.then(() =>

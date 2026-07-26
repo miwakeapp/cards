@@ -135,6 +135,9 @@ export function buildConversionReport(manifest: ConversionManifest): string {
   const aiResolvedTargets = candidates.filter((candidate) =>
     candidate.targetInContextResolution.method === "ai"
   );
+  const senseSelections = manifest.candidates.filter((candidate) =>
+    candidate.senseResolution.status !== "not-needed"
+  );
   for (const candidate of candidates) {
     const method = candidate.sourceResolution.method;
     sourceMethodCounts.set(method, (sourceMethodCounts.get(method) ?? 0) + 1);
@@ -263,6 +266,56 @@ export function buildConversionReport(manifest: ConversionManifest): string {
         inlineCode(resolution.surface)
       } | ${resolution.method === "ai" ? resolution.model : ""} | ${
         inlineCode(abbreviated(contextText(candidate.target.fields["Full context"] ?? "")))
+      } |`;
+    }),
+    "",
+    "## Sense selections",
+    "",
+    senseSelections.length === 1
+      ? "1 candidate has a multi-sense JMDict entry."
+      : `${senseSelections.length} candidates have multi-sense JMDict entries.`,
+    "",
+    "| Note ID | Target | Disposition | Status | Selected / compatible senses | Key | Hint | Model | Full context | Sense-selection evidence |",
+    "| ---: | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+    ...senseSelections.map((candidate) => {
+      const resolution = candidate.senseResolution;
+      const disposition = deferredReason(candidate) ?? "eligible";
+      let selection = "";
+      let compatible = "";
+      let model = "";
+      if (resolution.status === "pending") {
+        selection = "pending";
+        compatible = resolution.compatibleSenses.join(",");
+      } else if (resolution.status === "determined") {
+        selection = resolution.applicableSenses.join(",");
+        compatible = resolution.applicableSenses.join(",");
+      } else if (resolution.status === "generated") {
+        selection = resolution.applicableSenses.length === 0
+          ? "all compatible"
+          : resolution.applicableSenses.join(",");
+        compatible = resolution.compatibleSenses.join(",");
+        model = resolution.model;
+      } else if (resolution.status === "no-match") {
+        selection = "none";
+        compatible = resolution.compatibleSenses.join(",");
+        model = resolution.model;
+      } else if (resolution.status === "failed") {
+        selection = "failed";
+        compatible = resolution.compatibleSenses.join(",");
+        model = resolution.model;
+      }
+      return `| ${candidate.noteId} | ${inlineCode(candidate.recognitionTarget)} | ${
+        inlineCode(disposition)
+      } | ${inlineCode(resolution.status)} | ${inlineCode(`${selection} / ${compatible}`)} | ${
+        inlineCode(candidate.target.fields.Key)
+      } | ${inlineCode(candidate.target.fields.Hint ?? "")} | ${model} | ${
+        inlineCode(abbreviated(contextText(candidate.target.fields["Full context"] ?? "")))
+      } | ${
+        inlineCode(
+          abbreviated(
+            contextText(candidate.senseSelectionContext),
+          ),
+        )
       } |`;
     }),
   );

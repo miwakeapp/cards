@@ -29,6 +29,7 @@ async function candidate(): Promise<ConversionCandidate> {
     recognitionTarget: "ねこ",
     keyRecognitionTarget: "ねこ",
     readingKana: "ねこ",
+    senseSelectionContext: "ねこがいる。",
     sourceResolution: { name: null, method: "none", url: null, urlIsPublic: false },
     targetInContextResolution: { method: "deterministic", surface: "ねこ" },
     fullContextResolution: { status: "source-unavailable" },
@@ -92,6 +93,18 @@ Deno.test("failed enrichment defers a candidate from apply", async () => {
     error: "Invalid JSON response",
   };
   assertEquals(deferredReason(item), "ai-enrichment-failed");
+});
+
+Deno.test("a usage matching no JMDict sense is deferred from apply", async () => {
+  const item = await candidate();
+  item.fullContextResolution = { status: "restored", method: "exact" };
+  item.senseResolution = {
+    status: "no-match",
+    model: "gpt-5.6",
+    generatedAt: "2026-07-26T00:00:00.000Z",
+    compatibleSenses: [1, 2],
+  };
+  assertEquals(deferredReason(item), "no-applicable-jmdict-sense");
 });
 
 Deno.test("note fingerprints are insensitive to field and tag ordering", async () => {

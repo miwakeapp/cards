@@ -94,6 +94,7 @@ Deno.test("convertAnimecardsNote deterministically converts and highlights an in
     method: "deterministic",
     surface: "たべて",
   });
+  assertEquals(result.candidate.senseSelectionContext, "たべている。");
 });
 
 Deno.test("convertAnimecardsNote declines a verb stem embedded in another lexical item", async () => {
@@ -271,7 +272,93 @@ Deno.test("convertAnimecardsNote retains opt-in multi-sense enrichment machinery
   );
 
   assert(result.candidate);
-  assertEquals(result.candidate.senseResolution, { status: "pending" });
+  assertEquals(result.candidate.senseResolution, {
+    status: "pending",
+    compatibleSenses: [1, 2, 3, 4, 5, 6],
+  });
+});
+
+Deno.test("convertAnimecardsNote keeps neighboring EPUB evidence separate from card context", async () => {
+  const entry = makeWord({ kana: ["やがて"], senses: 3, partOfSpeech: ["adv"] });
+  const entries = new Map([[entry.id, entry]]);
+  const paragraphs = [
+    {
+      html: "長い時間が過ぎた。",
+      plainText: "長い時間が過ぎた。",
+      document: "chapter.xhtml",
+      index: 0,
+    },
+    {
+      html: "やがて必然となる。",
+      plainText: "やがて必然となる。",
+      document: "chapter.xhtml",
+      index: 1,
+    },
+    {
+      html: "物語はそこで終わる。",
+      plainText: "物語はそこで終わる。",
+      document: "chapter.xhtml",
+      index: 2,
+    },
+  ];
+  const result = await convertAnimecardsNote(
+    makeNote({
+      Word: "やがて",
+      Sentence: "やがて必然となる。",
+      Glossary: '<a href="https://jitendex.org/?q=1234567">definition</a>',
+      Reading: "やがて",
+    }),
+    {
+      sourceModel: "Animecards",
+      targetModel: "Miwake",
+      sourceFields: SOURCE_FIELDS,
+      entries,
+      spellingIndex: buildSpellingIndex(entries.values()),
+      includeMultipleSenses: true,
+      epubSourceCorpus: {
+        sources: [{
+          name: "Test Book",
+          documents: ["長い時間が過ぎた。やがて必然となる。物語はそこで終わる。"],
+          paragraphs,
+        }],
+      },
+    },
+  );
+
+  assert(result.candidate);
+  assertEquals(result.candidate.target.fields["Full context"], "<mark>やがて</mark>必然となる。");
+  assertEquals(
+    result.candidate.senseSelectionContext,
+    "長い時間が過ぎた。\n\nやがて必然となる。\n\n物語はそこで終わる。",
+  );
+});
+
+Deno.test("convertAnimecardsNote resolves a multi-sense entry from JMDict restrictions", async () => {
+  const entry = await preextractedJMDictEntry("1158110");
+  const entries = new Map([[entry.id, entry]]);
+  const result = await convertAnimecardsNote(
+    makeNote({
+      Word: "異名",
+      Sentence: "その異名を知っている。",
+      Glossary: '<a href="https://jitendex.org/?q=1158110">definition</a>',
+      Reading: "異名[いみょう]",
+    }),
+    {
+      sourceModel: "Animecards",
+      targetModel: "Miwake",
+      sourceFields: SOURCE_FIELDS,
+      entries,
+      spellingIndex: buildSpellingIndex(entries.values()),
+      includeMultipleSenses: true,
+    },
+  );
+
+  assert(result.candidate);
+  assertEquals(result.candidate.target.fields.Key, "異名 | 1158110 | 1");
+  assertEquals(result.candidate.senseResolution, {
+    status: "determined",
+    applicableSenses: [1],
+  });
 });
 
 Deno.test("convertAnimecardsNote uses an explicit override for multiple glossary entries", async () => {

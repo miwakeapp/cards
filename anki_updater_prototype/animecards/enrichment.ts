@@ -1,39 +1,42 @@
-import { createCard } from "card_creator";
-import type { GeneratedCardFields } from "card_field_generation";
+import { compatibleSenseNumbersForJMDictUsage, createCard } from "card_creator";
+import type { GeneratedCardFields, GeneratedSenseAndHint } from "card_field_generation";
 import type { JMDictWord } from "data";
 import { applyDisplayTargetOverride } from "./display_target.ts";
 import { cardSourceFromResolution } from "./source.ts";
-import type { ConversionCandidate } from "./types.ts";
+import {
+  type ConversionCandidate,
+  minimizedContextNeedsGeneration,
+  senseResolutionIsComplete,
+  senseResolutionNeedsGeneration,
+} from "./types.ts";
+
+type CandidateGeneratedFields =
+  | GeneratedCardFields
+  | (GeneratedSenseAndHint & Partial<Pick<GeneratedCardFields, "minimizedContext">>);
 
 /** Whether a candidate still needs the canonical card-field AI call. */
 export function needsCardFieldEnrichment(candidate: ConversionCandidate): boolean {
+  if (candidate.senseResolution.status === "no-match") return false;
   return candidate.fullContextResolution.status === "restored" &&
-    (!["not-needed", "generated"].includes(candidate.senseResolution.status) ||
-      !["not-needed", "generated"].includes(candidate.minimizedContextResolution.status));
+    (!senseResolutionIsComplete(candidate.senseResolution) ||
+      minimizedContextNeedsGeneration(candidate.minimizedContextResolution));
 }
 
-function validateApplicableSenses(values: number[], senseCount: number): number[] {
+function validateApplicableSenses(values: number[], compatibleSenses: number[]): number[] {
   if (
-    values.some((value) => !Number.isInteger(value) || value < 1 || value > senseCount) ||
+    values.some((value) => !Number.isInteger(value) || !compatibleSenses.includes(value)) ||
     new Set(values).size !== values.length
   ) {
     throw new Error(
-      `AI returned invalid applicable senses ${JSON.stringify(values)} for ${senseCount} senses.`,
+      `AI returned applicable senses ${JSON.stringify(values)}; expected unique integers from ` +
+        `the JMDict-compatible senses ${JSON.stringify(compatibleSenses)}.`,
     );
   }
-  return [...values].sort((left, right) => left - right);
-}
-
-function normalizedHint(
-  hint: string | null,
-  recognitionTarget: string,
-  applicableSenses: number[],
-  senseCount: number,
-): string {
-  const allSensesApply = applicableSenses.length === 0 ||
-    applicableSenses.length === senseCount;
-  if (allSensesApply || hint === null || !hint.includes(recognitionTarget)) return "";
-  return hint;
+  const sorted = [...values].sort((left, right) => left - right);
+  return sorted.length === compatibleSenses.length &&
+      sorted.every((value, index) => value === compatibleSenses[index])
+    ? []
+    : sorted;
 }
 
 /**
@@ -45,36 +48,73 @@ function normalizedHint(
 export async function applyGeneratedCardFields(
   candidate: ConversionCandidate,
   entry: JMDictWord,
-  fields: GeneratedCardFields,
+  fields: CandidateGeneratedFields,
   model: string,
   generatedAt: string,
 ): Promise<void> {
-  let applicableSenses: number[] = [];
+  let applicableSenses = candidate.senseResolution.status === "determined" ||
+      candidate.senseResolution.status === "generated"
+    ? candidate.senseResolution.applicableSenses
+    : [];
   let hint = candidate.target.fields.Hint;
   let minimizedContext = candidate.target.fields["Minimized context"];
   let senseResolution = candidate.senseResolution;
   let minimizedContextResolution = candidate.minimizedContextResolution;
 
-  if (candidate.senseResolution.status !== "not-needed") {
-    applicableSenses = validateApplicableSenses(fields.applicableSenses, entry.sense.length);
-    hint = normalizedHint(
-      fields.hint,
+  if (senseResolutionNeedsGeneration(candidate.senseResolution)) {
+    const compatibleSenses = compatibleSenseNumbersForJMDictUsage(
+      entry,
       candidate.keyRecognitionTarget,
-      applicableSenses,
-      entry.sense.length,
+      entry.kanji.some(({ text }) => text === candidate.keyRecognitionTarget)
+        ? candidate.readingKana
+        : undefined,
     );
-    senseResolution = { status: "generated", model, generatedAt, applicableSenses };
+    if (
+      JSON.stringify(candidate.senseResolution.compatibleSenses) !==
+        JSON.stringify(compatibleSenses)
+    ) {
+      throw new Error(
+        `Candidate records JMDict-compatible senses ${
+          JSON.stringify(candidate.senseResolution.compatibleSenses)
+        }, but the selected spelling and reading now permit ${JSON.stringify(compatibleSenses)}.`,
+      );
+    }
+    if (fields.applicableSenses === null) {
+      candidate.senseResolution = {
+        status: "no-match",
+        model,
+        generatedAt,
+        compatibleSenses,
+      };
+      return;
+    }
+    applicableSenses = validateApplicableSenses(fields.applicableSenses, compatibleSenses);
+    if (applicableSenses.length === 0) {
+      hint = "";
+    } else {
+      if (fields.hint === null) {
+        throw new Error("The validated AI sense selection is missing its hint.");
+      }
+      hint = fields.hint;
+    }
+    senseResolution = {
+      status: "generated",
+      model,
+      generatedAt,
+      compatibleSenses,
+      applicableSenses,
+    };
   }
 
-  if (candidate.minimizedContextResolution.status !== "not-needed") {
+  if (minimizedContextNeedsGeneration(candidate.minimizedContextResolution)) {
+    if (!("minimizedContext" in fields)) {
+      throw new Error("AI result is missing minimizedContext for a candidate that requires it.");
+    }
     minimizedContext = fields.minimizedContext ?? "";
     minimizedContextResolution = { status: "generated", model, generatedAt };
   }
 
-  const selectedSenses =
-    applicableSenses.length === 0 || applicableSenses.length === entry.sense.length
-      ? undefined
-      : applicableSenses;
+  const selectedSenses = applicableSenses.length === 0 ? undefined : applicableSenses;
   const card = await createCard({
     jmdictEntry: entry,
     recognitionTarget: candidate.keyRecognitionTarget,

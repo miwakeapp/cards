@@ -1,4 +1,4 @@
-export const CONVERSION_MANIFEST_VERSION = 9;
+export const CONVERSION_MANIFEST_VERSION = 12;
 
 export interface AnkiFieldValue {
   value: string;
@@ -35,11 +35,49 @@ export type MinimizedContextResolution =
   | { status: "generated"; model: string; generatedAt: string }
   | { status: "failed"; model: string; attemptedAt: string; error: string };
 
+/** Whether minimized-context generation still needs an AI result, including a retry after failure. */
+export function minimizedContextNeedsGeneration(
+  resolution: MinimizedContextResolution,
+): resolution is Extract<MinimizedContextResolution, { status: "pending" | "failed" }> {
+  return resolution.status === "pending" || resolution.status === "failed";
+}
+
 export type SenseResolution =
   | { status: "not-needed" }
-  | { status: "pending" }
-  | { status: "generated"; model: string; generatedAt: string; applicableSenses: number[] }
-  | { status: "failed"; model: string; attemptedAt: string; error: string };
+  | { status: "determined"; applicableSenses: number[] }
+  | { status: "pending"; compatibleSenses: number[] }
+  | {
+    status: "generated";
+    model: string;
+    generatedAt: string;
+    compatibleSenses: number[];
+    applicableSenses: number[];
+  }
+  | {
+    status: "no-match";
+    model: string;
+    generatedAt: string;
+    compatibleSenses: number[];
+  }
+  | {
+    status: "failed";
+    model: string;
+    attemptedAt: string;
+    error: string;
+    compatibleSenses: number[];
+  };
+
+/** Whether a candidate's JMDict senses are final and safe to render or apply. */
+export function senseResolutionIsComplete(resolution: SenseResolution): boolean {
+  return ["not-needed", "determined", "generated"].includes(resolution.status);
+}
+
+/** Whether sense selection still needs an AI result, including a retry after failure. */
+export function senseResolutionNeedsGeneration(
+  resolution: SenseResolution,
+): resolution is Extract<SenseResolution, { status: "pending" | "failed" }> {
+  return resolution.status === "pending" || resolution.status === "failed";
+}
 
 export type FullContextResolution =
   | { status: "source-unavailable" }
@@ -72,6 +110,13 @@ export interface ConversionCandidate {
   /** Explicit notation retained from the source Animecard, if any. */
   recognitionTargetOverride?: string;
   readingKana: string;
+  /**
+   * Plain-text evidence supplied to sense-selection AI.
+   *
+   * This can include neighboring source paragraphs that are useful for interpretation but must
+   * never be rendered as the card's `Full context`.
+   */
+  senseSelectionContext: string;
   sourceResolution: SourceResolution;
   targetInContextResolution: TargetInContextResolution;
   fullContextResolution: FullContextResolution;
@@ -107,6 +152,7 @@ export interface ConversionManifest {
 export type DeferredReason =
   | "full-context-source-unavailable"
   | "full-context-restoration-failed"
+  | "no-applicable-jmdict-sense"
   | "ai-enrichment-failed"
   | "manual-hold";
 
@@ -117,6 +163,9 @@ export function deferredReason(candidate: ConversionCandidate): DeferredReason |
   }
   if (candidate.fullContextResolution.status === "failed") {
     return "full-context-restoration-failed";
+  }
+  if (candidate.senseResolution.status === "no-match") {
+    return "no-applicable-jmdict-sense";
   }
   if (
     candidate.minimizedContextResolution.status === "failed" ||

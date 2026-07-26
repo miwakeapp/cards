@@ -296,6 +296,22 @@ export function epubContextPlainText(match: EPUBContextMatch): string {
   return joinedParagraphText(match.paragraphs);
 }
 
+/**
+ * Builds a compact source window for semantic decisions about a matched usage.
+ *
+ * The flashcard context may intentionally omit a preceding reply, speaker cue, or other detail
+ * that disambiguates a dictionary sense. Include one neighboring paragraph on each side while
+ * keeping this evidence separate from the context eventually rendered on the card.
+ */
+export function epubSenseSelectionContext(match: EPUBContextMatch): string {
+  const firstIndex = match.paragraphs[0].index;
+  const lastIndex = match.paragraphs.at(-1)!.index;
+  return match.window
+    .filter((paragraph) => paragraph.index >= firstIndex - 1 && paragraph.index <= lastIndex + 1)
+    .map((paragraph) => paragraph.plainText)
+    .join("\n\n");
+}
+
 export function EPUBBracketsAreBalanced(text: string): boolean {
   const pairs: Record<string, string> = {
     "「": "」",

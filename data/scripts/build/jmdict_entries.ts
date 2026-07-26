@@ -79,7 +79,7 @@ const ANIMECARDS_CONVERTER_TEST_IDS = new Set([
   "2548280", // のしのしと歩く
 ]);
 
-// IDs used by card_creator few-shot examples
+// IDs used by `card_field_generation` few-shot examples
 const FEW_SHOT_IDS = new Set([
   "1497700", // 父方
   "1529950", // 無垢
@@ -87,6 +87,10 @@ const FEW_SHOT_IDS = new Set([
   "1403360", // 増幅
   "2258260", // ハンダ付け
   "2007360", // 後ろめたい
+  "1630340", // 金子, none of the entry's senses applies to its use as a surname
+  "1761890", // 女子大生, a specialized sense requires positive contextual evidence
+  "1445760", // さかしま, mentioned as a string rather than used with a dictionary sense
+  "2019710", // おませ, metalinguistic discussion supplies semantic evidence
 ]);
 
 // Dynamically load IDs from card_creator eval inputs

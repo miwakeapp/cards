@@ -7,10 +7,14 @@ export {
   MODEL_IDS,
 } from "./generate.ts";
 export type {
+  AllCompatibleSenses,
   CardFieldGenerationInput,
+  GeneratedApplicableCardFields,
   GeneratedCardFields,
   GeneratedSenseAndHint,
   ModelId,
+  NoApplicableSense,
+  SelectedApplicableSenses,
   SenseAndHintGenerationInput,
 } from "./generate.ts";
 export { needsAIMinimizedContext } from "./minimized_context.ts";

@@ -1,0 +1,105 @@
+{
+  "id": "1445760",
+  "kanji": [
+    {
+      "common": true,
+      "text": "逆しま",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "倒",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "さかしま",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "adj-na"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "reverse"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "inversion"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "upside down"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n",
+        "adj-na"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "unreasonable"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "absurd"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "wrong"
+        }
+      ]
+    }
+  ]
+}

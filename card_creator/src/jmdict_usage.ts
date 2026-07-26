@@ -215,3 +215,18 @@ export function resolveJMDictUsage(
     readingSuffix,
   };
 }
+
+/**
+ * Returns the 1-indexed senses permitted by JMDict for a selected spelling and reading.
+ *
+ * This applies the entry's reading-to-spelling restrictions followed by each sense's spelling and
+ * reading restrictions. It makes no contextual or pedagogical choice among the returned senses.
+ * The same form validation and compatibility rules are used by `createCard()`.
+ */
+export function compatibleSenseNumbersForJMDictUsage(
+  entry: JMDictWord,
+  recognitionTarget: string,
+  kanaReading: string | undefined,
+): number[] {
+  return resolveJMDictUsage(entry, recognitionTarget, kanaReading, undefined).senseNumbers;
+}

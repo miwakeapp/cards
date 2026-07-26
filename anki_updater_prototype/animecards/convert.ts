@@ -1,5 +1,5 @@
 import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
-import { createCard, type MiwakeCard } from "card_creator";
+import { compatibleSenseNumbersForJMDictUsage, createCard, type MiwakeCard } from "card_creator";
 import { toHiragana } from "japanese_text";
 import { markContextTargets, markedContextHasRuby } from "../shared/mark_context.ts";
 import {
@@ -29,14 +29,17 @@ import {
   cardSourceFromResolution,
   type EPUBContextMatch,
   epubContextPlainText,
+  epubSenseSelectionContext,
   type EPUBSourceCorpus,
   expandEPUBContextToIncludeTarget,
+  findUniqueEPUBContext,
   resolveSource,
 } from "./source.ts";
 import {
   type AnkiNoteInfo,
   type ConversionCandidate,
   type FullContextResolution,
+  type SenseResolution,
   type SkippedNote,
   snapshotNote,
   type SourceFieldMapping,
@@ -339,20 +342,26 @@ export async function convertAnimecardsNote(
 
   let contextHTML = options.contextOverride?.html ?? originalContextHTML;
   let epubContextMatch: EPUBContextMatch | null = null;
+  let senseSelectionEPUBMatch: EPUBContextMatch | null = null;
   let fullContextResolution: FullContextResolution = options.contextOverride?.resolution ?? {
     status: "source-unavailable",
   };
-  if (options.contextOverride === undefined && options.epubSourceCorpus !== undefined) {
+  if (options.epubSourceCorpus !== undefined) {
+    senseSelectionEPUBMatch = findUniqueEPUBContext(
+      options.epubSourceCorpus,
+      originalContextHTML,
+      sourceResolution.name,
+    );
     const analysis = analyzeEPUBContext(
       options.epubSourceCorpus,
       originalContextHTML,
       sourceResolution.name,
     );
     if (analysis.status !== "not-found") epubContextMatch = analysis.match;
-    if (analysis.status === "complete") {
+    if (options.contextOverride === undefined && analysis.status === "complete") {
       contextHTML = normalizeContextHTML(analysis.contextHTML);
       fullContextResolution = { status: "restored", method: "exact" };
-    } else if (analysis.status === "cut-off") {
+    } else if (options.contextOverride === undefined && analysis.status === "cut-off") {
       fullContextResolution = { status: "pending", source: analysis.match.source };
     }
   }
@@ -586,6 +595,18 @@ export async function convertAnimecardsNote(
       );
     }
 
+    let senseResolution: SenseResolution = { status: "not-needed" };
+    if (entry.sense.length > 1) {
+      const compatibleSenses = compatibleSenseNumbersForJMDictUsage(
+        entry,
+        keyRecognitionTarget,
+        entry.kanji.some(({ text }) => text === keyRecognitionTarget) ? selectedReading : undefined,
+      );
+      senseResolution = compatibleSenses.length === 1
+        ? { status: "determined", applicableSenses: compatibleSenses }
+        : { status: "pending", compatibleSenses };
+    }
+
     const targetFields = {
       "Key": card.key,
       "Recognition target": displayTarget.recognitionTarget,
@@ -606,15 +627,16 @@ export async function convertAnimecardsNote(
         keyRecognitionTarget,
         ...(recognitionTargetOverride === undefined ? {} : { recognitionTargetOverride }),
         readingKana: selectedReading,
+        senseSelectionContext: senseSelectionEPUBMatch === null
+          ? context
+          : epubSenseSelectionContext(senseSelectionEPUBMatch),
         sourceResolution,
         targetInContextResolution,
         fullContextResolution,
         minimizedContextResolution: needsAIMinimizedContext(card.fullContext)
           ? { status: "pending" }
           : { status: "not-needed" },
-        senseResolution: entry.sense.length === 1
-          ? { status: "not-needed" }
-          : { status: "pending" },
+        senseResolution,
         original: await snapshotNote(note),
         target: { modelName: options.targetModel, fields: targetFields },
       },

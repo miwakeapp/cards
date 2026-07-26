@@ -36,6 +36,8 @@ See the exported `CreateCardInput` and `CardSource` documentation for the exact 
 
 `formatReadingForAnki()` formats a selected spelling and reading using Anki's bracket-based furigana syntax. It returns `null` when the local furigana data cannot determine precise placement.
 
+`compatibleSenseNumbersForJMDictUsage()` applies JMDict's spelling and reading restrictions before a caller makes any contextual choice among senses. It uses the same validation and compatibility rules as `createCard()`.
+
 Card construction uses JMDict furigana data and the compact spelling-to-readings index from the `data` package. Refresh the full local resources with:
 
 ```sh

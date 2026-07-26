@@ -1,10 +1,15 @@
 import "../../data/test/use_jmdict_fixtures.ts";
 
-import { assertEquals } from "@std/assert";
+import { assertEquals, assertNotEquals, assertRejects } from "@std/assert";
 import type { ModelId, SenseAndHintGenerationInput } from "card_field_generation";
 import { renderEntry } from "jmdict_to_html";
 import { analyzeCard, type AnalyzedCard } from "../src/analyze.ts";
-import { contextForPrompt, suggestForCard, suggestionInputHash } from "../src/suggest.ts";
+import {
+  contextForPrompt,
+  suggestedKey,
+  suggestForCard,
+  suggestionInputHash,
+} from "../src/suggest.ts";
 import { makeNote, makeWord } from "./fixtures.ts";
 
 async function retargetingCard(): Promise<AnalyzedCard> {
@@ -23,6 +28,7 @@ async function retargetingCard(): Promise<AnalyzedCard> {
   const note = makeNote({
     key: "言葉 | 1000000 | 1",
     dictionaryEntry: renderEntry(previousEntry),
+    reading: "言[こと] 葉[ば]",
     fullContext: "これは<mark>言葉</mark><br>のテストです。",
   });
   return await analyzeCard(note, currentEntry);
@@ -39,7 +45,7 @@ Deno.test("suggestForCard supplies the shared sense-and-hint generator input", a
     generate: (input, modelId) => {
       received = { input, modelId };
       return Promise.resolve({
-        applicableSenses: [2, 2, 99],
+        applicableSenses: [2],
         hint: "言葉遣い",
       });
     },
@@ -49,7 +55,9 @@ Deno.test("suggestForCard supplies the shared sense-and-hint generator input", a
     input: {
       context: "これは言葉\nのテストです。",
       recognitionTarget: "言葉",
-      jmdictEntry: card.latestWord,
+      jmdictEntry: card.latestWord!,
+      kanaReading: "ことば",
+      compatibleSenseNumbers: [1, 2],
     },
     modelId: "gpt-5.5",
   });
@@ -92,6 +100,75 @@ Deno.test("suggestForCard reuses an input-matched cache entry", async () => {
   assertEquals(suggestion.senses, [1]);
   assertEquals(suggestion.aiHint, "対象言葉");
   assertEquals(suggestion.fromCache, true);
+});
+
+Deno.test("suggestionInputHash covers fields used as deterministic sense evidence", async () => {
+  const card = await retargetingCard();
+  const originalHash = await suggestionInputHash(card, "claude-opus-4-8");
+
+  card.note.fields.reading = "言葉[ことば]";
+  const editedReadingHash = await suggestionInputHash(card, "claude-opus-4-8");
+  assertNotEquals(editedReadingHash, originalHash);
+
+  card.note.fields.recognitionTarget = "～言葉";
+  const editedTargetHash = await suggestionInputHash(card, "claude-opus-4-8");
+  assertNotEquals(editedTargetHash, editedReadingHash);
+});
+
+Deno.test("suggestForCard rejects a usage matching no sense in the latest entry", async () => {
+  const card = await retargetingCard();
+
+  await assertRejects(
+    () =>
+      suggestForCard(card, {
+        generate: () =>
+          Promise.resolve({
+            applicableSenses: null,
+            hint: null,
+          }),
+      }),
+    Error,
+    'No sense in the latest JMDict entry "1000000" applies to recognition target "言葉"',
+  );
+});
+
+Deno.test("suggestForCard preserves a restricted all-compatible selection in the key", async () => {
+  const previousEntry = makeWord({
+    kanji: ["言葉", "詞"],
+    senses: [
+      { glosses: ["word"] },
+      { glosses: ["language"] },
+    ],
+  });
+  const currentEntry = makeWord({
+    kanji: ["言葉", "詞"],
+    senses: [
+      { glosses: ["term"] },
+      { glosses: ["language"] },
+    ],
+  });
+  currentEntry.sense[1].appliesToKanji = ["詞"];
+  const card = await analyzeCard(
+    makeNote({
+      key: "言葉 | 1000000 | 1",
+      dictionaryEntry: renderEntry(previousEntry),
+      reading: "言[こと] 葉[ば]",
+    }),
+    currentEntry,
+  );
+
+  const { suggestion } = await suggestForCard(card, {
+    generate: (input) => {
+      assertEquals(input.compatibleSenseNumbers, [1]);
+      return Promise.resolve({
+        applicableSenses: [],
+        hint: null,
+      });
+    },
+  });
+
+  assertEquals(suggestion.senses, [1]);
+  assertEquals(suggestedKey(card, suggestion.senses), "言葉 | 1000000 | 1");
 });
 
 Deno.test("contextForPrompt removes target markup and converts legacy line breaks", () => {
