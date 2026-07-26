@@ -47,6 +47,7 @@ rt {
 #recognition-target,
 #reading {
   line-height: 2;
+  text-wrap: balance;
   font-size: 3rem;
   text-align: center;
   margin: 0;
