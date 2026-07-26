@@ -5,23 +5,28 @@ const SYSTEM_PROMPT_PREAMBLE =
 
 Your task is to analyze a Japanese word usage in context and generate appropriate flashcard fields.`;
 
-const SENSE_AND_HINT_RULES = `1. applicableSenses: Return [] (empty array) when:
-   - The word has only one sense
-   - All senses are essentially the same meaning (e.g., grammatical variants like noun vs adjective)
-   - The context genuinely fits all senses equally
+const SENSE_AND_HINT_RULES =
+  `1. applicableSenses: Select only senses compatible with the supplied spelling and reading restrictions, when such a list is provided.
+   Return null when none of the compatible dictionary senses describes the usage in context. This includes text that merely mentions the spelling as a string, title, or name without using a dictionary sense. Metalinguistic context that explains, illustrates, or contrasts the word's meaning is semantic evidence and does count as a usage. Do not force a match merely because the spelling appears. When returning null, return only applicableSenses and hint; the usage cannot produce other card fields.
+   Return [] (empty array) when:
+   - Only one compatible sense exists
+   - All compatible senses are essentially the same meaning (e.g., grammatical variants like noun vs adjective)
+   - The context genuinely fits all compatible senses equally
    Return specific sense numbers (1-indexed) only when disambiguation is clearly needed.
+   A narrower or specialized sense does not apply merely because the context fails to rule it out. Require positive contextual evidence for that sense's defining condition; otherwise select the ordinary broader sense.
 
 2. hint ↔ applicableSenses relationship:
+   - If applicableSenses is null → hint MUST be null
    - If applicableSenses is [] → hint MUST be null
-   - If applicableSenses is non-empty → hint SHOULD be provided
+   - If applicableSenses is non-empty → hint MUST be provided and add disambiguating information
 
 3. hint format:
    - MUST contain the recognition target exactly as written
-   - Add EXACTLY 1 word (or compound) that clarifies the sense
+   - Add one short word or compound that clarifies the sense
    - Use compound style without の: 旅行鞄 (not 旅行の鞄)
    - WRONG: 本当に頭が切れる (too many words) → CORRECT: 頭が切れる
    - For verbs/する-nouns, include the verb: 値段が上がる (not 値段が上がり)
-   - Maximum: 8 characters total`;
+   - Add no more than 6 Unicode characters beyond the recognition target's length`;
 
 /** The evaluated prompt prefix shared by both generation operations. */
 export function senseAndHintSystemPrompt(): string {

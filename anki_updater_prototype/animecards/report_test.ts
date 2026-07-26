@@ -53,11 +53,12 @@ Deno.test("buildConversionReport groups exact final source HTML strings", () => 
         recognitionTarget: "本",
         keyRecognitionTarget: "本",
         readingKana: "ほん",
+        senseSelectionContext: "本を読む。",
         sourceResolution: { name: null, method: "none", url: null, urlIsPublic: false },
         targetInContextResolution: { method: "deterministic", surface: "本" },
         fullContextResolution: { status: "source-unavailable" },
         minimizedContextResolution: { status: "pending" },
-        senseResolution: { status: "pending" },
+        senseResolution: { status: "pending", compatibleSenses: [1, 2] },
         original: { fields: {} },
         target: { fields: { Source: "", Key: "本 | 2" } },
       },
@@ -67,6 +68,7 @@ Deno.test("buildConversionReport groups exact final source HTML strings", () => 
         recognitionTarget: "微塵",
         keyRecognitionTarget: "微塵",
         readingKana: "みじん",
+        senseSelectionContext: "微塵も疑わない。",
         sourceResolution: {
           name: "容疑者Xの献身",
           method: "epub",
@@ -81,7 +83,7 @@ Deno.test("buildConversionReport groups exact final source HTML strings", () => 
           error: "Could not derive a complete reading",
         },
         minimizedContextResolution: { status: "pending" },
-        senseResolution: { status: "pending" },
+        senseResolution: { status: "pending", compatibleSenses: [1, 2] },
         original: { fields: {} },
         target: {
           fields: {
@@ -143,4 +145,109 @@ Deno.test("buildConversionReport groups exact final source HTML strings", () => 
   assertStringIncludes(deferredCSV, "3,微塵");
   assertStringIncludes(deferredCSV, "4,衝撃波");
   assertStringIncludes(deferredCSV, "full-context-source-unavailable");
+});
+
+Deno.test("buildConversionReport shows selected and compatible senses", () => {
+  const manifest = {
+    version: 12,
+    generatedAt: "2026-07-26T00:00:00.000Z",
+    query: 'note:"Animecards"',
+    sourceModel: "Animecards",
+    targetModel: "Miwake",
+    sourceFields: {},
+    candidates: [{
+      noteId: 42,
+      approved: false,
+      jmdictId: "1414110",
+      recognitionTarget: "大小",
+      keyRecognitionTarget: "大小",
+      readingKana: "だいしょう",
+      senseSelectionContext: "前段。物の大小を比べる。後段。",
+      sourceResolution: {
+        name: "Test",
+        method: "source-field",
+        url: null,
+        urlIsPublic: false,
+      },
+      targetInContextResolution: { method: "deterministic", surface: "大小" },
+      fullContextResolution: { status: "restored", method: "exact" },
+      minimizedContextResolution: { status: "not-needed" },
+      senseResolution: {
+        status: "generated",
+        model: "gemini-3.5-flash",
+        generatedAt: "2026-07-26T00:00:00.000Z",
+        compatibleSenses: [1, 2, 3],
+        applicableSenses: [2],
+      },
+      original: { fields: {} },
+      target: {
+        fields: {
+          Source: '<span lang="en">Test</span>',
+          Key: "大小 | 1414110 | 2",
+          Hint: "規模大小",
+          "Full context": "物の<mark>大小</mark>を比べる。",
+        },
+      },
+    }],
+    skipped: [],
+  } as unknown as ConversionManifest;
+
+  const report = buildConversionReport(manifest);
+  assertStringIncludes(report, "## Sense selections");
+  assertStringIncludes(
+    report,
+    "| 42 | `大小` | `manual-hold` | `generated` | `2 / 1,2,3` | `大小 \\| 1414110 \\| 2` | `規模大小` | gemini-3.5-flash | `物の大小を比べる。` | `前段。物の大小を比べる。後段。` |",
+  );
+});
+
+Deno.test("buildConversionReport audits no-match sense selections", () => {
+  const manifest = {
+    version: 12,
+    generatedAt: "2026-07-26T00:00:00.000Z",
+    query: 'note:"Animecards"',
+    sourceModel: "Animecards",
+    targetModel: "Miwake",
+    sourceFields: {},
+    candidates: [{
+      noteId: 43,
+      approved: true,
+      jmdictId: "1630340",
+      recognitionTarget: "金子",
+      keyRecognitionTarget: "金子",
+      readingKana: "きんす",
+      senseSelectionContext: "バイトの金子は配達中だ。",
+      sourceResolution: {
+        name: "Test",
+        method: "source-field",
+        url: null,
+        urlIsPublic: false,
+      },
+      targetInContextResolution: { method: "deterministic", surface: "金子" },
+      fullContextResolution: { status: "restored", method: "exact" },
+      minimizedContextResolution: { status: "not-needed" },
+      senseResolution: {
+        status: "no-match",
+        model: "gpt-5.6",
+        generatedAt: "2026-07-26T00:00:00.000Z",
+        compatibleSenses: [1, 2],
+      },
+      original: { fields: {} },
+      target: {
+        fields: {
+          Source: '<span lang="en">Test</span>',
+          Key: "金子 | 1630340",
+          Hint: "",
+          "Full context": "バイトの<mark>金子</mark>は配達中だ。",
+        },
+      },
+    }],
+    skipped: [],
+  } as unknown as ConversionManifest;
+
+  const report = buildConversionReport(manifest);
+  assertStringIncludes(
+    report,
+    "| 43 | `金子` | `no-applicable-jmdict-sense` | `no-match` | `none / 1,2` | `金子 \\| 1630340` | `` | gpt-5.6 |",
+  );
+  assertStringIncludes(report, "| 1 | `no-applicable-jmdict-sense` |");
 });

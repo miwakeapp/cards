@@ -110,8 +110,13 @@ for (const { row, entry, recognitionTarget: cardTarget } of resolved) {
     source: row.source || undefined,
   }, modelId);
   const recognitionTarget = cardTarget;
-  const applicableSenseNumbers = fields.applicableSenses.length === 0 ||
-      fields.applicableSenses.length === entry.sense.length
+  if (fields.applicableSenses === null) {
+    throw new Error(
+      `No sense in JMDict entry ${JSON.stringify(entry.id)} applies to recognition target ` +
+        `${JSON.stringify(recognitionTarget)} in the supplied sentence.`,
+    );
+  }
+  const applicableSenseNumbers = fields.applicableSenses.length === 0
     ? undefined
     : fields.applicableSenses;
   const card = await createCard({
@@ -121,10 +126,7 @@ for (const { row, entry, recognitionTarget: cardTarget } of resolved) {
       ? { kanaReading: fields.reading }
       : {}),
     applicableSenseNumbers,
-    hint: applicableSenseNumbers !== undefined &&
-        fields.hint?.includes(recognitionTarget)
-      ? fields.hint
-      : undefined,
+    hint: fields.hint ?? undefined,
     fullContext: markContextTargets(row.sentence, [fields.targetInContext]),
     minimizedContext: fields.minimizedContext === null ? undefined : fields.minimizedContext,
     source: row.source === "" ? undefined : {

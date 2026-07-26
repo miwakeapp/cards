@@ -16,6 +16,7 @@ import {
   type ConversionCandidate,
   type ConversionManifest,
   deferredReason,
+  senseResolutionIsComplete,
 } from "./types.ts";
 
 /** Validated command-line options for applying a conversion manifest. */
@@ -143,7 +144,7 @@ async function main(): Promise<void> {
     );
   }
   const incompleteSenseSelections = candidates.filter((candidate) =>
-    !["not-needed", "generated"].includes(candidate.senseResolution.status)
+    !senseResolutionIsComplete(candidate.senseResolution)
   );
   if (incompleteSenseSelections.length > 0) {
     throw new Error(

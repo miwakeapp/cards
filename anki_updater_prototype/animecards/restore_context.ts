@@ -381,6 +381,7 @@ async function main(): Promise<void> {
         spellingIndex,
         jmdictIdOverride: candidate.jmdictId,
         epubSourceCorpus: corpus,
+        includeMultipleSenses: candidate.senseResolution.status !== "not-needed",
         contextOverride: {
           html: restoredHTML,
           resolution,

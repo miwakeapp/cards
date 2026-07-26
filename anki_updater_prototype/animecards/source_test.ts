@@ -4,6 +4,7 @@ import {
   cardSourceFromResolution,
   cleanSourceName,
   elideLongQuotedEPUBContext,
+  epubSenseSelectionContext,
   expandEPUBContextToBalancedParagraphEnd,
   expandEPUBContextToIncludeTarget,
   extractEPUBHTMLSubstring,
@@ -143,6 +144,29 @@ Deno.test("EPUB context lookup returns ruby HTML and a same-document window", ()
 
   assertEquals(match?.paragraphs, [paragraphs[1]]);
   assertEquals(match?.window.length, 3);
+  assertEquals(
+    match === null ? null : epubSenseSelectionContext(match),
+    "前段。\n\n完全な文です。\n\n後段。",
+  );
+});
+
+Deno.test("EPUB sense-selection context includes only the nearest neighboring paragraphs", () => {
+  const paragraphs = [
+    { html: "遠い前段。", plainText: "遠い前段。", document: "chapter.xhtml", index: 0 },
+    { html: "直前。", plainText: "直前。", document: "chapter.xhtml", index: 1 },
+    { html: "対象。", plainText: "対象。", document: "chapter.xhtml", index: 2 },
+    { html: "直後。", plainText: "直後。", document: "chapter.xhtml", index: 3 },
+    { html: "遠い後段。", plainText: "遠い後段。", document: "chapter.xhtml", index: 4 },
+  ];
+
+  assertEquals(
+    epubSenseSelectionContext({
+      source: "Book",
+      paragraphs: [paragraphs[2]],
+      window: paragraphs,
+    }),
+    "直前。\n\n対象。\n\n直後。",
+  );
 });
 
 Deno.test("EPUB context lookup and extraction span adjacent semantic paragraphs", () => {

@@ -29,6 +29,7 @@ import {
   CONVERSION_MANIFEST_VERSION,
   type ConversionCandidate,
   type ConversionManifest,
+  senseResolutionIsComplete,
   type SkippedNote,
 } from "./types.ts";
 
@@ -41,6 +42,7 @@ interface Options {
   ankiConnectURL: string;
   epubTextsDirectory: string | undefined;
   jmdictOverridesPath: string | undefined;
+  includeMultipleSenses: boolean;
   resolveTargetsWithAI: boolean;
   aiModel: ModelId;
   targetAICachePath: string;
@@ -54,10 +56,6 @@ interface Options {
   };
 }
 
-// The enrichment and deduplication stages retain support for multi-sense entries so that we can
-// validate and enable it later. Production preparation remains deliberately single-sense-only.
-const INCLUDE_MULTIPLE_SENSE_ENTRIES = false;
-
 function positiveInteger(value: unknown, flag: string): number {
   const parsed = typeof value === "string" && value !== "" ? Number(value) : value;
   if (typeof parsed !== "number" || !Number.isInteger(parsed) || parsed <= 0) {
@@ -68,7 +66,11 @@ function positiveInteger(value: unknown, flag: string): number {
 
 function parseArguments(args: string[]): Options {
   const flags = parseArgs(args, {
-    boolean: ["no-epub-source-lookup", "resolve-targets-with-ai"],
+    boolean: [
+      "no-epub-source-lookup",
+      "include-multiple-senses",
+      "resolve-targets-with-ai",
+    ],
     string: [
       "query",
       "source-model",
@@ -113,6 +115,7 @@ function parseArguments(args: string[]): Options {
       ? undefined
       : flags["epub-texts-dir"] ?? path.join(import.meta.dirname!, "..", "epub_texts"),
     jmdictOverridesPath: flags["jmdict-overrides"],
+    includeMultipleSenses: flags["include-multiple-senses"],
     resolveTargetsWithAI: flags["resolve-targets-with-ai"],
     aiModel: aiModel as ModelId,
     targetAICachePath: flags["target-ai-cache"] ?? `${output}.target-ai-cache.jsonl`,
@@ -184,7 +187,7 @@ function removeDuplicateKeys(
 ): { candidates: ConversionCandidate[]; skipped: SkippedNote[] } {
   const byKey = new Map<string, ConversionCandidate[]>();
   for (const candidate of candidates) {
-    if (candidate.senseResolution.status !== "not-needed") {
+    if (!senseResolutionIsComplete(candidate.senseResolution)) {
       continue;
     }
     const key = candidate.target.fields["Key"];
@@ -211,7 +214,9 @@ function removeDuplicateKeys(
       kept.push(values[0]);
     }
   }
-  kept.push(...candidates.filter((candidate) => candidate.senseResolution.status !== "not-needed"));
+  kept.push(
+    ...candidates.filter((candidate) => !senseResolutionIsComplete(candidate.senseResolution)),
+  );
   return { candidates: kept, skipped };
 }
 
@@ -244,7 +249,7 @@ async function main(): Promise<void> {
   } catch (error) {
     console.error(error instanceof Error ? error.message : String(error));
     console.error(
-      "Usage: deno task animecards:prepare [--limit=N] [--query=...] [--source-model=Animecards] [--target-model=Miwake] [--output=PATH] [--anki-connect-url=URL] [--epub-texts-dir=PATH|--no-epub-source-lookup] [--jmdict-overrides=PATH] [--resolve-targets-with-ai] [--ai-model=MODEL] [--target-ai-cache=PATH] [--word-field=NAME] [--sentence-field=NAME] [--glossary-field=NAME] [--reading-field=NAME] [--source-field=NAME] [--source-url-field=NAME]",
+      "Usage: deno task animecards:prepare [--limit=N] [--query=...] [--source-model=Animecards] [--target-model=Miwake] [--output=PATH] [--anki-connect-url=URL] [--epub-texts-dir=PATH|--no-epub-source-lookup] [--jmdict-overrides=PATH] [--include-multiple-senses] [--resolve-targets-with-ai] [--ai-model=MODEL] [--target-ai-cache=PATH] [--word-field=NAME] [--sentence-field=NAME] [--glossary-field=NAME] [--reading-field=NAME] [--source-field=NAME] [--source-url-field=NAME]",
     );
     Deno.exit(1);
   }
@@ -324,7 +329,7 @@ async function main(): Promise<void> {
       spellingIndex,
       jmdictIdOverride: jmdictOverrides.get(note.noteId),
       epubSourceCorpus,
-      includeMultipleSenses: INCLUDE_MULTIPLE_SENSE_ENTRIES,
+      includeMultipleSenses: options.includeMultipleSenses,
     };
     let result = await convertAnimecardsNote(note, conversionOptions);
     if (
@@ -347,8 +352,15 @@ async function main(): Promise<void> {
             jmdictEntry: request.entry,
             source: request.sourceResolution.name ?? undefined,
             sourceURL: request.sourceResolution.url ?? undefined,
-            readingFromContext: request.reading,
+            kanaReading: request.reading,
           }, options.aiModel);
+          if (fields.applicableSenses === null) {
+            throw new Error(
+              `No JMDict sense applies to recognition target ${
+                JSON.stringify(request.recognitionTarget)
+              } in the supplied context.`,
+            );
+          }
           const surface = fields.targetInContext;
           if (surface.length === 0 || !request.context.includes(surface)) {
             throw new Error(
