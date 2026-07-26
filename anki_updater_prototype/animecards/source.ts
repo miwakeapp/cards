@@ -135,14 +135,13 @@ function paragraphSpanAt(
   return result;
 }
 
-/** Finds one exact EPUB occurrence, including across adjacent paragraphs, and returns its window. */
-export function findUniqueEPUBContext(
+function findEPUBContexts(
   corpus: EPUBSourceCorpus,
   contextHTML: string,
   sourceName?: string,
-): EPUBContextMatch | null {
+): EPUBContextMatch[] {
   const context = searchableEPUBText(contextHTML);
-  if (context.length < 3) return null;
+  if (context.length < 3) return [];
 
   const matches: EPUBContextMatch[] = [];
   for (const source of corpus.sources) {
@@ -167,6 +166,16 @@ export function findUniqueEPUBContext(
       }
     }
   }
+  return matches;
+}
+
+/** Finds one exact EPUB occurrence, including across adjacent paragraphs, and returns its window. */
+export function findUniqueEPUBContext(
+  corpus: EPUBSourceCorpus,
+  contextHTML: string,
+  sourceName?: string,
+): EPUBContextMatch | null {
+  const matches = findEPUBContexts(corpus, contextHTML, sourceName);
   return matches.length === 1 ? matches[0] : null;
 }
 
@@ -481,6 +490,14 @@ export function hasCompleteContextBoundaries(paragraph: string, excerpt: string)
   const start = paragraph.indexOf(excerpt);
   if (start === -1 || start !== paragraph.lastIndexOf(excerpt)) return false;
   const end = start + excerpt.length;
+  const openAtStart = openQuotesAt(paragraph, start);
+  const openAtEnd = openQuotesAt(paragraph, end);
+  if (
+    openAtStart === null || openAtStart.length > 0 ||
+    openAtEnd === null || openAtEnd.length > 0
+  ) {
+    return false;
+  }
   const leftComplete = start === 0 ||
     /[。！？!?」』〉》「『〈《]/u.test(paragraph[start - 1]) ||
     /^[「『〈《]/u.test(excerpt);
@@ -606,16 +623,35 @@ export function analyzeEPUBContext(
   contextHTML: string,
   sourceName?: string,
 ): EPUBContextAnalysis {
-  const match = findUniqueEPUBContext(corpus, contextHTML, sourceName);
-  if (match === null) return { status: "not-found" };
+  const matches = findEPUBContexts(corpus, contextHTML, sourceName);
+  if (matches.length === 0) return { status: "not-found" };
   const excerpt = searchableEPUBText(contextHTML);
-  if (!hasCompleteContextBoundaries(epubContextPlainText(match), excerpt)) {
-    return { status: "cut-off", match };
+  const analyses = matches.map((match): Exclude<EPUBContextAnalysis, { status: "not-found" }> => {
+    if (!hasCompleteContextBoundaries(epubContextPlainText(match), excerpt)) {
+      return { status: "cut-off", match };
+    }
+    const restored = extractEPUBHTMLFromParagraphs(match.paragraphs, excerpt);
+    return restored === null
+      ? { status: "cut-off", match }
+      : { status: "complete", match, contextHTML: restored };
+  });
+
+  if (analyses.length === 1) return analyses[0];
+
+  // The historical source location is immaterial when every occurrence is already complete and
+  // produces identical cleaned, ruby-preserving HTML. Never choose between distinct expansions.
+  if (analyses.every((analysis) => analysis.status === "complete")) {
+    const [first, ...rest] = analyses;
+    if (
+      first.status === "complete" &&
+      rest.every((analysis) =>
+        analysis.status === "complete" && analysis.contextHTML === first.contextHTML
+      )
+    ) {
+      return first;
+    }
   }
-  const restored = extractEPUBHTMLFromParagraphs(match.paragraphs, excerpt);
-  return restored === null
-    ? { status: "cut-off", match }
-    : { status: "complete", match, contextHTML: restored };
+  return { status: "not-found" };
 }
 
 export function cleanSourceName(sourceHTML: string): string | null {
