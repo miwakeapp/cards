@@ -1,0 +1,12 @@
+{
+  "imports": {
+    "yanki-connect": "npm:yanki-connect@^4.0.6"
+  },
+  "tasks": {
+    "doc:check": "deno doc --lint scripts/setup.ts",
+    "setup": "deno run --allow-net --allow-read=. scripts/setup.ts"
+  },
+  "fmt": {
+    "exclude": ["assets/*.html"]
+  }
+}

@@ -21,16 +21,12 @@
 :root {
   --hint-color: rgb(100 100 100);
   --source-color: rgb(140 140 140);
-  --kanji-forms-marker-color: rgb(72 103 129);
-  --kana-forms-marker-color: rgb(120 90 121);
 }
 
 /* https://docs.ankiweb.net/templates/styling.html#night-mode */
 .nightMode {
   --hint-color: rgb(200 200 200);
   --source-color: rgb(160 160 160);
-  --kanji-forms-marker-color: rgb(128 160 184);
-  --kana-forms-marker-color: rgb(175 148 176);
 }
 
 body {
@@ -62,32 +58,6 @@ rt {
 
 #dictionary-entry {
   margin-top: 0.5rem;
-  column-gap: 0.5rem;
-  row-gap: 0.25rem;
-
-  /* Override minimal.css's `display: contents` so each forms list occupies its own marked row. */
-  > .forms {
-    display: flex;
-    flex-basis: 100%;
-    flex-wrap: wrap;
-    align-items: baseline;
-    order: 1;
-    gap: 0;
-    margin: 0;
-    padding: 0;
-    padding-inline-start: 0.5rem;
-    border-inline-start: 3px solid var(--kanji-forms-marker-color);
-    list-style: none;
-    line-height: 1.15;
-
-    &.kana {
-      border-inline-start-color: var(--kana-forms-marker-color);
-    }
-
-    > li {
-      order: initial;
-    }
-  }
 
   &:has(.tag-sK, .tag-sk) > .forms {
     flex-basis: calc(100% - 2rem);
@@ -101,14 +71,6 @@ rt {
   /* Keep the expando after the first visible row when every kanji form is hidden. */
   &:not(.show-hidden-readings) > .forms.kanji:not(:has(> li:not(.tag-sK, .tag-sk))) + .forms.kana {
     order: 1;
-  }
-
-  > .forms.kanji + .forms.kana > li:first-child::before {
-    content: none;
-  }
-
-  &:not(.show-hidden-readings) > .forms:not(:has(> li:not(.tag-sK, .tag-sk))) {
-    display: none;
   }
 }
 

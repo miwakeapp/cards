@@ -5,6 +5,8 @@
   --rarely-used-color: rgb(128 128 128);
   --default-font-size: 18px;
   --link-color: rgb(29 78 137);
+  --kanji-forms-marker-color: rgb(72 103 129);
+  --kana-forms-marker-color: rgb(120 90 121);
 
   /* https://docs.ankiweb.net/templates/styling.html#night-mode */
   .nightMode & {
@@ -12,6 +14,8 @@
     --text-color: rgb(255 255 255);
     --secondary-text-color: color-mix(in srgb, var(--text-color), rgb(0 0 0) 40%);
     --link-color: rgb(138 180 248);
+    --kanji-forms-marker-color: rgb(128 160 184);
+    --kana-forms-marker-color: rgb(175 148 176);
   }
 
   *,
@@ -27,7 +31,8 @@
   display: flex;
   flex-wrap: wrap;
   align-items: start;
-  row-gap: 0.5rem;
+  column-gap: 0.5rem;
+  row-gap: 0.25rem;
 
   a {
     color: var(--link-color);
@@ -68,14 +73,28 @@
     }
   }
 
-  /* Make the `.forms` `display: contents` so that individual `<li>`s can be styled as `inline`. */
+  /* Keep kanji and kana forms on compact, individually marked rows. */
   > .forms {
-    display: contents;
+    display: flex;
+    flex-basis: 100%;
+    flex-wrap: wrap;
+    align-items: baseline;
+    order: 1;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    padding-inline-start: 0.5rem;
+    border-inline-start: 3px solid var(--kanji-forms-marker-color);
+    list-style: none;
+    line-height: 1.15;
+
+    &.kana {
+      border-inline-start-color: var(--kana-forms-marker-color);
+    }
 
     > li {
       display: inline;
       white-space: nowrap;
-      order: 1; /* relocate to the end of the outer `.miwake-dictionary-entry` container */
 
       /* Hide inter-element whitespace */
       font-size: 0;
@@ -111,9 +130,8 @@
     }
   }
 
-  /* Separator goes on the `<li>` because of the `display: contents` trick. */
-  > .forms.kanji + .forms.kana > li:first-child::before {
-    content: "\A0／\A0";
+  &:not(.show-hidden-readings) > .forms:not(:has(> li:not(.tag-sK, .tag-sk))) {
+    display: none;
   }
 
   > :not(.forms, .senses, .part-of-speech) {

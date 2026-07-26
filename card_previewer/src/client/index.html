@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Miwake Cards Previewer — Dictionary Entry</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/styles/site.css">
+  <link rel="stylesheet" href="/styles/dictionary_preview.css">
+
+  <header class="site-header">
+    <nav class="preview-navigation" aria-label="Preview views">
+      <strong aria-current="page">Dictionary entry</strong>
+      <a href="/card_preview.html">Card template</a>
+    </nav>
+
+    <div class="page-heading">
+      <h1>Dictionary Entry Preview</h1>
+      <p>Inspect the rendered dictionary field using the shared card fixture catalog.</p>
+    </div>
+
+    <section class="preview-controls" aria-label="Preview controls">
+      <label class="fixture-control">
+        Fixture
+        <select id="fixture"></select>
+      </label>
+      <label>
+        Style sheet
+        <select id="style">
+          <option value="/model/minimal.css">Minimal</option>
+          <option value="/styles/jitendexish.css">Jitendex-ish</option>
+        </select>
+      </label>
+      <label class="checkbox-control">
+        <input type="checkbox" id="night-mode">
+        Night mode
+      </label>
+    </section>
+    <p id="fixture-reason" class="fixture-reason" aria-live="polite"></p>
+  </header>
+
+  <main class="preview-main">
+    <section class="preview-panel" aria-labelledby="entry-heading">
+      <header class="panel-heading">
+        <h2 id="entry-heading">Rendered dictionary entry</h2>
+        <p id="entry-id"></p>
+      </header>
+      <div id="dictionary-stage" class="dictionary-stage">
+        <article id="dictionary-entry" class="miwake-dictionary-entry" lang="en"></article>
+      </div>
+      <footer id="dictionary-entry-links" class="dictionary-entry-links"></footer>
+    </section>
+  </main>
+
+  <script type="module" src="/dictionary_preview.js"></script>
+</html>

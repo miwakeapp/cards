@@ -1,0 +1,160 @@
+.width-control {
+  > span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  input {
+    width: clamp(10rem, 20vw, 18rem);
+  }
+
+  output {
+    min-width: 3.7rem;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.card-preview-main {
+  width: min(100%, 96rem);
+}
+
+.fidelity-note {
+  margin-bottom: 1rem;
+  padding: 0.75rem 0.9rem;
+  border-inline-start: 3px solid var(--preview-accent);
+  background: var(--preview-panel);
+  color: var(--preview-muted);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.field-editor {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--preview-border);
+  border-radius: 0.75rem;
+  background: var(--preview-panel);
+  font-size: 0.88rem;
+  line-height: 1.45;
+
+  summary {
+    width: fit-content;
+    color: var(--preview-accent);
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  > p {
+    margin: 0.6rem 0;
+    color: var(--preview-muted);
+  }
+}
+
+#field-editors {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+  align-items: start;
+  gap: 0.75rem;
+
+  label {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  label:has(textarea[data-field="Dictionary entry"]) {
+    grid-column: 1 / -1;
+  }
+
+  span {
+    font-weight: 700;
+  }
+
+  small {
+    color: var(--preview-muted);
+  }
+
+  textarea {
+    box-sizing: border-box;
+    width: 100%;
+    resize: vertical;
+    padding: 0.55rem;
+    border: 1px solid var(--preview-border);
+    border-radius: 0.35rem;
+    background: rgb(250 251 252);
+    color: rgb(31 39 46);
+    font: 0.78rem/1.45 ui-monospace, monospace;
+
+    &:focus {
+      border-color: var(--preview-accent);
+      outline: 2px solid rgb(49 81 111 / 0.15);
+    }
+  }
+}
+
+.editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.card-panel-heading {
+  align-items: start;
+
+  > div {
+    min-width: 0;
+  }
+}
+
+#front-back-measurement {
+  margin-top: 0.4rem;
+  color: rgb(73 82 90);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+
+  > span {
+    display: block;
+    overflow-wrap: anywhere;
+  }
+
+  .measurement-summary {
+    margin-bottom: 0.2rem;
+    color: rgb(61 91 68);
+    font-weight: 700;
+  }
+
+  &.has-shift .measurement-summary {
+    color: rgb(145 73 44);
+  }
+}
+
+.card-stage {
+  --card-width: 420px;
+  overflow-x: auto;
+  padding: 1rem;
+  background:
+    linear-gradient(90deg, rgb(231 235 238) 1px, transparent 1px) 0 0 / 1rem 1rem,
+    linear-gradient(rgb(231 235 238) 1px, transparent 1px) 0 0 / 1rem 1rem,
+    rgb(245 247 248);
+
+  iframe {
+    display: block;
+    width: var(--card-width);
+    min-height: 34rem;
+    margin: 0 auto;
+    border: 0;
+    background: rgb(48 48 48);
+    box-shadow: 0 0.3rem 1rem rgb(0 0 0 / 0.18);
+  }
+}
+
+@media (max-width: 48rem) {
+  .width-control {
+    flex: 1 1 100%;
+
+    input {
+      width: min(18rem, calc(100vw - 7rem));
+    }
+  }
+}

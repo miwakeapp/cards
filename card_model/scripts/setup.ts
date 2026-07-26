@@ -1,5 +1,5 @@
 /**
- * Sets up (or refreshes) the Miwake note type via AnkiConnect.
+ * Creates the Miwake note type via AnkiConnect.
  *
  * - Fields (in order, with Key first for sorting/browsing):
  *   Key, Recognition target, Reading, Hint, Full context, Minimized context,
@@ -7,10 +7,11 @@
  * - Templates match the current Anki model (furigana:Reading fallback).
  * - CSS = card chrome + current minimal.css (night-mode aware).
  *
- * Run with: deno task setup-miwake-model
+ * Run with: deno task --cwd card_model setup
  */
 
-import { ac } from "../anki_connect.ts";
+import * as path from "@std/path";
+import { YankiConnect } from "yanki-connect";
 
 const MODEL_NAME = "Miwake";
 const FIELDS = [
@@ -23,38 +24,25 @@ const FIELDS = [
   "Dictionary entry",
   "Source",
 ];
-const FIELD_FONT_TARGETS = [
-  "Key",
-  "Recognition target",
-  "Reading",
-  "Hint",
-  "Full context",
-  "Minimized context",
-  "Dictionary entry",
-  "Source",
-];
 const FIELD_FONT_FAMILY = "Noto Serif JP";
+const client = new YankiConnect();
 
-const frontPath = new URL("./front.html", import.meta.url);
-const backPath = new URL("./back.html", import.meta.url);
-const stylesPrefixPath = new URL("./styles_prefix.css", import.meta.url);
+const assetsDirectory = path.resolve(import.meta.dirname!, "../assets");
+const frontPath = path.resolve(assetsDirectory, "front.html");
+const backPath = path.resolve(assetsDirectory, "back.html");
+const stylesPrefixPath = path.resolve(assetsDirectory, "styles_prefix.css");
+const minimalCSSPath = path.resolve(assetsDirectory, "minimal.css");
 
-const [front, back, stylesPrefix] = await Promise.all([
+const [front, back, stylesPrefix, minimalCSS] = await Promise.all([
   Deno.readTextFile(frontPath),
   Deno.readTextFile(backPath),
   Deno.readTextFile(stylesPrefixPath),
+  Deno.readTextFile(minimalCSSPath),
 ]);
-
-// Card-level styling: prefix for card chrome, then append shared minimal.css from disk.
-const minimalCSSPath = new URL(
-  "../../../html_dictionary_previewer/src/client/styles/minimal.css",
-  import.meta.url,
-);
-const minimalCSS = await Deno.readTextFile(minimalCSSPath);
 
 const combinedCSS = `${stylesPrefix}\n${minimalCSS}`;
 
-const models: string[] = await ac("modelNames");
+const models = await client.model.modelNames();
 const exists = models.includes(MODEL_NAME);
 
 if (exists) {
@@ -64,7 +52,7 @@ if (exists) {
 }
 
 console.log(`Creating model ${MODEL_NAME}...`);
-await ac("createModel", {
+await client.model.createModel({
   modelName: MODEL_NAME,
   inOrderFields: FIELDS,
   css: combinedCSS,
@@ -78,8 +66,8 @@ await ac("createModel", {
 });
 
 // Ensure browser/editor font is set for core fields.
-for (const field of FIELD_FONT_TARGETS) {
-  await ac("modelFieldSetFont", {
+for (const field of FIELDS) {
+  await client.model.modelFieldSetFont({
     modelName: MODEL_NAME,
     fieldName: field,
     font: FIELD_FONT_FAMILY,

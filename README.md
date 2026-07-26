@@ -18,17 +18,18 @@ Some workflows call AI providers. Copy `.env.sample` to `.env` and add only the 
 
 ## Packages
 
-| Package                                                     | Purpose                                                                                    |
-| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| [`card_creator`](./card_creator/)                           | Deterministically validates and renders fully decided Miwake Card fields.                  |
-| [`card_field_generation`](./card_field_generation/)         | Owns the shared, evaluated AI prompt for unresolved card fields.                           |
-| [`card_creator_evals`](./card_creator_evals/)               | Runs and reviews the shared AI card-field evals.                                           |
-| [`card_updater`](./card_updater/)                           | Reviews and applies changes caused by new JMDict revisions.                                |
-| [`data`](./data/)                                           | Owns JMDict and rarity resource access, provenance, downloads, and checked-in samples.     |
-| [`html_dictionary_previewer`](./html_dictionary_previewer/) | Visually compares dictionary-entry styles against checked-in sample entries.               |
-| [`jmdict_to_html`](./jmdict_to_html/)                       | Renders semantic JMDict HTML and formats Anki furigana.                                    |
-| [`rarity_score`](./rarity_score/)                           | Scores recognition-target rarity using the generated corpus resources.                     |
-| [`anki_updater_prototype`](./anki_updater_prototype/)       | Preserves recurring and potentially reusable personal Anki workflows at prototype quality. |
+| Package                                               | Purpose                                                                                    |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| [`card_creator`](./card_creator/)                     | Deterministically validates and renders fully decided Miwake Card fields.                  |
+| [`card_field_generation`](./card_field_generation/)   | Owns the shared, evaluated AI prompt for unresolved card fields.                           |
+| [`card_creator_evals`](./card_creator_evals/)         | Runs and reviews the shared AI card-field evals.                                           |
+| [`card_model`](./card_model/)                         | Owns the production Anki card templates, styles, font, and setup workflow.                 |
+| [`card_previewer`](./card_previewer/)                 | Previews dictionary-entry styles and card templates with shared representative fixtures.   |
+| [`card_updater`](./card_updater/)                     | Reviews and applies changes caused by new JMDict revisions.                                |
+| [`data`](./data/)                                     | Owns JMDict and rarity resource access, provenance, downloads, and checked-in samples.     |
+| [`jmdict_to_html`](./jmdict_to_html/)                 | Renders semantic JMDict HTML and formats Anki furigana.                                    |
+| [`rarity_score`](./rarity_score/)                     | Scores recognition-target rarity using the generated corpus resources.                     |
+| [`anki_updater_prototype`](./anki_updater_prototype/) | Preserves recurring and potentially reusable personal Anki workflows at prototype quality. |
 
 Reusable packages expose their public APIs through `src/mod.ts` and declared subpaths. Executable packages use `src/main.ts` for the Deno entrypoint and keep browser code under `src/client/`. Auxiliary commands belong in `scripts/`, and tests and their fixtures belong in `test/`.
 
@@ -53,7 +54,7 @@ deno task --recursive --if-present build
 deno task ci
 ```
 
-Package-specific workflows are run from the repository root with `--cwd`, for example `deno task --cwd data update:jmdict` or `deno task --cwd html_dictionary_previewer dev`. Each package README documents its own prerequisites, outputs, and tasks. Related tasks use `:` namespaces, so patterns such as `deno task --cwd data "download:*"` can run a family in parallel.
+Package-specific workflows are run from the repository root with `--cwd`, for example `deno task --cwd data update:jmdict` or `deno task --cwd card_previewer dev`. Each package README documents its own prerequisites, outputs, and tasks. Related tasks use `:` namespaces, so patterns such as `deno task --cwd data "download:*"` can run a family in parallel.
 
 ## Checked-in and local artifacts
 
