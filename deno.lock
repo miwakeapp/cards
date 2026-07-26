@@ -397,6 +397,11 @@
           "npm:zod@^4.1.13"
         ]
       },
+      "card_model": {
+        "dependencies": [
+          "npm:yanki-connect@^4.0.6"
+        ]
+      },
       "data": {
         "dependencies": [
           "npm:@types/node@^24.13.3"

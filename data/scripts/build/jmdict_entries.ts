@@ -70,6 +70,30 @@ const CARD_CREATOR_TEST_IDS = new Set([
   "2434300", // 潔癖症, source ebook uses full-size kana in partial ruby
 ]);
 
+// IDs used by the shared Miwake Cards preview fixtures.
+const MIWAKE_CARDS_PREVIEW_FIXTURE_IDS = new Set([
+  "1000100", // ＡＢＣ順, full-width Latin ruby
+  "1000230", // あかん, dialect + variants
+  "1014630", // アウター, antonym + abbreviation
+  "1061000", // シノニム, related references
+  "1122910", // ホルモン, language source + dialect
+  "1158110", // 異名, reading restrictions
+  "1178920", // 於いて, search-only forms
+  "1211360", // 堪忍袋の緒が切れる, long mixed-furigana wrapping
+  "1358280", // 食べる, short ruby baseline
+  "1414110", // 大小, many senses
+  "1574430", // 餃子, multi-component source ruby
+  "1590470", // 画期的, multiple forms
+  "1591900", // 綺麗, card template interactions
+  "1604990", // 目にあう, many written forms
+  "1632080", // 松明, whole-word gikun
+  "1855690", // 等々, suffix marker + repetition
+  "2013080", // 没する, form restrictions + verb types
+  "2030540", // 狂喜乱舞, simple dense compound
+  "2228700", // 彼岸桜, shared tags
+  "2861582", // トスアップ, shared field + language source
+]);
+
 // IDs used by Animecards converter integration tests
 const ANIMECARDS_CONVERTER_TEST_IDS = new Set([
   "1313600", // 事もなげに
@@ -115,6 +139,7 @@ const preextractedIds = new Set([
   ...JMDICT_TO_HTML_TEST_IDS,
   ...FURIGANA_TEST_IDS,
   ...CARD_CREATOR_TEST_IDS,
+  ...MIWAKE_CARDS_PREVIEW_FIXTURE_IDS,
   ...ANIMECARDS_CONVERTER_TEST_IDS,
   ...FEW_SHOT_IDS,
   ...evalInputIds,
@@ -124,6 +149,7 @@ console.log(`Looking for ${preextractedIds.size} entries...`);
 console.log(`  - jmdict_to_html tests: ${JMDICT_TO_HTML_TEST_IDS.size}`);
 console.log(`  - furigana tests: ${FURIGANA_TEST_IDS.size}`);
 console.log(`  - card_creator tests: ${CARD_CREATOR_TEST_IDS.size}`);
+console.log(`  - Miwake Cards preview fixtures: ${MIWAKE_CARDS_PREVIEW_FIXTURE_IDS.size}`);
 console.log(`  - Animecards converter tests: ${ANIMECARDS_CONVERTER_TEST_IDS.size}`);
 console.log(`  - few-shot examples: ${FEW_SHOT_IDS.size}`);
 console.log(`  - eval inputs: ${evalInputIds.size}`);

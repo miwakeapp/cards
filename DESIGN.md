@@ -260,14 +260,14 @@ Furigana placement involves lookups in large data tables. The current design pre
 
 ### Anki templates
 
-See [`anki_updater_prototype/`](./anki_updater_prototype/)'s HTML and CSS files.
+See the [`card_model`](./card_model/) package's HTML and CSS files.
 
 The JavaScript on the back side of the card is responsible for:
 
 - Handling the disclosure button for showing the full context in place of the minimized context.
 - Adding the `relevant` CSS class to sense `<li>`s that are relevant (which is all of them, by default).
 
-The CSS in [`styles_prefix.css`](./anki_updater_prototype/shared/miwake_model/styles_prefix.css) is meant to be combined with one of the CSS files for the semantic HTML JMDict entries, as a prefix that handles the rest of the card.
+The CSS in [`styles_prefix.css`](./card_model/assets/styles_prefix.css) is combined with [`minimal.css`](./card_model/assets/minimal.css), as a prefix that handles the rest of the card around the semantic JMDict entry.
 
 For now, we inline the JavaScript onto the back side of the card, and the styles into the styles part of the card. It appears that [dividing up code into external files is quite intricate](https://forums.ankiweb.net/t/how-to-include-external-files-in-your-template-js-css-etc-guide/11719), so we avoid that.
 

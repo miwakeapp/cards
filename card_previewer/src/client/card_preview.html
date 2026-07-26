@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Miwake Cards Previewer — Card Template</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/styles/site.css">
+  <link rel="stylesheet" href="/styles/card_preview.css">
+
+  <header class="site-header">
+    <nav class="preview-navigation" aria-label="Preview views">
+      <a href="/">Dictionary entry</a>
+      <strong aria-current="page">Card template</strong>
+    </nav>
+
+    <div class="page-heading">
+      <h1>Card Template Preview</h1>
+      <p>Inspect the checked-in model files using the shared card fixture catalog.</p>
+    </div>
+
+    <section class="preview-controls" aria-label="Preview controls">
+      <label class="fixture-control">
+        Fixture
+        <select id="fixture"></select>
+      </label>
+      <label>
+        Visible side
+        <select id="card-side">
+          <option value="back">Back</option>
+          <option value="front">Front</option>
+        </select>
+      </label>
+      <label class="width-control">
+        Card width
+        <span>
+          <input id="card-width" type="range" min="320" max="720" step="10" value="420">
+          <output id="card-width-output" for="card-width">420 px</output>
+        </span>
+      </label>
+      <label class="checkbox-control">
+        <input type="checkbox" id="night-mode" checked>
+        Night mode
+      </label>
+    </section>
+    <p id="fixture-reason" class="fixture-reason" aria-live="polite"></p>
+  </header>
+
+  <main class="preview-main card-preview-main">
+    <aside class="fidelity-note">
+      The preview loads the checked-in <code>front.html</code>, <code>back.html</code>,
+      <code>styles_prefix.css</code>, and <code>minimal.css</code>. Edit those files to change the
+      preview, then use <b>Reload model files</b>.
+    </aside>
+
+    <details class="field-editor">
+      <summary>Edit Anki card fields</summary>
+      <p>
+        These are the raw stored values. The preview applies Anki’s bracket-to-ruby
+        <code>furigana:</code> filter when the templates request it.
+      </p>
+      <div id="field-editors"></div>
+      <div class="editor-actions">
+        <button type="button" id="reset-fields">Reset fields</button>
+        <button type="button" id="reload-source">Reload model files</button>
+      </div>
+    </details>
+
+    <section class="preview-panel card-panel" aria-labelledby="card-heading">
+      <header class="panel-heading card-panel-heading">
+        <div>
+          <h2 id="card-heading">Rendered card</h2>
+          <p id="front-back-measurement">Measuring front and back…</p>
+        </div>
+      </header>
+      <div class="card-stage">
+        <iframe id="card-frame" title="Rendered Miwake card"></iframe>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="/card_preview.js"></script>
+</html>

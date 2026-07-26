@@ -4,7 +4,7 @@ This package is a saved-work scratchpad for recurring or potentially reusable An
 
 ## Workflows
 
-- `shared/` contains reusable AnkiConnect, Miwake note-model, and JMDict resolution code.
+- `shared/` contains reusable AnkiConnect and JMDict resolution code.
 - `animecards/` contains the reviewable, in-place Animecards → Miwake card conversion workflow.
 - `jlpt/` contains the JLPT CSV import workflow and its source CSV data.
 
@@ -17,7 +17,6 @@ deno task animecards:prepare
 deno task animecards:restore-context generated/animecards-YYYY-MM-DD.json
 deno task animecards:enrich generated/animecards-YYYY-MM-DD.context.json
 deno task animecards:apply generated/animecards-YYYY-MM-DD.context.enriched.json
-deno task setup-miwake-model
 deno task create-from-csv jlpt/jlpt-moji-goi/N1_2025-12_moji-goi.csv
 deno task report-unresolved-csv jlpt/jlpt-moji-goi jlpt/jlpt-moji-goi/unresolved-report.csv
 deno task report-vocab-appearances jlpt/jlpt-moji-goi/moji-goi-vocab.csv jlpt/jlpt-moji-goi/vocab-appearances.csv
