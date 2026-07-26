@@ -97,6 +97,11 @@ rt {
     order: 3;
   }
 
+  /* Keep the expando after the first visible row when every kanji form is hidden. */
+  &:not(.show-hidden-readings) > .forms.kanji:not(:has(> li:not(.tag-sK, .tag-sk))) + .forms.kana {
+    order: 1;
+  }
+
   > .forms.kanji + .forms.kana > li:first-child::before {
     content: none;
   }
