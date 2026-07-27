@@ -14,8 +14,9 @@ import { isKanji } from "japanese_text";
  *
  * For kana-only spellings (where `spelling === kanaReading`), returns the spelling as-is. A
  * one-kanji spelling is always formatted directly because its only possible annotation boundary
- * is unambiguous. Returns `null` when a longer spelling/reading pair has no unambiguous placement
- * in the furigana data.
+ * is unambiguous. A JMDict gikun or jukujikun reading can likewise annotate the complete spelling
+ * when no more precise upstream placement exists. Returns `null` when a longer spelling/reading
+ * pair has no justified placement.
  */
 export async function formatReadingForAnki(
   jmdictEntry: JMDictWord,
@@ -43,6 +44,10 @@ export async function formatReadingForAnki(
   const formatted = await jmdictFuriganaFor(jmdictEntry.id, spelling, kanaReading);
   if (formatted !== undefined) {
     return formatted;
+  }
+
+  if (applicableReading.tags.includes("gikun")) {
+    return `${spelling}[${kanaReading}]`;
   }
 
   if (isKanji(spelling)) {

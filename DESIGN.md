@@ -421,6 +421,12 @@ Source furigana is even stronger evidence and should be preserved. Otherwise, th
 
 The applicable sense is 1, "another name; nickname; alias", not the biology sense "synonym". JMDict restricts the latter sense to いめい, but it does _not_ restrict いめい to that sense: sense 1 permits both いみょう and いめい. Thus the sense selection alone cannot prove the reading. In the absence of source furigana, いみょう is a reasonable choice because JMDict marks it as the common reading, but that remains an inference.
 
+#### Ruby that is not a pronunciation
+
+Publishers also use ruby position for explanatory annotations. For example, a source can annotate 帰投 with `ＲＴＢ` ("return to base"), or the larger phrase 薬物局所輸送 with `ＤＤＳ` ("drug delivery system"). These annotations are useful context and should ultimately be preserved, but they are not evidence that 帰投 is pronounced アールティービー or that 局所 has a reading derived from DDS.
+
+A mismatching annotation cannot simply be assumed to be explanatory. It can instead reveal a missing JMDict reading, a wrong JMDict entry, or a bad source extraction. The 薬物局所輸送 example adds another structural problem when the recognition target 局所 covers only part of the annotated base. Until the pipeline has a principled way to classify and represent such ruby without weakening pronunciation validation, it should defer these cards for manual review.
+
 #### More than one reading is acceptable
 
 Some spellings have multiple readings without a corresponding difference in meaning. [明日](https://takoboto.jp/?w=1584660), for example, can mean "tomorrow" as あした, あす, or みょうにち, with register and context influencing the natural choice. These alternatives should not produce duplicate cards: the front and meaning being learned are the same.

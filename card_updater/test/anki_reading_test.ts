@@ -58,6 +58,14 @@ Deno.test("recomputeAnkiReading: resolves an upstream search-only spelling", asy
   );
 });
 
+Deno.test("recomputeAnkiReading: groups a JMDict gikun reading", async () => {
+  const entry = await preextractedJMDictEntry("1576750");
+  assertEquals(
+    await recomputeAnkiReading("黄[たそ] 昏[がれ]", "黄昏", entry),
+    "黄昏[たそがれ]",
+  );
+});
+
 Deno.test("recomputeAnkiReading: returns null when the lookup record is missing", async () => {
   const entry = await preextractedJMDictEntry("1205330");
   assertEquals(

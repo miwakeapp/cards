@@ -548,6 +548,32 @@ Deno.test("convertAnimecardsNote accepts equivalent JMDict readings in different
   assertEquals(result.candidate.target.fields["Full context"], "<mark>珈琲</mark>を飲む。");
 });
 
+Deno.test("convertAnimecardsNote prefers a canonical reading over a search-only script variant", async () => {
+  const entry = await preextractedJMDictEntry("2195830");
+  const entries = new Map([[entry.id, entry]]);
+  const result = await convertAnimecardsNote(
+    makeNote({
+      Word: "ドン引き",
+      Sentence: "全員がドン引きした。",
+      Reading: "ドンびき",
+      Glossary: '<a href="https://jitendex.org/?q=2195830">definition</a>',
+    }),
+    {
+      sourceModel: "Animecards",
+      targetModel: "Miwake",
+      sourceFields: SOURCE_FIELDS,
+      entries,
+      spellingIndex: buildSpellingIndex(entries.values()),
+      includeMultipleSenses: true,
+    },
+  );
+
+  assert(result.candidate);
+  assertEquals(result.candidate.readingKana, "どんびき");
+  assertEquals(result.candidate.target.fields["Reading"], "ドン 引[び]き");
+  assertEquals(result.candidate.target.fields["Full context"], "全員が<mark>ドン引き</mark>した。");
+});
+
 Deno.test("convertAnimecardsNote keys a kana-script swap with the source spelling", async () => {
   const entry = makeWord({ kana: ["いざこざ", "イザコザ"] });
   const entries = new Map([[entry.id, entry]]);

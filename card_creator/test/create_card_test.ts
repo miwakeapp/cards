@@ -483,6 +483,17 @@ Deno.test("createCard separates suffix notation from multi-kanji furigana", asyn
   assertEquals(card.reading, "～ 等[とう] 々[とう]");
 });
 
+Deno.test("createCard applies a missing gikun placement to the complete spelling", async () => {
+  const card = await createCard({
+    jmdictEntry: await preextractedJMDictEntry("1576750"),
+    recognitionTarget: "黄昏",
+    kanaReading: "たそがれ",
+    fullContext: "永遠の<mark>黄昏</mark>の中で停止していた。",
+  });
+
+  assertEquals(card.reading, "黄昏[たそがれ]");
+});
+
 Deno.test("createCard requires precise furigana for multi-kanji spellings", async () => {
   const unattractive = await preextractedJMDictEntry("1205330");
   // The test fixture deliberately omits this known-good upstream placement record.

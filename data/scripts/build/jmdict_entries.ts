@@ -67,6 +67,7 @@ const CARD_CREATOR_TEST_IDS = new Set([
   "1504680", // 焚き火, source ebook partially annotates the spelling
   "1533460", // 面子, source ruby uses hiragana for a katakana reading
   "1574430", // 餃子, complex multi-component source ruby
+  "1576750", // 黄昏, whole-spelling gikun fallback
   "1580650", // 人人, source ruby on a repeated base
   "1581200", // 曽, prefix
   "1855690", // 等々, suffix notation before multi-kanji furigana
