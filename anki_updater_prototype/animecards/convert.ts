@@ -233,6 +233,10 @@ function applicableReadings(entry: JMdictWord, recognitionTarget: string): strin
   return [...new Set(readings)];
 }
 
+function isSearchOnlyReading(entry: JMdictWord, reading: string): boolean {
+  return entry.kana.find(({ text }) => text === reading)?.tags.includes("sk") === true;
+}
+
 function chooseReading(
   entry: JMdictWord,
   recognitionTarget: string,
@@ -254,7 +258,13 @@ function chooseReading(
   }
   const exactMatching = readings.filter((reading) => existingCandidates.includes(reading));
   if (exactMatching.length === 1) {
-    return { reading: exactMatching[0] };
+    const exact = exactMatching[0];
+    const canonicalEquivalent = readings.filter((reading) =>
+      !isSearchOnlyReading(entry, reading) && kanaScriptsMatch(reading, exact)
+    );
+    if (!isSearchOnlyReading(entry, exact) || canonicalEquivalent.length === 0) {
+      return { reading: exact };
+    }
   }
   const matching = readings.filter((reading) =>
     existingCandidates.some((candidate) => kanaScriptsMatch(candidate, reading))
@@ -266,9 +276,14 @@ function chooseReading(
     matching.length > 1 &&
     matching.every((reading) => kanaScriptsMatch(reading, matching[0]))
   ) {
-    const scores = matching.map((reading) => sourceOrthographyScore(reading, recognitionTarget));
+    const canonical = matching.filter((reading) => !isSearchOnlyReading(entry, reading));
+    const preferred = canonical.length > 0 ? canonical : matching;
+    if (preferred.length === 1) {
+      return { reading: preferred[0] };
+    }
+    const scores = preferred.map((reading) => sourceOrthographyScore(reading, recognitionTarget));
     const highestScore = Math.max(...scores);
-    const closestToTarget = matching.filter((_, index) => scores[index] === highestScore);
+    const closestToTarget = preferred.filter((_, index) => scores[index] === highestScore);
     if (closestToTarget.length === 1) {
       return { reading: closestToTarget[0] };
     }
