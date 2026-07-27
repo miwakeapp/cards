@@ -1,4 +1,4 @@
-export const CONVERSION_MANIFEST_VERSION = 12;
+export const CONVERSION_MANIFEST_VERSION = 13;
 
 export interface AnkiFieldValue {
   value: string;
@@ -79,12 +79,27 @@ export function senseResolutionNeedsGeneration(
   return resolution.status === "pending" || resolution.status === "failed";
 }
 
+interface FullContextSelectionInput {
+  /** EPUB source containing the required context. */
+  source: string;
+  /**
+   * Source-faithful structural lower bound for AI selection, including restored ruby and any
+   * sentence or dialogue completion required before semantic judgment.
+   */
+  requiredContextHTML: string;
+}
+
 export type FullContextResolution =
   | { status: "source-unavailable" }
-  | { status: "pending"; source: string }
+  | ({ status: "pending" } & FullContextSelectionInput)
   | { status: "restored"; method: "exact" }
   | { status: "restored"; method: "ai"; model: string; generatedAt: string }
-  | { status: "failed"; model: string; attemptedAt: string; error: string };
+  | ({
+    status: "failed";
+    model: string;
+    attemptedAt: string;
+    error: string;
+  } & FullContextSelectionInput);
 
 export type TargetInContextResolution =
   | { method: "deterministic"; surface: string; additionalSurfaces?: string[] }

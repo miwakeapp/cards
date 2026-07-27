@@ -375,9 +375,17 @@ export async function convertAnimecardsNote(
     if (analysis.status !== "not-found") epubContextMatch = analysis.match;
     if (options.contextOverride === undefined && analysis.status === "complete") {
       contextHTML = normalizeContextHTML(analysis.contextHTML);
-      fullContextResolution = { status: "restored", method: "exact" };
+      fullContextResolution = {
+        status: "pending",
+        source: analysis.match.source,
+        requiredContextHTML: contextHTML,
+      };
     } else if (options.contextOverride === undefined && analysis.status === "cut-off") {
-      fullContextResolution = { status: "pending", source: analysis.match.source };
+      fullContextResolution = {
+        status: "pending",
+        source: analysis.match.source,
+        requiredContextHTML: originalContextHTML,
+      };
     }
   }
 
@@ -458,7 +466,11 @@ export async function convertAnimecardsNote(
         contextHTML = normalizeContextHTML(recoveredContextHTML);
         context = contextPlainText(contextHTML);
         surfaceMatches = sourceSurfaceMatches;
-        fullContextResolution = { status: "restored", method: "exact" };
+        fullContextResolution = {
+          status: "pending",
+          source: epubContextMatch.source,
+          requiredContextHTML: contextHTML,
+        };
       }
     }
   }
