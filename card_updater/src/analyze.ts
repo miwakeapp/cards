@@ -150,7 +150,7 @@ export async function analyzeCard(
     latestWord.kana.some((form) => form.text === parsedKey.spelling);
 
   const alignment = alignSenses(oldParsed.senses, newParsed.senses);
-  const proposedReading = await analyzeReading(note, parsedKey);
+  const proposedReading = await analyzeReading(note, parsedKey, latestWord);
   const changeChips = buildChangeChips(oldParsed, newParsed, alignment);
   if (changeChips.length === 0 && storedEntryHTML !== latestEntryHTML.trim()) {
     changeChips.push({ kind: "formatting", label: "", text: "formatting-only difference" });
@@ -347,6 +347,7 @@ function exceptional(
 async function analyzeReading(
   note: MiwakeNoteSnapshot,
   parsedKey: MiwakeKey,
+  latestWord: JMdictWord,
 ): Promise<string | null> {
   const recognitionTarget = note.fields.recognitionTarget || parsedKey.spelling;
   let lookupSpelling = recognitionTarget;
@@ -377,7 +378,7 @@ async function analyzeReading(
   const result = await recomputeAnkiReading(
     reading,
     lookupSpelling,
-    parsedKey.jmdictId,
+    latestWord,
   );
   if (result === null) return null;
   const decoratedResult = `${readingPrefix}${result}${readingSuffix}`;

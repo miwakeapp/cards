@@ -1,4 +1,5 @@
 import { formatReadingForAnki } from "card_creator";
+import type { JMDictWord } from "data";
 
 /** Parses the strict Anki bracket syntax emitted by Miwake Cards and verifies its surface spelling. */
 export function parseAnkiReading(
@@ -57,7 +58,7 @@ function parseChunk(chunk: string): { surface: string; reading: string } | null 
 export async function recomputeAnkiReading(
   field: string,
   expectedSurface: string,
-  jmdictId: string,
+  jmdictEntry: JMDictWord,
 ): Promise<string | null> {
   const parsed = parseAnkiReading(field, expectedSurface);
   if (parsed === null) return null;
@@ -65,7 +66,7 @@ export async function recomputeAnkiReading(
   const formatted: string[] = [];
   for (const reading of parsed) {
     const updated = await formatReadingForAnki(
-      jmdictId,
+      jmdictEntry,
       expectedSurface,
       reading,
     );

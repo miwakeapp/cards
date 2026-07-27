@@ -46,6 +46,10 @@ const FURIGANA_TEST_IDS = new Set([
   "1080510", // テレビ
   "1000100", // ＡＢＣ順
   "1000110", // ＣＤプレーヤー
+  "1032910", // ＯＢ, JMDict reading includes a separator omitted by Lorenzi
+  "1427810", // 張子のトラ, literal kana differs in script from JMDict reading
+  "2195830", // ドン引き, canonical and search-only readings differ in kana script
+  "2238240", // アクの強い, literal kana differs in script from JMDict reading
 ]);
 
 // IDs used by card_creator tests

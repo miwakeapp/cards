@@ -1,7 +1,6 @@
 import * as path from "@std/path";
-import type { JMDictFurigana } from "./mod.ts";
 import { furiganaCache } from "./furigana_cache.ts";
-import { importFurigana } from "./furigana_import.ts";
+import { type FuriganaData, importFurigana } from "./furigana_import.ts";
 import {
   type FuriganaResourceRecord,
   readRuntimeResourceManifest,
@@ -11,7 +10,7 @@ import { resourcePaths } from "./resource_paths.ts";
 
 /** Mutable upstream source used to build Miwake Cards' furigana lookup. */
 const FURIGANA_URL = "https://jisho.hlorenzi.com/furigana.txt";
-const FURIGANA_FORMAT_VERSION = 4;
+const FURIGANA_FORMAT_VERSION = 5;
 const MAX_SOURCE_BYTES = 128 * 1024 * 1024;
 const MAX_DELTA_FRACTION = 0.2;
 
@@ -24,8 +23,8 @@ export interface EnsureLatestFuriganaResult {
 }
 
 function furiganaChangeFraction(
-  current: JMDictFurigana,
-  candidate: JMDictFurigana,
+  current: FuriganaData,
+  candidate: FuriganaData,
 ): number {
   let changed = 0;
   for (const [key, value] of Object.entries(candidate)) {
@@ -129,8 +128,8 @@ export async function ensureLatestFurigana(
 }
 
 function validateChangeSize(
-  current: JMDictFurigana | null,
-  candidate: JMDictFurigana,
+  current: FuriganaData | null,
+  candidate: FuriganaData,
   acceptLargeChange: boolean,
 ): void {
   if (current === null || acceptLargeChange) {
@@ -147,11 +146,11 @@ function validateChangeSize(
   }
 }
 
-async function readLocalArtifact(): Promise<JMDictFurigana | null> {
+async function readLocalArtifact(): Promise<FuriganaData | null> {
   try {
     const data = JSON.parse(
       await Deno.readTextFile(resourcePaths.jmdictFurigana),
-    ) as JMDictFurigana;
+    ) as FuriganaData;
     if (typeof data !== "object" || data === null || Array.isArray(data)) {
       throw new Error(`Malformed furigana artifact at ${resourcePaths.jmdictFurigana}.`);
     }

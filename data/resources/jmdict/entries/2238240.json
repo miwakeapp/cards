@@ -1,0 +1,109 @@
+{
+  "id": "2238240",
+  "kanji": [
+    {
+      "common": false,
+      "text": "アクの強い",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "灰汁の強い",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "あくの強い",
+      "tags": [
+        "sK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "あくのつよい",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adj-i"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "アクが強い",
+          1
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "harsh tasting"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "strongly alkaline tasting"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adj-i"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "excessively strong-willed"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "fiercely individualistic"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "strongly idiosyncratic"
+        }
+      ]
+    }
+  ]
+}

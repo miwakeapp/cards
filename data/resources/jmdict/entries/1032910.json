@@ -1,0 +1,120 @@
+{
+  "id": "1032910",
+  "kanji": [
+    {
+      "common": false,
+      "text": "ＯＢ",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "オー・ビー",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "オービー",
+      "tags": [
+        "sk"
+      ],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "オールドボーイ"
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "old boy"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "alumnus"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "graduate"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "former member"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "former employee"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "former player"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [
+        "golf"
+      ],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "out of bounds"
+        }
+      ]
+    }
+  ]
+}

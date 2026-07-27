@@ -1,6 +1,7 @@
 import "../../data/test/use_jmdict_fixtures.ts";
 
 import { assertEquals } from "@std/assert";
+import { preextractedJMDictEntry } from "data";
 import { parseAnkiReading, recomputeAnkiReading } from "../src/anki_reading.ts";
 
 Deno.test("parseAnkiReading: recovers pronunciation from precise placement", () => {
@@ -22,39 +23,49 @@ Deno.test("parseAnkiReading: rejects markup, mismatched surfaces, and malformed 
 });
 
 Deno.test("recomputeAnkiReading: changes placement without changing pronunciation", async () => {
+  const entry = await preextractedJMDictEntry("2252350");
   assertEquals(
     await recomputeAnkiReading(
       "大[お] 人[とな] 買[が]い",
       "大人買い",
-      "2252350",
+      entry,
     ),
     "大人[おとな] 買[が]い",
   );
 });
 
 Deno.test("recomputeAnkiReading: replaces legacy zero-surface annotations", async () => {
+  const entry = await preextractedJMDictEntry("2252350");
   assertEquals(
     await recomputeAnkiReading(
       "大[お] 人[と] [な] 買[が]い",
       "大人買い",
-      "2252350",
+      entry,
     ),
     "大人[おとな] 買[が]い",
   );
 });
 
 Deno.test("recomputeAnkiReading: resolves an upstream search-only spelling", async () => {
+  const entry = await preextractedJMDictEntry("1399910");
   assertEquals(
     await recomputeAnkiReading(
       "搔き集める[かきあつめる]",
       "搔き集める",
-      "1399910",
+      entry,
     ),
     "搔[か]き 集[あつ]める",
   );
 });
 
 Deno.test("recomputeAnkiReading: returns null when the lookup record is missing", async () => {
-  assertEquals(await recomputeAnkiReading("食べる[たべる]", "食べる", "9999999"), null);
-  assertEquals(await recomputeAnkiReading("食[た]べる", "食べる", "9999999"), null);
+  const entry = await preextractedJMDictEntry("1205330");
+  assertEquals(
+    await recomputeAnkiReading("恰好悪い[かっこわるい]", "恰好悪い", entry),
+    null,
+  );
+  assertEquals(
+    await recomputeAnkiReading("恰好[かっこ] 悪[わる]い", "恰好悪い", entry),
+    null,
+  );
 });

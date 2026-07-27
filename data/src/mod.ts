@@ -6,15 +6,14 @@ import { furiganaCache } from "./furigana_cache.ts";
 import type { JMDictReadings } from "./jmdict_readings.ts";
 import { jmdictReadingsCache } from "./jmdict_readings_cache.ts";
 import type { JMDictWord } from "./jmdict_types.ts";
+import type { FuriganaData } from "./furigana_import.ts";
+import { furiganaKey, normalizedFuriganaKey } from "./furigana_key.ts";
 import { resourcePaths } from "./resource_paths.ts";
 
 export type { JMDictWord } from "./jmdict_types.ts";
 
 /** JMDict tag expansions. Key: tag abbreviation, value: full description. */
 export type JMDictTags = Record<string, string>;
-
-/** Furigana placement data. Key format: "jmdictId|word|reading", value: Anki furigana format. */
-export type JMDictFurigana = Record<string, string>;
 
 /** Map of JMDict entry ID to entry data. */
 export type JMDictEntries = Map<string, JMDictWord>;
@@ -38,18 +37,31 @@ export function jmdictTags(): Promise<JMDictTags> {
   return tagsPromise;
 }
 
-/**
- * Lazily loads and returns JMDict furigana placement data.
- * Safe to call multiple times concurrently - will deduplicate requests.
- */
-export function jmdictFurigana(): Promise<JMDictFurigana> {
+function loadJMDictFurigana(): Promise<FuriganaData> {
   if (!furiganaCache.promise) {
     furiganaCache.promise = (async () => {
       const content = await Deno.readTextFile(resourcePaths.jmdictFurigana);
-      return JSON.parse(content) as JMDictFurigana;
+      return JSON.parse(content) as FuriganaData;
     })();
   }
   return furiganaCache.promise;
+}
+
+/**
+ * Returns precisely placed Anki furigana for a JMDict spelling and reading, when available.
+ *
+ * Exact upstream keys take precedence. The fallback accounts only for kana-script differences and
+ * orthographic separators ignored by Lorenzi's matcher; callers remain responsible for selecting
+ * an exact reading from JMDict.
+ */
+export async function jmdictFuriganaFor(
+  jmdictId: string,
+  spelling: string,
+  reading: string,
+): Promise<string | undefined> {
+  const furigana = await loadJMDictFurigana();
+  return furigana[furiganaKey(jmdictId, spelling, reading)] ??
+    furigana[normalizedFuriganaKey(jmdictId, spelling, reading)];
 }
 
 /**

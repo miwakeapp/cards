@@ -1,0 +1,109 @@
+{
+  "id": "1427810",
+  "kanji": [
+    {
+      "common": false,
+      "text": "張子の虎",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "張り子の虎",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "張り子のトラ",
+      "tags": [
+        "sK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "張子のトラ",
+      "tags": [
+        "sK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "はりこのとら",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "exp",
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "papier-mâché tiger (toy with a loose, wobbly head)"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "exp",
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "id"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "paper tiger"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "someone (or something) who is all bark and no bite"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "man of straw"
+        }
+      ]
+    }
+  ]
+}

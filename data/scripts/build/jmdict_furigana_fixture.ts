@@ -1,5 +1,5 @@
 import * as path from "@std/path";
-import type { JMDictFurigana } from "../../src/mod.ts";
+import type { FuriganaData } from "../../src/furigana_import.ts";
 import { resourcePaths } from "../../src/resource_paths.ts";
 
 const dataDirectory = path.resolve(import.meta.dirname!, "../..");
@@ -22,7 +22,7 @@ if (entryIds.size === 0) throw new Error("No pre-extracted JMDict entries found"
 
 const furigana = JSON.parse(
   await Deno.readTextFile(resourcePaths.jmdictFurigana),
-) as JMDictFurigana;
+) as FuriganaData;
 for (const key of OMITTED_KEYS) {
   if (!(key in furigana)) {
     throw new Error(

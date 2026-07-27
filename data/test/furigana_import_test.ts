@@ -20,6 +20,39 @@ Deno.test("importFurigana imports search-only spellings supplied upstream", () =
   });
 });
 
+Deno.test("importFurigana adds unambiguous aliases for Lorenzi-normalized readings", () => {
+  assertEquals(
+    importFurigana(
+      [
+        "1032910;Ｏ.Ｂ;オー.ビー",
+        "1427810;張.子.のトラ;はり.こ.のトラ",
+        "2195830;ドン.引.き;ドン.び.き",
+        "2238240;アクの.強.い;アクの.つよ.い",
+      ].join("\n"),
+    ),
+    {
+      "1032910|ＯＢ|オービー": "Ｏ[オー] Ｂ[ビー]",
+      "1032910|ＯＢ|おーびー": "Ｏ[オー] Ｂ[ビー]",
+      "1427810|張子のトラ|はりこのトラ": "張[はり] 子[こ]のトラ",
+      "1427810|張子のトラ|はりこのとら": "張[はり] 子[こ]のトラ",
+      "2195830|ドン引き|ドンびき": "ドン 引[び]き",
+      "2195830|ドン引き|どんびき": "ドン 引[び]き",
+      "2238240|アクの強い|アクのつよい": "アクの 強[つよ]い",
+      "2238240|アクの強い|あくのつよい": "アクの 強[つよ]い",
+    },
+  );
+});
+
+Deno.test("importFurigana omits ambiguous normalized aliases", () => {
+  assertEquals(
+    importFurigana("1;薔.薇;ボ.ん\n1;薔.薇;ぼ.ン\n"),
+    {
+      "1|薔薇|ボん": "薔[ボ] 薇[ん]",
+      "1|薔薇|ぼン": "薔[ぼ] 薇[ン]",
+    },
+  );
+});
+
 Deno.test("importFurigana rejects malformed source data", () => {
   assertThrows(
     () => importFurigana("1686540;種.付;たね\n"),
