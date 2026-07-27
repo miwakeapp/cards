@@ -1,6 +1,7 @@
 import "../../data/test/use_jmdict_fixtures.ts";
 
 import { assertEquals } from "@std/assert";
+import { preextractedJMDictEntry } from "data";
 
 import { formatReadingForAnki } from "../src/format_reading_for_anki.ts";
 
@@ -15,11 +16,18 @@ const furiganaTestCases: [string, string, string, string][] = [
   ["1361590", "新幹線", "しんかんせん", "新[しん] 幹[かん] 線[せん]"],
   ["1370420", "図書館", "としょかん", "図[と] 書[しょ] 館[かん]"],
   ["1413260", "大学生", "だいがくせい", "大[だい] 学[がく] 生[せい]"],
+  ["1032910", "ＯＢ", "オー・ビー", "Ｏ[オー] Ｂ[ビー]"],
+  ["1427810", "張子のトラ", "はりこのとら", "張[はり] 子[こ]のトラ"],
+  ["2195830", "ドン引き", "どんびき", "ドン 引[び]き"],
+  ["2238240", "アクの強い", "あくのつよい", "アクの 強[つよ]い"],
 ];
 
 for (const [id, word, reading, expected] of furiganaTestCases) {
   Deno.test(`formatReadingForAnki: ${word}`, async () => {
-    assertEquals(await formatReadingForAnki(id, word, reading), expected);
+    assertEquals(
+      await formatReadingForAnki(await preextractedJMDictEntry(id), word, reading),
+      expected,
+    );
   });
 }
 
@@ -32,7 +40,7 @@ const kanaOnlyTestCases: [string, string][] = [
 
 for (const [id, kana] of kanaOnlyTestCases) {
   Deno.test(`formatReadingForAnki (kana-only): ${kana}`, async () => {
-    const result = await formatReadingForAnki(id, kana, kana);
+    const result = await formatReadingForAnki(await preextractedJMDictEntry(id), kana, kana);
     assertEquals(result, kana);
   });
 }
@@ -44,40 +52,52 @@ const nonKanjiTestCases: [string, string, string, string][] = [
 
 for (const [id, word, reading, expected] of nonKanjiTestCases) {
   Deno.test(`formatReadingForAnki (non-kanji): ${word}`, async () => {
-    assertEquals(await formatReadingForAnki(id, word, reading), expected);
+    assertEquals(
+      await formatReadingForAnki(await preextractedJMDictEntry(id), word, reading),
+      expected,
+    );
   });
 }
 
 Deno.test("formatReadingForAnki requires an exact spelling and reading", async () => {
+  const entry = await preextractedJMDictEntry("1217700");
   assertEquals(
-    await formatReadingForAnki("1217700", "頑張る", "がんばる"),
+    await formatReadingForAnki(entry, "頑張る", "がんばる"),
     "頑[がん] 張[ば]る",
   );
   assertEquals(
-    await formatReadingForAnki("1217700", "頑張ル", "がんばる"),
+    await formatReadingForAnki(entry, "頑張ル", "がんばる"),
     null,
   );
   assertEquals(
-    await formatReadingForAnki("1217700", "頑張る", "ガンバル"),
+    await formatReadingForAnki(entry, "頑張る", "ガンバル"),
     null,
   );
   assertEquals(
-    await formatReadingForAnki("1217700", "頑張ル", "ガンバル"),
+    await formatReadingForAnki(entry, "頑張ル", "ガンバル"),
     null,
   );
 });
 
 Deno.test("formatReadingForAnki: uses an imported search-only kanji spelling", async () => {
+  const entry = await preextractedJMDictEntry("1686540");
   assertEquals(
-    await formatReadingForAnki("1686540", "種つけ", "たねつけ"),
+    await formatReadingForAnki(entry, "種つけ", "たねつけ"),
     "種[たね]つけ",
   );
   assertEquals(
-    await formatReadingForAnki("0000000", "種つけ", "たねつけ"),
+    await formatReadingForAnki(
+      await preextractedJMDictEntry("1217700"),
+      "種つけ",
+      "たねつけ",
+    ),
     null,
   );
 });
 
 Deno.test("formatReadingForAnki: directly annotates a single kanji", async () => {
-  assertEquals(await formatReadingForAnki("0000000", "炬", "たいまつ"), "炬[たいまつ]");
+  assertEquals(
+    await formatReadingForAnki(await preextractedJMDictEntry("1632080"), "炬", "たいまつ"),
+    "炬[たいまつ]",
+  );
 });

@@ -1,3 +1,8 @@
+import { furiganaKey, normalizedFuriganaKey } from "./furigana_key.ts";
+
+/** Generated lookup whose values contain precisely placed Anki furigana. */
+export type FuriganaData = Record<string, string>;
+
 interface Segment {
   base: string;
   reading: string;
@@ -73,22 +78,36 @@ function toAnkiFormat(segments: readonly Segment[]): string {
   return result;
 }
 
-/**
- * Builds Miwake Cards' exact furigana lookup from Lorenzi's Jisho output.
- */
-export function importFurigana(source: string): Record<string, string> {
+/** Builds Miwake Cards' furigana lookup from Lorenzi's Jisho output. */
+export function importFurigana(source: string): FuriganaData {
   const data: Record<string, string> = {};
+  const normalizedAliases = new Map<string, string | null>();
   for (const [index, line] of source.split("\n").entries()) {
     if (line === "" || line.startsWith("#")) continue;
 
     const row = parseSourceRow(line, index + 1);
-    const key = `${row.id}|${row.word}|${row.reading}`;
+    const key = furiganaKey(row.id, row.word, row.reading);
     const formatted = toAnkiFormat(row.segments);
     const existing = data[key];
     if (existing !== undefined && existing !== formatted) {
       throw new Error(`Conflicting furigana rows for ${key}`);
     }
     data[key] = formatted;
+
+    const normalizedKey = normalizedFuriganaKey(row.id, row.word, row.reading);
+    if (normalizedKey !== key) {
+      const existingAlias = normalizedAliases.get(normalizedKey);
+      normalizedAliases.set(
+        normalizedKey,
+        existingAlias === undefined || existingAlias === formatted ? formatted : null,
+      );
+    }
+  }
+
+  for (const [key, formatted] of normalizedAliases) {
+    if (formatted !== null && data[key] === undefined) {
+      data[key] = formatted;
+    }
   }
 
   return data;

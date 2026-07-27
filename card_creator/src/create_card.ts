@@ -73,7 +73,7 @@ export async function createCard(input: CreateCardInput): Promise<MiwakeCard> {
   let reading: string | null = null;
   if (usage.usesReadingField) {
     const formattedReading = await formatReadingForAnki(
-      input.jmdictEntry.id,
+      input.jmdictEntry,
       usage.spelling,
       usage.kanaReading,
     );

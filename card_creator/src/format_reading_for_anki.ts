@@ -1,10 +1,10 @@
-import { jmdictFurigana } from "data";
+import { jmdictFuriganaFor, type JMDictWord } from "data";
 import { isKanji } from "japanese_text";
 
 /**
- * Formats a JMDict ID, spelling, and kana reading into Anki-style furigana.
- * For example, ("1234567", "大人買い", "おとながい") becomes "大人[おとな] 買[が]い"
- * and ("2345678", "頑張る", "がんばる") becomes "頑[がん] 張[ば]る".
+ * Formats a JMDict entry's exact spelling and applicable kana reading as Anki-style furigana.
+ * For example, ("大人買い", "おとながい") becomes "大人[おとな] 買[が]い" and ("頑張る",
+ * "がんばる") becomes "頑[がん] 張[ば]る".
  *
  * Rules:
  * - No trailing whitespace
@@ -18,19 +18,31 @@ import { isKanji } from "japanese_text";
  * in the furigana data.
  */
 export async function formatReadingForAnki(
-  jmdictId: string,
+  jmdictEntry: JMDictWord,
   spelling: string,
   kanaReading: string,
 ): Promise<string | null> {
+  const kanaForm = jmdictEntry.kana.find(({ text }) => text === spelling);
+  if (kanaForm !== undefined) {
+    return spelling === kanaReading ? spelling : null;
+  }
+
+  const kanjiForm = jmdictEntry.kanji.find(({ text }) => text === spelling);
+  const applicableReading = jmdictEntry.kana.find(({ text, appliesToKanji }) =>
+    text === kanaReading &&
+    (appliesToKanji.includes("*") || appliesToKanji.includes(spelling))
+  );
+  if (kanjiForm === undefined || applicableReading === undefined) {
+    return null;
+  }
+
   if (spelling === kanaReading) {
     return spelling;
   }
 
-  const furigana = await jmdictFurigana();
-  const key = `${jmdictId}|${spelling}|${kanaReading}`;
-  const exact = furigana[key];
-  if (exact !== undefined) {
-    return exact;
+  const formatted = await jmdictFuriganaFor(jmdictEntry.id, spelling, kanaReading);
+  if (formatted !== undefined) {
+    return formatted;
   }
 
   if (isKanji(spelling)) {

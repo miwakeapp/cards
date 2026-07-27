@@ -55,7 +55,7 @@ Deno.test("ensureLatestFurigana manages the downloaded artifact end to end", asy
     const manifest = await readRuntimeResourceManifest(manifestPath);
     assertEquals(manifest.resources.furigana?.etag, 'W/"first"');
     assertEquals(manifest.resources.furigana?.entryCount, 2);
-    assertEquals(manifest.resources.furigana?.formatVersion, 4);
+    assertEquals(manifest.resources.furigana?.formatVersion, 5);
 
     let conditionalHeaders: Headers | undefined;
     globalThis.fetch = (_input, init) => {
