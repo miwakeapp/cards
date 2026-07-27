@@ -286,6 +286,8 @@ Deno.test("needsCardFieldEnrichment waits for a restored full context", () => {
   const value = candidate();
   value.fullContextResolution = {
     status: "failed",
+    source: "Test",
+    requiredContextHTML: "物の大小を比べる。",
     model: "gemini-3.5-flash",
     attemptedAt: "2026-07-21T00:00:00.000Z",
     error: "Source ruby could not be validated",

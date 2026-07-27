@@ -5,7 +5,7 @@ import {
   defaultDeferredContextsPath,
   defaultReportPath,
 } from "./report.ts";
-import type { ConversionManifest } from "./types.ts";
+import { CONVERSION_MANIFEST_VERSION, type ConversionManifest } from "./types.ts";
 
 Deno.test("defaultReportPath replaces the manifest extension", () => {
   assertEquals(defaultReportPath("generated/conversion.json"), "generated/conversion.report.md");
@@ -17,7 +17,7 @@ Deno.test("defaultReportPath replaces the manifest extension", () => {
 
 Deno.test("buildConversionReport groups exact final source HTML strings", () => {
   const manifest = {
-    version: 8,
+    version: CONVERSION_MANIFEST_VERSION,
     generatedAt: "2026-07-15T00:00:00.000Z",
     query: 'note:"Animecards"',
     sourceModel: "Animecards",
@@ -78,6 +78,8 @@ Deno.test("buildConversionReport groups exact final source HTML strings", () => 
         targetInContextResolution: { method: "deterministic", surface: "微塵" },
         fullContextResolution: {
           status: "failed",
+          source: "容疑者Xの献身",
+          requiredContextHTML: "微塵も疑わない。",
           model: "gemini-3.5-flash",
           attemptedAt: "2026-07-21T00:00:00.000Z",
           error: "Could not derive a complete reading",
@@ -149,7 +151,7 @@ Deno.test("buildConversionReport groups exact final source HTML strings", () => 
 
 Deno.test("buildConversionReport shows selected and compatible senses", () => {
   const manifest = {
-    version: 12,
+    version: CONVERSION_MANIFEST_VERSION,
     generatedAt: "2026-07-26T00:00:00.000Z",
     query: 'note:"Animecards"',
     sourceModel: "Animecards",
@@ -202,7 +204,7 @@ Deno.test("buildConversionReport shows selected and compatible senses", () => {
 
 Deno.test("buildConversionReport audits no-match sense selections", () => {
   const manifest = {
-    version: 12,
+    version: CONVERSION_MANIFEST_VERSION,
     generatedAt: "2026-07-26T00:00:00.000Z",
     query: 'note:"Animecards"',
     sourceModel: "Animecards",

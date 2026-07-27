@@ -135,6 +135,60 @@ function paragraphSpanAt(
   return result;
 }
 
+const DIALOGUE_QUOTE_PAIRS: Readonly<Record<string, string>> = {
+  "「": "」",
+  "『": "』",
+};
+
+interface DialogueSpan {
+  start: number;
+  end: number;
+}
+
+/**
+ * Finds the outer dialogue span(s) that an excerpt cuts into.
+ *
+ * A complete quotation already contained by the excerpt needs no expansion. If the excerpt starts
+ * or ends inside one or more nested quotations, the returned union includes every affected outer
+ * quotation.
+ */
+function dialogueExpansionSpan(
+  text: string,
+  excerptStart: number,
+  excerptEnd: number,
+): DialogueSpan | null {
+  const stack: Array<{ character: string; index: number }> = [];
+  const closingQuotes = new Set(Object.values(DIALOGUE_QUOTE_PAIRS));
+  const pairs: DialogueSpan[] = [];
+  for (let index = 0; index < text.length; ++index) {
+    const character = text[index];
+    if (DIALOGUE_QUOTE_PAIRS[character] !== undefined) {
+      stack.push({ character, index });
+    } else if (closingQuotes.has(character)) {
+      const opening = stack.pop();
+      if (
+        opening === undefined ||
+        DIALOGUE_QUOTE_PAIRS[opening.character] !== character
+      ) {
+        return null;
+      }
+      pairs.push({ start: opening.index, end: index + 1 });
+    }
+  }
+  if (stack.length > 0) return null;
+
+  const cutPairs = pairs.filter((pair) =>
+    pair.start < excerptEnd &&
+    pair.end > excerptStart &&
+    !(pair.start >= excerptStart && pair.end <= excerptEnd)
+  );
+  if (cutPairs.length === 0) return null;
+  return {
+    start: Math.min(excerptStart, ...cutPairs.map((pair) => pair.start)),
+    end: Math.max(excerptEnd, ...cutPairs.map((pair) => pair.end)),
+  };
+}
+
 function findEPUBContexts(
   corpus: EPUBSourceCorpus,
   contextHTML: string,
@@ -158,8 +212,24 @@ function findEPUBContexts(
         const paragraphs = paragraphSpanAt(documentParagraphs, start, start + context.length);
         const firstIndex = paragraphs[0].index;
         const lastIndex = paragraphs.at(-1)!.index;
+        const dialogueSpan = dialogueExpansionSpan(
+          documentText,
+          start,
+          start + context.length,
+        );
+        const dialogueParagraphs = dialogueSpan === null
+          ? []
+          : paragraphSpanAt(documentParagraphs, dialogueSpan.start, dialogueSpan.end);
+        const windowFirstIndex = Math.min(
+          firstIndex - 3,
+          dialogueParagraphs[0]?.index ?? firstIndex,
+        );
+        const windowLastIndex = Math.max(
+          lastIndex + 3,
+          dialogueParagraphs.at(-1)?.index ?? lastIndex,
+        );
         const window = documentParagraphs.filter((paragraph) =>
-          paragraph.index >= firstIndex - 3 && paragraph.index <= lastIndex + 3
+          paragraph.index >= windowFirstIndex && paragraph.index <= windowLastIndex
         );
         matches.push({ source: source.name, paragraphs, window });
         start = documentText.indexOf(context, start + 1);
@@ -339,11 +409,6 @@ const JAPANESE_QUOTE_PAIRS: Readonly<Record<string, string>> = {
   "〈": "〉",
   "《": "》",
 };
-// Japanese publishing convention represents an omission with two U+2026 leaders.
-const JAPANESE_ELLIPSIS = "……";
-const MAX_ADDED_CONTEXT_CHARACTERS = 200;
-const RELEVANCE_SELECTION_MINIMUM_ADDED_CHARACTERS = 100;
-const SENTENCE_END_PATTERN = /[。！？!?]/u;
 
 function openQuotesAt(text: string, end: number): string[] | null {
   const stack: string[] = [];
@@ -359,146 +424,95 @@ function openQuotesAt(text: string, end: number): string[] | null {
   return stack;
 }
 
-function closeElidedQuotes(openQuotes: string[], selectedText: string): string {
-  if (openQuotes.length === 0) return "";
-  const ellipsis = /…[。！？!?]?$/u.test(selectedText) ? "" : JAPANESE_ELLIPSIS;
-  const closingQuotes = [...openQuotes].reverse()
-    .map((opening) => JAPANESE_QUOTE_PAIRS[opening])
-    .join("");
-  return `${ellipsis}${closingQuotes}`;
-}
-
-function elidedQuotedSubstring(
-  restoredHTML: string,
-  restoredText: string,
-  originalText: string,
-  start: number,
-  end: number,
-  maximumAddedCharacters: number,
+/**
+ * Expands a source excerpt to include every outer piece of dialogue it cuts into.
+ *
+ * The result remains a contiguous source span, retains source ruby, and may cross EPUB paragraphs.
+ * Complete quotations already contained in the excerpt do not cause expansion.
+ */
+export function expandEPUBContextToFullDialogue(
+  match: EPUBContextMatch,
+  contextHTML: string,
 ): string | null {
-  const openAtStart = openQuotesAt(restoredText, start);
-  const openAtEnd = openQuotesAt(restoredText, end);
-  if (openAtStart === null || openAtEnd === null) return null;
-  if (openAtStart.length === 0 && openAtEnd.length === 0) return null;
-
-  const sourceHTML = extractEPUBHTMLSubstring(restoredHTML, restoredText.slice(start, end));
-  if (sourceHTML === null) return null;
-  const prefix = openAtStart.map((opening) => `${opening}${JAPANESE_ELLIPSIS}`).join("");
-  const suffix = closeElidedQuotes(openAtEnd, restoredText.slice(start, end));
-  const result = `${prefix}${sourceHTML}${suffix}`;
-  const resultText = searchableEPUBText(result);
-  if (
-    !resultText.includes(originalText) ||
-    !EPUBBracketsAreBalanced(resultText) ||
-    [...resultText].length - [...originalText].length > maximumAddedCharacters
-  ) {
-    return null;
-  }
-  return result;
+  const excerpt = searchableEPUBText(contextHTML);
+  const passage = joinedParagraphText(match.window);
+  const start = passage.indexOf(excerpt);
+  if (!excerpt || start === -1 || start !== passage.lastIndexOf(excerpt)) return null;
+  const span = dialogueExpansionSpan(passage, start, start + excerpt.length);
+  if (span === null) return null;
+  const expanded = passage.slice(span.start, span.end);
+  if (!hasCompleteContextBoundaries(passage, expanded)) return null;
+  return extractEPUBHTMLFromParagraphs(match.window, expanded);
 }
 
-/** Whether a long restored quotation merits a separate relevance-selection pass. */
-export function quotedEPUBContextNeedsRelevanceSelection(
-  restoredHTML: string,
-  originalContextHTML: string,
-): boolean {
-  const restoredText = searchableEPUBText(restoredHTML);
-  const originalText = searchableEPUBText(originalContextHTML);
-  const addedCharacters = [...restoredText].length - [...originalText].length;
-  const sentenceEnds = restoredText.match(/[。！？!?]/gu)?.length ?? 0;
-  return addedCharacters > RELEVANCE_SELECTION_MINIMUM_ADDED_CHARACTERS &&
-    sentenceEnds >= 2 &&
-    /[「『]/u.test(restoredText) &&
-    /[」』]/u.test(restoredText) &&
-    EPUBBracketsAreBalanced(restoredText);
-}
-
-/** Validates a model-selected source span and marks any omitted surrounding dialogue. */
-export function formatRelevantQuotedEPUBContext(
-  restoredHTML: string,
+/**
+ * Restores source ruby for a complete excerpt, accepting an unchanged Animecards excerpt outside
+ * dialogue and expanding any excerpt that cuts into `「…」` or `『…』`.
+ */
+function finalizeEPUBContextSelection(
+  match: EPUBContextMatch,
   selectedContextHTML: string,
   originalContextHTML: string,
 ): string | null {
-  const restoredText = searchableEPUBText(restoredHTML);
   const selectedText = searchableEPUBText(selectedContextHTML);
   const originalText = searchableEPUBText(originalContextHTML);
-  if (!selectedText.includes(originalText) || selectedText.length >= restoredText.length) {
-    return null;
-  }
+  if (!selectedText.includes(originalText)) return null;
 
-  const selectedStart = restoredText.indexOf(selectedText);
-  if (selectedStart === -1 || selectedStart !== restoredText.lastIndexOf(selectedText)) return null;
-  let start = selectedStart;
-  let end = selectedStart + selectedText.length;
-  while (start > 0 && /[「『]/u.test(restoredText[start - 1])) --start;
-  while (end < restoredText.length && /[」』]/u.test(restoredText[end])) ++end;
-  const leftIsNatural = start === 0 ||
-    /[。！？!?」』]/u.test(restoredText[start - 1]) ||
-    /[「『]/u.test(restoredText[start]);
-  const rightIsNatural = end === restoredText.length ||
-    /[。！？!?」』…]/u.test(restoredText[end - 1] ?? "");
-  if (!leftIsNatural || !rightIsNatural) return null;
-
-  const openAtStart = openQuotesAt(restoredText, start);
-  const openAtEnd = openQuotesAt(restoredText, end);
-  if (openAtStart === null || openAtEnd === null) return null;
-  const sourceHTML = extractEPUBHTMLSubstring(restoredHTML, restoredText.slice(start, end));
+  const sourceHTML = extractEPUBHTMLFromParagraphs(match.window, selectedText);
   if (sourceHTML === null) return null;
-
-  const prefix = openAtStart.map((opening) => `${opening}${JAPANESE_ELLIPSIS}`).join("");
-  const suffix = closeElidedQuotes(openAtEnd, restoredText.slice(start, end));
-  const result = `${prefix}${sourceHTML}${suffix}`;
-  const resultText = searchableEPUBText(result);
-  return resultText.includes(originalText) && EPUBBracketsAreBalanced(resultText) ? result : null;
+  const passage = joinedParagraphText(match.window);
+  if (hasCompleteContextBoundaries(passage, selectedText)) return sourceHTML;
+  return expandEPUBContextToFullDialogue(match, sourceHTML);
 }
 
-/** Explicitly elides distant dialogue when quote balancing would make a context excessive. */
-export function elideLongQuotedEPUBContext(
-  restoredHTML: string,
-  originalContextHTML: string,
-  maximumAddedCharacters = MAX_ADDED_CONTEXT_CHARACTERS,
-): string {
-  const restoredText = searchableEPUBText(restoredHTML);
-  const originalText = searchableEPUBText(originalContextHTML);
-  if (
-    [...restoredText].length - [...originalText].length <= maximumAddedCharacters ||
-    !EPUBBracketsAreBalanced(restoredText)
-  ) {
-    return restoredHTML;
-  }
+/**
+ * Produces the smallest source-faithful span that a semantic context selection must retain.
+ *
+ * This restores ruby, completes a partial sentence when possible, and expands excerpts that cut
+ * into dialogue. It deliberately does not decide whether the resulting span is understandable
+ * without neighboring source text.
+ */
+export function requiredEPUBContext(
+  match: EPUBContextMatch,
+  contextHTML: string,
+): string | null {
+  const exact = finalizeEPUBContextSelection(match, contextHTML, contextHTML);
+  if (exact !== null) return exact;
 
-  const originalStart = restoredText.indexOf(originalText);
-  if (originalStart === -1 || originalStart !== restoredText.lastIndexOf(originalText)) {
-    return restoredHTML;
+  const sentence = expandEPUBContextToSentence(match.paragraphs, contextHTML);
+  if (sentence !== null) {
+    const finalized = finalizeEPUBContextSelection(match, sentence, contextHTML);
+    if (finalized !== null) return finalized;
   }
-  const originalEnd = originalStart + originalText.length;
+  return expandEPUBContextToBalancedParagraphEnd(match.paragraphs, contextHTML);
+}
 
-  let sentenceStart = 0;
-  for (let index = originalStart - 1; index >= 0; --index) {
-    if (SENTENCE_END_PATTERN.test(restoredText[index])) {
-      sentenceStart = index + 1;
-      break;
-    }
-  }
-  let sentenceEnd = originalEnd;
-  if (!SENTENCE_END_PATTERN.test(restoredText[originalEnd - 1] ?? "")) {
-    sentenceEnd = restoredText.length;
-    for (let index = originalEnd; index < restoredText.length; ++index) {
-      if (SENTENCE_END_PATTERN.test(restoredText[index]) || /[」』]/u.test(restoredText[index])) {
-        sentenceEnd = index + 1;
-        break;
-      }
-    }
-  }
+/**
+ * Validates an AI-selected context against its deterministic lower bound and the EPUB source.
+ *
+ * The selection must be a unique contiguous source span containing the required context. Any
+ * dialogue it cuts into is expanded before the final natural-boundary checks.
+ */
+export function validateEPUBContextSelection(
+  match: EPUBContextMatch,
+  selectedContextHTML: string,
+  requiredContextHTML: string,
+): string | null {
+  const finalized = finalizeEPUBContextSelection(
+    match,
+    selectedContextHTML,
+    requiredContextHTML,
+  );
+  if (finalized === null) return null;
 
-  return elidedQuotedSubstring(
-    restoredHTML,
-    restoredText,
-    originalText,
-    sentenceStart,
-    sentenceEnd,
-    maximumAddedCharacters,
-  ) ?? restoredHTML;
+  const passage = joinedParagraphText(match.window);
+  const finalizedText = searchableEPUBText(finalized);
+  const requiredText = searchableEPUBText(requiredContextHTML);
+  return finalizedText.includes(requiredText) &&
+      EPUBBracketsAreBalanced(finalizedText) &&
+      hasCompleteContextBoundaries(passage, finalizedText)
+    ? finalized
+    : null;
 }
 
 /** True when an excerpt already starts and ends at natural source-context boundaries. */
@@ -535,20 +549,23 @@ export function expandEPUBContextToSentence(
 
   let sentenceStart = 0;
   for (let index = start - 1; index >= 0; --index) {
-    if (/[。！？!?」』〉》「『〈《]/u.test(passageText[index])) {
+    if (/[。！？!?]/u.test(passageText[index])) {
       sentenceStart = index + 1;
       break;
     }
   }
-  let sentenceEnd = passageText.length;
-  for (let index = originalEnd; index < passageText.length; ++index) {
-    if (/[。！？!?]/u.test(passageText[index])) {
-      sentenceEnd = index + 1;
-      break;
+  let sentenceEnd = originalEnd;
+  if (!/[。！？!?]/u.test(passageText[originalEnd - 1] ?? "")) {
+    sentenceEnd = passageText.length;
+    for (let index = originalEnd; index < passageText.length; ++index) {
+      if (/[。！？!?]/u.test(passageText[index])) {
+        sentenceEnd = index + 1;
+        break;
+      }
     }
   }
   const expanded = passageText.slice(sentenceStart, sentenceEnd);
-  if (expanded.length <= excerpt.length || !EPUBBracketsAreBalanced(expanded)) return null;
+  if (expanded.length <= excerpt.length) return null;
   return extractEPUBHTMLFromParagraphs(paragraphs, expanded);
 }
 
@@ -633,7 +650,10 @@ export type EPUBContextAnalysis =
   | { status: "complete"; match: EPUBContextMatch; contextHTML: string }
   | { status: "cut-off"; match: EPUBContextMatch };
 
-/** Finds an EPUB excerpt, restores ruby immediately, and flags only true cutoff cases for AI. */
+/**
+ * Finds an EPUB excerpt and derives the source-faithful span that later semantic selection must
+ * retain.
+ */
 export function analyzeEPUBContext(
   corpus: EPUBSourceCorpus,
   contextHTML: string,
@@ -641,12 +661,8 @@ export function analyzeEPUBContext(
 ): EPUBContextAnalysis {
   const matches = findEPUBContexts(corpus, contextHTML, sourceName);
   if (matches.length === 0) return { status: "not-found" };
-  const excerpt = searchableEPUBText(contextHTML);
   const analyses = matches.map((match): Exclude<EPUBContextAnalysis, { status: "not-found" }> => {
-    if (!hasCompleteContextBoundaries(epubContextPlainText(match), excerpt)) {
-      return { status: "cut-off", match };
-    }
-    const restored = extractEPUBHTMLFromParagraphs(match.paragraphs, excerpt);
+    const restored = requiredEPUBContext(match, contextHTML);
     return restored === null
       ? { status: "cut-off", match }
       : { status: "complete", match, contextHTML: restored };
@@ -654,14 +670,18 @@ export function analyzeEPUBContext(
 
   if (analyses.length === 1) return analyses[0];
 
-  // The historical source location is immaterial when every occurrence is already complete and
-  // produces identical cleaned, ruby-preserving HTML. Never choose between distinct expansions.
+  // The historical source location is immaterial only when every occurrence has identical
+  // cleaned HTML and an identical semantic-evidence window. Never ask AI to choose between
+  // occurrences whose surrounding context differs.
   if (analyses.every((analysis) => analysis.status === "complete")) {
     const [first, ...rest] = analyses;
     if (
       first.status === "complete" &&
       rest.every((analysis) =>
-        analysis.status === "complete" && analysis.contextHTML === first.contextHTML
+        analysis.status === "complete" &&
+        analysis.contextHTML === first.contextHTML &&
+        JSON.stringify(analysis.match.window.map((paragraph) => paragraph.html)) ===
+          JSON.stringify(first.match.window.map((paragraph) => paragraph.html))
       )
     ) {
       return first;

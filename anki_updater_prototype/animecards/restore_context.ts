@@ -1,5 +1,5 @@
 /**
- * Restores source-authored ruby and expands cutoff Animecards contexts from EPUB text.
+ * Uses cached AI judgment to select clear full contexts around deterministic EPUB source spans.
  *
  * Run with: deno task animecards:restore-context MANIFEST.json [--model=MODEL] [--limit=N]
  */
@@ -9,29 +9,15 @@ import * as path from "@std/path";
 import { MODEL_IDS, type ModelId } from "card_field_generation";
 import { allJMDictEntries } from "data";
 import { buildSpellingIndex } from "../shared/jmdict_resolution/recognition_target_lookup.ts";
-import {
-  EPUB_CONTEXT_PROMPT_VERSION,
-  EPUB_RELEVANCE_SELECTION_VERSION,
-  extractFullEPUBContext,
-  selectRelevantEPUBContext,
-} from "./epub_context_extraction.ts";
+import { EPUB_CONTEXT_PROMPT_VERSION, selectFullEPUBContext } from "./epub_context_extraction.ts";
 import { convertAnimecardsNote } from "./convert.ts";
 import { checkpointMatchesInput, createCheckpointManifest } from "./checkpoint.ts";
 import { normalizeContextHTML } from "./html.ts";
 import { writeConversionAuditArtifacts } from "./report.ts";
 import {
-  elideLongQuotedEPUBContext,
-  EPUBBracketsAreBalanced,
-  epubContextPlainText,
-  expandEPUBContextToBalancedParagraphEnd,
-  expandEPUBContextToSentence,
-  extractEPUBHTMLFromParagraphs,
-  findUniqueEPUBContext,
-  formatRelevantQuotedEPUBContext,
-  hasCompleteContextBoundaries,
+  analyzeEPUBContext,
   loadEPUBSourceCorpus,
-  quotedEPUBContextNeedsRelevanceSelection,
-  searchableEPUBText,
+  validateEPUBContextSelection,
 } from "./source.ts";
 import {
   type AnkiNoteInfo,
@@ -189,7 +175,7 @@ async function main(): Promise<void> {
   );
   if (options.limit !== undefined) candidates = candidates.slice(0, options.limit);
   console.error(
-    `Restoring ${candidates.length} cutoff contexts with ${options.model} at concurrency ${options.concurrency}...`,
+    `Selecting ${candidates.length} full contexts with ${options.model} at concurrency ${options.concurrency}...`,
   );
 
   const candidateIndexes = new Map(
@@ -198,9 +184,6 @@ async function main(): Promise<void> {
   let generated = 0;
   let reused = 0;
   let failed = 0;
-  let relevanceGenerated = 0;
-  let relevanceReused = 0;
-  let relevanceFailed = 0;
   let nextIndex = 0;
   let cacheWrite = Promise.resolve();
 
@@ -217,41 +200,42 @@ async function main(): Promise<void> {
     if (workIndex >= candidates.length) return;
     const candidate = candidates[workIndex];
     const attemptedAt = new Date().toISOString();
+    const contextResolution = candidate.fullContextResolution;
+    if (contextResolution.status !== "pending" && contextResolution.status !== "failed") {
+      throw new Error(`Candidate ${candidate.noteId} does not need context selection.`);
+    }
+    const { source, requiredContextHTML } = contextResolution;
     try {
       const originalContext = normalizeContextHTML(
         sourceField(candidate, manifest.sourceFields.sentence),
       );
-      const source = candidate.fullContextResolution.status === "pending"
-        ? candidate.fullContextResolution.source
-        : candidate.sourceResolution.name;
-      const match = findUniqueEPUBContext(corpus, originalContext, source ?? undefined);
-      if (match === null) throw new Error("The original excerpt no longer has one EPUB match.");
+      const analysis = analyzeEPUBContext(corpus, originalContext, source);
+      if (analysis.status === "not-found") {
+        throw new Error("The original excerpt no longer has one unambiguous EPUB match.");
+      }
+      const { match } = analysis;
       const inputFingerprint = await fingerprint({
         promptVersion: EPUB_CONTEXT_PROMPT_VERSION,
         model: options.model,
         word: candidate.keyRecognitionTarget,
-        originalContext,
+        requiredContextHTML,
         windowHTML: match.window.map((paragraph) => `<p>${paragraph.html}</p>`),
       });
       const cacheKey = `${candidate.noteId}:${inputFingerprint}`;
       const cached = cache.get(cacheKey);
-      const originalText = searchableEPUBText(originalContext);
       let restoredHTML: string;
       let generatedAt: string;
       let resolution: ConversionCandidate["fullContextResolution"];
-      const deterministicRecovery = candidate.fullContextResolution.status === "failed"
-        ? (hasCompleteContextBoundaries(epubContextPlainText(match), originalText)
-          ? extractEPUBHTMLFromParagraphs(match.paragraphs, originalText)
-          : expandEPUBContextToSentence(match.paragraphs, originalContext) ??
-            expandEPUBContextToBalancedParagraphEnd(match.paragraphs, originalContext))
-        : null;
-      if (deterministicRecovery !== null) {
-        restoredHTML = deterministicRecovery;
-        generatedAt = attemptedAt;
-        resolution = { status: "restored", method: "exact" };
-        ++reused;
-      } else if (cached !== undefined && cached.contextHTML !== undefined) {
-        restoredHTML = cached.contextHTML;
+      if (cached !== undefined && cached.contextHTML !== undefined) {
+        const validated = validateEPUBContextSelection(
+          match,
+          cached.contextHTML,
+          requiredContextHTML,
+        );
+        if (validated === null) {
+          throw new Error("Cached context no longer validates against its EPUB source.");
+        }
+        restoredHTML = validated;
         generatedAt = cached.generatedAt;
         resolution = {
           status: "restored",
@@ -261,33 +245,22 @@ async function main(): Promise<void> {
         };
         ++reused;
       } else {
-        const extracted = await extractFullEPUBContext({
+        const selected = await selectFullEPUBContext({
           windowHTML: match.window.map((paragraph) => `<p>${paragraph.html}</p>`),
           word: candidate.keyRecognitionTarget,
-          originalContext,
+          requiredContext: requiredContextHTML,
         }, options.model);
-        const extractedText = searchableEPUBText(extracted);
-        if (!extractedText.includes(originalText)) {
-          throw new Error("Extracted context does not contain the complete original excerpt.");
-        }
-        restoredHTML = extractEPUBHTMLFromParagraphs(match.window, extractedText) ?? "";
-        if (!restoredHTML) {
-          throw new Error(
-            "Extracted context is not a unique verbatim substring of the EPUB window.",
-          );
-        }
-        const isCompleteWithinParagraph = match.window.some((paragraph) =>
-          hasCompleteContextBoundaries(paragraph.plainText, extractedText)
+        const validated = validateEPUBContextSelection(
+          match,
+          selected,
+          requiredContextHTML,
         );
-        if (
-          extractedText.length <= originalText.length ||
-          !EPUBBracketsAreBalanced(extractedText) ||
-          (!isCompleteWithinParagraph && !restoredHTML.includes("</p>\n\n<p>"))
-        ) {
+        if (validated === null) {
           throw new Error(
-            "Extracted context is not a longer, complete, balanced source excerpt.",
+            "Selected context is not a unique, naturally bounded source span containing the required context.",
           );
         }
+        restoredHTML = validated;
         generatedAt = attemptedAt;
         const cachedResult: CachedContextResult = {
           noteId: candidate.noteId,
@@ -305,73 +278,6 @@ async function main(): Promise<void> {
         };
         ++generated;
       }
-
-      if (quotedEPUBContextNeedsRelevanceSelection(restoredHTML, originalContext)) {
-        const relevanceInputFingerprint = await fingerprint({
-          selectionVersion: EPUB_RELEVANCE_SELECTION_VERSION,
-          stage: "quoted-context-relevance",
-          model: options.model,
-          word: candidate.keyRecognitionTarget,
-          originalContext,
-          restoredHTML,
-        });
-        const relevanceCacheKey = `${candidate.noteId}:${relevanceInputFingerprint}`;
-        const cachedRelevance = cache.get(relevanceCacheKey);
-        if (cachedRelevance?.contextHTML !== undefined) {
-          restoredHTML = cachedRelevance.contextHTML;
-          generatedAt = cachedRelevance.generatedAt;
-          resolution = {
-            status: "restored",
-            method: "ai",
-            model: cachedRelevance.model,
-            generatedAt,
-          };
-          ++relevanceReused;
-        } else {
-          try {
-            const selected = await selectRelevantEPUBContext({
-              restoredContext: restoredHTML,
-              word: candidate.keyRecognitionTarget,
-              originalContext,
-            }, options.model);
-            const relevantHTML = formatRelevantQuotedEPUBContext(
-              restoredHTML,
-              selected,
-              originalContext,
-            );
-            if (relevantHTML === null) {
-              throw new Error(
-                "Selected context was not a shorter, complete, verbatim source span.",
-              );
-            }
-            restoredHTML = relevantHTML;
-            generatedAt = attemptedAt;
-            const cachedResult: CachedContextResult = {
-              noteId: candidate.noteId,
-              inputFingerprint: relevanceInputFingerprint,
-              model: options.model,
-              generatedAt,
-              contextHTML: restoredHTML,
-            };
-            await cacheContextResult(relevanceCacheKey, cachedResult);
-            resolution = {
-              status: "restored",
-              method: "ai",
-              model: options.model,
-              generatedAt,
-            };
-            ++relevanceGenerated;
-            console.error(
-              `  Minimized source context ${candidate.noteId}: ${candidate.recognitionTarget}`,
-            );
-          } catch (error) {
-            ++relevanceFailed;
-            const message = error instanceof Error ? error.message : String(error);
-            console.error(`  Kept full source context ${candidate.noteId}: ${message}`);
-          }
-        }
-      }
-      restoredHTML = elideLongQuotedEPUBContext(restoredHTML, originalContext);
 
       const converted = await convertAnimecardsNote(originalNote(candidate), {
         sourceModel: manifest.sourceModel,
@@ -411,6 +317,8 @@ async function main(): Promise<void> {
       const message = error instanceof Error ? error.message : String(error);
       candidate.fullContextResolution = {
         status: "failed",
+        source,
+        requiredContextHTML,
         model: options.model,
         attemptedAt,
         error: message,
@@ -432,10 +340,7 @@ async function main(): Promise<void> {
   await writeManifest(options.outputPath, manifest);
   await writeConversionAuditArtifacts(manifest, options.outputPath);
   console.error(
-    `Context restoration: ${generated} generated, ${reused} cached, ${failed} failed. Output: ${options.outputPath}`,
-  );
-  console.error(
-    `Quoted-context relevance: ${relevanceGenerated} generated, ${relevanceReused} cached, ${relevanceFailed} kept full.`,
+    `Context selection: ${generated} generated, ${reused} cached, ${failed} failed. Output: ${options.outputPath}`,
   );
   if (failed > 0) Deno.exitCode = 1;
 }

@@ -770,6 +770,11 @@ Deno.test("convertAnimecardsNote recovers a missing source from the EPUB corpus"
   assertEquals(result.candidate.approved, true);
   assertEquals(result.candidate.target.fields.Source, '<span lang="ja">『テスト小説』</span>');
   assertEquals(result.candidate.sourceResolution.method, "epub");
+  assertEquals(result.candidate.fullContextResolution, {
+    status: "pending",
+    source: "テスト小説",
+    requiredContextHTML: "彼はたべている。",
+  });
 });
 
 Deno.test("convertAnimecardsNote preserves semantic EPUB paragraph boundaries", async () => {
@@ -854,7 +859,12 @@ Deno.test("convertAnimecardsNote expands a truncated EPUB excerpt to reach its t
   );
 
   assert(result.candidate);
-  assertEquals(result.candidate.fullContextResolution, { status: "restored", method: "exact" });
+  assertEquals(result.candidate.fullContextResolution, {
+    status: "pending",
+    source: "Test Book",
+    requiredContextHTML:
+      "だから読者諸氏が、ここに述べられたことを裁判の証拠品みたいなかたちで、（それがどのような商取引なのか見当もつかないが）使用されることは、お勧めしかねる。",
+  });
   assertEquals(
     result.candidate.target.fields["Full context"],
     "だから読者諸氏が、ここに述べられたことを裁判の証拠品みたいなかたちで、（それがどのような商取引なのか<mark>見当もつかない</mark>が）使用されることは、お勧めしかねる。",
@@ -887,7 +897,12 @@ Deno.test("convertAnimecardsNote recovers a one-kanji target from the adjacent E
   );
 
   assert(result.candidate);
-  assertEquals(result.candidate.fullContextResolution, { status: "restored", method: "exact" });
+  assertEquals(result.candidate.fullContextResolution, {
+    status: "pending",
+    source: "Test Book",
+    requiredContextHTML:
+      "その間、俺は文字通り一睡もしなかった。<ruby><rb>鉄</rb><rt>てつ</rt><rb>釘</rb><rt>くぎ</rt></ruby>を打たれるような頭痛に襲われた。",
+  });
   assertEquals(
     result.candidate.target.fields["Full context"],
     "その間、俺は文字通り一睡もしなかった。 鉄[てつ]<mark>釘[くぎ]</mark>を打たれるような頭痛に襲われた。",

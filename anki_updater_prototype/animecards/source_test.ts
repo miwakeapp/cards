@@ -3,18 +3,19 @@ import {
   analyzeEPUBContext,
   cardSourceFromResolution,
   cleanSourceName,
-  elideLongQuotedEPUBContext,
   epubSenseSelectionContext,
   expandEPUBContextToBalancedParagraphEnd,
+  expandEPUBContextToFullDialogue,
   expandEPUBContextToIncludeTarget,
+  expandEPUBContextToSentence,
   extractEPUBHTMLSubstring,
   extractSourceURL,
   findUniqueEPUBContext,
   findUniqueEPUBSource,
-  formatRelevantQuotedEPUBContext,
   isPublicSourceURL,
-  quotedEPUBContextNeedsRelevanceSelection,
+  requiredEPUBContext,
   resolveSource,
+  validateEPUBContextSelection,
 } from "./source.ts";
 
 Deno.test("source cleanup removes known reader suffixes", () => {
@@ -232,7 +233,7 @@ Deno.test("EPUB substring extraction strips source paragraph attributes", () => 
   );
 });
 
-Deno.test("EPUB context analysis distinguishes complete excerpts from cutoffs", () => {
+Deno.test("EPUB context analysis derives the required complete sentence", () => {
   const paragraph = {
     html: "前文。<ruby>完全<rt>かんぜん</rt></ruby>な文です。後文。",
     plainText: "前文。完全な文です。後文。",
@@ -247,7 +248,100 @@ Deno.test("EPUB context analysis distinguishes complete excerpts from cutoffs", 
     match: { source: "Book", paragraphs: [paragraph], window: [paragraph] },
     contextHTML: "<ruby>完全<rt>かんぜん</rt></ruby>な文です。",
   });
-  assertEquals(analyzeEPUBContext(corpus, "完全な文", "Book").status, "cut-off");
+  assertEquals(analyzeEPUBContext(corpus, "完全な文", "Book"), {
+    status: "complete",
+    match: { source: "Book", paragraphs: [paragraph], window: [paragraph] },
+    contextHTML: "<ruby>完全<rt>かんぜん</rt></ruby>な文です。",
+  });
+});
+
+Deno.test("EPUB context analysis expands a good sentence to its full dialogue", () => {
+  const paragraph = {
+    html:
+      "「前文。<ruby>対象<rt>たいしょう</rt></ruby>の文です。後文。『さらに内側です』と続けます。」",
+    plainText: "「前文。対象の文です。後文。『さらに内側です』と続けます。」",
+    document: "quoted.xhtml",
+    index: 0,
+  };
+  const corpus = {
+    sources: [{ name: "Book", documents: [paragraph.plainText], paragraphs: [paragraph] }],
+  };
+
+  assertEquals(analyzeEPUBContext(corpus, "対象の文です。", "Book"), {
+    status: "complete",
+    match: { source: "Book", paragraphs: [paragraph], window: [paragraph] },
+    contextHTML:
+      "「前文。<ruby>対象<rt>たいしょう</rt></ruby>の文です。後文。『さらに内側です』と続けます。」",
+  });
+  assertEquals(analyzeEPUBContext(corpus, "さらに内側です", "Book"), {
+    status: "complete",
+    match: { source: "Book", paragraphs: [paragraph], window: [paragraph] },
+    contextHTML:
+      "「前文。<ruby>対象<rt>たいしょう</rt></ruby>の文です。後文。『さらに内側です』と続けます。」",
+  });
+});
+
+Deno.test("EPUB context selection accepts an unchanged standalone sentence", () => {
+  const paragraph = {
+    html: "前文。<ruby>対象<rt>たいしょう</rt></ruby>の文です。後文。",
+    plainText: "前文。対象の文です。後文。",
+    document: "standalone.xhtml",
+    index: 0,
+  };
+  const match = { source: "Book", paragraphs: [paragraph], window: [paragraph] };
+
+  assertEquals(
+    requiredEPUBContext(match, "対象の文です。"),
+    "<ruby>対象<rt>たいしょう</rt></ruby>の文です。",
+  );
+  assertEquals(validateEPUBContextSelection(match, "対象の文", "対象の文"), null);
+});
+
+Deno.test("required EPUB context is only a structural lower bound", () => {
+  const paragraph = {
+    html: "前文が指示対象を説明する。だから、<ruby>対象<rt>たいしょう</rt></ruby>の文です。後文。",
+    plainText: "前文が指示対象を説明する。だから、対象の文です。後文。",
+    document: "standalone.xhtml",
+    index: 0,
+  };
+  const match = { source: "Book", paragraphs: [paragraph], window: [paragraph] };
+
+  assertEquals(
+    requiredEPUBContext(match, "対象の文です。"),
+    "だから、<ruby>対象<rt>たいしょう</rt></ruby>の文です。",
+  );
+  assertEquals(
+    validateEPUBContextSelection(
+      match,
+      "前文が指示対象を説明する。だから、対象の文です。",
+      "だから、<ruby>対象<rt>たいしょう</rt></ruby>の文です。",
+    ),
+    "前文が指示対象を説明する。だから、<ruby>対象<rt>たいしょう</rt></ruby>の文です。",
+  );
+});
+
+Deno.test("EPUB context validation enforces the required span", () => {
+  const paragraph = {
+    html: "前文。「<ruby>対象<rt>たいしょう</rt></ruby>の文です。後文。」さらに別の文。",
+    plainText: "前文。「対象の文です。後文。」さらに別の文。",
+    document: "quoted.xhtml",
+    index: 0,
+  };
+  const match = { source: "Book", paragraphs: [paragraph], window: [paragraph] };
+  const required = "「<ruby>対象<rt>たいしょう</rt></ruby>の文です。後文。」";
+
+  assertEquals(
+    validateEPUBContextSelection(match, "対象の文です。", required),
+    null,
+  );
+  assertEquals(
+    validateEPUBContextSelection(match, "「対象の文です。後文。」", required),
+    required,
+  );
+  assertEquals(
+    validateEPUBContextSelection(match, "対象の文です。後文。」さらに別の文。", required),
+    null,
+  );
 });
 
 Deno.test("EPUB context analysis accepts repeated equivalent complete excerpts", () => {
@@ -270,6 +364,32 @@ Deno.test("EPUB context analysis accepts repeated equivalent complete excerpts",
     status: "complete",
     match: { source: "Book", paragraphs: [first], window: [first] },
     contextHTML: "<ruby>同一<rt>どういつ</rt></ruby>の文です。",
+  });
+});
+
+Deno.test("EPUB context analysis rejects repeated excerpts with different evidence windows", () => {
+  const first = {
+    html: "最初の前提。対象の文です。",
+    plainText: "最初の前提。対象の文です。",
+    document: "first.xhtml",
+    index: 0,
+  };
+  const second = {
+    html: "別の前提。対象の文です。",
+    plainText: "別の前提。対象の文です。",
+    document: "second.xhtml",
+    index: 0,
+  };
+  const corpus = {
+    sources: [{
+      name: "Book",
+      documents: [first.plainText, second.plainText],
+      paragraphs: [first, second],
+    }],
+  };
+
+  assertEquals(analyzeEPUBContext(corpus, "対象の文です。", "Book"), {
+    status: "not-found",
   });
 });
 
@@ -299,7 +419,7 @@ Deno.test("EPUB context analysis rejects repeated excerpts with different source
   });
 });
 
-Deno.test("EPUB context analysis rejects a complete sentence inside a longer quotation", () => {
+Deno.test("EPUB context analysis rejects ambiguous quoted and standalone occurrences", () => {
   const quoted = {
     html: "「前文。対象の文です。後文。」",
     plainText: "「前文。対象の文です。後文。」",
@@ -325,7 +445,7 @@ Deno.test("EPUB context analysis rejects a complete sentence inside a longer quo
   });
 });
 
-Deno.test("EPUB context analysis rejects an unclosed angle-bracket quotation", () => {
+Deno.test("EPUB context analysis does not treat angle brackets as dialogue", () => {
   const paragraph = {
     html: "〈前文です〉説明して、〈対象の文です。続きです〉",
     plainText: "〈前文です〉説明して、〈対象の文です。続きです〉",
@@ -344,6 +464,7 @@ Deno.test("EPUB context analysis rejects an unclosed angle-bracket quotation", (
     analyzeEPUBContext(corpus, "〈対象の文です。続きです〉", "Book").status,
     "complete",
   );
+  assertEquals(analyzeEPUBContext(corpus, "〈対象の文です", "Book").status, "cut-off");
 });
 
 Deno.test("EPUB context expansion includes a target after a truncated excerpt", () => {
@@ -417,71 +538,102 @@ Deno.test("EPUB context expansion can recover a balanced quote-final paragraph",
   );
 });
 
-Deno.test("long quoted context elides distant dialogue and preserves source ruby", () => {
-  const restored = `「前の長い文。さらに長い文。<ruby>最後<rt>さいご</rt></ruby>の文」`;
+Deno.test("EPUB sentence expansion does not include the following sentence", () => {
+  const paragraph = {
+    html: "彼女は<ruby>中年<rt>ちゅうねん</rt></ruby>の領域に着実に歩を進めつつあった。次の文。",
+    plainText: "彼女は中年の領域に着実に歩を進めつつあった。次の文。",
+    document: "chapter.xhtml",
+    index: 0,
+  };
+
   assertEquals(
-    elideLongQuotedEPUBContext(restored, "最後の文", 8),
-    `「……<ruby>最後<rt>さいご</rt></ruby>の文」`,
+    expandEPUBContextToSentence([paragraph], "中年の領域に着実に歩を進めつつあった。"),
+    "彼女は<ruby>中年<rt>ちゅうねん</rt></ruby>の領域に着実に歩を進めつつあった。",
   );
 });
 
-Deno.test("long quoted context marks omissions on both sides", () => {
-  const restored = "「前の長い文。対象の文。後ろの長い文。」";
+Deno.test("EPUB sentence expansion does not split at an inline title quotation", () => {
+  const paragraph = {
+    html:
+      "「《ソードアート・オンライン》という名のこの世界は、ひとつの巨大なシステムによって<ruby>制御<rt>せいぎょ</rt></ruby>されています。次の文。」",
+    plainText:
+      "「《ソードアート・オンライン》という名のこの世界は、ひとつの巨大なシステムによって制御されています。次の文。」",
+    document: "chapter.xhtml",
+    index: 0,
+  };
+  const match = { source: "Book", paragraphs: [paragraph], window: [paragraph] };
+  const original = "ひとつの巨大なシステムによって制御されています。";
+  const expanded = expandEPUBContextToSentence([paragraph], original);
+
   assertEquals(
-    elideLongQuotedEPUBContext(restored, "対象の文。", 8),
-    "「……対象の文。……」",
+    expanded,
+    "「《ソードアート・オンライン》という名のこの世界は、ひとつの巨大なシステムによって<ruby>制御<rt>せいぎょ</rt></ruby>されています。",
+  );
+  assertEquals(
+    requiredEPUBContext(match, original),
+    "「《ソードアート・オンライン》という名のこの世界は、ひとつの巨大なシステムによって<ruby>制御<rt>せいぎょ</rt></ruby>されています。次の文。」",
   );
 });
 
-Deno.test("long quoted context does not repeat an existing trailing ellipsis", () => {
-  const restored = "「前の長い文。対象の文……。後ろの長い文。」";
-  assertEquals(
-    elideLongQuotedEPUBContext(restored, "対象の文……。", 8),
-    "「……対象の文……。」",
-  );
-});
+Deno.test("EPUB dialogue expansion preserves complete cross-paragraph speech", () => {
+  const paragraphs = [
+    {
+      html: "「最初の文。",
+      plainText: "「最初の文。",
+      document: "chapter.xhtml",
+      index: 0,
+    },
+    {
+      html: "二番目の文。",
+      plainText: "二番目の文。",
+      document: "chapter.xhtml",
+      index: 1,
+    },
+    {
+      html: "三番目の文。",
+      plainText: "三番目の文。",
+      document: "chapter.xhtml",
+      index: 2,
+    },
+    {
+      html: "四番目の文。",
+      plainText: "四番目の文。",
+      document: "chapter.xhtml",
+      index: 3,
+    },
+    {
+      html: "<ruby>対象<rt>たいしょう</rt></ruby>の文。",
+      plainText: "対象の文。",
+      document: "chapter.xhtml",
+      index: 4,
+    },
+    {
+      html: "最後の文。」",
+      plainText: "最後の文。」",
+      document: "chapter.xhtml",
+      index: 5,
+    },
+  ];
+  const corpus = {
+    sources: [{
+      name: "Book",
+      documents: [paragraphs.map((paragraph) => paragraph.plainText).join("")],
+      paragraphs,
+    }],
+  };
+  const match = findUniqueEPUBContext(corpus, "対象の文。", "Book")!;
 
-Deno.test("long quoted context does not manufacture a balanced sentence fragment", () => {
-  const restored = `「${"前".repeat(20)}対象${"後".repeat(20)}」`;
-  assertEquals(elideLongQuotedEPUBContext(restored, "対象", 8), restored);
-});
-
-Deno.test("long multi-sentence quotations request relevance selection", () => {
-  const restored = `「${"関係のない文。".repeat(15)}対象の文。」`;
-  assertEquals(quotedEPUBContextNeedsRelevanceSelection(restored, "対象の文"), true);
-  assertEquals(quotedEPUBContextNeedsRelevanceSelection("「前文。対象の文。」", "対象の文"), false);
-});
-
-Deno.test("relevant quoted context keeps adjacent brackets and elides omitted dialogue", () => {
-  const restored =
-    `「あいつらは<ruby>色目<rt>いろめ</rt></ruby>をつかって、僕とは目を合わせない。大体、縄文時代から女はそうなんだ。」`;
+  assertEquals(match.window, paragraphs);
   assertEquals(
-    formatRelevantQuotedEPUBContext(
-      restored,
-      `あいつらは<ruby>色目<rt>いろめ</rt></ruby>をつかって、僕とは目を合わせない。`,
-      "色目をつかって、",
-    ),
-    `「あいつらは<ruby>色目<rt>いろめ</rt></ruby>をつかって、僕とは目を合わせない。……」`,
-  );
-});
-
-Deno.test("relevant quoted context does not repeat an existing trailing ellipsis", () => {
-  const restored = "「前文。対象の文……。後文。」";
-  assertEquals(
-    formatRelevantQuotedEPUBContext(restored, "対象の文……。", "対象の文"),
-    "「……対象の文……。」",
-  );
-});
-
-Deno.test("relevant quoted context rejects rewrites and sentence fragments", () => {
-  const restored = "「前文。対象の文です。後文。」";
-  assertEquals(
-    formatRelevantQuotedEPUBContext(restored, "対象文です。", "対象の文"),
-    null,
-  );
-  assertEquals(
-    formatRelevantQuotedEPUBContext(restored, "対象の文", "対象の文"),
-    null,
+    expandEPUBContextToFullDialogue(match, "対象の文。"),
+    [
+      "<p>「最初の文。</p>",
+      "<p>二番目の文。</p>",
+      "<p>三番目の文。</p>",
+      "<p>四番目の文。</p>",
+      "<p><ruby>対象<rt>たいしょう</rt></ruby>の文。</p>",
+      "<p>最後の文。」</p>",
+    ].join("\n\n"),
   );
 });
 

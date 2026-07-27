@@ -4,9 +4,8 @@ import { openai } from "@ai-sdk/openai";
 import { generateText, type LanguageModel } from "ai";
 import type { ModelId } from "card_field_generation";
 
-export const EPUB_CONTEXT_PROMPT_VERSION = 2;
-/** Bump when either the selection prompt or its deterministic validation contract changes. */
-export const EPUB_RELEVANCE_SELECTION_VERSION = 2;
+/** Bump whenever the selection prompt or its deterministic validation contract changes. */
+export const EPUB_CONTEXT_PROMPT_VERSION = 7;
 
 function getModel(modelId: ModelId): LanguageModel {
   if (modelId.startsWith("gemini-")) return google(modelId);
@@ -15,78 +14,45 @@ function getModel(modelId: ModelId): LanguageModel {
   throw new Error(`Unknown model ID: ${modelId}`);
 }
 
-export interface ExtractEPUBContextInput {
+export interface SelectFullEPUBContextInput {
   windowHTML: string[];
   word: string;
-  originalContext: string;
+  requiredContext: string;
 }
 
-/** Selects a source-faithful complete context for Animecards conversion. */
-export async function extractFullEPUBContext(
-  input: ExtractEPUBContextInput,
+/** Selects the smallest clear source context that contains a deterministic required span. */
+export async function selectFullEPUBContext(
+  input: SelectFullEPUBContextInput,
   modelId: ModelId,
 ): Promise<string> {
   const result = await generateText({
     model: getModel(modelId),
-    system: `You are extracting context for a Japanese language flashcard.
+    system: `You are selecting full context for a Japanese language flashcard.
 
-You will be given several paragraphs from a book. Expand the original excerpt to the appropriate full context for a flashcard about the given word.
+You will be given several paragraphs from a book and a required source span containing the target word. The required span has already been expanded to complete sentence and dialogue boundaries and is presumed to be good flashcard context. Return it unchanged unless a small amount of immediately adjacent text is genuinely necessary to understand the target word's usage in that span.
 
 Rules:
-- The result MUST contain the complete original excerpt verbatim
-- Always include a complete sentence (ending with 。 or closing quotation marks or other natural terminal punctuation)
-- If the sentence is very short (under ~15 characters) or unclear on its own, include adjacent sentence(s) to clarify
-- If the sentence is part of one- or two-sentence dialogue, include the whole dialogue exchange including 「」
-- Never return unmatched Japanese quote brackets: if the selected text ends with 」, include the corresponding opening 「
-- Do NOT include more context than necessary — usually one sentence is enough
+- The result MUST contain the complete required source span verbatim
+- If the required span overlaps dialogue enclosed by 「…」 or 『…』, include that complete outer dialogue; it may already be present, and must never be shortened or elided
+- "Enough context" means enough to understand how the target word is used, not enough to understand the surrounding story, argument, motivation, or scene
+- If the target usage is understandable by itself, return the required span unchanged, even when neighboring text would make the narrative richer or smoother
+- Expand only when an omitted referent, subject, cause, contrast, question, speech, action, or other setup makes the target usage itself confusing or materially misleading without it
+- A sentence describing a reaction may need the immediately preceding cause; do not add a reaction or consequence that merely follows an already-understandable target usage
+- Add adjacent sentences or exchange turns one at a time, retaining each only if removing it would make the target usage confusing or materially misleading; normally the result should contain no more than two or three sentences
+- Do not include mere attribution, scene mechanics, background, elaboration, or neighboring examples
+- When uncertain whether more context is necessary, return the required span unchanged
+- Always return naturally bounded context with balanced Japanese quote brackets
+- Do not include neighboring text merely to make the result longer
 - Copy text from the supplied paragraphs exactly; do not rewrite, correct, or invent anything
 - Preserve all HTML tags exactly as they appear (especially <ruby> and <rt>)
 - Return ONLY the selected HTML context, with no explanation or wrapping`,
     prompt: `Word: ${input.word}
 
-Original excerpt (must be contained in the result):
-${input.originalContext}
+Required source span (must be included verbatim):
+${input.requiredContext}
 
-Paragraphs:
+Source paragraphs:
 ${input.windowHTML.map((html, index) => `[${index}] ${html}`).join("\n")}`,
-  });
-  return result.text.trim();
-}
-
-export interface SelectRelevantEPUBContextInput {
-  restoredContext: string;
-  word: string;
-  originalContext: string;
-}
-
-/** Selects the smallest clear source span from an already-restored context. */
-export async function selectRelevantEPUBContext(
-  input: SelectRelevantEPUBContextInput,
-  modelId: ModelId,
-): Promise<string> {
-  const result = await generateText({
-    model: getModel(modelId),
-    system: `You are selecting context for a Japanese language flashcard.
-
-You will receive a source-faithful restored context, the shorter original flashcard excerpt, and the target word. Select the smallest contiguous source span that gives a reader clear context for the target.
-
-Rules:
-- The visible text MUST contain the complete original excerpt verbatim
-- Include the complete sentence containing the original excerpt
-- Include adjacent sentences only when needed to resolve a reference such as これ, それ, or そういう, explain a very short utterance, or otherwise make the target understandable
-- Do not include unrelated sentences merely because they belong to the same quoted speech or dialogue
-- Quote brackets do NOT need to balance; the caller will explicitly mark omitted dialogue
-- Return one contiguous substring of the restored context
-- Copy source text and HTML exactly; do not rewrite, correct, paraphrase, or add ellipses
-- Preserve all HTML tags exactly as they appear, especially <ruby> and <rt>
-- Return ONLY the selected HTML context, with no explanation or wrapping`,
-    prompt: `Word: ${input.word}
-
-Original excerpt (its complete visible text must be retained):
-${input.originalContext}
-
-Restored context:
-${input.restoredContext}`,
   });
   return result.text.trim();
 }
