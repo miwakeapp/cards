@@ -12,6 +12,7 @@ export const resourcePaths = {
   jmdictReadings: join(generatedDirectory, "jmdict_readings.json"),
   jmdictFurigana: join(generatedDirectory, "jmdict_furigana.json"),
   rarityDatabase: join(generatedDirectory, "rarity.sqlite3"),
+  bunproExamples: join(generatedDirectory, "bunpro_examples.json"),
   nwjcSurface1Gram: join(generatedDirectory, "nwjc", "NWJC-surface-1gram.txt"),
   bccwjLUW2: join(
     generatedDirectory,
