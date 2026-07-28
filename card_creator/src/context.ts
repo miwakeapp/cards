@@ -397,6 +397,53 @@ async function canonicalUnmarkedRubyReading(
   return normalizeForeignRubyReading(component.base, component.reading);
 }
 
+async function canonicalUnmarkedCompoundReadings(
+  analysis: RubyAnalysis,
+  resolveRubyReadings: RubyReadingResolver,
+): Promise<ReadonlyMap<Element, string>> {
+  if (
+    analysis.components.length < 2 ||
+    analysis.trailingBase !== "" ||
+    !hasPotentialFullSizeKanaArtifact(
+      analysis.components.map(({ reading }) => reading).join(""),
+    )
+  ) {
+    return new Map();
+  }
+
+  const spelling = analysis.components.map(({ base }) => base).join("");
+  const sourceReading = analysis.components.map(({ reading }) => reading).join("");
+  const dictionaryReadings = await resolveRubyReadings(spelling);
+  if (
+    dictionaryReadings.some((reading) => toHiragana(reading) === toHiragana(sourceReading))
+  ) {
+    return new Map();
+  }
+
+  const corrections = new Set(
+    dictionaryReadings
+      .map((reading) => tryCorrectFullSizeKana(sourceReading, reading))
+      .filter((reading): reading is string => reading !== undefined),
+  );
+  if (corrections.size !== 1) return new Map();
+
+  // EPUBs often split one compound annotation into an `<rt>` per kanji. JMdict generally records
+  // the compound, not each kanji as a standalone spelling, so validate the joined reading first
+  // and then restore the original component boundaries.
+  const correctedCharacters = [...corrections.values().next().value!];
+  const result = new Map<Element, string>();
+  let offset = 0;
+  for (const component of analysis.components) {
+    const length = [...component.reading].length;
+    const corrected = correctedCharacters.slice(offset, offset + length).join("");
+    if (corrected !== component.reading) {
+      result.set(component.readingElement, corrected);
+    }
+    offset += length;
+  }
+  return offset === correctedCharacters.length ? result : new Map();
+}
+
 function replaceRuby(
   ruby: Element,
   analysis: RubyAnalysis,
@@ -477,6 +524,17 @@ export async function processContextHTML(
   }
 
   for (const analysis of analyses.values()) {
+    if (
+      analysis.components.every(({ readingElement }) => !canonicalReadings.has(readingElement))
+    ) {
+      const compoundReadings = await canonicalUnmarkedCompoundReadings(
+        analysis,
+        resolveRubyReadings,
+      );
+      for (const [readingElement, reading] of compoundReadings) {
+        canonicalReadings.set(readingElement, reading);
+      }
+    }
     for (const component of analysis.components) {
       if (canonicalReadings.has(component.readingElement)) continue;
       const canonicalReading = await canonicalUnmarkedRubyReading(
