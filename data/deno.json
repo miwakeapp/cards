@@ -2,6 +2,7 @@
   "name": "data",
   "exports": {
     ".": "./src/mod.ts",
+    "./bunpro": "./src/bunpro.ts",
     "./download": "./src/download.ts",
     "./rarity": "./src/rarity.ts"
   },
@@ -9,6 +10,7 @@
     "doc:check": "deno doc --lint src scripts",
     "download:jmdict": "deno run --allow-net --allow-read=./generated --allow-write=./generated scripts/download/jmdict.ts",
     "download:furigana": "deno run --allow-net --allow-read=./generated --allow-write=./generated scripts/download/furigana.ts",
+    "download:bunpro": "deno run --allow-net=bunpro.jp --allow-read=./generated --allow-write=./generated scripts/download/bunpro.ts",
     "download:nwjc": "deno run --allow-net=github.com,raw.githubusercontent.com --allow-write=./generated scripts/download/nwjc.ts",
     "download:bccwj": "deno run --allow-net=repository.ninjal.ac.jp --allow-write=./generated scripts/download/bccwj.ts",
     "build:jmdict:entries": "deno run --allow-read=./generated/jmdict_eng.json,../card_creator_evals/inputs,./resources/jmdict/entries --allow-write=./resources/jmdict scripts/build/jmdict_entries.ts",

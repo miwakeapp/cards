@@ -32,6 +32,16 @@ The generated resources also include the National Institute for Japanese Languag
 
 Like the JMDict updater, the NWJC download task follows the current upstream file instead of pinning a source revision. The BCCWJ download uses the checksummed Version 1.1 artifact above. The resource builder validates both downloaded schemas before replacing the existing database. Downloaded source data and generated lookup resources remain local and are not committed.
 
+## Bunpro examples
+
+Download Bunpro's public grammar-point example corpus with:
+
+```sh
+deno task --cwd data download:bunpro
+```
+
+The downloader discovers grammar points through Bunpro's sitemap and reads their logged-out Next.js page-data payloads. It first verifies that the `てごらん` reference page still exposes all 12 grammar-point examples; if Bunpro begins requiring authentication, the task fails instead of silently installing the five-example public preview. Successful page downloads are cached by Next.js build ID so an interrupted run can resume. The generated JSON retains Bunpro's `漢字（かんじ）` readings alongside a plain sentence, so acquisition pipelines can use the readings for dictionary selection without displaying them in card context.
+
 ## Runtime resource manifest
 
 The installed furigana resource is recorded in `generated/manifest.json`, including its source, retrieval time, HTTP validators, entry count, and conversion format. JMDict carries its own version header, while `resources/jmdict/snapshot.json` records the provenance of the small checked-in test subset.
