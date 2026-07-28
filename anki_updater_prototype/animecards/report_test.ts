@@ -181,6 +181,14 @@ Deno.test("buildConversionReport shows selected and compatible senses", () => {
         compatibleSenses: [1, 2, 3],
         applicableSenses: [2],
       },
+      jmdictEntryResolution: {
+        model: "gemini-3.6-flash",
+        generatedAt: "2026-07-27T00:00:00.000Z",
+        applicableSenseNumbers: [2],
+        hint: "規模大小",
+        candidateJMDictIds: ["1414110", "2999999"],
+        allowedJMDictIds: ["1414110"],
+      },
       original: { fields: {} },
       target: {
         fields: {
@@ -199,6 +207,11 @@ Deno.test("buildConversionReport shows selected and compatible senses", () => {
   assertStringIncludes(
     report,
     "| 42 | `大小` | `manual-hold` | `generated` | `2 / 1,2,3` | `大小 \\| 1414110 \\| 2` | `規模大小` | gemini-3.5-flash | `物の大小を比べる。` | `前段。物の大小を比べる。後段。` |",
+  );
+  assertStringIncludes(report, "## JMDict entry selections");
+  assertStringIncludes(
+    report,
+    "| 42 | `大小` | 1414110 | `1414110` | `1414110, 2999999` | `規模大小` | gemini-3.6-flash | `前段。物の大小を比べる。後段。` |",
   );
 });
 
@@ -252,4 +265,40 @@ Deno.test("buildConversionReport audits no-match sense selections", () => {
     "| 43 | `金子` | `no-applicable-jmdict-sense` | `no-match` | `none / 1,2` | `金子 \\| 1630340` | `` | gpt-5.6 |",
   );
   assertStringIncludes(report, "| 1 | `no-applicable-jmdict-sense` |");
+});
+
+Deno.test("buildConversionReport audits individual deferred entry selections", () => {
+  const manifest = {
+    version: CONVERSION_MANIFEST_VERSION,
+    generatedAt: "2026-07-27T00:00:00.000Z",
+    query: 'note:"Animecards"',
+    sourceModel: "Animecards",
+    targetModel: "Miwake",
+    sourceFields: {},
+    candidates: [],
+    skipped: [{
+      noteId: 42,
+      word: "業",
+      reason: "ai-ambiguous-jmdict-entry",
+      detail: "1111111, 2222222",
+      entrySelection: {
+        model: "gemini-3.6-flash",
+        recognitionTarget: "業",
+        context: "前世の業か、職人の業か。",
+        candidateJMDictIds: ["1111111", "2222222"],
+        allowedJMDictIds: ["1111111", "2222222"],
+        candidateDescriptions: {
+          "1111111": "1. karma",
+          "2222222": "1. work; performance",
+        },
+      },
+    }],
+  } as unknown as ConversionManifest;
+
+  const report = buildConversionReport(manifest);
+  assertStringIncludes(report, "### Deferred JMDict entry selections");
+  assertStringIncludes(
+    report,
+    "| 42 | `業` | `ai-ambiguous-jmdict-entry` | `1111111, 2222222` | `1111111, 2222222` | `1111111: 1. karma \\|\\| 2222222: 1. work; performance` | gemini-3.6-flash | `前世の業か、職人の業か。` |",
+  );
 });

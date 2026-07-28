@@ -386,7 +386,7 @@ Deno.test("convertAnimecardsNote uses an explicit override for multiple glossary
 });
 
 Deno.test("convertAnimecardsNote declines a spelling shared by multiple JMDict entries", async () => {
-  const selected = makeWord({ id: "1111111", kanji: ["業"], kana: ["ごう"] });
+  const selected = makeWord({ id: "1111111", kanji: ["業"], kana: ["ごう"], senses: 2 });
   const other = makeWord({ id: "2222222", kanji: ["業"], kana: ["わざ"] });
   const entries = new Map([[selected.id, selected], [other.id, other]]);
   const result = await convertAnimecardsNote(
@@ -402,6 +402,7 @@ Deno.test("convertAnimecardsNote declines a spelling shared by multiple JMDict e
       sourceFields: SOURCE_FIELDS,
       entries,
       spellingIndex: buildSpellingIndex(entries.values()),
+      resolveAmbiguousEntries: true,
     },
   );
 
@@ -411,6 +412,236 @@ Deno.test("convertAnimecardsNote declines a spelling shared by multiple JMDict e
     reason: "ambiguous-jmdict-spelling",
     detail: "1111111, 2222222",
   });
+  assert(result.unresolvedJMDictEntry);
+  assertEquals(
+    result.unresolvedJMDictEntry.candidateEntries.map(({ id }) => id),
+    ["1111111", "2222222"],
+  );
+  assertEquals(result.unresolvedJMDictEntry.allowedJMDictIds, ["1111111"]);
+
+  const resolved = await convertAnimecardsNote(
+    makeNote({
+      Word: "業[ごう]",
+      Sentence: "前世の業だ。",
+      Glossary: '<a href="https://jitendex.org/?q=1111111">definition</a>',
+      Reading: "ごう",
+    }),
+    {
+      sourceModel: "Animecards",
+      targetModel: "Miwake",
+      sourceFields: SOURCE_FIELDS,
+      entries,
+      spellingIndex: buildSpellingIndex(entries.values()),
+      jmdictEntrySelectionOverride: {
+        jmdictId: "1111111",
+        recognitionTarget: "業",
+        applicableSenseNumbers: [1],
+        hint: "前世の業",
+        model: "gemini-3.6-flash",
+        generatedAt: "2026-07-27T00:00:00.000Z",
+        candidateJMDictIds: ["1111111", "2222222"],
+        allowedJMDictIds: ["1111111"],
+      },
+    },
+  );
+  assert(resolved.candidate);
+  assertEquals(resolved.candidate.target.fields.Key, "業 | 1111111 | 1");
+  assertEquals(resolved.candidate.target.fields.Hint, "前世の業");
+  assertEquals(resolved.candidate.senseResolution, {
+    status: "generated",
+    model: "gemini-3.6-flash",
+    generatedAt: "2026-07-27T00:00:00.000Z",
+    compatibleSenses: [1, 2],
+    applicableSenses: [1],
+  });
+  assertEquals(resolved.candidate.jmdictEntryResolution, {
+    model: "gemini-3.6-flash",
+    generatedAt: "2026-07-27T00:00:00.000Z",
+    applicableSenseNumbers: [1],
+    hint: "前世の業",
+    candidateJMDictIds: ["1111111", "2222222"],
+    allowedJMDictIds: ["1111111"],
+  });
+});
+
+Deno.test("convertAnimecardsNote lets a reviewed entry override replace a wrong glossary ID", async () => {
+  const selected = makeWord({ id: "1111111", kanji: ["業"], kana: ["ごう"], senses: 2 });
+  const wrong = makeWord({ id: "2222222", kanji: ["業"], kana: ["わざ"] });
+  const entries = new Map([[selected.id, selected], [wrong.id, wrong]]);
+  const result = await convertAnimecardsNote(
+    makeNote({
+      Word: "業[ごう]",
+      Sentence: "前世の業だ。",
+      Glossary: '<a href="https://jitendex.org/?q=2222222">wrong definition</a>',
+      Reading: "ごう",
+    }),
+    {
+      sourceModel: "Animecards",
+      targetModel: "Miwake",
+      sourceFields: SOURCE_FIELDS,
+      entries,
+      spellingIndex: buildSpellingIndex(entries.values()),
+      jmdictIdOverride: selected.id,
+      jmdictEntrySelectionOverride: {
+        jmdictId: selected.id,
+        recognitionTarget: "業",
+        applicableSenseNumbers: [1],
+        hint: "前世の業",
+        model: "gemini-3.6-flash",
+        generatedAt: "2026-07-28T00:00:00.000Z",
+        candidateJMDictIds: [selected.id, wrong.id],
+        allowedJMDictIds: [selected.id],
+      },
+    },
+  );
+
+  assert(result.candidate);
+  assertEquals(result.candidate.jmdictId, selected.id);
+  assertEquals(result.candidate.target.fields.Key, "業 | 1111111 | 1");
+  assertEquals(result.candidate.target.fields.Hint, "前世の業");
+});
+
+Deno.test("convertAnimecardsNote exposes Jitendex-merged glossary entries for selection", async () => {
+  const first = makeWord({ id: "1111111", kana: ["チャック"], partOfSpeech: ["n"] });
+  const second = makeWord({ id: "2222222", kana: ["チャック"], partOfSpeech: ["n"] });
+  const entries = new Map([[first.id, first], [second.id, second]]);
+  const note = makeNote({
+    Word: "チャック",
+    Sentence: "チャックを閉めた。",
+    Glossary: '<a href="https://jitendex.org/?q=1111111">zipper</a>' +
+      '<a href="https://jitendex.org/?q=2222222">lathe chuck</a>',
+    Reading: "チャック",
+  });
+  const options = {
+    sourceModel: "Animecards",
+    targetModel: "Miwake",
+    sourceFields: SOURCE_FIELDS,
+    entries,
+    spellingIndex: buildSpellingIndex(entries.values()),
+  };
+
+  const unresolved = await convertAnimecardsNote(note, options);
+  assertEquals(unresolved.skipped, {
+    noteId: 42,
+    word: "チャック",
+    reason: "multiple-jmdict-ids",
+    detail: "1111111, 2222222",
+  });
+  assert(unresolved.unresolvedJMDictEntry);
+  assertEquals(unresolved.unresolvedJMDictEntry.recognitionTarget, "チャック");
+  assertEquals(unresolved.unresolvedJMDictEntry.kanaReading, "チャック");
+  assertEquals(unresolved.unresolvedJMDictEntry.allowedJMDictIds, ["1111111", "2222222"]);
+
+  const resolved = await convertAnimecardsNote(note, {
+    ...options,
+    jmdictEntrySelectionOverride: {
+      jmdictId: "1111111",
+      recognitionTarget: "チャック",
+      applicableSenseNumbers: [1],
+      hint: "服のチャック",
+      model: "gemini-3.6-flash" as const,
+      generatedAt: "2026-07-27T00:00:00.000Z",
+      candidateJMDictIds: ["1111111", "2222222"],
+      allowedJMDictIds: ["1111111", "2222222"],
+    },
+  });
+  assert(resolved.candidate);
+  assertEquals(resolved.candidate.target.fields.Key, "チャック | 1111111");
+  assertEquals(resolved.candidate.target.fields.Hint, "服のチャック");
+  assertEquals(
+    resolved.candidate.target.fields["Full context"],
+    "<mark>チャック</mark>を閉めた。",
+  );
+});
+
+Deno.test("convertAnimecardsNote omits an entry-selection hint for an affix target", async () => {
+  const suffix = makeWord({
+    id: "1111111",
+    kana: ["ヅラ"],
+    partOfSpeech: ["n-suf"],
+  });
+  const noun = makeWord({
+    id: "2222222",
+    kana: ["ヅラ"],
+    partOfSpeech: ["n"],
+  });
+  const entries = new Map([[suffix.id, suffix], [noun.id, noun]]);
+  const result = await convertAnimecardsNote(
+    makeNote({
+      Word: "~ヅラ",
+      Sentence: "野武士ヅラが似合っている。",
+      Glossary: '<a href="https://jitendex.org/?q=1111111">suffix</a>' +
+        '<a href="https://jitendex.org/?q=2222222">noun</a>',
+      Reading: "ヅラ",
+    }),
+    {
+      sourceModel: "Animecards",
+      targetModel: "Miwake",
+      sourceFields: SOURCE_FIELDS,
+      entries,
+      spellingIndex: buildSpellingIndex(entries.values()),
+      jmdictEntrySelectionOverride: {
+        jmdictId: suffix.id,
+        recognitionTarget: "ヅラ",
+        applicableSenseNumbers: [1],
+        hint: "野武士ヅラ",
+        model: "gemini-3.6-flash",
+        generatedAt: "2026-07-28T00:00:00.000Z",
+        candidateJMDictIds: [suffix.id, noun.id],
+        allowedJMDictIds: [suffix.id, noun.id],
+      },
+    },
+  );
+
+  assert(result.candidate);
+  assertEquals(result.candidate.target.fields["Recognition target"], "～ヅラ");
+  assertEquals(result.candidate.target.fields.Hint, "");
+  assertEquals(result.candidate.jmdictEntryResolution?.hint, null);
+});
+
+Deno.test("convertAnimecardsNote retains a hint when another entry has the same affix pattern", async () => {
+  const selected = makeWord({
+    id: "1111111",
+    kana: ["ヅラ"],
+    partOfSpeech: ["n-suf"],
+  });
+  const otherSuffix = makeWord({
+    id: "2222222",
+    kana: ["ヅラ"],
+    partOfSpeech: ["n-suf"],
+  });
+  const entries = new Map([[selected.id, selected], [otherSuffix.id, otherSuffix]]);
+  const result = await convertAnimecardsNote(
+    makeNote({
+      Word: "~ヅラ",
+      Sentence: "野武士ヅラが似合っている。",
+      Glossary: '<a href="https://jitendex.org/?q=1111111">first suffix</a>' +
+        '<a href="https://jitendex.org/?q=2222222">second suffix</a>',
+      Reading: "ヅラ",
+    }),
+    {
+      sourceModel: "Animecards",
+      targetModel: "Miwake",
+      sourceFields: SOURCE_FIELDS,
+      entries,
+      spellingIndex: buildSpellingIndex(entries.values()),
+      jmdictEntrySelectionOverride: {
+        jmdictId: selected.id,
+        recognitionTarget: "ヅラ",
+        applicableSenseNumbers: [1],
+        hint: "野武士ヅラ",
+        model: "gemini-3.6-flash",
+        generatedAt: "2026-07-28T00:00:00.000Z",
+        candidateJMDictIds: [selected.id, otherSuffix.id],
+        allowedJMDictIds: [selected.id, otherSuffix.id],
+      },
+    },
+  );
+
+  assert(result.candidate);
+  assertEquals(result.candidate.target.fields["Recognition target"], "～ヅラ");
+  assertEquals(result.candidate.target.fields.Hint, "野武士ヅラ");
+  assertEquals(result.candidate.jmdictEntryResolution?.hint, "野武士ヅラ");
 });
 
 Deno.test("convertAnimecardsNote declines a bracketed recognition-target hint", async () => {

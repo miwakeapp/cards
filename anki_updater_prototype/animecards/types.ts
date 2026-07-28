@@ -113,6 +113,19 @@ export interface OriginalNoteSnapshot {
   fingerprint: string;
 }
 
+export interface JMDictEntryResolution {
+  model: string;
+  generatedAt: string;
+  /** Original sense numbers selected within the chosen entry; retained for deterministic replay. */
+  applicableSenseNumbers: number[];
+  /** Canonically validated hint, or `null` when final `～` notation makes it redundant. */
+  hint: string | null;
+  /** All same-spelling entries shown to the model as contrastive evidence. */
+  candidateJMDictIds: string[];
+  /** Entries that the Animecard's glossary permitted the model to select. */
+  allowedJMDictIds: string[];
+}
+
 export interface ConversionCandidate {
   noteId: number;
   /** False for an automatic deferral or a manual hold; omitted by `apply`. */
@@ -137,6 +150,8 @@ export interface ConversionCandidate {
   fullContextResolution: FullContextResolution;
   minimizedContextResolution: MinimizedContextResolution;
   senseResolution: SenseResolution;
+  /** Present when AI selected or verified the JMDict entry. */
+  jmdictEntryResolution?: JMDictEntryResolution;
   original: OriginalNoteSnapshot;
   target: {
     modelName: string;
@@ -149,6 +164,15 @@ export interface SkippedNote {
   word: string;
   reason: string;
   detail?: string;
+  entrySelection?: {
+    model: string;
+    recognitionTarget: string;
+    context: string;
+    candidateJMDictIds: string[];
+    allowedJMDictIds: string[];
+    /** Compact English gloss summaries keyed by candidate entry ID. */
+    candidateDescriptions: Record<string, string>;
+  };
 }
 
 export interface ConversionManifest {

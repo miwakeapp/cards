@@ -7,7 +7,8 @@ Your task is to analyze a Japanese word usage in context and generate appropriat
 
 const SENSE_AND_HINT_RULES =
   `1. applicableSenses: Select only senses compatible with the supplied spelling and reading restrictions, when such a list is provided.
-   Return null when none of the compatible dictionary senses describes the usage in context. This includes text that merely mentions the spelling as a string, title, or name without using a dictionary sense. Metalinguistic context that explains, illustrates, or contrasts the word's meaning is semantic evidence and does count as a usage. Do not force a match merely because the spelling appears. When returning null, return only applicableSenses and hint; the usage cannot produce other card fields.
+   Return null when none of the compatible dictionary senses describes the usage in context. This includes text that merely mentions the spelling as an opaque string or name without using a dictionary sense. A word inside a title or name still counts when that larger expression uses the word's ordinary meaning compositionally, such as 木綿 in 木綿のハンカチーフ. Metalinguistic context that explains, illustrates, or contrasts the word's meaning is semantic evidence and also counts as a usage. Do not force a match merely because the spelling appears. When returning null, return only applicableSenses and hint; the usage cannot produce other card fields.
+   Treat dictionary field, register, dialect, usage, and restriction tags as applicability evidence, not optional decoration. A shared English gloss does not make a specialized sense applicable outside its tagged domain; for example, a "pincer" sense tagged for the game of go does not describe an animal's claw.
    Return [] (empty array) when:
    - Only one compatible sense exists
    - All compatible senses are essentially the same meaning (e.g., grammatical variants like noun vs adjective)

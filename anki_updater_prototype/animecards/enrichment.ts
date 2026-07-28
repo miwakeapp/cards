@@ -1,7 +1,7 @@
 import { compatibleSenseNumbersForJMDictUsage, createCard } from "card_creator";
 import type { GeneratedCardFields, GeneratedSenseAndHint } from "card_field_generation";
 import type { JMDictWord } from "data";
-import { applyDisplayTargetOverride } from "./display_target.ts";
+import { applyDisplayTargetOverride, disambiguationHintForJMDictUsage } from "./display_target.ts";
 import { cardSourceFromResolution } from "./source.ts";
 import {
   type ConversionCandidate,
@@ -136,7 +136,22 @@ export async function applyGeneratedCardFields(
   candidate.target.fields.Key = card.key;
   candidate.target.fields["Recognition target"] = displayTarget.recognitionTarget;
   candidate.target.fields.Reading = displayTarget.reading ?? "";
-  candidate.target.fields.Hint = card.hint ?? "";
+  candidate.target.fields.Hint = candidate.jmdictEntryResolution === undefined
+    ? disambiguationHintForJMDictUsage(
+      card.hint ?? undefined,
+      displayTarget.recognitionTarget,
+      candidate.keyRecognitionTarget,
+      entry,
+      selectedSenses ?? compatibleSenseNumbersForJMDictUsage(
+        entry,
+        candidate.keyRecognitionTarget,
+        entry.kanji.some(({ text }) => text === candidate.keyRecognitionTarget)
+          ? candidate.readingKana
+          : undefined,
+      ),
+      [entry],
+    ) ?? ""
+    : card.hint ?? "";
   candidate.target.fields["Full context"] = card.fullContext;
   candidate.target.fields["Minimized context"] = card.minimizedContext ?? "";
   candidate.target.fields["Dictionary entry"] = card.dictionaryEntry;

@@ -4,7 +4,7 @@ This workflow converts reviewable Animecards notes in place. A note is eligible 
 
 - it has exactly one card;
 - its JMDict entry has exactly one sense, unless the explicit multi-sense rollout flag is used;
-- its JMDict entry can be identified from a glossary link or an exact headword match, and its recognition-target spelling belongs to only one JMDict entry;
+- its JMDict entry can be identified from a glossary link or an exact headword match, or the explicit entry-selection pass can distinguish several same-spelling entries;
 - its recognition-target field does not contain a bracketed usage hint;
 - its reading is unique, or the existing Animecards `Reading` field identifies it;
 - the exact or inflected target can be located unambiguously in the sentence;
@@ -32,7 +32,9 @@ deno task animecards:apply generated/animecards-YYYY-MM-DD.context.enriched.json
 
 The prepare command reads Anki and writes a reviewable JSON manifest and Markdown audit report; it never modifies the collection. Each candidate contains the complete original note data and a fingerprint. Set a candidate's `approved` property to `false` to hold it back.
 
-Pass `--resolve-targets-with-ai` to retry only otherwise-unresolved target-in-context cases with the prototype's combined card-field prompt. The returned value must be a literal substring of the context, and every occurrence is marked. Successful results are stored in an append-only `.target-ai-cache.jsonl` sidecar and recorded on each candidate with the model and generation time; all unrelated AI fields from this pass are discarded. `--ai-model` selects the model.
+Pass `--resolve-entries-with-ai` to handle a Jitendex glossary containing several JMDict links or a selected entry whose recognition-target spelling also belongs to other entries. Explicit source ruby first excludes entries with incompatible readings; an Animecard reading is weaker evidence and does not exclude competing entries before semantic comparison. The pass presents the remaining entries' senses as one numbered list to the canonical sense-and-hint operation. If the comparison chooses an unlinked entry whose reading contradicts the Animecard reading, the one linked, reading-compatible alternative may be checked independently and is accepted only when its senses fit the context and produce the required short contrastive hint. A semantically preferred same-reading entry is never overridden this way. Shared-spelling entries may have several senses because this operation selects the entry and senses at the same time; unrelated multi-sense cards remain controlled by `--include-multiple-senses`. No match, a selection spanning entries, or an allowed entry with no useful hint remains deferred with a distinct skip reason. A generated hint is omitted from the final card when its `～` boundary notation uniquely distinguishes the selected affix usage; another sense or entry with the same boundary pattern keeps the hint. Results are stored in an append-only `.entry-ai-cache.jsonl` sidecar, and the audit report records the allowed IDs, every compared ID, the selected ID, final hint, model, and context, including sense field and usage tags.
+
+Pass `--resolve-targets-with-ai` to retry only otherwise-unresolved target-in-context cases with the prototype's combined card-field prompt. The returned value must be a literal substring of the context, and every occurrence is marked. Successful results are stored in an append-only `.target-ai-cache.jsonl` sidecar and recorded on each candidate with the model and generation time; all unrelated AI fields from this pass are discarded. `--ai-model` selects the model for both optional preparation-time AI passes.
 
 Preparation searches the matching EPUB passage for every sourced candidate and deterministically derives the minimum source span that the final context must retain. It restores source-authored `<ruby>` and `<rt>`, completes partial sentences, and expands an excerpt that cuts into dialogue to the complete outer `「…」` or `『…』` passage, even across EPUB paragraphs; crossed paragraphs are serialized as plain `<p>` blocks. This span is only a structural lower bound: even a complete non-dialogue sentence remains pending until `animecards:restore-context` uses AI to judge whether it is understandable alone or needs the smallest useful amount of adjacent source context. The single cached selection pass defaults to Gemini Flash and may return the required span unchanged, but may never shorten it. Output is accepted only when it contains the entire required span, has complete balanced boundaries, and can be re-extracted verbatim from one unambiguous source window. Repeated source locations are accepted only when both their required HTML and semantic-evidence windows are identical. The append-only `.context-cache.jsonl` sidecar means an interrupted or dry run is reusable. Candidates without a source-backed full context are automatically deferred, omitted from enrichment and apply, and written by `animecards:report` to a `.deferred-contexts.csv` file for a later semi-manual pass. Apply accepts only semantically selected contexts.
 
@@ -52,12 +54,13 @@ deno task animecards:prepare --epub-texts-dir=/path/to/epub_texts
 deno task animecards:prepare --no-epub-source-lookup
 deno task animecards:prepare --jmdict-overrides=generated/jmdict-overrides.json
 deno task animecards:prepare --include-multiple-senses
+deno task animecards:prepare --resolve-entries-with-ai --ai-model=gemini-3.6-flash
 deno task animecards:prepare --resolve-targets-with-ai --ai-model=gemini-3.5-flash
 deno task animecards:restore-context generated/my-conversion.json --model=gemini-3.5-flash
 deno task animecards:apply generated/my-conversion.json --limit=10
 deno task animecards:apply generated/my-conversion.json --reset --write
 ```
 
-When a glossary contains several JMDict links, preparation declines to choose one. Supply a reviewed JSON object mapping Anki note IDs to JMDict IDs, such as `{ "1234567890": "1414110" }`, with `--jmdict-overrides`. The normal spelling, reading, and context checks still apply to the selected entry.
+For a reviewed manual decision, supply a JSON object mapping Anki note IDs to JMDict IDs, such as `{ "1234567890": "1414110" }`, with `--jmdict-overrides`. The normal spelling, reading, context, and same-spelling hint checks still apply to the selected entry.
 
 `Word`/`Expression`/`Recognition target`, `Sentence`/`Context`, `Glossary`/`Definition`, `Reading`, `Source`, and `Source URL` are detected automatically. Field flags override this detection. The complete source snapshot in the manifest is the recovery record, so retain it until the conversion has been reviewed and synced.

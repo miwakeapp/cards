@@ -162,6 +162,14 @@ export type ModelId = (typeof MODEL_IDS)[number];
 /** The model used when a caller does not choose one explicitly. */
 export const DEFAULT_MODEL_ID: ModelId = "claude-opus-4-8";
 
+/**
+ * Identifies the prompts, few-shot examples, and output contract used by this package.
+ *
+ * Persistent caches of generated fields must include this value in their cache key. Increment it
+ * whenever a change could affect model output or the interpretation of cached output.
+ */
+export const CARD_FIELD_GENERATION_CACHE_VERSION = 1;
+
 const applicableSensesSchema = z
   .array(z.number().int().positive())
   .nullable()

@@ -11,6 +11,7 @@ import { allJMDictEntries } from "data";
 import { buildSpellingIndex } from "../shared/jmdict_resolution/recognition_target_lookup.ts";
 import { EPUB_CONTEXT_PROMPT_VERSION, selectFullEPUBContext } from "./epub_context_extraction.ts";
 import { convertAnimecardsNote } from "./convert.ts";
+import { entrySelectionOverride } from "./entry_selection.ts";
 import { checkpointMatchesInput, createCheckpointManifest } from "./checkpoint.ts";
 import { normalizeContextHTML } from "./html.ts";
 import { writeConversionAuditArtifacts } from "./report.ts";
@@ -286,6 +287,7 @@ async function main(): Promise<void> {
         entries,
         spellingIndex,
         jmdictIdOverride: candidate.jmdictId,
+        jmdictEntrySelectionOverride: entrySelectionOverride(candidate),
         epubSourceCorpus: corpus,
         includeMultipleSenses: candidate.senseResolution.status !== "not-needed",
         contextOverride: {
