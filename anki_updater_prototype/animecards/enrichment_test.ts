@@ -360,5 +360,43 @@ Deno.test("applyGeneratedCardFields rerenders affix notation after sense selecti
 
   assertEquals(value.target.fields.Key, `そこそこ | ${degree.id} | 3`);
   assertEquals(value.target.fields["Recognition target"], "～そこそこ");
+  assertEquals(value.target.fields.Hint, "");
   assertEquals(value.recognitionTarget, "～そこそこ");
+});
+
+Deno.test("applyGeneratedCardFields retains a hint between same-pattern affix senses", async () => {
+  const suffixEntry = structuredClone(await preextractedJMDictEntry("1006690"));
+  suffixEntry.sense = [
+    { ...structuredClone(suffixEntry.sense[2]), gloss: suffixEntry.sense[0].gloss },
+    { ...structuredClone(suffixEntry.sense[2]), gloss: suffixEntry.sense[1].gloss },
+  ];
+  const value = candidate();
+  value.jmdictId = suffixEntry.id;
+  value.recognitionTarget = "そこそこ";
+  value.keyRecognitionTarget = "そこそこ";
+  value.readingKana = "そこそこ";
+  value.minimizedContextResolution = { status: "not-needed" };
+  value.senseResolution = { status: "pending", compatibleSenses: [1, 2] };
+  value.target.fields.Key = `そこそこ | ${suffixEntry.id}`;
+  value.target.fields["Recognition target"] = "そこそこ";
+  value.target.fields.Reading = "";
+  value.target.fields["Full context"] = "<mark>そこそこ</mark>の出来だ。";
+
+  await applyGeneratedCardFields(
+    value,
+    suffixEntry,
+    {
+      applicableSenses: [1],
+      targetInContext: "そこそこ",
+      hint: "評価はそこそこ",
+      minimizedContext: null,
+      cleanedSource: null,
+      sourceURLIsPublic: false,
+    },
+    "gemini-3.5-flash",
+    "2026-07-18T00:00:00.000Z",
+  );
+
+  assertEquals(value.target.fields["Recognition target"], "～そこそこ");
+  assertEquals(value.target.fields.Hint, "評価はそこそこ");
 });

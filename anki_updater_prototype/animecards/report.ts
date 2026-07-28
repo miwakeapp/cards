@@ -138,6 +138,12 @@ export function buildConversionReport(manifest: ConversionManifest): string {
   const senseSelections = manifest.candidates.filter((candidate) =>
     candidate.senseResolution.status !== "not-needed"
   );
+  const entrySelections = manifest.candidates.filter((candidate) =>
+    candidate.jmdictEntryResolution !== undefined
+  );
+  const entrySelectionDeferrals = manifest.skipped.filter((skipped) =>
+    skipped.entrySelection !== undefined
+  );
   for (const candidate of candidates) {
     const method = candidate.sourceResolution.method;
     sourceMethodCounts.set(method, (sourceMethodCounts.get(method) ?? 0) + 1);
@@ -221,6 +227,7 @@ export function buildConversionReport(manifest: ConversionManifest): string {
     `- Sense-selection AI models: ${
       [...senseModelCounts].map(([model, count]) => `${model}=${count}`).join(", ") || "none"
     }`,
+    `- JMDict-entry selections: ${entrySelections.length}`,
     `- Failed AI enrichments: ${failedEnrichments.length}`,
     "",
     "## Distinct final Source HTML",
@@ -317,6 +324,48 @@ export function buildConversionReport(manifest: ConversionManifest): string {
           ),
         )
       } |`;
+    }),
+    "",
+    "## JMDict entry selections",
+    "",
+    entrySelections.length === 1
+      ? "1 candidate required contrastive JMDict entry selection."
+      : `${entrySelections.length} candidates required contrastive JMDict entry selection.`,
+    "",
+    "| Note ID | Target | Selected entry | Allowed entries | Compared entries | Hint | Model | Context |",
+    "| ---: | --- | ---: | --- | --- | --- | --- | --- |",
+    ...entrySelections.map((candidate) => {
+      const resolution = candidate.jmdictEntryResolution!;
+      return `| ${candidate.noteId} | ${
+        inlineCode(candidate.recognitionTarget)
+      } | ${candidate.jmdictId} | ${inlineCode(resolution.allowedJMDictIds.join(", "))} | ${
+        inlineCode(resolution.candidateJMDictIds.join(", "))
+      } | ${inlineCode(candidate.target.fields.Hint ?? "")} | ${resolution.model} | ${
+        inlineCode(abbreviated(contextText(candidate.senseSelectionContext)))
+      } |`;
+    }),
+    "",
+    "### Deferred JMDict entry selections",
+    "",
+    entrySelectionDeferrals.length === 1
+      ? "1 entry-selection request was deferred."
+      : `${entrySelectionDeferrals.length} entry-selection requests were deferred.`,
+    "",
+    "| Note ID | Target | Reason | Detail | Allowed entries | Compared entry glosses | Model | Context |",
+    "| ---: | --- | --- | --- | --- | --- | --- | --- |",
+    ...entrySelectionDeferrals.map((skipped) => {
+      const audit = skipped.entrySelection!;
+      return `| ${skipped.noteId} | ${inlineCode(audit.recognitionTarget)} | ${
+        inlineCode(skipped.reason)
+      } | ${inlineCode(skipped.detail ?? "")} | ${
+        inlineCode(audit.allowedJMDictIds.join(", "))
+      } | ${
+        inlineCode(
+          audit.candidateJMDictIds.map((id) =>
+            `${id}: ${abbreviated(audit.candidateDescriptions[id] ?? "(missing)", 180)}`
+          ).join(" || "),
+        )
+      } | ${audit.model} | ${inlineCode(abbreviated(contextText(audit.context)))} |`;
     }),
   );
 

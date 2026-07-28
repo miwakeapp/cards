@@ -11,9 +11,15 @@ import {
 import { normalizeRecognitionTarget } from "../shared/jmdict_resolution/csv_resolution.ts";
 import {
   applyDisplayTargetOverride,
+  disambiguationHintForJMDictUsage,
   hasBoundaryNotation,
   normalizeNotationMarkers,
+  removeBoundaryNotation,
 } from "./display_target.ts";
+import {
+  type JMDictEntrySelectionOverride,
+  type UnresolvedJMDictEntry,
+} from "./entry_selection.ts";
 import {
   contextPlainText,
   extractJMDictIDs,
@@ -67,10 +73,16 @@ export interface UnresolvedTargetInContext {
 }
 
 type ConversionResult =
-  | { candidate: ConversionCandidate; skipped?: never }
+  | {
+    candidate: ConversionCandidate;
+    skipped?: never;
+    unresolvedJMDictEntry?: never;
+    unresolvedTargetInContext?: never;
+  }
   | {
     candidate?: never;
     skipped: SkippedNote;
+    unresolvedJMDictEntry?: UnresolvedJMDictEntry;
     unresolvedTargetInContext?: UnresolvedTargetInContext;
   };
 
@@ -154,24 +166,60 @@ async function resolveEntry(
   entries: Map<string, JMdictWord>,
   spellingIndex: SpellingIndex,
   entryIdOverride?: string,
+  entrySelectionOverride?: JMDictEntrySelectionOverride,
 ): Promise<
   | {
     entry: JMdictWord;
     recognitionTarget: string;
     recognitionTargetOverride: string | undefined;
   }
-  | { reason: string; detail?: string }
+  | { reason: string; detail?: string; candidateIds?: string[]; allowedIds?: string[] }
 > {
   let entry: JMdictWord;
   const extractedIds = extractJMDictIDs(glossary);
-  if (entryIdOverride !== undefined) {
-    const found = entries.get(entryIdOverride);
+  const selectedId = entrySelectionOverride?.jmdictId ?? entryIdOverride;
+  if (
+    entrySelectionOverride !== undefined &&
+    (
+      !entrySelectionOverride.candidateJMDictIds.includes(entrySelectionOverride.jmdictId) ||
+      !entrySelectionOverride.allowedJMDictIds.includes(entrySelectionOverride.jmdictId) ||
+      (
+        entryIdOverride === undefined &&
+        extractedIds.length > 0 &&
+        !extractedIds.includes(entrySelectionOverride.jmdictId)
+      )
+    )
+  ) {
+    return {
+      reason: "invalid-jmdict-entry-selection",
+      detail: entrySelectionOverride.jmdictId,
+    };
+  }
+  if (
+    entrySelectionOverride !== undefined && entryIdOverride !== undefined &&
+    entrySelectionOverride.jmdictId !== entryIdOverride
+  ) {
+    return {
+      reason: "conflicting-jmdict-overrides",
+      detail: `${entrySelectionOverride.jmdictId}, ${entryIdOverride}`,
+    };
+  }
+  if (selectedId !== undefined) {
+    const found = entries.get(selectedId);
     if (!found) {
-      return { reason: "missing-jmdict-entry", detail: entryIdOverride };
+      return { reason: "missing-jmdict-entry", detail: selectedId };
     }
     entry = found;
   } else if (extractedIds.length > 1) {
-    return { reason: "multiple-jmdict-ids", detail: extractedIds.join(", ") };
+    const lookupSpelling = removeBoundaryNotation(word);
+    const sameSpellingIds = findEntriesBySpelling(spellingIndex, lookupSpelling)
+      .map(({ id }) => id);
+    return {
+      reason: "multiple-jmdict-ids",
+      detail: extractedIds.join(", "),
+      candidateIds: [...new Set([...extractedIds, ...sameSpellingIds])],
+      allowedIds: extractedIds,
+    };
   } else if (extractedIds.length === 1) {
     const extractedId = extractedIds[0];
     const found = entries.get(extractedId);
@@ -188,6 +236,8 @@ async function resolveEntry(
       return {
         reason: "ambiguous-jmdict-match",
         detail: matches.map((match) => match.id).join(", "),
+        candidateIds: matches.map(({ id }) => id),
+        allowedIds: matches.map(({ id }) => id),
       };
     }
     entry = matches[0];
@@ -300,6 +350,71 @@ function chooseReading(
   };
 }
 
+function buildUnresolvedJMDictEntry(
+  context: string,
+  recognitionTarget: string,
+  existingReadingHTML: string,
+  candidateIds: string[],
+  allowedIds: string[],
+  entries: Map<string, JMdictWord>,
+  kanaReadingEvidence: UnresolvedJMDictEntry["kanaReadingEvidence"],
+  selectedReading?: string,
+): UnresolvedJMDictEntry | { reason: string; detail: string } {
+  const missingIds = candidateIds.filter((id) => !entries.has(id));
+  if (missingIds.length > 0) {
+    return {
+      reason: "missing-jmdict-entry",
+      detail: missingIds.join(", "),
+    };
+  }
+  const candidateEntries = candidateIds
+    .map((id) => entries.get(id)!)
+    .filter((entry) => entrySpellings(entry).includes(recognitionTarget));
+  const candidateEntryIds = new Set(candidateEntries.map(({ id }) => id));
+  const unavailableAllowedIds = allowedIds.filter((id) => !candidateEntryIds.has(id));
+  if (unavailableAllowedIds.length > 0) {
+    return {
+      reason: "jmdict-entry-selection-target-mismatch",
+      detail: `${JSON.stringify(recognitionTarget)} is not a spelling of ${
+        unavailableAllowedIds.join(", ")
+      }`,
+    };
+  }
+  if (candidateEntries.length < 2) {
+    return {
+      reason: "jmdict-entry-selection-needs-multiple-candidates",
+      detail: candidateEntries.map(({ id }) => id).join(", ") || "none",
+    };
+  }
+
+  let kanaReading = selectedReading;
+  if (kanaReading === undefined) {
+    const mergedEntry: JMdictWord = {
+      id: `entry-selection:${candidateEntries.map(({ id }) => id).join(",")}`,
+      kanji: candidateEntries.flatMap(({ kanji }) => kanji),
+      kana: candidateEntries.flatMap(({ kana }) => kana),
+      sense: candidateEntries.flatMap(({ sense }) => sense),
+    };
+    const result = chooseReading(mergedEntry, recognitionTarget, existingReadingHTML);
+    if (!("reading" in result)) {
+      return {
+        reason: "jmdict-entry-selection-reading-unresolved",
+        detail: result.detail ?? result.reason,
+      };
+    }
+    kanaReading = result.reading;
+  }
+
+  return {
+    context,
+    recognitionTarget,
+    kanaReading,
+    kanaReadingEvidence,
+    candidateEntries,
+    allowedJMDictIds: [...new Set(allowedIds)],
+  };
+}
+
 /** Builds the deterministic portion of a Miwake card conversion for one single-card Animecards note. */
 export async function convertAnimecardsNote(
   note: AnkiNoteInfo,
@@ -310,9 +425,12 @@ export async function convertAnimecardsNote(
     entries: Map<string, JMdictWord>;
     spellingIndex: SpellingIndex;
     jmdictIdOverride?: string;
+    jmdictEntrySelectionOverride?: JMDictEntrySelectionOverride;
     epubSourceCorpus?: EPUBSourceCorpus;
     /** Retains the future sense-selection pipeline without enabling it in normal preparation. */
     includeMultipleSenses?: boolean;
+    /** Lets a shared spelling reach entry selection without admitting unrelated multi-sense cards. */
+    resolveAmbiguousEntries?: boolean;
     contextOverride?: {
       html: string;
       resolution: FullContextResolution;
@@ -393,6 +511,8 @@ export async function convertAnimecardsNote(
   if (!context) {
     return skip(note.noteId, word, "empty-sentence");
   }
+  const senseSelectionContext = () =>
+    senseSelectionEPUBMatch === null ? context : epubSenseSelectionContext(senseSelectionEPUBMatch);
 
   const resolution = await resolveEntry(
     word,
@@ -401,15 +521,36 @@ export async function convertAnimecardsNote(
     options.entries,
     options.spellingIndex,
     options.jmdictIdOverride,
+    options.jmdictEntrySelectionOverride,
   );
   if (!("entry" in resolution)) {
+    if (resolution.candidateIds !== undefined && resolution.allowedIds !== undefined) {
+      const unresolved = buildUnresolvedJMDictEntry(
+        senseSelectionContext(),
+        removeBoundaryNotation(word),
+        fieldValue(note, options.sourceFields.reading),
+        resolution.candidateIds,
+        resolution.allowedIds,
+        options.entries,
+        "animecard",
+      );
+      if ("candidateEntries" in unresolved) {
+        return {
+          skipped: {
+            noteId: note.noteId,
+            word,
+            reason: resolution.reason,
+            detail: resolution.detail,
+          },
+          unresolvedJMDictEntry: unresolved,
+        };
+      }
+      return skip(note.noteId, word, unresolved.reason, unresolved.detail);
+    }
     return skip(note.noteId, word, resolution.reason, resolution.detail);
   }
   const { entry, recognitionTargetOverride } = resolution;
   let { recognitionTarget } = resolution;
-  if (entry.sense.length !== 1 && options.includeMultipleSenses !== true) {
-    return skip(note.noteId, word, "multiple-jmdict-senses", String(entry.sense.length));
-  }
   let readings = applicableReadings(entry, recognitionTarget);
   let readingResult = chooseReading(
     entry,
@@ -494,6 +635,18 @@ export async function convertAnimecardsNote(
   if (readings.length === 0) {
     return skip(note.noteId, word, "no-applicable-reading");
   }
+  const recognitionTargetIsAmbiguous = findEntriesBySpelling(
+    options.spellingIndex,
+    recognitionTarget,
+  ).length > 1;
+  if (
+    entry.sense.length !== 1 &&
+    options.includeMultipleSenses !== true &&
+    options.jmdictEntrySelectionOverride === undefined &&
+    !(options.resolveAmbiguousEntries === true && recognitionTargetIsAmbiguous)
+  ) {
+    return skip(note.noteId, word, "multiple-jmdict-senses", String(entry.sense.length));
+  }
   let surfaceForms = surfaceMatches.surfaces;
   let targetInContextResolution: TargetInContextResolution | null = null;
   if (surfaceForms.length === 0 && options.targetInContextOverride !== undefined) {
@@ -551,14 +704,64 @@ export async function convertAnimecardsNote(
       uniqueSurfaceForms as [string, ...string[]],
     );
     const usesReadingField = entry.kanji.some(({ text }) => text === recognitionTarget);
-    const renderCard = (reading: string | undefined) =>
-      createCard({
+    const entrySelectionOverride = options.jmdictEntrySelectionOverride;
+    if (
+      entrySelectionOverride !== undefined &&
+      (
+        entrySelectionOverride.jmdictId !== entry.id ||
+        entrySelectionOverride.recognitionTarget !== recognitionTarget
+      )
+    ) {
+      return skip(
+        note.noteId,
+        word,
+        "stale-jmdict-entry-selection",
+        `${entrySelectionOverride.jmdictId} / ${
+          JSON.stringify(entrySelectionOverride.recognitionTarget)
+        } became ${entry.id} / ${JSON.stringify(recognitionTarget)}`,
+      );
+    }
+    const selectedSensesForReading = (reading: string | undefined): number[] | undefined => {
+      if (entrySelectionOverride === undefined) return undefined;
+      const compatible = compatibleSenseNumbersForJMDictUsage(
+        entry,
+        recognitionTarget,
+        usesReadingField ? reading : undefined,
+      );
+      const selected = [...new Set(entrySelectionOverride.applicableSenseNumbers)]
+        .toSorted((left, right) => left - right);
+      if (
+        selected.length === 0 ||
+        selected.some((number) => !compatible.includes(number)) ||
+        selected.length !== entrySelectionOverride.applicableSenseNumbers.length
+      ) {
+        throw new Error(
+          `JMDict entry selection chose senses ${
+            JSON.stringify(entrySelectionOverride.applicableSenseNumbers)
+          }, but recognitionTarget ${JSON.stringify(recognitionTarget)} and kanaReading ${
+            JSON.stringify(reading)
+          } permit ${JSON.stringify(compatible)} in entry ${entry.id}.`,
+        );
+      }
+      return selected.length === compatible.length &&
+          selected.every((number, index) => number === compatible[index])
+        ? undefined
+        : selected;
+    };
+    const renderCard = (reading: string | undefined) => {
+      const applicableSenseNumbers = selectedSensesForReading(reading);
+      return createCard({
         jmdictEntry: entry,
         recognitionTarget,
         ...(usesReadingField ? { kanaReading: reading } : {}),
+        ...(applicableSenseNumbers === undefined ? {} : { applicableSenseNumbers }),
+        ...(entrySelectionOverride?.hint === undefined || entrySelectionOverride.hint === null
+          ? {}
+          : { hint: entrySelectionOverride.hint }),
         fullContext: markedContext,
         source: cardSourceFromResolution(sourceResolution),
       });
+    };
 
     let selectedReading: string;
     let card: MiwakeCard;
@@ -613,17 +816,63 @@ export async function convertAnimecardsNote(
       options.spellingIndex,
       keyRecognitionTarget,
     );
-    if (sameSpellingEntries.length > 1) {
-      return skip(
-        note.noteId,
-        word,
-        "ambiguous-jmdict-spelling",
-        sameSpellingEntries.map((match) => match.id).join(", "),
+    const displayHint = entrySelectionOverride === undefined
+      ? card.hint ?? undefined
+      : disambiguationHintForJMDictUsage(
+        card.hint ?? undefined,
+        displayTarget.recognitionTarget,
+        keyRecognitionTarget,
+        entry,
+        entrySelectionOverride.applicableSenseNumbers,
+        sameSpellingEntries,
       );
+    if (sameSpellingEntries.length > 1) {
+      const sameSpellingIds = sameSpellingEntries.map(({ id }) => id);
+      const overrideCoversAmbiguity = entrySelectionOverride !== undefined &&
+        entrySelectionOverride.recognitionTarget === keyRecognitionTarget &&
+        sameSpellingIds.every((id) => entrySelectionOverride.candidateJMDictIds.includes(id));
+      if (!overrideCoversAmbiguity) {
+        const unresolved = buildUnresolvedJMDictEntry(
+          senseSelectionContext(),
+          keyRecognitionTarget,
+          fieldValue(note, options.sourceFields.reading),
+          sameSpellingIds,
+          [entry.id],
+          options.entries,
+          markedContextHasRuby(markedContext) ? "source-ruby" : "animecard",
+          selectedReading,
+        );
+        if ("candidateEntries" in unresolved) {
+          return {
+            skipped: {
+              noteId: note.noteId,
+              word,
+              reason: "ambiguous-jmdict-spelling",
+              detail: sameSpellingIds.join(", "),
+            },
+            unresolvedJMDictEntry: unresolved,
+          };
+        }
+        return skip(note.noteId, word, unresolved.reason, unresolved.detail);
+      }
     }
 
     let senseResolution: SenseResolution = { status: "not-needed" };
-    if (entry.sense.length > 1) {
+    if (entrySelectionOverride !== undefined && entry.sense.length > 1) {
+      const compatibleSenses = compatibleSenseNumbersForJMDictUsage(
+        entry,
+        keyRecognitionTarget,
+        entry.kanji.some(({ text }) => text === keyRecognitionTarget) ? selectedReading : undefined,
+      );
+      const applicableSenses = selectedSensesForReading(selectedReading) ?? [];
+      senseResolution = {
+        status: "generated",
+        model: entrySelectionOverride.model,
+        generatedAt: entrySelectionOverride.generatedAt,
+        compatibleSenses,
+        applicableSenses,
+      };
+    } else if (entry.sense.length > 1) {
       const compatibleSenses = compatibleSenseNumbersForJMDictUsage(
         entry,
         keyRecognitionTarget,
@@ -638,7 +887,7 @@ export async function convertAnimecardsNote(
       "Key": card.key,
       "Recognition target": displayTarget.recognitionTarget,
       "Reading": displayTarget.reading ?? "",
-      "Hint": card.hint ?? "",
+      "Hint": displayHint ?? "",
       "Full context": card.fullContext,
       "Minimized context": card.minimizedContext ?? "",
       "Dictionary entry": card.dictionaryEntry,
@@ -654,9 +903,7 @@ export async function convertAnimecardsNote(
         keyRecognitionTarget,
         ...(recognitionTargetOverride === undefined ? {} : { recognitionTargetOverride }),
         readingKana: selectedReading,
-        senseSelectionContext: senseSelectionEPUBMatch === null
-          ? context
-          : epubSenseSelectionContext(senseSelectionEPUBMatch),
+        senseSelectionContext: senseSelectionContext(),
         sourceResolution,
         targetInContextResolution,
         fullContextResolution,
@@ -664,6 +911,23 @@ export async function convertAnimecardsNote(
           ? { status: "pending" }
           : { status: "not-needed" },
         senseResolution,
+        ...(entrySelectionOverride === undefined ? {} : {
+          jmdictEntryResolution: {
+            model: entrySelectionOverride.model,
+            generatedAt: entrySelectionOverride.generatedAt,
+            applicableSenseNumbers: entrySelectionOverride.applicableSenseNumbers,
+            hint: disambiguationHintForJMDictUsage(
+              entrySelectionOverride.hint ?? undefined,
+              displayTarget.recognitionTarget,
+              keyRecognitionTarget,
+              entry,
+              entrySelectionOverride.applicableSenseNumbers,
+              sameSpellingEntries,
+            ) ?? null,
+            candidateJMDictIds: entrySelectionOverride.candidateJMDictIds,
+            allowedJMDictIds: entrySelectionOverride.allowedJMDictIds,
+          },
+        }),
         original: await snapshotNote(note),
         target: { modelName: options.targetModel, fields: targetFields },
       },

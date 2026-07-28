@@ -9,6 +9,7 @@ import * as path from "@std/path";
 import { parseMiwakeKey } from "card_creator";
 import { allJMDictEntries } from "data";
 import {
+  CARD_FIELD_GENERATION_CACHE_VERSION,
   DEFAULT_MODEL_ID,
   generateCardFields,
   type GeneratedCardFields,
@@ -131,6 +132,7 @@ async function inputFingerprint(candidate: ConversionCandidate, model: ModelId):
   );
   const value = JSON.stringify({
     version: 10,
+    cardFieldGenerationVersion: CARD_FIELD_GENERATION_CACHE_VERSION,
     model,
     jmdictId: candidate.jmdictId,
     recognitionTarget: candidate.keyRecognitionTarget,

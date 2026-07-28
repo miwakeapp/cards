@@ -6,11 +6,12 @@
 
 import { parseArgs } from "@std/cli/parse-args";
 import * as path from "@std/path";
-import { allJMDictEntries } from "data";
+import { allJMDictEntries, type JMDictWord } from "data";
 import { createACInvoke, DEFAULT_ANKI_CONNECT_URL } from "../shared/anki_connect.ts";
 import { buildSpellingIndex } from "../shared/jmdict_resolution/recognition_target_lookup.ts";
 import { ankiSearchValue, fetchNoteInfos } from "./anki.ts";
 import {
+  CARD_FIELD_GENERATION_CACHE_VERSION,
   DEFAULT_MODEL_ID,
   generateCardFields,
   MODEL_IDS,
@@ -21,6 +22,12 @@ import {
   MIWAKE_FIELD_NAMES,
   type UnresolvedTargetInContext,
 } from "./convert.ts";
+import {
+  entrySelectionInputFingerprint,
+  type JMDictEntrySelection,
+  readingConflictForJMDictEntrySelection,
+  selectJMDictEntry,
+} from "./entry_selection.ts";
 import { resolveSourceFields } from "./fields.ts";
 import { normalizePlainText } from "./html.ts";
 import { defaultReportPath, writeConversionAuditArtifacts } from "./report.ts";
@@ -43,8 +50,10 @@ interface Options {
   epubTextsDirectory: string | undefined;
   jmdictOverridesPath: string | undefined;
   includeMultipleSenses: boolean;
+  resolveEntriesWithAI: boolean;
   resolveTargetsWithAI: boolean;
   aiModel: ModelId;
+  entryAICachePath: string;
   targetAICachePath: string;
   fields: {
     word?: string;
@@ -69,6 +78,7 @@ function parseArguments(args: string[]): Options {
     boolean: [
       "no-epub-source-lookup",
       "include-multiple-senses",
+      "resolve-entries-with-ai",
       "resolve-targets-with-ai",
     ],
     string: [
@@ -81,6 +91,7 @@ function parseArguments(args: string[]): Options {
       "epub-texts-dir",
       "jmdict-overrides",
       "ai-model",
+      "entry-ai-cache",
       "target-ai-cache",
       "word-field",
       "sentence-field",
@@ -116,8 +127,10 @@ function parseArguments(args: string[]): Options {
       : flags["epub-texts-dir"] ?? path.join(import.meta.dirname!, "..", "epub_texts"),
     jmdictOverridesPath: flags["jmdict-overrides"],
     includeMultipleSenses: flags["include-multiple-senses"],
+    resolveEntriesWithAI: flags["resolve-entries-with-ai"],
     resolveTargetsWithAI: flags["resolve-targets-with-ai"],
     aiModel: aiModel as ModelId,
+    entryAICachePath: flags["entry-ai-cache"] ?? `${output}.entry-ai-cache.jsonl`,
     targetAICachePath: flags["target-ai-cache"] ?? `${output}.target-ai-cache.jsonl`,
     fields: {
       word: flags["word-field"],
@@ -137,12 +150,19 @@ interface CachedTargetInContext {
   surface: string;
 }
 
+interface CachedJMDictEntrySelection {
+  inputFingerprint: string;
+  model: ModelId;
+  selection: JMDictEntrySelection;
+}
+
 async function targetInputFingerprint(
   request: UnresolvedTargetInContext,
   model: ModelId,
 ): Promise<string> {
   const value = JSON.stringify({
     version: 1,
+    cardFieldGenerationVersion: CARD_FIELD_GENERATION_CACHE_VERSION,
     model,
     jmdictId: request.entry.id,
     recognitionTarget: request.recognitionTarget,
@@ -178,6 +198,50 @@ async function appendTargetAICache(
 ): Promise<void> {
   await Deno.mkdir(path.dirname(filePath), { recursive: true });
   await Deno.writeTextFile(filePath, `${JSON.stringify(value)}\n`, { append: true });
+}
+
+async function loadEntryAICache(
+  filePath: string,
+): Promise<Map<string, CachedJMDictEntrySelection>> {
+  let content: string;
+  try {
+    content = await Deno.readTextFile(filePath);
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) return new Map();
+    throw error;
+  }
+  return new Map(
+    content.split("\n").filter(Boolean).map((line) => {
+      const item = JSON.parse(line) as CachedJMDictEntrySelection;
+      return [`${item.model}:${item.inputFingerprint}`, item];
+    }),
+  );
+}
+
+async function appendEntryAICache(
+  filePath: string,
+  value: CachedJMDictEntrySelection,
+): Promise<void> {
+  await Deno.mkdir(path.dirname(filePath), { recursive: true });
+  await Deno.writeTextFile(filePath, `${JSON.stringify(value)}\n`, { append: true });
+}
+
+function describeEntry(entry: JMDictWord): string {
+  return entry.sense.map((sense, index) => {
+    const glosses = sense.gloss
+      .filter(({ lang }) => lang === "eng")
+      .map(({ text }) => text)
+      .join("; ");
+    const qualifiers = [
+      sense.partOfSpeech.length > 0 ? `part of speech: ${sense.partOfSpeech.join(", ")}` : "",
+      sense.field.length > 0 ? `field: ${sense.field.join(", ")}` : "",
+      sense.misc.length > 0 ? `usage: ${sense.misc.join(", ")}` : "",
+      sense.info.length > 0 ? `note: ${sense.info.join("; ")}` : "",
+    ].filter(Boolean);
+    return `${index + 1}. ${glosses || "(no English gloss)"}${
+      qualifiers.length === 0 ? "" : ` [${qualifiers.join("; ")}]`
+    }`;
+  }).join(" | ");
 }
 
 function removeDuplicateKeys(
@@ -249,7 +313,7 @@ async function main(): Promise<void> {
   } catch (error) {
     console.error(error instanceof Error ? error.message : String(error));
     console.error(
-      "Usage: deno task animecards:prepare [--limit=N] [--query=...] [--source-model=Animecards] [--target-model=Miwake] [--output=PATH] [--anki-connect-url=URL] [--epub-texts-dir=PATH|--no-epub-source-lookup] [--jmdict-overrides=PATH] [--include-multiple-senses] [--resolve-targets-with-ai] [--ai-model=MODEL] [--target-ai-cache=PATH] [--word-field=NAME] [--sentence-field=NAME] [--glossary-field=NAME] [--reading-field=NAME] [--source-field=NAME] [--source-url-field=NAME]",
+      "Usage: deno task animecards:prepare [--limit=N] [--query=...] [--source-model=Animecards] [--target-model=Miwake] [--output=PATH] [--anki-connect-url=URL] [--epub-texts-dir=PATH|--no-epub-source-lookup] [--jmdict-overrides=PATH] [--include-multiple-senses] [--resolve-entries-with-ai] [--resolve-targets-with-ai] [--ai-model=MODEL] [--entry-ai-cache=PATH] [--target-ai-cache=PATH] [--word-field=NAME] [--sentence-field=NAME] [--glossary-field=NAME] [--reading-field=NAME] [--source-field=NAME] [--source-url-field=NAME]",
     );
     Deno.exit(1);
   }
@@ -313,15 +377,22 @@ async function main(): Promise<void> {
 
   const candidates: ConversionCandidate[] = [];
   const skipped: SkippedNote[] = [];
+  const entryAICache = options.resolveEntriesWithAI
+    ? await loadEntryAICache(options.entryAICachePath)
+    : new Map<string, CachedJMDictEntrySelection>();
   const targetAICache = options.resolveTargetsWithAI
     ? await loadTargetAICache(options.targetAICachePath)
     : new Map<string, CachedTargetInContext>();
+  let generatedEntryResolutions = 0;
+  let reusedEntryResolutions = 0;
+  let inconclusiveEntryResolutions = 0;
+  let failedEntryResolutions = 0;
   let generatedTargetResolutions = 0;
   let reusedTargetResolutions = 0;
   let failedTargetResolutions = 0;
   let processed = 0;
   for (const note of notes) {
-    const conversionOptions = {
+    const conversionOptions: Parameters<typeof convertAnimecardsNote>[1] = {
       sourceModel: options.sourceModel,
       targetModel: options.targetModel,
       sourceFields,
@@ -330,8 +401,114 @@ async function main(): Promise<void> {
       jmdictIdOverride: jmdictOverrides.get(note.noteId),
       epubSourceCorpus,
       includeMultipleSenses: options.includeMultipleSenses,
+      resolveAmbiguousEntries: options.resolveEntriesWithAI,
     };
+    let selectedEntryOverride:
+      | Extract<JMDictEntrySelection, { status: "selected" }>
+      | undefined;
     let result = await convertAnimecardsNote(note, conversionOptions);
+    if (options.resolveEntriesWithAI) {
+      for (let attempt = 0; attempt < 3 && result.unresolvedJMDictEntry !== undefined; ++attempt) {
+        const request = result.unresolvedJMDictEntry;
+        const inputFingerprint = await entrySelectionInputFingerprint(request, options.aiModel);
+        const cacheKey = `${options.aiModel}:${inputFingerprint}`;
+        let cached = entryAICache.get(cacheKey);
+        try {
+          if (cached === undefined) {
+            const selection = await selectJMDictEntry(request, options.aiModel);
+            cached = { inputFingerprint, model: options.aiModel, selection };
+            await appendEntryAICache(options.entryAICachePath, cached);
+            entryAICache.set(cacheKey, cached);
+            ++generatedEntryResolutions;
+          } else {
+            ++reusedEntryResolutions;
+          }
+
+          let selection = cached.selection;
+          if (selection.status === "selected") {
+            const readingConflict = readingConflictForJMDictEntrySelection(
+              request,
+              selection.jmdictId,
+            );
+            if (readingConflict === null) {
+              selectedEntryOverride = selection;
+              result = await convertAnimecardsNote(note, {
+                ...conversionOptions,
+                jmdictEntrySelectionOverride: selection,
+              });
+              continue;
+            }
+            selection = readingConflict;
+          }
+
+          ++inconclusiveEntryResolutions;
+          let reason: string;
+          let detail: string;
+          if (selection.status === "no-match") {
+            reason = "no-applicable-jmdict-entry";
+            detail = request.candidateEntries.map(({ id }) => id).join(", ");
+          } else if (selection.status === "no-reading-match") {
+            reason = "source-reading-matches-no-jmdict-entry";
+            detail = request.kanaReading;
+          } else if (selection.status === "hint-unavailable") {
+            reason = "jmdict-entry-hint-unavailable";
+            detail = `${selection.selectedJMDictId}; reading: ${request.kanaReading}`;
+          } else if (selection.status === "ambiguous") {
+            reason = "ai-ambiguous-jmdict-entry";
+            detail = selection.selectedJMDictIds.join(", ");
+          } else if (selection.status === "disallowed") {
+            reason = "ai-selected-unlinked-jmdict-entry";
+            detail = selection.selectedJMDictId;
+          } else {
+            reason = "ai-selected-reading-incompatible-jmdict-entry";
+            detail = `${selection.selectedJMDictId}; Animecard: ${request.kanaReading}; JMDict: ${
+              selection.compatibleReadings.join(", ") || "none"
+            }`;
+          }
+          result = {
+            skipped: {
+              noteId: note.noteId,
+              word: request.recognitionTarget,
+              reason,
+              detail,
+              entrySelection: {
+                model: options.aiModel,
+                recognitionTarget: request.recognitionTarget,
+                context: request.context,
+                candidateJMDictIds: request.candidateEntries.map(({ id }) => id).toSorted(),
+                allowedJMDictIds: [...request.allowedJMDictIds].toSorted(),
+                candidateDescriptions: Object.fromEntries(
+                  request.candidateEntries.map((entry) => [entry.id, describeEntry(entry)]),
+                ),
+              },
+            },
+          };
+        } catch (error) {
+          ++failedEntryResolutions;
+          const message = error instanceof Error ? error.message : String(error);
+          console.error(`  Entry AI failed for ${note.noteId}: ${message}`);
+          result = {
+            skipped: {
+              noteId: note.noteId,
+              word: request.recognitionTarget,
+              reason: "jmdict-entry-ai-failed",
+              detail: message,
+            },
+          };
+        }
+      }
+      if (result.unresolvedJMDictEntry !== undefined) {
+        ++failedEntryResolutions;
+        result = {
+          skipped: {
+            noteId: note.noteId,
+            word: result.unresolvedJMDictEntry.recognitionTarget,
+            reason: "jmdict-entry-resolution-did-not-converge",
+            detail: result.unresolvedJMDictEntry.candidateEntries.map(({ id }) => id).join(", "),
+          },
+        };
+      }
+    }
     if (
       options.resolveTargetsWithAI &&
       "unresolvedTargetInContext" in result &&
@@ -376,6 +553,7 @@ async function main(): Promise<void> {
         }
         result = await convertAnimecardsNote(note, {
           ...conversionOptions,
+          jmdictEntrySelectionOverride: selectedEntryOverride,
           targetInContextOverride: resolved,
         });
       } catch (error) {
@@ -443,6 +621,11 @@ async function main(): Promise<void> {
   if (options.resolveTargetsWithAI) {
     console.error(
       `Target-in-context AI: ${generatedTargetResolutions} generated, ${reusedTargetResolutions} cached, ${failedTargetResolutions} failed.`,
+    );
+  }
+  if (options.resolveEntriesWithAI) {
+    console.error(
+      `JMDict-entry AI: ${generatedEntryResolutions} generated, ${reusedEntryResolutions} cached, ${inconclusiveEntryResolutions} inconclusive, ${failedEntryResolutions} failed.`,
     );
   }
   console.error(`Skipped ${skipped.length}: ${JSON.stringify(Object.fromEntries(reasonCounts))}`);

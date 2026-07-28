@@ -89,6 +89,8 @@ After that setup is complete, the unobtrusive indicator changes color. From now 
 
 - **Hint** (optional): a sparingly-used disambiguation field for when multiple senses or JMDict entries match the same spelling, such that it would be roughly impossible to tell which was intended without the hint. It is not used when there is only a single JMDict entry for a given spelling and all of its senses are applicable. The hint is a Japanese phrase or fragment that uses the word in extremely-minimal context. AI-generated initially ✨, but users can edit this and the software should not interfere with that.
 
+  - Leading or trailing `～` notation can itself supply the minimal usage-pattern hint. The separate Hint field is omitted only when every selected sense has that boundary pattern and no unselected sense or same-spelling JMDict entry has the same pattern. For example, `～ヅラ` needs no additional hint when it uniquely identifies the suffix entry, but another suffix entry or another selected-entry suffix sense would still require one.
+
   - Sample: for sense 2 of [飾り物](https://takoboto.jp/?q=%E9%A3%BE%E3%82%8A%E7%89%A9), a good hint would be "Xさんは飾り物だ": a minimal sentence/sentence fragment that makes it clear we're looking for the sense that applies to a person.
 
   - Sample: a hint for 番 meaning ["pair (esp. of mated animals), brace, couple"](https://takoboto.jp/?w=2199920) instead of ["number (in a series)"](https://takoboto.jp/?w=2022640) could be "魂の番".
