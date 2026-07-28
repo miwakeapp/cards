@@ -3,7 +3,9 @@ import type { JMDictWord } from "data";
 import {
   buildSenseAndHintFewShotMessages,
   type SenseAndHintGenerationInput,
+  validateGeneratedMinimizedContext,
   validateGeneratedSenseAndHint,
+  validateGeneratedTargetInContext,
 } from "../src/generate.ts";
 import type { FewShotExample } from "../src/examples.ts";
 
@@ -202,6 +204,51 @@ Deno.test("validateGeneratedSenseAndHint enforces the hint contract", () => {
       applicableSenses: [3],
       hint: "異名あいうえおか",
     },
+  );
+});
+
+Deno.test("narrow generation validators reject unusable model output", () => {
+  assertEquals(
+    validateGeneratedMinimizedContext(
+      {
+        fullContext: "長い<mark>文脈</mark>です。",
+        recognitionTarget: "文脈",
+      },
+      "<mark>文脈</mark>です。",
+    ),
+    "<mark>文脈</mark>です。",
+  );
+  assertEquals(
+    validateGeneratedMinimizedContext(
+      {
+        fullContext: "長い<mark>文脈</mark>です。",
+        recognitionTarget: "文脈",
+      },
+      null,
+    ),
+    null,
+  );
+  assertThrows(
+    () =>
+      validateGeneratedMinimizedContext(
+        {
+          fullContext: "長い<mark>文脈</mark>です。",
+          recognitionTarget: "文脈",
+        },
+        "文脈です。",
+      ),
+    Error,
+    'recognitionTarget "文脈" does not contain a <mark> element',
+  );
+
+  assertEquals(
+    validateGeneratedTargetInContext({ context: "我が身を曝した。" }, "曝し"),
+    "曝し",
+  );
+  assertThrows(
+    () => validateGeneratedTargetInContext({ context: "我が身をさらした。" }, "曝し"),
+    Error,
+    '"曝し" is not a nonempty literal substring',
   );
 });
 

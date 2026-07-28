@@ -95,9 +95,11 @@ After that setup is complete, the unobtrusive indicator changes color. From now 
 
   - Sample: a hint for 番 meaning ["pair (esp. of mated animals), brace, couple"](https://takoboto.jp/?w=2199920) instead of ["number (in a series)"](https://takoboto.jp/?w=2022640) could be "魂の番".
 
-- **Full context**: the original full context sentence(s) in which the term was encountered, no matter how long it was. Uses `<mark>` for the term in question.
+- **Full context**: the original full context sentence(s) in which the term was encountered. Uses `<mark>` for the term in question.
 
   - This is extracted from the content being read ✨ automatically. It will at least be a single full sentence, but if the AI judges that more context is necessary, it can expand to two or three sentences. (See [expanding unhelpful context](#expanding-unhelpful-context).)
+
+  - Dialogue should normally include its opening and closing quotation marks. Exceptionally long dialogue can be elided at paragraph boundaries: keep the target paragraph, add one adjacent paragraph when the target paragraph is too short to stand alone, and use the Japanese ellipsis `……` to make omitted text explicit while retaining balanced quotation marks.
 
   - If the original context included furigana, they are preserved (although translated to Anki's `[]`-suffix microsyntax). Additionally, many books substitute full-sized kana in place of small kana in furigana position (as a kind of poor-man's `text-transform: full-size-kana`); the software corrects this back as part of the extraction and translation.
 

@@ -4,7 +4,13 @@ import type { LanguageModel } from "ai";
 import { z } from "zod";
 import type { JMDictWord } from "data";
 import type { FewShotExample } from "./examples.ts";
-import { cardFieldsSystemPrompt, senseAndHintSystemPrompt } from "./prompts.ts";
+import {
+  cardFieldsSystemPrompt,
+  contrastiveHintSystemPrompt,
+  minimizedContextSystemPrompt,
+  senseAndHintSystemPrompt,
+  targetInContextSystemPrompt,
+} from "./prompts.ts";
 
 // Keep these imports lazy so metadata-only consumers do not load the AI SDK or JMDict fixtures,
 // while ensuring concurrent first calls share one import operation.
@@ -139,6 +145,53 @@ export interface SenseAndHintGenerationInput {
   compatibleSenseNumbers: readonly number[];
 }
 
+/** Evidence needed when a caller only needs to shorten an already-resolved full context. */
+export interface MinimizedContextGenerationInput {
+  /** Source-faithful card context, including the target's canonical `<mark>` element(s). */
+  fullContext: string;
+
+  /** The JMDict spelling being learned. */
+  recognitionTarget: string;
+}
+
+/** Evidence needed when deterministic morphology cannot locate the target usage in context. */
+export interface TargetInContextGenerationInput {
+  /** Japanese source context containing the targeted usage. */
+  context: string;
+
+  /** The exact JMDict spelling being learned. */
+  recognitionTarget: string;
+
+  /** The JMDict entry selected for this usage. */
+  jmdictEntry: JMDictWord;
+
+  /**
+   * The exact JMDict kana form selected for this usage.
+   *
+   * Omitted when the contextual surface must be found before the caller can choose between
+   * multiple applicable readings. The supplied JMDict entry still bounds the possible readings.
+   */
+  kanaReading?: string;
+}
+
+/** Evidence for a hint needed to distinguish same-spelling JMDict entries. */
+export interface ContrastiveHintGenerationInput {
+  /** Japanese source context containing the selected usage. */
+  context: string;
+
+  /** The exact JMDict spelling shared by the competing entries. */
+  recognitionTarget: string;
+
+  /** The JMDict entry selected for this usage. */
+  selectedEntry: JMDictWord;
+
+  /** The selected entry's applicable 1-indexed sense numbers. */
+  applicableSenseNumbers: readonly number[];
+
+  /** Other same-spelling entries the front of the card would otherwise leave ambiguous. */
+  contrastingEntries: readonly JMDictWord[];
+}
+
 type SenseAndHintPromptInput = Pick<
   CardFieldGenerationInput,
   "context" | "recognitionTarget" | "jmdictEntry" | "kanaReading" | "compatibleSenseNumbers"
@@ -168,7 +221,7 @@ export const DEFAULT_MODEL_ID: ModelId = "claude-opus-4-8";
  * Persistent caches of generated fields must include this value in their cache key. Increment it
  * whenever a change could affect model output or the interpretation of cached output.
  */
-export const CARD_FIELD_GENERATION_CACHE_VERSION = 1;
+export const CARD_FIELD_GENERATION_CACHE_VERSION = 2;
 
 const applicableSensesSchema = z
   .array(z.number().int().positive())
@@ -216,6 +269,24 @@ const commonAIFieldsSchema = {
 
 const senseAndHintSchema = z.object({
   applicableSenses: applicableSensesSchema,
+  hint: hintSchema,
+});
+const minimizedContextSchema = z.object({
+  minimizedContext: z
+    .string()
+    .nullable()
+    .describe(
+      "A shortened version of the full context preserving the marked usage, or null if no useful shorter version exists.",
+    ),
+});
+const targetInContextSchema = z.object({
+  targetInContext: z
+    .string()
+    .describe(
+      "The exact nonempty substring from the context corresponding to the recognition target.",
+    ),
+});
+const contrastiveHintSchema = z.object({
   hint: hintSchema,
 });
 
@@ -310,6 +381,31 @@ interface RawGeneratedCardFields extends RawGeneratedSenseAndHint {
 
 const MAX_HINT_ADDITIONAL_CHARACTERS = 6;
 
+function validateGeneratedHint(recognitionTarget: string, hint: string): string {
+  if (!hint.includes(recognitionTarget)) {
+    throw new Error(
+      `AI hint ${JSON.stringify(hint)} does not contain recognitionTarget ${
+        JSON.stringify(recognitionTarget)
+      } exactly`,
+    );
+  }
+  if (hint === recognitionTarget) {
+    throw new Error(
+      `AI hint ${JSON.stringify(hint)} repeats recognitionTarget without disambiguating it`,
+    );
+  }
+  const hintLength = [...hint].length;
+  const targetLength = [...recognitionTarget].length;
+  if (hintLength > targetLength + MAX_HINT_ADDITIONAL_CHARACTERS) {
+    throw new Error(
+      `AI hint ${JSON.stringify(hint)} is ${hintLength - targetLength} characters longer than ` +
+        `recognitionTarget ${JSON.stringify(recognitionTarget)}; at most ` +
+        `${MAX_HINT_ADDITIONAL_CHARACTERS} additional characters are allowed`,
+    );
+  }
+  return hint;
+}
+
 /**
  * Validates and canonicalizes the semantic relationship between a generated sense selection and
  * hint. Exported from this internal module for focused tests; it is not part of the package API.
@@ -370,30 +466,9 @@ export function validateGeneratedSenseAndHint(
       }, but returned no disambiguating hint`,
     );
   }
-  if (!hint.includes(input.recognitionTarget)) {
-    throw new Error(
-      `AI hint ${JSON.stringify(hint)} does not contain recognitionTarget ${
-        JSON.stringify(input.recognitionTarget)
-      } exactly`,
-    );
-  }
-  if (hint === input.recognitionTarget) {
-    throw new Error(
-      `AI hint ${JSON.stringify(hint)} repeats recognitionTarget without disambiguating it`,
-    );
-  }
-  const hintLength = [...hint].length;
-  const targetLength = [...input.recognitionTarget].length;
-  if (hintLength > targetLength + MAX_HINT_ADDITIONAL_CHARACTERS) {
-    throw new Error(
-      `AI hint ${JSON.stringify(hint)} is ${hintLength - targetLength} characters longer than ` +
-        `recognitionTarget ${JSON.stringify(input.recognitionTarget)}; at most ` +
-        `${MAX_HINT_ADDITIONAL_CHARACTERS} additional characters are allowed`,
-    );
-  }
   return {
     applicableSenses: sorted as [number, ...number[]],
-    hint,
+    hint: validateGeneratedHint(input.recognitionTarget, hint),
   };
 }
 
@@ -574,4 +649,137 @@ export async function generateSenseAndHintFields(
     messages: buildSenseAndHintFewShotMessages(input, FEW_SHOT_EXAMPLES),
   });
   return validateGeneratedSenseAndHint(input, result.output);
+}
+
+/**
+ * Generates only a shortened context.
+ *
+ * This narrower operation avoids asking the model to repeat already-resolved readings, senses,
+ * sources, and target morphology merely because a long context needs shortening.
+ */
+export async function generateMinimizedContext(
+  input: MinimizedContextGenerationInput,
+  modelId: ModelId,
+): Promise<string | null> {
+  const [{ generateText, Output }] = await generationDependencies();
+  const result = await generateText({
+    model: await getModel(modelId),
+    output: Output.object({ schema: minimizedContextSchema }),
+    system: minimizedContextSystemPrompt(),
+    prompt: `Shorten this full context only if doing so produces a substantially simpler card.
+
+Recognition target: ${input.recognitionTarget}
+
+Full context:
+${input.fullContext}`,
+  });
+  return validateGeneratedMinimizedContext(input, result.output.minimizedContext);
+}
+
+/** Validates a generated minimized context. Exported from this internal module for focused tests. */
+export function validateGeneratedMinimizedContext(
+  input: MinimizedContextGenerationInput,
+  minimizedContext: string | null,
+): string | null {
+  if (minimizedContext !== null && !/<mark\b[^>]*>.*?<\/mark>/isu.test(minimizedContext)) {
+    throw new Error(
+      `AI minimizedContext for recognitionTarget ${
+        JSON.stringify(input.recognitionTarget)
+      } does not contain a <mark> element`,
+    );
+  }
+  return minimizedContext;
+}
+
+/**
+ * Generates only the inflected or otherwise transformed source substring for a selected entry.
+ *
+ * The result is constrained to a literal substring so deterministic conversion remains
+ * authoritative over highlighting and card construction.
+ */
+export async function generateTargetInContext(
+  input: TargetInContextGenerationInput,
+  modelId: ModelId,
+): Promise<string> {
+  const [{ generateText, Output }] = await generationDependencies();
+  const result = await generateText({
+    model: await getModel(modelId),
+    output: Output.object({ schema: targetInContextSchema }),
+    system: targetInContextSystemPrompt(),
+    prompt: `Locate this Japanese word usage in context.
+
+Recognition target: ${input.recognitionTarget}
+
+${
+      input.kanaReading === undefined
+        ? ""
+        : `Selected kana reading: ${input.kanaReading}\n\n`
+    }Context: ${input.context}
+
+Dictionary entry (JSON):
+${JSON.stringify(input.jmdictEntry, undefined, 2)}`,
+  });
+  return validateGeneratedTargetInContext(input, result.output.targetInContext);
+}
+
+/** Validates a generated source surface. Exported from this internal module for focused tests. */
+export function validateGeneratedTargetInContext(
+  input: Pick<TargetInContextGenerationInput, "context">,
+  targetInContext: string,
+): string {
+  if (targetInContext.length === 0 || !input.context.includes(targetInContext)) {
+    throw new Error(
+      `AI targetInContext ${JSON.stringify(targetInContext)} is not a nonempty literal ` +
+        `substring of the supplied context`,
+    );
+  }
+  return targetInContext;
+}
+
+/**
+ * Generates a semantic hint after reading evidence has already selected one same-spelling entry.
+ *
+ * Returning `null` is meaningful: it indicates that pronunciation, rather than context, is the
+ * only available distinction and the card should wait for multi-reading support.
+ */
+export async function generateContrastiveHint(
+  input: ContrastiveHintGenerationInput,
+  modelId: ModelId,
+): Promise<string | null> {
+  const applicableSenseNumbers = compatibleSenseNumbersForInput({
+    compatibleSenseNumbers: input.applicableSenseNumbers,
+    jmdictEntry: input.selectedEntry,
+  });
+  if (input.contrastingEntries.length === 0) {
+    throw new RangeError("contrastingEntries must contain at least one JMDict entry");
+  }
+  const [{ generateText, Output }] = await generationDependencies();
+  const result = await generateText({
+    model: await getModel(modelId),
+    output: Output.object({ schema: contrastiveHintSchema }),
+    system: contrastiveHintSystemPrompt(),
+    prompt: `Generate a short contrastive hint for this already-selected Japanese usage.
+
+Recognition target: ${input.recognitionTarget}
+
+Context: ${input.context}
+
+Selected JMDict entry and applicable senses:
+${
+      JSON.stringify(
+        {
+          ...input.selectedEntry,
+          sense: applicableSenseNumbers.map((number) => input.selectedEntry.sense[number - 1]),
+        },
+        undefined,
+        2,
+      )
+    }
+
+Contrasting same-spelling JMDict entries:
+${JSON.stringify(input.contrastingEntries, undefined, 2)}`,
+  });
+  return result.output.hint === null
+    ? null
+    : validateGeneratedHint(input.recognitionTarget, result.output.hint);
 }

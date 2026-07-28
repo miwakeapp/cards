@@ -246,27 +246,53 @@ async function main(): Promise<void> {
         };
         ++reused;
       } else {
-        const selected = await selectFullEPUBContext({
-          windowHTML: match.window.map((paragraph) => `<p>${paragraph.html}</p>`),
-          word: candidate.keyRecognitionTarget,
-          requiredContext: requiredContextHTML,
-        }, options.model);
-        const validated = validateEPUBContextSelection(
-          match,
-          selected,
-          requiredContextHTML,
-        );
-        if (validated === null) {
-          throw new Error(
-            "Selected context is not a unique, naturally bounded source span containing the required context.",
-          );
+        const validationFailure =
+          "Selected context is not a unique, naturally bounded source span containing the required context.";
+        let validated: string | null = null;
+        let previousValidationFailure: string | undefined;
+        let generatedModel = options.model;
+        for (let attempt = 1; attempt <= 3 && validated === null; ++attempt) {
+          const attemptModel = attempt === 3 && options.model !== "claude-opus-5"
+            ? "claude-opus-5"
+            : options.model;
+          try {
+            const selected = await selectFullEPUBContext({
+              windowHTML: match.window.map((paragraph) => `<p>${paragraph.html}</p>`),
+              word: candidate.keyRecognitionTarget,
+              requiredContext: requiredContextHTML,
+              previousValidationFailure,
+            }, attemptModel);
+            validated = validateEPUBContextSelection(
+              match,
+              selected,
+              requiredContextHTML,
+            );
+            if (validated === null) {
+              previousValidationFailure = `${validationFailure}\nRejected answer: ${
+                JSON.stringify(selected)
+              }`;
+            } else {
+              generatedModel = attemptModel;
+            }
+          } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            if (attempt === 3) throw error;
+            previousValidationFailure =
+              `The previous request failed before producing usable output: ${message}`;
+          }
+          if (validated === null && attempt < 3) {
+            console.error(
+              `  Retrying ${candidate.noteId} after invalid context selection (${attempt}/3).`,
+            );
+          }
         }
+        if (validated === null) throw new Error(validationFailure);
         restoredHTML = validated;
         generatedAt = attemptedAt;
         const cachedResult: CachedContextResult = {
           noteId: candidate.noteId,
           inputFingerprint,
-          model: options.model,
+          model: generatedModel,
           generatedAt,
           contextHTML: restoredHTML,
         };
@@ -274,7 +300,7 @@ async function main(): Promise<void> {
         resolution = {
           status: "restored",
           method: "ai",
-          model: options.model,
+          model: generatedModel,
           generatedAt,
         };
         ++generated;

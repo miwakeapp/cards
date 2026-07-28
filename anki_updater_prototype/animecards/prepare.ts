@@ -13,7 +13,7 @@ import { ankiSearchValue, fetchNoteInfos } from "./anki.ts";
 import {
   CARD_FIELD_GENERATION_CACHE_VERSION,
   DEFAULT_MODEL_ID,
-  generateCardFields,
+  generateTargetInContext,
   MODEL_IDS,
   type ModelId,
 } from "card_field_generation";
@@ -521,29 +521,12 @@ async function main(): Promise<void> {
       try {
         if (resolved === undefined) {
           const generatedAt = new Date().toISOString();
-          // The canonical call also returns sense and minimized-context fields. This pass uses only
-          // `targetInContext`; the normal enrichment stage remains authoritative for the others.
-          const fields = await generateCardFields({
+          const surface = await generateTargetInContext({
             context: request.context,
             recognitionTarget: request.recognitionTarget,
             jmdictEntry: request.entry,
-            source: request.sourceResolution.name ?? undefined,
-            sourceURL: request.sourceResolution.url ?? undefined,
             kanaReading: request.reading,
           }, options.aiModel);
-          if (fields.applicableSenses === null) {
-            throw new Error(
-              `No JMDict sense applies to recognition target ${
-                JSON.stringify(request.recognitionTarget)
-              } in the supplied context.`,
-            );
-          }
-          const surface = fields.targetInContext;
-          if (surface.length === 0 || !request.context.includes(surface)) {
-            throw new Error(
-              `AI target is not a literal substring: ${JSON.stringify(surface)}`,
-            );
-          }
           resolved = { inputFingerprint, model: options.aiModel, generatedAt, surface };
           await appendTargetAICache(options.targetAICachePath, resolved);
           targetAICache.set(cacheKey, resolved);

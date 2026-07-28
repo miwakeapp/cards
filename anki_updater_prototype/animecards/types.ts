@@ -93,6 +93,7 @@ export type FullContextResolution =
   | { status: "source-unavailable" }
   | ({ status: "pending" } & FullContextSelectionInput)
   | { status: "restored"; method: "exact" }
+  | { status: "restored"; method: "deterministic" }
   | { status: "restored"; method: "ai"; model: string; generatedAt: string }
   | ({
     status: "failed";

@@ -193,6 +193,7 @@ function adjectiveSurfaceForms(dictionaryForm: string): string[] {
     `${stem}ければ`,
     `${stem}さ`,
     `${stem}み`,
+    `${stem}げ`,
   ];
   // Some fixed negative expressions are tagged as i-adjectives in JMDict even though their
   // literary `ず`/`ぬ` forms expose the underlying verb, e.g. `そぐわない` → `そぐわず`.

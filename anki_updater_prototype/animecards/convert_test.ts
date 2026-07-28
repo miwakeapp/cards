@@ -333,6 +333,66 @@ Deno.test("convertAnimecardsNote keeps neighboring EPUB evidence separate from c
   );
 });
 
+Deno.test("convertAnimecardsNote accepts deterministically elided long dialogue", async () => {
+  const entry = makeWord({ kana: ["たべる"] });
+  const entries = new Map([[entry.id, entry]]);
+  const targetParagraph =
+    "ここには状況が十分にわかる説明があり、彼はゆっくりたべている。だからこの段落だけで意味が通じる。";
+  const paragraphs = [
+    {
+      html: "「ずっと前から続いている長い話の冒頭。",
+      plainText: "「ずっと前から続いている長い話の冒頭。",
+      document: "chapter.xhtml",
+      index: 0,
+    },
+    {
+      html: targetParagraph,
+      plainText: targetParagraph,
+      document: "chapter.xhtml",
+      index: 1,
+    },
+    {
+      html: "さらに話は続く。",
+      plainText: "さらに話は続く。",
+      document: "chapter.xhtml",
+      index: 2,
+    },
+    {
+      html: "ようやく話が終わる。」",
+      plainText: "ようやく話が終わる。」",
+      document: "chapter.xhtml",
+      index: 3,
+    },
+  ];
+  const result = await convertAnimecardsNote(
+    makeNote({ Sentence: "彼はゆっくりたべている。" }),
+    {
+      sourceModel: "Animecards",
+      targetModel: "Miwake",
+      sourceFields: SOURCE_FIELDS,
+      entries,
+      spellingIndex: buildSpellingIndex(entries.values()),
+      epubSourceCorpus: {
+        sources: [{
+          name: "Test Book",
+          documents: [paragraphs.map((paragraph) => paragraph.plainText).join("")],
+          paragraphs,
+        }],
+      },
+    },
+  );
+
+  assert(result.candidate);
+  assertEquals(result.candidate.fullContextResolution, {
+    status: "restored",
+    method: "deterministic",
+  });
+  assertEquals(
+    result.candidate.target.fields["Full context"],
+    "「……ここには状況が十分にわかる説明があり、彼はゆっくり<mark>たべて</mark>いる。だからこの段落だけで意味が通じる。……」",
+  );
+});
+
 Deno.test("convertAnimecardsNote resolves a multi-sense entry from JMDict restrictions", async () => {
   const entry = await preextractedJMDictEntry("1158110");
   const entries = new Map([[entry.id, entry]]);
@@ -888,6 +948,49 @@ Deno.test("convertAnimecardsNote adopts a kana dictionary spelling from an infle
   assertEquals(result.candidate.target.fields["Full context"], "匂いを<mark>かぎ</mark>");
 });
 
+Deno.test("convertAnimecardsNote restores and highlights repeated targets in one sentence", async () => {
+  const entry = makeWord({
+    kanji: ["嗅ぐ"],
+    kana: ["かぐ"],
+    partOfSpeech: ["v5g", "vt"],
+  });
+  const entries = new Map([[entry.id, entry]]);
+  const paragraph = {
+    html: "前文。男は匂いをかぎ、それからもう一度匂いをかぎ、首をかしげた。後文。",
+    plainText: "前文。男は匂いをかぎ、それからもう一度匂いをかぎ、首をかしげた。後文。",
+    document: "test.xhtml",
+    index: 0,
+  };
+  const result = await convertAnimecardsNote(
+    makeNote({ Word: "嗅ぐ", Sentence: "匂いをかぎ", Reading: "かぐ" }),
+    {
+      sourceModel: "Animecards",
+      targetModel: "Miwake",
+      sourceFields: SOURCE_FIELDS,
+      entries,
+      spellingIndex: buildSpellingIndex(entries.values()),
+      epubSourceCorpus: {
+        sources: [{
+          name: "Test Book",
+          documents: [paragraph.plainText],
+          paragraphs: [paragraph],
+        }],
+      },
+    },
+  );
+
+  assert(result.candidate);
+  assertEquals(
+    result.candidate.target.fields["Full context"],
+    "男は匂いを<mark>かぎ</mark>、それからもう一度匂いを<mark>かぎ</mark>、首をかしげた。",
+  );
+  assertEquals(result.candidate.fullContextResolution, {
+    status: "pending",
+    source: "Test Book",
+    requiredContextHTML: "男は匂いをかぎ、それからもう一度匂いをかぎ、首をかしげた。",
+  });
+});
+
 Deno.test("convertAnimecardsNote retains a kanji dictionary spelling used by the source", async () => {
   const entry = await preextractedJMDictEntry("1565480");
   const entries = new Map([[entry.id, entry]]);
@@ -1184,6 +1287,32 @@ Deno.test("convertAnimecardsNote normalizes and preserves a trailing JMDict nota
   assertEquals(result.candidate.target.fields.Key, "曽 | 1234567");
   assertEquals(result.candidate.target.fields.Reading, "曽[そう]～");
   assertEquals(result.candidate.target.fields["Full context"], "<mark>曽</mark>じいさんの形見");
+});
+
+Deno.test("convertAnimecardsNote ignores notation markers in the legacy reading field", async () => {
+  const entry = await preextractedJMDictEntry("1414110");
+  const entries = new Map([[entry.id, entry]]);
+  const result = await convertAnimecardsNote(
+    makeNote({
+      Word: "大小～",
+      Sentence: "大小を見る。",
+      Reading: "だいしょう～",
+      Glossary: '<a href="https://jitendex.org/?q=1414110">definition</a>',
+    }),
+    {
+      sourceModel: "Animecards",
+      targetModel: "Miwake",
+      sourceFields: SOURCE_FIELDS,
+      entries,
+      spellingIndex: buildSpellingIndex(entries.values()),
+      includeMultipleSenses: true,
+    },
+  );
+
+  assert(result.candidate, JSON.stringify(result.skipped));
+  assertEquals(result.candidate.readingKana, "だいしょう");
+  assertEquals(result.candidate.recognitionTarget, "大小～");
+  assertEquals(result.candidate.target.fields.Key, "大小 | 1414110");
 });
 
 Deno.test("convertAnimecardsNote leaves notes without a source for a later pass", async () => {

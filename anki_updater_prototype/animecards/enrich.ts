@@ -11,9 +11,8 @@ import { allJMDictEntries } from "data";
 import {
   CARD_FIELD_GENERATION_CACHE_VERSION,
   DEFAULT_MODEL_ID,
-  generateCardFields,
-  type GeneratedCardFields,
   type GeneratedSenseAndHint,
+  generateMinimizedContext,
   generateSenseAndHintFields,
   MODEL_IDS,
   type ModelId,
@@ -110,9 +109,7 @@ interface CachedAIResult {
 }
 
 function enrichmentContext(candidate: ConversionCandidate): string {
-  return normalizeContextHTML(
-    candidate.target.fields["Full context"].replace(/<\/?mark\b[^>]*>/giu, ""),
-  );
+  return normalizeContextHTML(candidate.target.fields["Full context"]);
 }
 
 function compatibleSenseNumbersForResolution(
@@ -262,57 +259,70 @@ async function main(): Promise<void> {
     if (entry === undefined) throw new Error(`JMDict entry ${candidate.jmdictId} is missing.`);
     const cardContext = enrichmentContext(candidate);
     const candidateInputFingerprint = await inputFingerprint(candidate, options.model);
-    const attemptedAt = new Date().toISOString();
-    const compatibleSenseNumbers = compatibleSenseNumbersForResolution(
-      candidate.senseResolution,
-    );
     const needsMinimizedContext = minimizedContextNeedsGeneration(
       candidate.minimizedContextResolution,
     );
-    try {
-      const sharedGenerationInput = {
-        recognitionTarget: candidate.keyRecognitionTarget,
-        jmdictEntry: entry,
-        kanaReading: candidate.readingKana,
-      };
-      const sensePromise = senseResolutionNeedsGeneration(candidate.senseResolution)
-        ? generateSenseAndHintFields({
-          ...sharedGenerationInput,
-          context: candidate.senseSelectionContext,
-          compatibleSenseNumbers: candidate.senseResolution.compatibleSenses,
-        }, options.model)
-        : undefined;
-      const cardFieldsPromise = needsMinimizedContext
-        ? generateCardFields({
-          ...sharedGenerationInput,
-          ...(compatibleSenseNumbers === undefined ? {} : { compatibleSenseNumbers }),
-          context: cardContext,
-          source: candidate.sourceResolution.name ?? undefined,
-          sourceURL: candidate.sourceResolution.url ?? undefined,
-        }, options.model)
-        : undefined;
-      const [senseFields, cardFields] = await Promise.all([sensePromise, cardFieldsPromise]);
-      let fields: GeneratedCardFields | GeneratedSenseAndHint;
-      if (senseFields !== undefined && cardFields !== undefined) {
-        fields = { ...cardFields, ...senseFields };
-      } else if (senseFields !== undefined) {
-        fields = senseFields;
-      } else if (cardFields !== undefined) {
-        fields = cardFields;
-      } else {
-        throw new Error("Candidate was scheduled without any pending AI-owned fields.");
+    let attemptedAt = new Date().toISOString();
+    let failureMessage: string | undefined;
+    for (let attempt = 1; attempt <= 3; ++attempt) {
+      attemptedAt = new Date().toISOString();
+      try {
+        const sharedGenerationInput = {
+          recognitionTarget: candidate.keyRecognitionTarget,
+          jmdictEntry: entry,
+          kanaReading: candidate.readingKana,
+        };
+        const sensePromise = senseResolutionNeedsGeneration(candidate.senseResolution)
+          ? generateSenseAndHintFields({
+            ...sharedGenerationInput,
+            context: candidate.senseSelectionContext,
+            compatibleSenseNumbers: candidate.senseResolution.compatibleSenses,
+          }, options.model)
+          : undefined;
+        const minimizedContextPromise = needsMinimizedContext
+          ? generateMinimizedContext({
+            recognitionTarget: candidate.keyRecognitionTarget,
+            fullContext: cardContext,
+          }, options.model)
+          : undefined;
+        const [senseFields, minimizedContext] = await Promise.all([
+          sensePromise,
+          minimizedContextPromise,
+        ]);
+        let fields: GeneratedSenseAndHint & { minimizedContext?: string | null };
+        if (senseFields !== undefined && minimizedContext !== undefined) {
+          fields = { ...senseFields, minimizedContext };
+        } else if (senseFields !== undefined) {
+          fields = senseFields;
+        } else if (minimizedContext !== undefined) {
+          // Sense fields are ignored when sense resolution is already complete.
+          fields = { applicableSenses: [], hint: null, minimizedContext };
+        } else {
+          throw new Error("Candidate was scheduled without any pending AI-owned fields.");
+        }
+        await applyGeneratedCardFields(candidate, entry, fields, options.model, attemptedAt);
+        failureMessage = undefined;
+        break;
+      } catch (error) {
+        failureMessage = error instanceof Error ? error.message : String(error);
+        if (isAIQuotaError(failureMessage)) break;
+        if (attempt < 3) {
+          console.error(
+            `  Retrying ${candidate.noteId} after invalid AI result (${attempt}/3): ${failureMessage}`,
+          );
+        }
       }
-      await applyGeneratedCardFields(candidate, entry, fields, options.model, attemptedAt);
+    }
+    if (failureMessage === undefined) {
       ++generated;
       console.error(`  Generated ${candidate.noteId}: ${candidate.recognitionTarget}`);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
+    } else {
       if (needsMinimizedContext) {
         candidate.minimizedContextResolution = {
           status: "failed",
           model: options.model,
           attemptedAt,
-          error: message,
+          error: failureMessage,
         };
       }
       if (senseResolutionNeedsGeneration(candidate.senseResolution)) {
@@ -320,13 +330,13 @@ async function main(): Promise<void> {
           status: "failed",
           model: options.model,
           attemptedAt,
-          error: message,
+          error: failureMessage,
           compatibleSenses: candidate.senseResolution.compatibleSenses,
         };
       }
       ++failed;
-      console.error(`  Failed ${candidate.noteId}: ${message}`);
-      if (isAIQuotaError(message)) {
+      console.error(`  Failed ${candidate.noteId}: ${failureMessage}`);
+      if (isAIQuotaError(failureMessage)) {
         rateLimited = true;
         console.error("  AI provider quota reached; leaving unscheduled candidates pending.");
       }

@@ -223,6 +223,17 @@ Deno.test("EPUB substring extraction restores ruby without including neighboring
   );
 });
 
+Deno.test("EPUB substring extraction can select one repeated occurrence by position", () => {
+  const html = "<ruby>生<rt>なま</rt></ruby>もの、<ruby>生<rt>い</rt></ruby>もの";
+  const secondStart = "生もの、".length;
+
+  assertEquals(extractEPUBHTMLSubstring(html, "生もの"), null);
+  assertEquals(
+    extractEPUBHTMLSubstring(html, "生もの", secondStart),
+    "<ruby>生<rt>い</rt></ruby>もの",
+  );
+});
+
 Deno.test("EPUB substring extraction strips source paragraph attributes", () => {
   assertEquals(
     extractEPUBHTMLSubstring(
@@ -245,14 +256,60 @@ Deno.test("EPUB context analysis derives the required complete sentence", () => 
   };
   assertEquals(analyzeEPUBContext(corpus, "完全な文です。", "Book"), {
     status: "complete",
-    match: { source: "Book", paragraphs: [paragraph], window: [paragraph] },
+    match: { source: "Book", paragraphs: [paragraph], window: [paragraph], contextStart: 3 },
     contextHTML: "<ruby>完全<rt>かんぜん</rt></ruby>な文です。",
   });
   assertEquals(analyzeEPUBContext(corpus, "完全な文", "Book"), {
     status: "complete",
-    match: { source: "Book", paragraphs: [paragraph], window: [paragraph] },
+    match: { source: "Book", paragraphs: [paragraph], window: [paragraph], contextStart: 3 },
     contextHTML: "<ruby>完全<rt>かんぜん</rt></ruby>な文です。",
   });
+});
+
+Deno.test("EPUB context analysis locates repeated excerpts within one source sentence", () => {
+  const paragraph = {
+    html:
+      "前文。男は<ruby>匂<rt>にお</rt></ruby>いをかぎ、それからもう一度匂いをかぎ、首をかしげた。後文。",
+    plainText: "前文。男は匂いをかぎ、それからもう一度匂いをかぎ、首をかしげた。後文。",
+    document: "chapter.xhtml",
+    index: 0,
+  };
+  const corpus = {
+    sources: [{ name: "Book", documents: [paragraph.plainText], paragraphs: [paragraph] }],
+  };
+
+  const analysis = analyzeEPUBContext(corpus, "匂いをかぎ", "Book");
+  assertEquals(analysis.status, "complete");
+  assertEquals(
+    analysis.status === "complete" ? analysis.contextHTML : null,
+    "男は<ruby>匂<rt>にお</rt></ruby>いをかぎ、それからもう一度匂いをかぎ、首をかしげた。",
+  );
+});
+
+Deno.test("EPUB context analysis retains positions through identical sentence expansion", () => {
+  const sentence = "男は匂いをかぎ、首をかしげた。";
+  const paragraph = {
+    html: `前文。${sentence}間の文。${sentence}後文。`,
+    plainText: `前文。${sentence}間の文。${sentence}後文。`,
+    document: "chapter.xhtml",
+    index: 0,
+  };
+  const corpus = {
+    sources: [{ name: "Book", documents: [paragraph.plainText], paragraphs: [paragraph] }],
+  };
+
+  const analysis = analyzeEPUBContext(corpus, "匂いをかぎ", "Book");
+  assertEquals(analysis.status, "complete");
+  assertEquals(
+    analysis.status === "complete" ? analysis.contextHTML : null,
+    sentence,
+  );
+  assertEquals(
+    analysis.status === "complete"
+      ? validateEPUBContextSelection(analysis.match, sentence, sentence)
+      : null,
+    sentence,
+  );
 });
 
 Deno.test("EPUB context analysis expands a good sentence to its full dialogue", () => {
@@ -269,13 +326,18 @@ Deno.test("EPUB context analysis expands a good sentence to its full dialogue", 
 
   assertEquals(analyzeEPUBContext(corpus, "対象の文です。", "Book"), {
     status: "complete",
-    match: { source: "Book", paragraphs: [paragraph], window: [paragraph] },
+    match: { source: "Book", paragraphs: [paragraph], window: [paragraph], contextStart: 4 },
     contextHTML:
       "「前文。<ruby>対象<rt>たいしょう</rt></ruby>の文です。後文。『さらに内側です』と続けます。」",
   });
   assertEquals(analyzeEPUBContext(corpus, "さらに内側です", "Book"), {
     status: "complete",
-    match: { source: "Book", paragraphs: [paragraph], window: [paragraph] },
+    match: {
+      source: "Book",
+      paragraphs: [paragraph],
+      window: [paragraph],
+      contextStart: paragraph.plainText.indexOf("さらに内側です"),
+    },
     contextHTML:
       "「前文。<ruby>対象<rt>たいしょう</rt></ruby>の文です。後文。『さらに内側です』と続けます。」",
   });
@@ -344,6 +406,37 @@ Deno.test("EPUB context validation enforces the required span", () => {
   );
 });
 
+Deno.test("EPUB context validation treats paragraph edges as natural boundaries", () => {
+  const heading = {
+    html: "１",
+    plainText: "１",
+    document: "chapter.xhtml",
+    index: 0,
+  };
+  const sentence = {
+    html: "<ruby>対象<rt>たいしょう</rt></ruby>の文です。",
+    plainText: "対象の文です。",
+    document: "chapter.xhtml",
+    index: 1,
+  };
+  const following = {
+    html: "続く段落",
+    plainText: "続く段落",
+    document: "chapter.xhtml",
+    index: 2,
+  };
+  const match = {
+    source: "Book",
+    paragraphs: [sentence],
+    window: [heading, sentence, following],
+  };
+
+  assertEquals(
+    validateEPUBContextSelection(match, "<p>対象の文です。</p>", "対象の文です。"),
+    "<ruby>対象<rt>たいしょう</rt></ruby>の文です。",
+  );
+});
+
 Deno.test("EPUB context analysis accepts repeated equivalent complete excerpts", () => {
   const first = {
     html: "<ruby>同一<rt>どういつ</rt></ruby>の文です。",
@@ -362,9 +455,39 @@ Deno.test("EPUB context analysis accepts repeated equivalent complete excerpts",
 
   assertEquals(analyzeEPUBContext(corpus, "同一の文です。", "Book"), {
     status: "complete",
-    match: { source: "Book", paragraphs: [first], window: [first] },
+    match: { source: "Book", paragraphs: [first], window: [first], contextStart: 0 },
     contextHTML: "<ruby>同一<rt>どういつ</rt></ruby>の文です。",
   });
+});
+
+Deno.test("EPUB context analysis accepts identical complete dialogue with different narration", () => {
+  const letter = "『あなたの<ruby>素性<rt>すじょう</rt></ruby>を知っています。お返事ください。』";
+  const first = {
+    html: `最初の場面。${letter}彼は便箋を畳んだ。`,
+    plainText: "最初の場面。『あなたの素性を知っています。お返事ください。』彼は便箋を畳んだ。",
+    document: "first.xhtml",
+    index: 0,
+  };
+  const second = {
+    html: `別の場面。${letter}彼女は封筒に戻した。`,
+    plainText: "別の場面。『あなたの素性を知っています。お返事ください。』彼女は封筒に戻した。",
+    document: "second.xhtml",
+    index: 0,
+  };
+  const corpus = {
+    sources: [{
+      name: "Book",
+      documents: [first.plainText, second.plainText],
+      paragraphs: [first, second],
+    }],
+  };
+
+  const analysis = analyzeEPUBContext(corpus, "あなたの素性を知っています。", "Book");
+  assertEquals(analysis.status, "complete");
+  assertEquals(
+    analysis.status === "complete" ? analysis.contextHTML : null,
+    letter,
+  );
 });
 
 Deno.test("EPUB context analysis rejects repeated excerpts with different evidence windows", () => {
@@ -575,7 +698,7 @@ Deno.test("EPUB sentence expansion does not split at an inline title quotation",
   );
 });
 
-Deno.test("EPUB dialogue expansion preserves complete cross-paragraph speech", () => {
+Deno.test("EPUB dialogue expansion elides long cross-paragraph speech", () => {
   const paragraphs = [
     {
       html: "「最初の文。",
@@ -627,12 +750,89 @@ Deno.test("EPUB dialogue expansion preserves complete cross-paragraph speech", (
   assertEquals(
     expandEPUBContextToFullDialogue(match, "対象の文。"),
     [
+      "<p>「……四番目の文。</p>",
+      "<p><ruby>対象<rt>たいしょう</rt></ruby>の文。……」</p>",
+    ].join("\n\n"),
+  );
+  const analysis = analyzeEPUBContext(corpus, "対象の文。", "Book");
+  assertEquals(analysis.status, "complete");
+  assertEquals(
+    analysis.status === "complete"
+      ? { contextHTML: analysis.contextHTML, dialogueElided: analysis.dialogueElided }
+      : null,
+    {
+      contextHTML: [
+        "<p>「……四番目の文。</p>",
+        "<p><ruby>対象<rt>たいしょう</rt></ruby>の文。……」</p>",
+      ].join("\n\n"),
+      dialogueElided: true,
+    },
+  );
+});
+
+Deno.test("EPUB dialogue expansion keeps only a sufficiently substantial target paragraph", () => {
+  const targetText =
+    "この段落だけで対象の状況が十分にわかるだけの長さがあり、前後の段落がなくても意味を理解できる対象の文です。";
+  const paragraphs = [
+    {
+      html: "「最初の文。",
+      plainText: "「最初の文。",
+      document: "chapter.xhtml",
+      index: 0,
+    },
+    {
+      html: targetText,
+      plainText: targetText,
+      document: "chapter.xhtml",
+      index: 1,
+    },
+    {
+      html: "最後の文。」",
+      plainText: "最後の文。」",
+      document: "chapter.xhtml",
+      index: 2,
+    },
+  ];
+  const match = {
+    source: "Book",
+    paragraphs: [paragraphs[1]],
+    window: paragraphs,
+    contextStart: paragraphs[0].plainText.length,
+  };
+
+  assertEquals(
+    expandEPUBContextToFullDialogue(match, "対象の文です。"),
+    `「……${targetText}……」`,
+  );
+});
+
+Deno.test("EPUB dialogue expansion preserves complete two-paragraph speech", () => {
+  const paragraphs = [
+    {
+      html: "「最初の文。",
+      plainText: "「最初の文。",
+      document: "chapter.xhtml",
+      index: 0,
+    },
+    {
+      html: "<ruby>対象<rt>たいしょう</rt></ruby>の文。」",
+      plainText: "対象の文。」",
+      document: "chapter.xhtml",
+      index: 1,
+    },
+  ];
+  const match = {
+    source: "Book",
+    paragraphs: [paragraphs[1]],
+    window: paragraphs,
+    contextStart: paragraphs[0].plainText.length,
+  };
+
+  assertEquals(
+    expandEPUBContextToFullDialogue(match, "対象の文。"),
+    [
       "<p>「最初の文。</p>",
-      "<p>二番目の文。</p>",
-      "<p>三番目の文。</p>",
-      "<p>四番目の文。</p>",
-      "<p><ruby>対象<rt>たいしょう</rt></ruby>の文。</p>",
-      "<p>最後の文。」</p>",
+      "<p><ruby>対象<rt>たいしょう</rt></ruby>の文。」</p>",
     ].join("\n\n"),
   );
 });

@@ -297,7 +297,9 @@ function chooseReading(
     return { reason: "no-applicable-reading" };
   }
 
-  const existingCandidates = readingFieldCandidates(existingReadingHTML);
+  const existingCandidates = readingFieldCandidates(existingReadingHTML).map(
+    removeBoundaryNotation,
+  );
   const exactTargetMatching = readings.filter((reading) => reading === recognitionTarget);
   if (exactTargetMatching.length === 1) {
     return { reading: exactTargetMatching[0] };
@@ -493,11 +495,13 @@ export async function convertAnimecardsNote(
     if (analysis.status !== "not-found") epubContextMatch = analysis.match;
     if (options.contextOverride === undefined && analysis.status === "complete") {
       contextHTML = normalizeContextHTML(analysis.contextHTML);
-      fullContextResolution = {
-        status: "pending",
-        source: analysis.match.source,
-        requiredContextHTML: contextHTML,
-      };
+      fullContextResolution = analysis.dialogueElided === true
+        ? { status: "restored", method: "deterministic" }
+        : {
+          status: "pending",
+          source: analysis.match.source,
+          requiredContextHTML: contextHTML,
+        };
     } else if (options.contextOverride === undefined && analysis.status === "cut-off") {
       fullContextResolution = {
         status: "pending",
