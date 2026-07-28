@@ -1019,6 +1019,25 @@ Deno.test("createCard renders and validates explicit source metadata", async () 
   );
 });
 
+Deno.test("createCard renders trusted source HTML verbatim", async () => {
+  const card = await createCard({
+    jmdictEntry: await preextractedJMDictEntry("1414110"),
+    recognitionTarget: "大小",
+    kanaReading: "だいしょう",
+    fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
+    source: {
+      html:
+        '<span lang="JA-jp">てごらん</span> <em onclick="alert(\'trusted HTML\')">(JLPT N3)</em> | Bunpro',
+      lang: "en",
+      url: "https://bunpro.jp/grammar_points/てごらん",
+    },
+  });
+  assertEquals(
+    card.source,
+    '<a lang="en" href="https://bunpro.jp/grammar_points/%E3%81%A6%E3%81%94%E3%82%89%E3%82%93"><span lang="JA-jp">てごらん</span> <em onclick="alert(\'trusted HTML\')">(JLPT N3)</em> | Bunpro</a>',
+  );
+});
+
 Deno.test("createCard escapes caller-owned plain-text fields", async () => {
   const card = await createCard({
     jmdictEntry: await preextractedJMDictEntry("1414110"),

@@ -26,16 +26,21 @@ function canonicalURL(url: string): string {
 /** Formats already-resolved source metadata for the Miwake Card's `Source` field. */
 export function formatSourceHTML(source: CardSource | undefined): string | null {
   if (source === undefined) return null;
-  if (source.text === "" || source.text !== source.text.trim()) {
-    throw new Error(
-      `source.text ${JSON.stringify(source.text)} must be nonempty and have no surrounding ` +
-        `whitespace`,
-    );
-  }
 
   const lang = canonicalLanguageTag(source.lang);
   const url = source.url === undefined ? undefined : canonicalURL(source.url);
-  const label = escape(source.text);
+  let label: string;
+  if (source.text !== undefined) {
+    if (source.text === "" || source.text !== source.text.trim()) {
+      throw new Error(
+        `source.text ${JSON.stringify(source.text)} must be nonempty and have no surrounding ` +
+          `whitespace`,
+      );
+    }
+    label = escape(source.text);
+  } else {
+    label = source.html;
+  }
 
   if (url === undefined) {
     return `<span lang="${lang}">${label}</span>`;

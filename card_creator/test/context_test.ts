@@ -17,6 +17,33 @@ Deno.test("processContextHTML corrects unmarked full-size kana using JMDict read
   );
 });
 
+Deno.test("processContextHTML corrects split compound ruby using the compound's reading", async () => {
+  const readings = new Map<string, readonly string[]>([
+    ["無慮", ["むりょ"]],
+    ["貸家", ["かしや", "かしいえ"]],
+  ]);
+  const resolveReadings = (spelling: string) => Promise.resolve(readings.get(spelling) ?? []);
+
+  assertEquals(
+    await processContextHTML(
+      "<ruby>無<rt>む</rt>慮<rt>りよ</rt></ruby>の<mark>大小</mark>を見る。",
+      "大小",
+      "だいしょう",
+      resolveReadings,
+    ),
+    "無[む] 慮[りょ]の<mark>大小</mark>を見る。",
+  );
+  assertEquals(
+    await processContextHTML(
+      "<ruby>貸<rt>か</rt>家<rt>しや</rt></ruby>の<mark>大小</mark>を見る。",
+      "大小",
+      "だいしょう",
+      resolveReadings,
+    ),
+    "貸[か] 家[しや]の<mark>大小</mark>を見る。",
+  );
+});
+
 Deno.test("processContextHTML preserves dictionary readings with genuine full-size kana", async () => {
   const readings = new Map<string, readonly string[]>([
     ["貸家", ["かしや", "かしいえ"]],

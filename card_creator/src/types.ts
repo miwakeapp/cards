@@ -1,35 +1,56 @@
 import type { JMDictWord } from "data";
 
 /** Human-readable provenance to store in the Miwake Card's `Source` field. */
-export interface CardSource {
-  /**
-   * The exact final display label as plain text, without HTML.
-   *
-   * The caller chooses any title punctuation because only the acquisition pipeline knows what kind
-   * of source this is. For example, pass `『虐殺器官』` for a Japanese book, `「記事名」` for a
-   * Japanese article, or `Tatoeba` for an unquoted project name. `createCard()` preserves the
-   * supplied label and escapes it for HTML.
-   */
-  text: string;
+export type CardSource =
+  & {
+    /**
+     * A language tag accepted and canonicalized by `Intl.getCanonicalLocales()`, such as `ja` or
+     * `en`.
+     *
+     * This is explicit rather than inferred from characters: a title's language cannot be reliably
+     * determined from its script alone. The tag is canonicalized before being written to HTML.
+     */
+    lang: string;
 
-  /**
-   * A language tag accepted and canonicalized by `Intl.getCanonicalLocales()`, such as `ja` or
-   * `en`.
-   *
-   * This is explicit rather than inferred from characters: a title's language cannot be reliably
-   * determined from its script alone. The tag is canonicalized before being written to HTML.
-   */
-  lang: string;
+    /**
+     * A URL for the source, normalized with the platform `URL` parser.
+     *
+     * Any absolute scheme is allowed, including application deep links. The acquisition pipeline
+     * decides whether a URL is suitable for the card. Its presence changes the Source field from a
+     * `<span>` to an `<a>`.
+     */
+    url?: string;
+  }
+  & (
+    | {
+      /**
+       * The exact final display label as plain text, without HTML.
+       *
+       * The caller chooses any title punctuation because only the acquisition pipeline knows what
+       * kind of source this is. For example, pass `『虐殺器官』` for a Japanese book, `「記事名」` for
+       * a Japanese article, or `Tatoeba` for an unquoted project name. `createCard()` preserves the
+       * supplied label and escapes it for HTML.
+       */
+      text: string;
 
-  /**
-   * A URL for the source, normalized with the platform `URL` parser.
-   *
-   * Any absolute scheme is allowed, including application deep links. The acquisition pipeline
-   * decides whether a URL is suitable for the card. Its presence changes the Source field from a
-   * `<span>` to an `<a>`.
-   */
-  url?: string;
-}
+      /** Unavailable when `text` supplies the label. */
+      html?: never;
+    }
+    | {
+      /**
+       * The exact final display label as trusted HTML.
+       *
+       * `createCard()` inserts this string verbatim, without parsing, escaping, validating, or
+       * sanitizing it. Callers must never populate it with untrusted content. Use it only when the
+       * label needs markup, such as `<span lang="ja">てごらん</span> (JLPT N3) | Bunpro`; prefer
+       * `text` otherwise.
+       */
+      html: string;
+
+      /** Unavailable when `html` supplies the label. */
+      text?: never;
+    }
+  );
 
 /**
  * Fully decided semantic content from which `createCard()` deterministically renders a Miwake
