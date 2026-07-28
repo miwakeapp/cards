@@ -193,6 +193,17 @@ Deno.test("findSurfaceFormsForLookupSpelling recognizes conjunctive derivations"
   );
 });
 
+Deno.test("findSurfaceFormsForLookupSpelling recognizes i-adjective げ derivations", async () => {
+  assertEquals(
+    await findSurfaceFormsForLookupSpelling(
+      "その決意に他人が賢しげに説教なんかできるものじゃないわ。",
+      "賢しい",
+      { partOfSpeech: ["adj-i"] },
+    ),
+    ["賢しげ"],
+  );
+});
+
 Deno.test("findSurfaceFormsForLookupSpelling rejects stems embedded in another lexical item", async () => {
   assertEquals(
     await findSurfaceFormsForLookupSpelling("好きな食べ物は寿司だ。", "食べる", {

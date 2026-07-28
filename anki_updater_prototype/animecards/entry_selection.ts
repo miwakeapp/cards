@@ -1,6 +1,7 @@
 import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
 import {
   CARD_FIELD_GENERATION_CACHE_VERSION,
+  generateContrastiveHint,
   type GeneratedSenseAndHint,
   generateSenseAndHintFields,
   type ModelId,
@@ -76,10 +77,60 @@ function uniqueForms<T>(forms: T[]): T[] {
   return [...new Map(forms.map((form) => [JSON.stringify(form), form])).values()];
 }
 
+const GLOSS_STOP_WORDS = new Set([
+  "an",
+  "and",
+  "as",
+  "at",
+  "by",
+  "esp",
+  "for",
+  "from",
+  "in",
+  "of",
+  "on",
+  "one",
+  "or",
+  "the",
+  "to",
+  "with",
+]);
+
+function glossVocabulary(entry: JMdictWord, senseNumbers?: readonly number[]): Set<string> {
+  const senses = senseNumbers === undefined
+    ? entry.sense
+    : senseNumbers.map((number) => entry.sense[number - 1]);
+  return new Set(
+    senses
+      .flatMap((sense) => sense.gloss)
+      .filter(({ lang }) => lang === "eng")
+      .flatMap(({ text }) => text.toLowerCase().match(/[a-z]+/gu) ?? [])
+      .filter((word) => word.length > 1 && !GLOSS_STOP_WORDS.has(word)),
+  );
+}
+
+/**
+ * Conservatively declines to invent a semantic contrast when JMDict's English glosses share
+ * meaningful vocabulary. This catches duplicate entries split primarily by reading or register;
+ * false negatives merely leave a card for multi-reading support or manual review.
+ */
+function entriesHaveSharedGlossVocabulary(
+  selectedEntry: JMdictWord,
+  applicableSenseNumbers: readonly number[],
+  contrastingEntries: readonly JMdictWord[],
+): boolean {
+  const selectedWords = glossVocabulary(selectedEntry, applicableSenseNumbers);
+  const contrastingWords = new Set(
+    contrastingEntries.flatMap((entry) => [...glossVocabulary(entry)]),
+  );
+  return selectedWords.intersection(contrastingWords).size > 0;
+}
+
 type GenerateSenseAndHint = (
   input: SenseAndHintGenerationInput,
   model: ModelId,
 ) => Promise<GeneratedSenseAndHint>;
+type GenerateContrastiveHint = typeof generateContrastiveHint;
 
 /** Revalidates cached selections against reading evidence that is not entrusted to the model. */
 export function readingConflictForJMDictEntrySelection(
@@ -176,6 +227,7 @@ export async function selectJMDictEntry(
   request: UnresolvedJMDictEntry,
   model: ModelId,
   generate: GenerateSenseAndHint = generateSenseAndHintFields,
+  generateHint: GenerateContrastiveHint = generateContrastiveHint,
 ): Promise<JMDictEntrySelection> {
   const readingCompatibleEntries = request.candidateEntries.filter((entry) =>
     readingConflictForJMDictEntrySelection(request, entry.id) === null
@@ -215,15 +267,33 @@ export async function selectJMDictEntry(
     }
     const readingConflict = readingConflictForJMDictEntrySelection(request, jmdictId);
     if (readingConflict !== null) return readingConflict;
-    if (generated.hint === null) {
+    const applicableSenseNumbers = selectedSenses.map(({ senseNumber }) => senseNumber);
+    const selectedEntry = candidateEntries.find(({ id }) => id === jmdictId)!;
+    const contrastingEntries = request.candidateEntries.filter(({ id }) => id !== jmdictId);
+    const hint = generated.hint ?? (
+      entriesHaveSharedGlossVocabulary(
+          selectedEntry,
+          applicableSenseNumbers,
+          contrastingEntries,
+        )
+        ? null
+        : await generateHint({
+          context: request.context,
+          recognitionTarget: request.recognitionTarget,
+          selectedEntry,
+          applicableSenseNumbers,
+          contrastingEntries,
+        }, model)
+    );
+    if (hint === null) {
       return { status: "hint-unavailable", selectedJMDictId: jmdictId };
     }
     return {
       status: "selected",
       jmdictId,
       recognitionTarget: request.recognitionTarget,
-      applicableSenseNumbers: selectedSenses.map(({ senseNumber }) => senseNumber),
-      hint: generated.hint,
+      applicableSenseNumbers,
+      hint,
       model,
       generatedAt: new Date().toISOString(),
       candidateJMDictIds: request.candidateEntries.map(({ id }) => id).toSorted(),

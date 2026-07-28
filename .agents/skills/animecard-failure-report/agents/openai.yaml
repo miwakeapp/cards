@@ -1,0 +1,4 @@
+interface:
+  display_name: "Animecard Failure Report"
+  short_description: "Summarize unresolved Animecards by actionable pipeline failure"
+  default_prompt: "Produce a concise remediation-oriented Markdown report for the latest Animecards conversion manifest."

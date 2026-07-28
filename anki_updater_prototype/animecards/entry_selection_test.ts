@@ -225,7 +225,63 @@ Deno.test("selectJMDictEntry defers a source-ruby distinction with no useful hin
     }),
     "gemini-3.6-flash",
     () => Promise.resolve({ applicableSenses: [], hint: null }),
+    () => Promise.resolve(null),
   );
+  assertEquals(result, {
+    status: "hint-unavailable",
+    selectedJMDictId: "1111111",
+  });
+});
+
+Deno.test("selectJMDictEntry asks for a contrastive hint after reading selects the entry", async () => {
+  const selectedEntry = entry("1111111", ["karma"]);
+  const contrastingEntry = entry("2222222", ["work"]);
+  const result = await selectJMDictEntry(
+    request({
+      allowedJMDictIds: ["1111111"],
+      kanaReadingEvidence: "source-ruby",
+      candidateEntries: [contrastingEntry, selectedEntry],
+    }),
+    "gemini-3.6-flash",
+    () => Promise.resolve({ applicableSenses: [], hint: null }),
+    (input) => {
+      assertEquals(input.selectedEntry, selectedEntry);
+      assertEquals(input.applicableSenseNumbers, [1]);
+      assertEquals(input.contrastingEntries, [contrastingEntry]);
+      return Promise.resolve("前世の業");
+    },
+  );
+
+  assertEquals(result, {
+    status: "selected",
+    jmdictId: "1111111",
+    recognitionTarget: "業",
+    applicableSenseNumbers: [1],
+    hint: "前世の業",
+    model: "gemini-3.6-flash",
+    generatedAt: result.status === "selected" ? result.generatedAt : "",
+    candidateJMDictIds: ["1111111", "2222222"],
+    allowedJMDictIds: ["1111111"],
+  });
+});
+
+Deno.test("selectJMDictEntry does not invent a hint for entries with overlapping glosses", async () => {
+  const result = await selectJMDictEntry(
+    request({
+      allowedJMDictIds: ["1111111"],
+      kanaReadingEvidence: "source-ruby",
+      candidateEntries: [
+        entry("2222222", ["karma", "destiny"]),
+        entry("1111111", ["karma", "fate"]),
+      ],
+    }),
+    "gemini-3.6-flash",
+    () => Promise.resolve({ applicableSenses: [], hint: null }),
+    () => {
+      throw new Error("Contrastive generation should not run for overlapping glosses.");
+    },
+  );
+
   assertEquals(result, {
     status: "hint-unavailable",
     selectedJMDictId: "1111111",
