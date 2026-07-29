@@ -431,6 +431,8 @@ export async function convertAnimecardsNote(
     epubSourceCorpus?: EPUBSourceCorpus;
     /** Retains the future sense-selection pipeline without enabling it in normal preparation. */
     includeMultipleSenses?: boolean;
+    /** Accepts the original Animecard context as final when no source can be resolved. */
+    includeSourceless?: boolean;
     /** Lets a shared spelling reach entry selection without admitting unrelated multi-sense cards. */
     resolveAmbiguousEntries?: boolean;
     contextOverride?: {
@@ -471,17 +473,18 @@ export async function convertAnimecardsNote(
     originalContextHTML,
     options.epubSourceCorpus,
   );
-  if (sourceResolution.name === null) {
+  if (sourceResolution.name === null && options.includeSourceless !== true) {
     return skip(note.noteId, word, "no-source");
   }
 
   let contextHTML = options.contextOverride?.html ?? originalContextHTML;
   let epubContextMatch: EPUBContextMatch | null = null;
   let senseSelectionEPUBMatch: EPUBContextMatch | null = null;
-  let fullContextResolution: FullContextResolution = options.contextOverride?.resolution ?? {
-    status: "source-unavailable",
-  };
-  if (options.epubSourceCorpus !== undefined) {
+  let fullContextResolution: FullContextResolution = options.contextOverride?.resolution ??
+    (sourceResolution.name === null
+      ? { status: "restored", method: "original" }
+      : { status: "source-unavailable" });
+  if (options.epubSourceCorpus !== undefined && sourceResolution.name !== null) {
     senseSelectionEPUBMatch = findUniqueEPUBContext(
       options.epubSourceCorpus,
       originalContextHTML,

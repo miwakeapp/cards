@@ -50,6 +50,7 @@ interface Options {
   epubTextsDirectory: string | undefined;
   jmdictOverridesPath: string | undefined;
   includeMultipleSenses: boolean;
+  includeSourceless: boolean;
   resolveEntriesWithAI: boolean;
   resolveTargetsWithAI: boolean;
   aiModel: ModelId;
@@ -78,6 +79,7 @@ function parseArguments(args: string[]): Options {
     boolean: [
       "no-epub-source-lookup",
       "include-multiple-senses",
+      "include-sourceless",
       "resolve-entries-with-ai",
       "resolve-targets-with-ai",
     ],
@@ -127,6 +129,7 @@ function parseArguments(args: string[]): Options {
       : flags["epub-texts-dir"] ?? path.join(import.meta.dirname!, "..", "epub_texts"),
     jmdictOverridesPath: flags["jmdict-overrides"],
     includeMultipleSenses: flags["include-multiple-senses"],
+    includeSourceless: flags["include-sourceless"],
     resolveEntriesWithAI: flags["resolve-entries-with-ai"],
     resolveTargetsWithAI: flags["resolve-targets-with-ai"],
     aiModel: aiModel as ModelId,
@@ -313,7 +316,7 @@ async function main(): Promise<void> {
   } catch (error) {
     console.error(error instanceof Error ? error.message : String(error));
     console.error(
-      "Usage: deno task animecards:prepare [--limit=N] [--query=...] [--source-model=Animecards] [--target-model=Miwake] [--output=PATH] [--anki-connect-url=URL] [--epub-texts-dir=PATH|--no-epub-source-lookup] [--jmdict-overrides=PATH] [--include-multiple-senses] [--resolve-entries-with-ai] [--resolve-targets-with-ai] [--ai-model=MODEL] [--entry-ai-cache=PATH] [--target-ai-cache=PATH] [--word-field=NAME] [--sentence-field=NAME] [--glossary-field=NAME] [--reading-field=NAME] [--source-field=NAME] [--source-url-field=NAME]",
+      "Usage: deno task animecards:prepare [--limit=N] [--query=...] [--source-model=Animecards] [--target-model=Miwake] [--output=PATH] [--anki-connect-url=URL] [--epub-texts-dir=PATH|--no-epub-source-lookup] [--jmdict-overrides=PATH] [--include-multiple-senses] [--include-sourceless] [--resolve-entries-with-ai] [--resolve-targets-with-ai] [--ai-model=MODEL] [--entry-ai-cache=PATH] [--target-ai-cache=PATH] [--word-field=NAME] [--sentence-field=NAME] [--glossary-field=NAME] [--reading-field=NAME] [--source-field=NAME] [--source-url-field=NAME]",
     );
     Deno.exit(1);
   }
@@ -401,6 +404,7 @@ async function main(): Promise<void> {
       jmdictIdOverride: jmdictOverrides.get(note.noteId),
       epubSourceCorpus,
       includeMultipleSenses: options.includeMultipleSenses,
+      includeSourceless: options.includeSourceless,
       resolveAmbiguousEntries: options.resolveEntriesWithAI,
     };
     let selectedEntryOverride:

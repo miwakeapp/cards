@@ -30,6 +30,8 @@ const PRIVATE_SOURCE_HOSTS = new Set([
   "reader.ttsu.app",
 ]);
 const TEMPORARY_QUERY_PARAMETER_PATTERN = /^(?:auth|expires?|signature|token)$/iu;
+const ANKI_RUBY_READING_PATTERN =
+  /(?<=[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}ー々〆ヵヶ])\[[\p{Script=Hiragana}\p{Script=Katakana}ー・]+\]/gv;
 
 /** Best-effort language classification for unstructured legacy source labels. */
 export function inferLegacySourceLanguage(sourceText: string): "ja" | "en" {
@@ -59,7 +61,12 @@ export function searchableEPUBText(html: string): string {
     html
       .replace(/<rt\b[^>]*>.*?<\/rt>/gisu, "")
       .replace(/<[^>]+>/gu, ""),
-  ).replace(/\s+/gu, "").trim();
+  )
+    // Animecards may serialize source ruby as Anki brackets. Match its printed base against the
+    // EPUB base text; `extractEPUBHTMLSubstring()` later restores the authoritative `<ruby>`.
+    .replace(ANKI_RUBY_READING_PATTERN, "")
+    .replace(/\s+/gu, "")
+    .trim();
 }
 
 function cleanEPUBHTML(html: string): string {
