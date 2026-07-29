@@ -1328,3 +1328,32 @@ Deno.test("convertAnimecardsNote leaves notes without a source for a later pass"
 
   assertEquals(result.skipped?.reason, "no-source");
 });
+
+Deno.test("convertAnimecardsNote explicitly accepts a source-less note's original context", async () => {
+  const entry = makeWord({ kana: ["たべる"] });
+  const entries = new Map([[entry.id, entry]]);
+  const result = await convertAnimecardsNote(makeNote({ Source: "" }), {
+    sourceModel: "Animecards",
+    targetModel: "Miwake",
+    sourceFields: SOURCE_FIELDS,
+    entries,
+    spellingIndex: buildSpellingIndex(entries.values()),
+    includeSourceless: true,
+  });
+
+  assert(result.candidate, JSON.stringify(result.skipped));
+  assertEquals(result.candidate.approved, true);
+  assertEquals(result.candidate.sourceResolution, {
+    name: null,
+    method: "none",
+    url: null,
+    urlIsPublic: false,
+  });
+  assertEquals(result.candidate.fullContextResolution, {
+    status: "restored",
+    method: "original",
+  });
+  assertEquals(result.candidate.target.fields["Full context"], "<mark>たべて</mark>いる。");
+  assertEquals(result.candidate.target.fields["Minimized context"], "");
+  assertEquals(result.candidate.target.fields.Source, "");
+});

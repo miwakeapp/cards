@@ -151,6 +151,26 @@ Deno.test("EPUB context lookup returns ruby HTML and a same-document window", ()
   );
 });
 
+Deno.test("EPUB lookup ignores Anki-style readings and restores source ruby", () => {
+  const paragraph = {
+    html: "別れの<ruby>弾丸<rt>メール</rt></ruby>だ。",
+    plainText: "別れの弾丸だ。",
+    document: "chapter.xhtml",
+    index: 0,
+  };
+  const corpus = {
+    sources: [{ name: "Book", documents: [paragraph.plainText], paragraphs: [paragraph] }],
+  };
+
+  assertEquals(findUniqueEPUBSource(corpus, "別れの 弾丸[メール]だ。"), "Book");
+  const analysis = analyzeEPUBContext(corpus, "別れの 弾丸[メール]だ。", "Book");
+  assertEquals(analysis.status, "complete");
+  assertEquals(
+    analysis.status === "complete" ? analysis.contextHTML : null,
+    "別れの<ruby>弾丸<rt>メール</rt></ruby>だ。",
+  );
+});
+
 Deno.test("EPUB sense-selection context includes only the nearest neighboring paragraphs", () => {
   const paragraphs = [
     { html: "遠い前段。", plainText: "遠い前段。", document: "chapter.xhtml", index: 0 },

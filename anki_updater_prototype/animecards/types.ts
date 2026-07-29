@@ -1,4 +1,4 @@
-export const CONVERSION_MANIFEST_VERSION = 13;
+export const CONVERSION_MANIFEST_VERSION = 14;
 
 export interface AnkiFieldValue {
   value: string;
@@ -92,6 +92,7 @@ interface FullContextSelectionInput {
 export type FullContextResolution =
   | { status: "source-unavailable" }
   | ({ status: "pending" } & FullContextSelectionInput)
+  | { status: "restored"; method: "original" }
   | { status: "restored"; method: "exact" }
   | { status: "restored"; method: "deterministic" }
   | { status: "restored"; method: "ai"; model: string; generatedAt: string }
