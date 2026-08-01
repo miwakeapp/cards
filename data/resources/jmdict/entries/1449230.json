@@ -1,0 +1,88 @@
+{
+  "id": "1449230",
+  "kanji": [
+    {
+      "common": true,
+      "text": "当分",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "とうぶん",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adv",
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "for the present"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "for the time being"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adv",
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "for a while (from now)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "for some time (to come)"
+        }
+      ]
+    }
+  ]
+}

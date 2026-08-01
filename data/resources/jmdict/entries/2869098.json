@@ -1,0 +1,62 @@
+{
+  "id": "2869098",
+  "kanji": [],
+  "kana": [
+    {
+      "common": false,
+      "text": "シャイア",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "シャイアー",
+      "tags": [
+        "sk"
+      ],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "シャー",
+      "tags": [
+        "sk"
+      ],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "shire (administrative unit in the UK, Australia, etc.)"
+        }
+      ]
+    }
+  ]
+}

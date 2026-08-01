@@ -1,0 +1,118 @@
+{
+  "id": "1269140",
+  "kanji": [
+    {
+      "common": false,
+      "text": "呉れ呉れも",
+      "tags": [
+        "rK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "呉々も",
+      "tags": [
+        "rK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "呉呉も",
+      "tags": [
+        "rK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "くれぐれも",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adv"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "sincerely"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "earnestly"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "wholeheartedly"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adv"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "repeatedly"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "over and over"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "again and again"
+        }
+      ]
+    }
+  ]
+}

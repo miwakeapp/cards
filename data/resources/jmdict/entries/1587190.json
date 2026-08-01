@@ -1,0 +1,92 @@
+{
+  "id": "1587190",
+  "kanji": [
+    {
+      "common": true,
+      "text": "生ける",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "活ける",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "いける",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "v1",
+        "vt"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to arrange (flowers)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to plant"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adj-f"
+      ],
+      "appliesToKanji": [
+        "生ける"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "living"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "live"
+        }
+      ]
+    }
+  ]
+}

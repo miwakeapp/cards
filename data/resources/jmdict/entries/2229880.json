@@ -1,0 +1,54 @@
+{
+  "id": "2229880",
+  "kanji": [
+    {
+      "common": false,
+      "text": "銅戈",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "どうか",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "戈",
+          "ほこ・1",
+          1
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "bronze dagger-axe"
+        }
+      ]
+    }
+  ]
+}

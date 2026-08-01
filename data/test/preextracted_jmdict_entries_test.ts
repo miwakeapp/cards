@@ -18,16 +18,15 @@ Deno.test("pre-extracted JMDict entries are internally consistent and cover cons
     ids.add(word.id);
   }
 
-  for await (
-    const entry of Deno.readDir(path.resolve(dataDirectory, "../card_creator_evals/inputs"))
-  ) {
-    if (!entry.isFile || !entry.name.endsWith(".json")) continue;
-    const input = JSON.parse(
-      await Deno.readTextFile(
-        path.resolve(dataDirectory, "../card_creator_evals/inputs", entry.name),
-      ),
-    ) as { jmdictId: string };
-    assert(ids.has(input.jmdictId), `${entry.name} needs missing JMDict entry ${input.jmdictId}`);
+  const cardFieldGenerationManifestPath = path.resolve(
+    dataDirectory,
+    "resources/jmdict/card_field_generation_eval_entry_ids.json",
+  );
+  const cardFieldGenerationIds = JSON.parse(
+    await Deno.readTextFile(cardFieldGenerationManifestPath),
+  ) as string[];
+  for (const id of cardFieldGenerationIds) {
+    assert(ids.has(id), `Card-field generation evals need missing JMDict entry ${id}`);
   }
 
   const furigana = JSON.parse(
@@ -44,4 +43,26 @@ Deno.test("pre-extracted JMDict entries are internally consistent and cover cons
   assertEquals(snapshot.source, "https://github.com/scriptin/jmdict-simplified");
   assertMatch(snapshot.version, /^\d+\.\d+\.\d+$/);
   assertMatch(snapshot.dictDate, /^\d{4}-\d{2}-\d{2}$/);
+});
+
+Deno.test("aggregate JMDict build owns the independent entry and furigana artifacts", async () => {
+  const config = JSON.parse(
+    await Deno.readTextFile(path.join(dataDirectory, "deno.json")),
+  ) as {
+    tasks: Record<string, { dependencies?: string[] } | string>;
+  };
+  const aggregate = config.tasks["build:jmdict"];
+  assert(typeof aggregate === "object");
+  assertEquals(
+    [...aggregate.dependencies ?? []].sort(),
+    [
+      "build:jmdict:entries",
+      "build:jmdict:furigana-fixture",
+      "build:jmdict:readings",
+      "build:jmdict:tags",
+    ],
+  );
+  const furiganaFixture = config.tasks["build:jmdict:furigana-fixture"];
+  assert(typeof furiganaFixture === "object");
+  assertEquals(furiganaFixture.dependencies, undefined);
 });

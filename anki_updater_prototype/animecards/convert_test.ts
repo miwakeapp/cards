@@ -3,7 +3,7 @@ import "../../data/test/use_jmdict_fixtures.ts";
 import { assert, assertEquals } from "@std/assert";
 import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
 import { preextractedJMDictEntry } from "data";
-import { buildSpellingIndex } from "../shared/jmdict_resolution/recognition_target_lookup.ts";
+import { buildSpellingIndex } from "card_resolution";
 import { convertAnimecardsNote } from "./convert.ts";
 import type { AnkiNoteInfo, SourceFieldMapping } from "./types.ts";
 
@@ -81,7 +81,7 @@ Deno.test("convertAnimecardsNote deterministically converts and highlights an in
     spellingIndex: buildSpellingIndex(entries.values()),
   });
 
-  assert(result.candidate);
+  assert(result.candidate, JSON.stringify(result.skipped));
   assertEquals(result.candidate.target.fields["Key"], "たべる | 1234567");
   assertEquals(result.candidate.target.fields["Recognition target"], "たべる");
   assertEquals(result.candidate.target.fields["Reading"], "");
@@ -95,6 +95,31 @@ Deno.test("convertAnimecardsNote deterministically converts and highlights an in
     surface: "たべて",
   });
   assertEquals(result.candidate.senseSelectionContext, "たべている。");
+});
+
+Deno.test("convertAnimecardsNote marks only the resolved lexical occurrence in HTML", async () => {
+  const entry = makeWord({ kana: ["なる"], partOfSpeech: ["v5r"] });
+  const entries = new Map([[entry.id, entry]]);
+  const result = await convertAnimecardsNote(
+    makeNote({
+      Word: "なる",
+      Reading: "なる",
+      Sentence: "<p>彼の考えとは<ruby>異<rt>こと</rt></ruby>なるが、</p><p>結果はこうなる。</p>",
+    }),
+    {
+      sourceModel: "Animecards",
+      targetModel: "Miwake",
+      sourceFields: SOURCE_FIELDS,
+      entries,
+      spellingIndex: buildSpellingIndex(entries.values()),
+    },
+  );
+
+  assert(result.candidate, JSON.stringify(result.skipped));
+  assertEquals(
+    result.candidate.target.fields["Full context"],
+    "<p>彼の考えとは 異[こと]なるが、</p><p>結果はこう<mark>なる</mark>。</p>",
+  );
 });
 
 Deno.test("convertAnimecardsNote declines a verb stem embedded in another lexical item", async () => {
@@ -143,15 +168,15 @@ Deno.test("convertAnimecardsNote highlights every inflection of the target", asy
     },
   );
 
-  assert(result.candidate);
+  assert(result.candidate, JSON.stringify(result.skipped));
   assertEquals(
     result.candidate.target.fields["Full context"],
-    "同じように、<mark>頼った</mark>り<mark>頼られた</mark>りすればいいと思うよ。",
+    "同じように、<mark>頼ったり</mark><mark>頼られたり</mark>すればいいと思うよ。",
   );
   assertEquals(result.candidate.targetInContextResolution, {
     method: "deterministic",
-    surface: "頼った",
-    additionalSurfaces: ["頼られた"],
+    surface: "頼ったり",
+    additionalSurfaces: ["頼られたり"],
   });
 });
 
@@ -174,10 +199,10 @@ Deno.test("convertAnimecardsNote handles embedded whitespace in target surfaces"
     },
   );
 
-  assert(result.candidate);
+  assert(result.candidate, JSON.stringify(result.skipped));
   assertEquals(
     result.candidate.target.fields["Full context"],
-    "同じように、<mark>頼っ た</mark>り<mark>頼られた</mark>りすればいい。",
+    "同じように、<mark>頼っ たり</mark><mark>頼られたり</mark>すればいい。",
   );
 });
 
@@ -210,7 +235,7 @@ Deno.test("convertAnimecardsNote accepts an audited AI target override at every 
       generatedAt: "2026-07-22T00:00:00.000Z",
     },
   });
-  assert(result.candidate);
+  assert(result.candidate, JSON.stringify(result.skipped));
   assertEquals(
     result.candidate.target.fields["Full context"],
     "<mark>のっしのっしと歩いていった</mark>。また、" +
@@ -522,6 +547,49 @@ Deno.test("convertAnimecardsNote declines a spelling shared by multiple JMDict e
     candidateJMDictIds: ["1111111", "2222222"],
     allowedJMDictIds: ["1111111"],
   });
+});
+
+Deno.test("convertAnimecardsNote finds same-spelling entries across JMDict form categories", async () => {
+  const nonKanaForm = makeWord({
+    id: "1111111",
+    kanji: ["かな"],
+    kana: ["カナ"],
+    partOfSpeech: ["n"],
+  });
+  const kanaForm = makeWord({
+    id: "2222222",
+    kana: ["かな"],
+    partOfSpeech: ["n"],
+  });
+  const entries = new Map([[nonKanaForm.id, nonKanaForm], [kanaForm.id, kanaForm]]);
+
+  const result = await convertAnimecardsNote(
+    makeNote({
+      Word: "かな",
+      Sentence: "かなを比べる。",
+      Glossary: "",
+      Reading: "かな",
+    }),
+    {
+      sourceModel: "Animecards",
+      targetModel: "Miwake",
+      sourceFields: SOURCE_FIELDS,
+      entries,
+      spellingIndex: buildSpellingIndex(entries.values()),
+    },
+  );
+
+  assertEquals(result.skipped, {
+    noteId: 42,
+    word: "かな",
+    reason: "ambiguous-jmdict-match",
+    detail: "1111111, 2222222",
+  });
+  assert(result.unresolvedJMDictEntry);
+  assertEquals(
+    result.unresolvedJMDictEntry.candidateEntries.map(({ id }) => id),
+    ["1111111", "2222222"],
+  );
 });
 
 Deno.test("convertAnimecardsNote lets a reviewed entry override replace a wrong glossary ID", async () => {
@@ -1010,7 +1078,7 @@ Deno.test("convertAnimecardsNote retains a kanji dictionary spelling used by the
     },
   );
 
-  assert(result.candidate);
+  assert(result.candidate, JSON.stringify(result.skipped));
   assertEquals(result.candidate.recognitionTarget, "嗅ぐ");
   assertEquals(result.candidate.keyRecognitionTarget, "嗅ぐ");
   assertEquals(result.candidate.target.fields["Key"], "嗅ぐ | 1565480");
@@ -1151,7 +1219,7 @@ Deno.test("convertAnimecardsNote preserves semantic EPUB paragraph boundaries", 
     },
   );
 
-  assert(result.candidate);
+  assert(result.candidate, JSON.stringify(result.skipped));
   assertEquals(
     result.candidate.target.fields["Full context"],
     [
@@ -1192,7 +1260,7 @@ Deno.test("convertAnimecardsNote expands a truncated EPUB excerpt to reach its t
     },
   );
 
-  assert(result.candidate);
+  assert(result.candidate, JSON.stringify(result.skipped));
   assertEquals(result.candidate.fullContextResolution, {
     status: "pending",
     source: "Test Book",

@@ -1,0 +1,111 @@
+{
+  "id": "1430680",
+  "kanji": [
+    {
+      "common": false,
+      "text": "直と",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "頓と",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "ひたと",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adv"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "close to"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adv"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "directly (e.g. staring)"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adv"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "suddenly (e.g. stopping)"
+        }
+      ]
+    }
+  ]
+}

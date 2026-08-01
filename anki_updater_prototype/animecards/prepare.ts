@@ -8,26 +8,12 @@ import { parseArgs } from "@std/cli/parse-args";
 import * as path from "@std/path";
 import { allJMDictEntries, type JMDictWord } from "data";
 import { createACInvoke, DEFAULT_ANKI_CONNECT_URL } from "../shared/anki_connect.ts";
-import { buildSpellingIndex } from "../shared/jmdict_resolution/recognition_target_lookup.ts";
+import { buildSpellingIndex } from "card_resolution";
 import { ankiSearchValue, fetchNoteInfos } from "./anki.ts";
-import {
-  CARD_FIELD_GENERATION_CACHE_VERSION,
-  DEFAULT_MODEL_ID,
-  generateTargetInContext,
-  MODEL_IDS,
-  type ModelId,
-} from "card_field_generation";
-import {
-  convertAnimecardsNote,
-  MIWAKE_FIELD_NAMES,
-  type UnresolvedTargetInContext,
-} from "./convert.ts";
-import {
-  entrySelectionInputFingerprint,
-  type JMDictEntrySelection,
-  readingConflictForJMDictEntrySelection,
-  selectJMDictEntry,
-} from "./entry_selection.ts";
+import { isAIQuotaError, MODEL_IDS, type ModelId } from "card_field_generation";
+import { JSONLGenerationCache } from "card_field_generation/file-cache";
+import { convertAnimecardsNote, MIWAKE_FIELD_NAMES } from "./convert.ts";
+import { readingConflictForJMDictEntrySelection, selectJMDictEntry } from "./entry_selection.ts";
 import { resolveSourceFields } from "./fields.ts";
 import { normalizePlainText } from "./html.ts";
 import { defaultReportPath, writeConversionAuditArtifacts } from "./report.ts";
@@ -52,10 +38,8 @@ interface Options {
   includeMultipleSenses: boolean;
   includeSourceless: boolean;
   resolveEntriesWithAI: boolean;
-  resolveTargetsWithAI: boolean;
-  aiModel: ModelId;
-  entryAICachePath: string;
-  targetAICachePath: string;
+  aiModel: ModelId | undefined;
+  entryGenerationCachePath: string;
   fields: {
     word?: string;
     sentence?: string;
@@ -81,7 +65,6 @@ function parseArguments(args: string[]): Options {
       "include-multiple-senses",
       "include-sourceless",
       "resolve-entries-with-ai",
-      "resolve-targets-with-ai",
     ],
     string: [
       "query",
@@ -93,8 +76,7 @@ function parseArguments(args: string[]): Options {
       "epub-texts-dir",
       "jmdict-overrides",
       "ai-model",
-      "entry-ai-cache",
-      "target-ai-cache",
+      "entry-generation-cache",
       "word-field",
       "sentence-field",
       "glossary-field",
@@ -113,8 +95,8 @@ function parseArguments(args: string[]): Options {
   const date = new Date().toISOString().slice(0, 10);
   const output = flags.output ??
     path.join(import.meta.dirname!, "..", "generated", `animecards-${date}.json`);
-  const aiModel = flags["ai-model"] ?? DEFAULT_MODEL_ID;
-  if (!MODEL_IDS.includes(aiModel as ModelId)) {
+  const aiModel = flags["ai-model"] as ModelId | undefined;
+  if (aiModel !== undefined && !MODEL_IDS.includes(aiModel)) {
     throw new Error(`Unknown AI model: ${aiModel}. Available: ${MODEL_IDS.join(", ")}`);
   }
   return {
@@ -131,10 +113,9 @@ function parseArguments(args: string[]): Options {
     includeMultipleSenses: flags["include-multiple-senses"],
     includeSourceless: flags["include-sourceless"],
     resolveEntriesWithAI: flags["resolve-entries-with-ai"],
-    resolveTargetsWithAI: flags["resolve-targets-with-ai"],
-    aiModel: aiModel as ModelId,
-    entryAICachePath: flags["entry-ai-cache"] ?? `${output}.entry-ai-cache.jsonl`,
-    targetAICachePath: flags["target-ai-cache"] ?? `${output}.target-ai-cache.jsonl`,
+    aiModel,
+    entryGenerationCachePath: flags["entry-generation-cache"] ??
+      path.join(import.meta.dirname!, "..", "generated", "card-field-generation-cache.jsonl"),
     fields: {
       word: flags["word-field"],
       sentence: flags["sentence-field"],
@@ -144,89 +125,6 @@ function parseArguments(args: string[]): Options {
       sourceURL: flags["source-url-field"],
     },
   };
-}
-
-interface CachedTargetInContext {
-  inputFingerprint: string;
-  model: ModelId;
-  generatedAt: string;
-  surface: string;
-}
-
-interface CachedJMDictEntrySelection {
-  inputFingerprint: string;
-  model: ModelId;
-  selection: JMDictEntrySelection;
-}
-
-async function targetInputFingerprint(
-  request: UnresolvedTargetInContext,
-  model: ModelId,
-): Promise<string> {
-  const value = JSON.stringify({
-    version: 1,
-    cardFieldGenerationVersion: CARD_FIELD_GENERATION_CACHE_VERSION,
-    model,
-    jmdictId: request.entry.id,
-    recognitionTarget: request.recognitionTarget,
-    reading: request.reading,
-    context: request.context,
-    source: request.sourceResolution,
-  });
-  const digest = new Uint8Array(
-    await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value)),
-  );
-  return [...digest].map((byte) => byte.toString(16).padStart(2, "0")).join("");
-}
-
-async function loadTargetAICache(filePath: string): Promise<Map<string, CachedTargetInContext>> {
-  let content: string;
-  try {
-    content = await Deno.readTextFile(filePath);
-  } catch (error) {
-    if (error instanceof Deno.errors.NotFound) return new Map();
-    throw error;
-  }
-  return new Map(
-    content.split("\n").filter(Boolean).map((line) => {
-      const item = JSON.parse(line) as CachedTargetInContext;
-      return [`${item.model}:${item.inputFingerprint}`, item];
-    }),
-  );
-}
-
-async function appendTargetAICache(
-  filePath: string,
-  value: CachedTargetInContext,
-): Promise<void> {
-  await Deno.mkdir(path.dirname(filePath), { recursive: true });
-  await Deno.writeTextFile(filePath, `${JSON.stringify(value)}\n`, { append: true });
-}
-
-async function loadEntryAICache(
-  filePath: string,
-): Promise<Map<string, CachedJMDictEntrySelection>> {
-  let content: string;
-  try {
-    content = await Deno.readTextFile(filePath);
-  } catch (error) {
-    if (error instanceof Deno.errors.NotFound) return new Map();
-    throw error;
-  }
-  return new Map(
-    content.split("\n").filter(Boolean).map((line) => {
-      const item = JSON.parse(line) as CachedJMDictEntrySelection;
-      return [`${item.model}:${item.inputFingerprint}`, item];
-    }),
-  );
-}
-
-async function appendEntryAICache(
-  filePath: string,
-  value: CachedJMDictEntrySelection,
-): Promise<void> {
-  await Deno.mkdir(path.dirname(filePath), { recursive: true });
-  await Deno.writeTextFile(filePath, `${JSON.stringify(value)}\n`, { append: true });
 }
 
 function describeEntry(entry: JMDictWord): string {
@@ -316,7 +214,7 @@ async function main(): Promise<void> {
   } catch (error) {
     console.error(error instanceof Error ? error.message : String(error));
     console.error(
-      "Usage: deno task animecards:prepare [--limit=N] [--query=...] [--source-model=Animecards] [--target-model=Miwake] [--output=PATH] [--anki-connect-url=URL] [--epub-texts-dir=PATH|--no-epub-source-lookup] [--jmdict-overrides=PATH] [--include-multiple-senses] [--include-sourceless] [--resolve-entries-with-ai] [--resolve-targets-with-ai] [--ai-model=MODEL] [--entry-ai-cache=PATH] [--target-ai-cache=PATH] [--word-field=NAME] [--sentence-field=NAME] [--glossary-field=NAME] [--reading-field=NAME] [--source-field=NAME] [--source-url-field=NAME]",
+      "Usage: deno task animecards:prepare [--limit=N] [--query=...] [--source-model=Animecards] [--target-model=Miwake] [--output=PATH] [--anki-connect-url=URL] [--epub-texts-dir=PATH|--no-epub-source-lookup] [--jmdict-overrides=PATH] [--include-multiple-senses] [--include-sourceless] [--resolve-entries-with-ai] [--ai-model=MODEL] [--entry-generation-cache=PATH] [--word-field=NAME] [--sentence-field=NAME] [--glossary-field=NAME] [--reading-field=NAME] [--source-field=NAME] [--source-url-field=NAME]",
     );
     Deno.exit(1);
   }
@@ -380,19 +278,10 @@ async function main(): Promise<void> {
 
   const candidates: ConversionCandidate[] = [];
   const skipped: SkippedNote[] = [];
-  const entryAICache = options.resolveEntriesWithAI
-    ? await loadEntryAICache(options.entryAICachePath)
-    : new Map<string, CachedJMDictEntrySelection>();
-  const targetAICache = options.resolveTargetsWithAI
-    ? await loadTargetAICache(options.targetAICachePath)
-    : new Map<string, CachedTargetInContext>();
-  let generatedEntryResolutions = 0;
-  let reusedEntryResolutions = 0;
+  const entryGenerationCache = new JSONLGenerationCache(options.entryGenerationCachePath);
+  let selectedEntryResolutions = 0;
   let inconclusiveEntryResolutions = 0;
   let failedEntryResolutions = 0;
-  let generatedTargetResolutions = 0;
-  let reusedTargetResolutions = 0;
-  let failedTargetResolutions = 0;
   let processed = 0;
   for (const note of notes) {
     const conversionOptions: Parameters<typeof convertAnimecardsNote>[1] = {
@@ -407,42 +296,40 @@ async function main(): Promise<void> {
       includeSourceless: options.includeSourceless,
       resolveAmbiguousEntries: options.resolveEntriesWithAI,
     };
-    let selectedEntryOverride:
-      | Extract<JMDictEntrySelection, { status: "selected" }>
-      | undefined;
     let result = await convertAnimecardsNote(note, conversionOptions);
     if (options.resolveEntriesWithAI) {
       for (let attempt = 0; attempt < 3 && result.unresolvedJMDictEntry !== undefined; ++attempt) {
         const request = result.unresolvedJMDictEntry;
-        const inputFingerprint = await entrySelectionInputFingerprint(request, options.aiModel);
-        const cacheKey = `${options.aiModel}:${inputFingerprint}`;
-        let cached = entryAICache.get(cacheKey);
         try {
-          if (cached === undefined) {
-            const selection = await selectJMDictEntry(request, options.aiModel);
-            cached = { inputFingerprint, model: options.aiModel, selection };
-            await appendEntryAICache(options.entryAICachePath, cached);
-            entryAICache.set(cacheKey, cached);
-            ++generatedEntryResolutions;
-          } else {
-            ++reusedEntryResolutions;
-          }
-
-          let selection = cached.selection;
+          let selection = await selectJMDictEntry(request, {
+            ...(options.aiModel === undefined ? {} : { modelId: options.aiModel }),
+            cache: entryGenerationCache,
+            maxAttempts: 3,
+            onAttempt(attempt) {
+              if (attempt.validationError !== undefined && attempt.number < 3) {
+                console.error(
+                  `  Retrying entry selection for ${note.noteId} after invalid result ${attempt.number}/3: ${attempt.validationError}`,
+                );
+              }
+            },
+          });
           if (selection.status === "selected") {
             const readingConflict = readingConflictForJMDictEntrySelection(
               request,
               selection.jmdictId,
             );
             if (readingConflict === null) {
-              selectedEntryOverride = selection;
+              ++selectedEntryResolutions;
               result = await convertAnimecardsNote(note, {
                 ...conversionOptions,
                 jmdictEntrySelectionOverride: selection,
               });
               continue;
             }
-            selection = readingConflict;
+            selection = {
+              ...readingConflict,
+              modelConfigurationIds: selection.modelConfigurationIds,
+            };
           }
 
           ++inconclusiveEntryResolutions;
@@ -454,12 +341,12 @@ async function main(): Promise<void> {
           } else if (selection.status === "no-reading-match") {
             reason = "source-reading-matches-no-jmdict-entry";
             detail = request.kanaReading;
-          } else if (selection.status === "hint-unavailable") {
-            reason = "jmdict-entry-hint-unavailable";
-            detail = `${selection.selectedJMDictId}; reading: ${request.kanaReading}`;
           } else if (selection.status === "ambiguous") {
             reason = "ai-ambiguous-jmdict-entry";
-            detail = selection.selectedJMDictIds.join(", ");
+            detail = selection.possibleJMDictIds.join(", ");
+          } else if (selection.status === "sense-ambiguous") {
+            reason = "ai-ambiguous-jmdict-sense";
+            detail = `${selection.possibleJMDictId}: ${selection.possibleSenseNumbers.join(", ")}`;
           } else if (selection.status === "disallowed") {
             reason = "ai-selected-unlinked-jmdict-entry";
             detail = selection.selectedJMDictId;
@@ -476,7 +363,7 @@ async function main(): Promise<void> {
               reason,
               detail,
               entrySelection: {
-                model: options.aiModel,
+                model: selection.modelConfigurationIds.join(", ") || "(no AI call)",
                 recognitionTarget: request.recognitionTarget,
                 context: request.context,
                 candidateJMDictIds: request.candidateEntries.map(({ id }) => id).toSorted(),
@@ -488,6 +375,7 @@ async function main(): Promise<void> {
             },
           };
         } catch (error) {
+          if (isAIQuotaError(error)) throw error;
           ++failedEntryResolutions;
           const message = error instanceof Error ? error.message : String(error);
           console.error(`  Entry AI failed for ${note.noteId}: ${message}`);
@@ -511,45 +399,6 @@ async function main(): Promise<void> {
             detail: result.unresolvedJMDictEntry.candidateEntries.map(({ id }) => id).join(", "),
           },
         };
-      }
-    }
-    if (
-      options.resolveTargetsWithAI &&
-      "unresolvedTargetInContext" in result &&
-      result.unresolvedTargetInContext !== undefined
-    ) {
-      const request = result.unresolvedTargetInContext;
-      const inputFingerprint = await targetInputFingerprint(request, options.aiModel);
-      const cacheKey = `${options.aiModel}:${inputFingerprint}`;
-      let resolved = targetAICache.get(cacheKey);
-      try {
-        if (resolved === undefined) {
-          const generatedAt = new Date().toISOString();
-          const surface = await generateTargetInContext({
-            context: request.context,
-            recognitionTarget: request.recognitionTarget,
-            jmdictEntry: request.entry,
-            kanaReading: request.reading,
-          }, options.aiModel);
-          resolved = { inputFingerprint, model: options.aiModel, generatedAt, surface };
-          await appendTargetAICache(options.targetAICachePath, resolved);
-          targetAICache.set(cacheKey, resolved);
-          ++generatedTargetResolutions;
-        } else {
-          ++reusedTargetResolutions;
-        }
-        result = await convertAnimecardsNote(note, {
-          ...conversionOptions,
-          jmdictEntrySelectionOverride: selectedEntryOverride,
-          targetInContextOverride: resolved,
-        });
-      } catch (error) {
-        ++failedTargetResolutions;
-        console.error(
-          `  Target AI failed for ${note.noteId}: ${
-            error instanceof Error ? error.message : String(error)
-          }`,
-        );
       }
     }
     if (result.candidate) {
@@ -605,14 +454,9 @@ async function main(): Promise<void> {
     sourceCounts.set(method, (sourceCounts.get(method) ?? 0) + 1);
   }
   console.error(`Sources: ${JSON.stringify(Object.fromEntries(sourceCounts))}`);
-  if (options.resolveTargetsWithAI) {
-    console.error(
-      `Target-in-context AI: ${generatedTargetResolutions} generated, ${reusedTargetResolutions} cached, ${failedTargetResolutions} failed.`,
-    );
-  }
   if (options.resolveEntriesWithAI) {
     console.error(
-      `JMDict-entry AI: ${generatedEntryResolutions} generated, ${reusedEntryResolutions} cached, ${inconclusiveEntryResolutions} inconclusive, ${failedEntryResolutions} failed.`,
+      `JMDict-entry AI: ${selectedEntryResolutions} selected, ${inconclusiveEntryResolutions} inconclusive, ${failedEntryResolutions} failed.`,
     );
   }
   console.error(`Skipped ${skipped.length}: ${JSON.stringify(Object.fromEntries(reasonCounts))}`);

@@ -1,0 +1,102 @@
+{
+  "id": "1010350",
+  "kanji": [],
+  "kana": [
+    {
+      "common": true,
+      "text": "ばれる",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "バレる",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "v1",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to leak out (of a secret)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to come out"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to be exposed (of a lie, improper behaviour, etc.)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to be found out"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to be discovered"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "v1",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to get away (of a fish)"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,120 @@
+{
+  "id": "1012520",
+  "kanji": [
+    {
+      "common": false,
+      "text": "若しかして",
+      "tags": [
+        "rK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "もしかして",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adv"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "もしかすると"
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "perhaps"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "possibly"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "maybe"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "by any chance"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "if I'm not mistaken"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adv"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "if"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "in case"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "in the event that"
+        }
+      ]
+    }
+  ]
+}

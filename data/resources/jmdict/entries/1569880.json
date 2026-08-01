@@ -1,0 +1,221 @@
+{
+  "id": "1569880",
+  "kanji": [
+    {
+      "common": true,
+      "text": "睨む",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "にらむ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "v5m",
+        "vt"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to glare at"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to scowl at"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to glower at"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "v5m",
+        "vt"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to stare intensely at"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to examine carefully"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "v5m",
+        "vt"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to estimate"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to guess"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to suspect"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to judge"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "v5m",
+        "vt"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "睨まれる"
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [
+        "often as 睨まれる"
+      ],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to keep an eye on someone (e.g. a suspicious or untrustworthy person)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to watch"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "v5m",
+        "vt"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to take account of"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to take into consideration"
+        }
+      ]
+    }
+  ]
+}

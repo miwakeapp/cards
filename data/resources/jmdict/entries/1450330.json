@@ -1,0 +1,257 @@
+{
+  "id": "1450330",
+  "kanji": [
+    {
+      "common": true,
+      "text": "逃げる",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "遁げる",
+      "tags": [
+        "rK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "迯げる",
+      "tags": [
+        "sK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "にげる",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "v1",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to run away"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to flee"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to get away (e.g. from danger)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to escape"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to break out"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to leave (e.g. one's spouse)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to take cover"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "v1",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to avoid (a question, responsibility, etc.)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to evade"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to dodge"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to shirk"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to back away"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "v1",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to win without being overtaken"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to hold off the other contenders (until the finish)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to keep the lead (and win)"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "v1",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to escape (of heat, a gas, etc.)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to leak out (e.g. of a scent)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to be lost (e.g. of flavor)"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "v1",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [
+        "as 腰が〜 or 体が〜"
+      ],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to fail to hold an ideal posture"
+        }
+      ]
+    }
+  ]
+}

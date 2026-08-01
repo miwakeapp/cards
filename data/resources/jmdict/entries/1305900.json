@@ -1,0 +1,100 @@
+{
+  "id": "1305900",
+  "kanji": [
+    {
+      "common": true,
+      "text": "使い道",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "使い途",
+      "tags": [
+        "rK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "使いみち",
+      "tags": [
+        "sK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "つかいみち",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "purpose"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "utility"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "objective"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "way to use something"
+        }
+      ]
+    }
+  ]
+}

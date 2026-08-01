@@ -1,0 +1,201 @@
+{
+  "id": "1598080",
+  "kanji": [
+    {
+      "common": true,
+      "text": "摘む",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "摘まむ",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "撮む",
+      "tags": [
+        "rK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "抓む",
+      "tags": [
+        "rK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "つまむ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "v5m",
+        "vt"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to pinch"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to hold (between one's fingers)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to pick up (with chopsticks, tweezers, etc.)"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "v5m",
+        "vt"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to pick up and eat"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to snack on"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "v5m",
+        "vt"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to pick out (the main point)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to summarize"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to sum up"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "v5m",
+        "vt"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [
+        "usu. in the passive"
+      ],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to bewitch"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to possess"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to fascinate"
+        }
+      ]
+    }
+  ]
+}

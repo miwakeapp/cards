@@ -12,7 +12,7 @@ Deno.test("parseAnkiReading: supports multiple canonical alternatives", () => {
   assertEquals(parseAnkiReading("明日[あした] / 明日[あす]", "明日"), ["あした", "あす"]);
 });
 
-Deno.test("parseAnkiReading: recovers legacy zero-surface annotations", () => {
+Deno.test("parseAnkiReading: recovers malformed zero-surface annotations", () => {
   assertEquals(parseAnkiReading("気[き] [っ] 風[ぷ]", "気風"), ["きっぷ"]);
 });
 
@@ -34,7 +34,7 @@ Deno.test("recomputeAnkiReading: changes placement without changing pronunciatio
   );
 });
 
-Deno.test("recomputeAnkiReading: replaces legacy zero-surface annotations", async () => {
+Deno.test("recomputeAnkiReading: replaces malformed zero-surface annotations", async () => {
   const entry = await preextractedJMDictEntry("2252350");
   assertEquals(
     await recomputeAnkiReading(

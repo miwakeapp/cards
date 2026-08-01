@@ -1,0 +1,88 @@
+{
+  "id": "1599350",
+  "kanji": [
+    {
+      "common": true,
+      "text": "貪欲",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "貪慾",
+      "tags": [
+        "rK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "どんよく",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "とんよく",
+      "tags": [
+        "ok"
+      ],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "たんよく",
+      "tags": [
+        "ok"
+      ],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adj-na",
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "greedy"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "avaricious"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "covetous"
+        }
+      ]
+    }
+  ]
+}

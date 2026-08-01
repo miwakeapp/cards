@@ -1,0 +1,156 @@
+{
+  "id": "1451960",
+  "kanji": [
+    {
+      "common": true,
+      "text": "同化",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "どうか",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vt",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "異化",
+          1
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "assimilation"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "absorption"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vt"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "adaptation"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vt"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [
+        "biol"
+      ],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "assimilation"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "anabolism"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [
+        "ling"
+      ],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "assimilation (phonology)"
+        }
+      ]
+    }
+  ]
+}

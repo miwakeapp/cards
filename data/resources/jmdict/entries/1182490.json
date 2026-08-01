@@ -1,0 +1,59 @@
+{
+  "id": "1182490",
+  "kanji": [
+    {
+      "common": false,
+      "text": "傍目",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "岡目",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "おかめ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "looking on from the side"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "looking on by an outsider"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "id": "1690690",
+  "kanji": [
+    {
+      "common": false,
+      "text": "箔押し",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "箔押",
+      "tags": [
+        "io"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "はくおし",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vt",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "foil stamping"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "hot stamping"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vt",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "gold tooling (a book)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "gilt tooling"
+        }
+      ]
+    }
+  ]
+}

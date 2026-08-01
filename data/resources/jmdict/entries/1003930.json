@@ -1,0 +1,117 @@
+{
+  "id": "1003930",
+  "kanji": [],
+  "kana": [
+    {
+      "common": true,
+      "text": "くよくよ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "クヨクヨ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "vs"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "on-mim"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to fret (over)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to brood (about)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to mope"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to worry"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adv",
+        "adv-to"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "on-mim"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "worriedly"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "(fretting) constantly"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "(worrying) over this and that"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "(obsessing) to no end"
+        }
+      ]
+    }
+  ]
+}

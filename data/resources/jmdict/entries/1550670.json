@@ -1,0 +1,132 @@
+{
+  "id": "1550670",
+  "kanji": [
+    {
+      "common": true,
+      "text": "裏面",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "ウラ面",
+      "tags": [
+        "sK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "うらめん",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "表面",
+          1
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "back (side)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "reverse"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "B side (of a record)"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [
+        "vidg"
+      ],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "secret levels"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "hidden levels"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "post-game content"
+        }
+      ]
+    }
+  ]
+}

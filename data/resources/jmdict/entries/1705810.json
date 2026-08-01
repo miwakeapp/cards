@@ -1,0 +1,107 @@
+{
+  "id": "1705810",
+  "kanji": [
+    {
+      "common": false,
+      "text": "身支度",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "身仕度",
+      "tags": [
+        "rK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "身じたく",
+      "tags": [
+        "sK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "みじたく",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "dress"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "outfit"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "getup"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "vs",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to dress oneself"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to outfit oneself"
+        }
+      ]
+    }
+  ]
+}

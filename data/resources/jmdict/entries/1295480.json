@@ -1,0 +1,67 @@
+{
+  "id": "1295480",
+  "kanji": [
+    {
+      "common": true,
+      "text": "細々",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "細細",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "こまごま",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adv",
+        "adv-to",
+        "vs"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "minutely"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "in detail"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "with particular attention"
+        }
+      ]
+    }
+  ]
+}

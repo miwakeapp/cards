@@ -24,4 +24,6 @@ deno task report-vocab-appearances jlpt/jlpt-moji-goi/moji-goi-vocab.csv jlpt/jl
 
 The Animecards workflow separates read-only preparation from an explicitly-enabled write phase, fingerprints complete source notes, verifies card-ID preservation, and records nontrivial cases instead of guessing. It also replaces the former leech workflow: convert a leech Animecard in place and apply with `--reset` to return its retained card to Anki's new queue. See [`animecards/README.md`](./animecards/README.md).
 
-`shared/jmdict_resolution/recognition_target_lookup.ts` handles tokenizer-backed recognition-target normalization, including common deinflection cases. This is intended to be reusable by the eventual browser extension.
+The maintained `card_resolution` package handles tokenizer-backed recognition-target normalization, including common deinflection cases, and marks the corresponding structured source HTML.
+
+The JLPT CSV importer uses that deterministic resolution for target location and source-ruby reading evidence. It uses the focused `card_field_generation` operations only for semantic sense selection, source-grounded hints, and long-context minimization. The prepare, enrich, and JLPT focused card-field operations share validated results through `generated/card-field-generation-cache.jsonl`; context restoration keeps its separate corpus-match cache.

@@ -1,0 +1,99 @@
+{
+  "id": "1245930",
+  "kanji": [
+    {
+      "common": true,
+      "text": "空洞",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "空胴",
+      "tags": [
+        "sK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "くうどう",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "cavity"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "hollow"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "cave"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "cavern"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adj-no"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "hollow"
+        }
+      ]
+    }
+  ]
+}

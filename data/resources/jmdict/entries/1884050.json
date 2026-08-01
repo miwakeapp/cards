@@ -1,0 +1,119 @@
+{
+  "id": "1884050",
+  "kanji": [
+    {
+      "common": false,
+      "text": "進退窮まる",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "進退きわまる",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "進退極まる",
+      "tags": [
+        "sK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "進退谷まる",
+      "tags": [
+        "sK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "しんたいきわまる",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "exp",
+        "v5r"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to be driven into a corner"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to be left with nowhere to turn"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to be in a dilemma"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "exp",
+        "v5r"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to be unable to go forward or backward"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to be stranded"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to get stuck"
+        }
+      ]
+    }
+  ]
+}

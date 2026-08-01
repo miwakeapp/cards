@@ -1,0 +1,79 @@
+{
+  "id": "2829305",
+  "kanji": [
+    {
+      "common": false,
+      "text": "売券",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "売り券",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "沽り券",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "沽券",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "うりけん",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "ばいけん"
+        ],
+        [
+          "沽券",
+          2
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "arch"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "certificate of sale"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "deed of sale"
+        }
+      ]
+    }
+  ]
+}

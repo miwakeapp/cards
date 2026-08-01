@@ -1,0 +1,100 @@
+{
+  "id": "1183620",
+  "kanji": [
+    {
+      "common": true,
+      "text": "穏便",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "おんびん",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adj-na",
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "gentle"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "peaceable"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "amicable"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "quiet"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adj-na",
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "without fuss"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "simply"
+        }
+      ]
+    }
+  ]
+}

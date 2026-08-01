@@ -1,0 +1,95 @@
+{
+  "id": "1637800",
+  "kanji": [],
+  "kana": [
+    {
+      "common": false,
+      "text": "ニューハーフ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "ニュー・ハーフ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [
+        {
+          "lang": "eng",
+          "full": true,
+          "wasei": true,
+          "text": "new half"
+        }
+      ],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "(male-to-female) crossdresser"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "transvestite"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "drag queen"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "trans woman"
+        }
+      ]
+    }
+  ]
+}

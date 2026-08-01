@@ -88,7 +88,7 @@ Deno.test("failed enrichment defers a candidate from apply", async () => {
   item.fullContextResolution = { status: "restored", method: "exact" };
   item.minimizedContextResolution = {
     status: "failed",
-    model: "gemini-3.5-flash",
+    model: "gemini-3.6-flash",
     attemptedAt: "2026-07-21T00:00:00.000Z",
     error: "Invalid JSON response",
   };
@@ -100,11 +100,24 @@ Deno.test("a usage matching no JMDict sense is deferred from apply", async () =>
   item.fullContextResolution = { status: "restored", method: "exact" };
   item.senseResolution = {
     status: "no-match",
-    model: "gpt-5.6",
+    model: "gpt-5.6-sol",
     generatedAt: "2026-07-26T00:00:00.000Z",
     compatibleSenses: [1, 2],
   };
   assertEquals(deferredReason(item), "no-applicable-jmdict-sense");
+});
+
+Deno.test("an ambiguous JMDict usage is deferred distinctly from no-match", async () => {
+  const item = await candidate();
+  item.fullContextResolution = { status: "restored", method: "exact" };
+  item.senseResolution = {
+    status: "ambiguous",
+    model: "claude-opus-5",
+    generatedAt: "2026-07-29T00:00:00.000Z",
+    compatibleSenses: [1, 2, 3],
+    possibleSenses: [1, 3],
+  };
+  assertEquals(deferredReason(item), "ambiguous-jmdict-sense");
 });
 
 Deno.test("note fingerprints are insensitive to field and tag ordering", async () => {

@@ -1,0 +1,148 @@
+{
+  "id": "2175080",
+  "kanji": [
+    {
+      "common": false,
+      "text": "下らん",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "くだらん",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adj-f"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "下らぬ",
+          1
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "trivial"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "trifling"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "insignificant"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "not worth bothering with"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "worthless"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "useless"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "good-for-nothing"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adj-f"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "下らぬ",
+          2
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "stupid"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "nonsensical"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "absurd"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "foolish"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "silly"
+        }
+      ]
+    }
+  ]
+}

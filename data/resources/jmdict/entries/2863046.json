@@ -1,0 +1,58 @@
+{
+  "id": "2863046",
+  "kanji": [
+    {
+      "common": false,
+      "text": "生業",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "すぎわい",
+      "tags": [
+        "gikun"
+      ],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "dated"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "occupation"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "livelihood"
+        }
+      ]
+    }
+  ]
+}

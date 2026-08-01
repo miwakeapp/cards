@@ -1,0 +1,124 @@
+{
+  "id": "1317910",
+  "kanji": [
+    {
+      "common": false,
+      "text": "自重",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "じちょう",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "self-respect"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "prudence"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "not acting rashly"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "restraining oneself"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "taking care of oneself"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "being careful with one's health"
+        }
+      ]
+    }
+  ]
+}

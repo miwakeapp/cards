@@ -1,25 +1,28 @@
 /**
  * Adds canonical AI-owned sense, hint, and minimized-context fields to a conversion manifest.
  *
- * Run with: deno task animecards:enrich MANIFEST.json [--output=PATH] [--model=MODEL] [--limit=N] [--concurrency=N]
+ * Run with: deno task animecards:enrich MANIFEST.json [--output=PATH] [--model=MODEL] [--generation-cache=PATH] [--limit=N] [--concurrency=N]
  */
 
 import { parseArgs } from "@std/cli/parse-args";
 import * as path from "@std/path";
-import { parseMiwakeKey } from "card_creator";
-import { allJMDictEntries } from "data";
+import { jmdictUsagesForSpelling } from "card_creator";
+import { buildSpellingIndex, findAllEntriesBySpelling } from "card_resolution";
+import { allJMDictEntries, type JMDictWord } from "data";
+import { isAIQuotaError, minimizeContext, MODEL_IDS, type ModelId } from "card_field_generation";
+export { isAIQuotaError } from "card_field_generation";
+import { JSONLGenerationCache } from "card_field_generation/file-cache";
 import {
-  CARD_FIELD_GENERATION_CACHE_VERSION,
-  DEFAULT_MODEL_ID,
-  type GeneratedSenseAndHint,
-  generateMinimizedContext,
-  generateSenseAndHintFields,
-  MODEL_IDS,
-  type ModelId,
-} from "card_field_generation";
+  markAuditedContextTargetWithinAnchor,
+  markResolvedContextTargetWithinAnchor,
+} from "../shared/anchored_context.ts";
+import {
+  selectSensesAndMaybeGenerateHint,
+  type SenseAndHintResolution,
+} from "../shared/focused_card_generation.ts";
 import { applyGeneratedCardFields, needsCardFieldEnrichment } from "./enrichment.ts";
 import { checkpointMatchesInput, createCheckpointManifest } from "./checkpoint.ts";
-import { normalizeContextHTML } from "./html.ts";
+import { contextPlainText, normalizeContextHTML } from "./html.ts";
 import { writeConversionAuditArtifacts } from "./report.ts";
 import {
   CONVERSION_MANIFEST_VERSION,
@@ -27,18 +30,153 @@ import {
   type ConversionManifest,
   deferUnavailableSourceContexts,
   minimizedContextNeedsGeneration,
-  type MinimizedContextResolution,
-  type SenseResolution,
   senseResolutionNeedsGeneration,
 } from "./types.ts";
 
 interface Options {
   manifestPath: string;
   outputPath: string;
-  cachePath: string;
-  model: ModelId;
+  generationCachePath: string;
+  model: ModelId | undefined;
   limit: number | undefined;
   concurrency: number;
+}
+
+type EnrichmentOperationName = "context minimization" | "sense/hint generation";
+
+interface PendingEnrichmentOperation<Result> {
+  promise: Promise<Result>;
+  attemptedModelConfigurationIds: ReadonlySet<string>;
+}
+
+interface MinimizedContextResult {
+  value: string | null;
+  metadata: { modelConfigurationId: string };
+}
+
+export interface PendingCandidateEnrichment {
+  sense?: PendingEnrichmentOperation<SenseAndHintResolution>;
+  minimizedContext?: PendingEnrichmentOperation<MinimizedContextResult>;
+}
+
+export interface CandidateEnrichmentFailure {
+  operation: EnrichmentOperationName;
+  error: string;
+}
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
+function modelSummary(
+  attempted: ReadonlySet<string>,
+  completed: readonly string[] = [],
+): string {
+  return [...new Set([...attempted, ...completed])].join(", ") || "(unknown)";
+}
+
+/**
+ * Settles and applies independent AI-owned fields without discarding a successful sibling result.
+ *
+ * Sense selection and hinting form one sequential operation, while context minimization is
+ * independent and runs in parallel. Each fulfilled operation is validated and applied on its own;
+ * only the operation that rejects or fails application is recorded as failed and retried later.
+ */
+export async function applySettledCandidateEnrichment(
+  candidate: ConversionCandidate,
+  entry: JMDictWord,
+  sameSpellingEntries: readonly JMDictWord[],
+  work: PendingCandidateEnrichment,
+  attemptedAt: string,
+): Promise<CandidateEnrichmentFailure[]> {
+  if (work.sense === undefined && work.minimizedContext === undefined) {
+    throw new Error("Candidate was scheduled without any pending AI-owned fields.");
+  }
+  const [senseResult, minimizedContextResult] = await Promise.allSettled(
+    [
+      work.sense?.promise,
+      work.minimizedContext?.promise,
+    ] as const,
+  );
+  const failures: CandidateEnrichmentFailure[] = [];
+
+  function failSense(error: unknown, completedModels: readonly string[] = []): void {
+    const message = errorMessage(error);
+    failures.push({ operation: "sense/hint generation", error: message });
+    if (senseResolutionNeedsGeneration(candidate.senseResolution)) {
+      candidate.senseResolution = {
+        status: "failed",
+        model: modelSummary(
+          work.sense?.attemptedModelConfigurationIds ?? new Set(),
+          completedModels,
+        ),
+        attemptedAt,
+        error: message,
+        compatibleSenses: candidate.senseResolution.compatibleSenses,
+      };
+    }
+  }
+
+  if (work.sense !== undefined) {
+    if (senseResult.status === "rejected") {
+      failSense(senseResult.reason);
+    } else if (senseResult.value !== undefined) {
+      const resolution = senseResult.value;
+      try {
+        await applyGeneratedCardFields(
+          candidate,
+          entry,
+          sameSpellingEntries,
+          {
+            senseSelection: resolution.senseSelection,
+            hintOutcome: resolution.hintOutcome,
+          },
+          { senseSelection: modelSummary(new Set(), resolution.modelConfigurationIds) },
+          attemptedAt,
+        );
+      } catch (error) {
+        failSense(error, resolution.modelConfigurationIds);
+      }
+    }
+  }
+
+  function failMinimizedContext(error: unknown, completedModel?: string): void {
+    const message = errorMessage(error);
+    failures.push({ operation: "context minimization", error: message });
+    if (minimizedContextNeedsGeneration(candidate.minimizedContextResolution)) {
+      candidate.minimizedContextResolution = {
+        status: "failed",
+        model: modelSummary(
+          work.minimizedContext?.attemptedModelConfigurationIds ?? new Set(),
+          completedModel === undefined ? [] : [completedModel],
+        ),
+        attemptedAt,
+        error: message,
+      };
+    }
+  }
+
+  if (work.minimizedContext !== undefined) {
+    if (minimizedContextResult.status === "rejected") {
+      failMinimizedContext(minimizedContextResult.reason);
+    } else if (minimizedContextResult.value !== undefined) {
+      const result = minimizedContextResult.value;
+      try {
+        await applyGeneratedCardFields(
+          candidate,
+          entry,
+          sameSpellingEntries,
+          { minimizedContext: result.value },
+          { minimizedContext: result.metadata.modelConfigurationId },
+          attemptedAt,
+        );
+      } catch (error) {
+        failMinimizedContext(error, result.metadata.modelConfigurationId);
+      }
+    }
+  }
+
+  return failures;
 }
 
 function enrichedManifestPath(manifestPath: string): string {
@@ -46,23 +184,16 @@ function enrichedManifestPath(manifestPath: string): string {
   return `${manifestPath.slice(0, -extension.length)}.enriched${extension}`;
 }
 
-/** Whether an AI provider error means later requests in this run cannot presently succeed. */
-export function isAIQuotaError(message: string): boolean {
-  return /(?:spend-based rate limit|exceeded your current quota|insufficient_quota)/iu.test(
-    message,
-  );
-}
-
 function parseArguments(args: string[]): Options {
   const flags = parseArgs(args, {
-    string: ["_", "output", "cache", "model", "limit", "concurrency"],
+    string: ["_", "output", "generation-cache", "model", "limit", "concurrency"],
   });
   const [manifestPath] = flags._;
   if (manifestPath === undefined) {
     throw new Error("A conversion manifest path is required.");
   }
-  const model = flags.model ?? DEFAULT_MODEL_ID;
-  if (!MODEL_IDS.includes(model as ModelId)) {
+  const model = flags.model as ModelId | undefined;
+  if (model !== undefined && !MODEL_IDS.includes(model)) {
     throw new Error(`Unknown model: ${model}. Available: ${MODEL_IDS.join(", ")}`);
   }
   const limit = flags.limit === undefined ? undefined : Number(flags.limit);
@@ -77,8 +208,9 @@ function parseArguments(args: string[]): Options {
   return {
     manifestPath,
     outputPath,
-    cachePath: flags.cache ?? `${outputPath}.ai-cache.jsonl`,
-    model: model as ModelId,
+    generationCachePath: flags["generation-cache"] ??
+      path.join(import.meta.dirname!, "..", "generated", "card-field-generation-cache.jsonl"),
+    model,
     limit,
     concurrency,
   };
@@ -94,56 +226,45 @@ function parseManifest(json: string): ConversionManifest {
   return manifest;
 }
 
-interface CachedAIResult {
-  noteId: number;
-  originalFingerprint: string;
-  inputFingerprint: string;
-  model: ModelId;
-  key: string;
-  recognitionTarget: string;
-  reading: string;
-  hint: string;
-  minimizedContext: string;
-  minimizedContextResolution: MinimizedContextResolution;
-  senseResolution: SenseResolution;
-}
-
 function enrichmentContext(candidate: ConversionCandidate): string {
   return normalizeContextHTML(candidate.target.fields["Full context"]);
 }
 
-function compatibleSenseNumbersForResolution(
-  resolution: SenseResolution,
-): number[] | undefined {
-  if (resolution.status === "not-needed") return undefined;
-  if (resolution.status === "determined") return resolution.applicableSenses;
-  return resolution.compatibleSenses;
+function ankiFuriganaSurfaceHTML(html: string): string {
+  return html.split(/(<[^>]+>)/gu).map((part) =>
+    part.startsWith("<") ? part : part.replace(/(?:^|[ ])([^  \[\]]+)\[([^\]]+)\]/gu, "$1")
+  ).join("");
 }
 
-async function inputFingerprint(candidate: ConversionCandidate, model: ModelId): Promise<string> {
-  const senseResolution = candidate.senseResolution;
-  const needsSenseSelection = senseResolutionNeedsGeneration(senseResolution);
-  const compatibleSenseNumbers = compatibleSenseNumbersForResolution(senseResolution);
-  const needsMinimizedContext = minimizedContextNeedsGeneration(
-    candidate.minimizedContextResolution,
+/** Marks only target occurrences belonging to the accepted Full context within wider evidence. */
+export async function markedSenseSelectionContext(
+  candidate: ConversionCandidate,
+  partOfSpeech: readonly string[],
+): Promise<string> {
+  const fullContext = contextPlainText(
+    ankiFuriganaSurfaceHTML(candidate.target.fields["Full context"]),
   );
-  const value = JSON.stringify({
-    version: 10,
-    cardFieldGenerationVersion: CARD_FIELD_GENERATION_CACHE_VERSION,
-    model,
-    jmdictId: candidate.jmdictId,
-    recognitionTarget: candidate.keyRecognitionTarget,
-    senseSelectionContext: needsSenseSelection ? candidate.senseSelectionContext : undefined,
-    cardContext: needsMinimizedContext ? enrichmentContext(candidate) : undefined,
-    source: candidate.sourceResolution,
-    needsSenseSelection,
-    compatibleSenseNumbers,
-    needsMinimizedContext,
-  });
-  const digest = new Uint8Array(
-    await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value)),
-  );
-  return [...digest].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+  try {
+    const resolution = candidate.targetInContextResolution;
+    if (resolution.method === "ai") {
+      return markAuditedContextTargetWithinAnchor(
+        candidate.senseSelectionContext,
+        fullContext,
+        [resolution.surface],
+      );
+    }
+    return await markResolvedContextTargetWithinAnchor(
+      candidate.senseSelectionContext,
+      fullContext,
+      candidate.keyRecognitionTarget,
+      partOfSpeech,
+    );
+  } catch (cause) {
+    throw new Error(
+      `Could not locate accepted Full context within sense-selection evidence for note ${candidate.noteId}`,
+      { cause },
+    );
+  }
 }
 
 async function writeManifest(outputPath: string, manifest: ConversionManifest): Promise<void> {
@@ -168,60 +289,6 @@ async function loadWorkingManifest(options: Options): Promise<ConversionManifest
   return await createCheckpointManifest(original);
 }
 
-async function loadCachedResults(
-  cacheFile: string,
-  manifest: ConversionManifest,
-  model: ModelId,
-): Promise<number> {
-  let content: string;
-  try {
-    content = await Deno.readTextFile(cacheFile);
-  } catch (error) {
-    if (error instanceof Deno.errors.NotFound) return 0;
-    throw error;
-  }
-
-  const candidates = new Map(manifest.candidates.map((candidate) => [candidate.noteId, candidate]));
-  const cachedByInput = new Map<string, CachedAIResult>();
-  for (const line of content.split("\n").filter(Boolean)) {
-    const result = JSON.parse(line) as CachedAIResult;
-    if (result.model === model && result.inputFingerprint !== undefined) {
-      cachedByInput.set(`${result.noteId}:${result.inputFingerprint}`, result);
-    }
-  }
-  let loaded = 0;
-  for (const candidate of candidates.values()) {
-    const currentInputFingerprint = await inputFingerprint(candidate, model);
-    const result = cachedByInput.get(`${candidate.noteId}:${currentInputFingerprint}`);
-    if (result === undefined || candidate.original.fingerprint !== result.originalFingerprint) {
-      continue;
-    }
-    const parsedKey = parseMiwakeKey(result.key);
-    if (
-      parsedKey === null ||
-      parsedKey.jmdictId !== candidate.jmdictId ||
-      parsedKey.spelling !== candidate.keyRecognitionTarget
-    ) {
-      continue;
-    }
-    candidate.target.fields.Key = result.key;
-    candidate.target.fields["Recognition target"] = result.recognitionTarget;
-    candidate.target.fields.Reading = result.reading;
-    candidate.target.fields.Hint = result.hint;
-    candidate.target.fields["Minimized context"] = result.minimizedContext;
-    candidate.recognitionTarget = result.recognitionTarget;
-    candidate.minimizedContextResolution = result.minimizedContextResolution;
-    candidate.senseResolution = result.senseResolution;
-    ++loaded;
-  }
-  return loaded;
-}
-
-async function appendCachedResult(cacheFile: string, result: CachedAIResult): Promise<void> {
-  await Deno.mkdir(path.dirname(cacheFile), { recursive: true });
-  await Deno.writeTextFile(cacheFile, `${JSON.stringify(result)}\n`, { append: true });
-}
-
 async function main(): Promise<void> {
   const options = parseArguments(Deno.args);
   const manifest = await loadWorkingManifest(options);
@@ -229,9 +296,7 @@ async function main(): Promise<void> {
   if (newlyDeferred > 0) {
     console.error(`Deferred ${newlyDeferred} candidates without source-backed full context.`);
   }
-  const aiCachePath = options.cachePath;
-  const cachedCount = await loadCachedResults(aiCachePath, manifest, options.model);
-  if (cachedCount > 0) console.error(`Loaded ${cachedCount} cached AI results.`);
+  const generationCache = new JSONLGenerationCache(options.generationCachePath);
   let candidates = manifest.candidates.filter((candidate) =>
     candidate.approved !== false && needsCardFieldEnrichment(candidate)
   );
@@ -245,11 +310,11 @@ async function main(): Promise<void> {
 
   console.error(`Loading JMDict for ${candidates.length} AI card-field enrichments...`);
   const entries = await allJMDictEntries();
+  const spellingIndex = buildSpellingIndex(entries.values());
   let generated = 0;
   let failed = 0;
   let nextCandidateIndex = 0;
   let rateLimited = false;
-  let cacheWrite = Promise.resolve();
   async function enrichNextCandidate(): Promise<void> {
     if (rateLimited) return;
     const candidateIndex = nextCandidateIndex++;
@@ -257,106 +322,109 @@ async function main(): Promise<void> {
     const candidate = candidates[candidateIndex];
     const entry = entries.get(candidate.jmdictId);
     if (entry === undefined) throw new Error(`JMDict entry ${candidate.jmdictId} is missing.`);
+    const sameSpellingEntries = findAllEntriesBySpelling(
+      spellingIndex,
+      candidate.keyRecognitionTarget,
+    );
     const cardContext = enrichmentContext(candidate);
-    const candidateInputFingerprint = await inputFingerprint(candidate, options.model);
     const needsMinimizedContext = minimizedContextNeedsGeneration(
       candidate.minimizedContextResolution,
     );
-    let attemptedAt = new Date().toISOString();
-    let failureMessage: string | undefined;
-    for (let attempt = 1; attempt <= 3; ++attempt) {
-      attemptedAt = new Date().toISOString();
-      try {
-        const sharedGenerationInput = {
-          recognitionTarget: candidate.keyRecognitionTarget,
-          jmdictEntry: entry,
-          kanaReading: candidate.readingKana,
-        };
-        const sensePromise = senseResolutionNeedsGeneration(candidate.senseResolution)
-          ? generateSenseAndHintFields({
-            ...sharedGenerationInput,
-            context: candidate.senseSelectionContext,
-            compatibleSenseNumbers: candidate.senseResolution.compatibleSenses,
-          }, options.model)
-          : undefined;
-        const minimizedContextPromise = needsMinimizedContext
-          ? generateMinimizedContext({
-            recognitionTarget: candidate.keyRecognitionTarget,
-            fullContext: cardContext,
-          }, options.model)
-          : undefined;
-        const [senseFields, minimizedContext] = await Promise.all([
-          sensePromise,
-          minimizedContextPromise,
-        ]);
-        let fields: GeneratedSenseAndHint & { minimizedContext?: string | null };
-        if (senseFields !== undefined && minimizedContext !== undefined) {
-          fields = { ...senseFields, minimizedContext };
-        } else if (senseFields !== undefined) {
-          fields = senseFields;
-        } else if (minimizedContext !== undefined) {
-          // Sense fields are ignored when sense resolution is already complete.
-          fields = { applicableSenses: [], hint: null, minimizedContext };
-        } else {
-          throw new Error("Candidate was scheduled without any pending AI-owned fields.");
-        }
-        await applyGeneratedCardFields(candidate, entry, fields, options.model, attemptedAt);
-        failureMessage = undefined;
-        break;
-      } catch (error) {
-        failureMessage = error instanceof Error ? error.message : String(error);
-        if (isAIQuotaError(failureMessage)) break;
-        if (attempt < 3) {
+    const attemptedAt = new Date().toISOString();
+    const attemptedSenseModelConfigurationIds = new Set<string>();
+    const attemptedMinimizationModelConfigurationIds = new Set<string>();
+    const generationOptions = {
+      ...(options.model === undefined ? {} : { modelId: options.model }),
+      cache: generationCache,
+      maxAttempts: 3,
+    };
+    const attemptReporter = (
+      operation: string,
+      modelConfigurationIds: Set<string>,
+    ): (attempt: {
+      number: number;
+      modelConfigurationId: string;
+      validationError?: string;
+    }) => void => {
+      return (attempt) => {
+        modelConfigurationIds.add(attempt.modelConfigurationId);
+        if (attempt.validationError !== undefined && attempt.number < 3) {
           console.error(
-            `  Retrying ${candidate.noteId} after invalid AI result (${attempt}/3): ${failureMessage}`,
+            `  Retrying ${operation} for ${candidate.noteId} after invalid ${attempt.number}/3 result: ${attempt.validationError}`,
           );
         }
-      }
+      };
+    };
+    const senseGenerationOptions = {
+      ...generationOptions,
+      onAttempt: attemptReporter("sense/hint generation", attemptedSenseModelConfigurationIds),
+    };
+    const minimizationGenerationOptions = {
+      ...generationOptions,
+      onAttempt: attemptReporter(
+        "context minimization",
+        attemptedMinimizationModelConfigurationIds,
+      ),
+    };
+    let sensePromise: Promise<SenseAndHintResolution> | undefined;
+    if (senseResolutionNeedsGeneration(candidate.senseResolution)) {
+      const compatibleSenseNumbers = candidate.senseResolution.compatibleSenses;
+      sensePromise = (async () =>
+        await selectSensesAndMaybeGenerateHint(
+          {
+            senseSelection: {
+              context: await markedSenseSelectionContext(
+                candidate,
+                entry.sense.flatMap((sense) => sense.partOfSpeech),
+              ),
+              recognitionTarget: candidate.keyRecognitionTarget,
+              jmdictEntry: entry,
+              compatibleSenseNumbers,
+            },
+            frontSideUsages: jmdictUsagesForSpelling(
+              sameSpellingEntries,
+              candidate.keyRecognitionTarget,
+            ),
+          },
+          senseGenerationOptions,
+        ))();
     }
-    if (failureMessage === undefined) {
+    const minimizedContextPromise = needsMinimizedContext
+      ? minimizeContext({ fullContext: cardContext }, minimizationGenerationOptions)
+      : undefined;
+    const failures = await applySettledCandidateEnrichment(
+      candidate,
+      entry,
+      sameSpellingEntries,
+      {
+        ...(sensePromise === undefined ? {} : {
+          sense: {
+            promise: sensePromise,
+            attemptedModelConfigurationIds: attemptedSenseModelConfigurationIds,
+          },
+        }),
+        ...(minimizedContextPromise === undefined ? {} : {
+          minimizedContext: {
+            promise: minimizedContextPromise,
+            attemptedModelConfigurationIds: attemptedMinimizationModelConfigurationIds,
+          },
+        }),
+      },
+      attemptedAt,
+    );
+    if (failures.length === 0) {
       ++generated;
       console.error(`  Generated ${candidate.noteId}: ${candidate.recognitionTarget}`);
     } else {
-      if (needsMinimizedContext) {
-        candidate.minimizedContextResolution = {
-          status: "failed",
-          model: options.model,
-          attemptedAt,
-          error: failureMessage,
-        };
-      }
-      if (senseResolutionNeedsGeneration(candidate.senseResolution)) {
-        candidate.senseResolution = {
-          status: "failed",
-          model: options.model,
-          attemptedAt,
-          error: failureMessage,
-          compatibleSenses: candidate.senseResolution.compatibleSenses,
-        };
-      }
       ++failed;
-      console.error(`  Failed ${candidate.noteId}: ${failureMessage}`);
-      if (isAIQuotaError(failureMessage)) {
+      for (const failure of failures) {
+        console.error(`  Failed ${candidate.noteId} (${failure.operation}): ${failure.error}`);
+      }
+      if (failures.some((failure) => isAIQuotaError(failure.error))) {
         rateLimited = true;
         console.error("  AI provider quota reached; leaving unscheduled candidates pending.");
       }
     }
-    cacheWrite = cacheWrite.then(() =>
-      appendCachedResult(aiCachePath, {
-        noteId: candidate.noteId,
-        originalFingerprint: candidate.original.fingerprint,
-        inputFingerprint: candidateInputFingerprint,
-        model: options.model,
-        key: candidate.target.fields.Key,
-        recognitionTarget: candidate.target.fields["Recognition target"],
-        reading: candidate.target.fields.Reading,
-        hint: candidate.target.fields.Hint,
-        minimizedContext: candidate.target.fields["Minimized context"],
-        minimizedContextResolution: candidate.minimizedContextResolution,
-        senseResolution: candidate.senseResolution,
-      })
-    );
-    await cacheWrite;
     await enrichNextCandidate();
   }
   await Promise.all(

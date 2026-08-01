@@ -1,0 +1,90 @@
+{
+  "id": "2655350",
+  "kanji": [
+    {
+      "common": false,
+      "text": "係",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "掛",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "がかり",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "suf"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "係",
+          "かかり・1",
+          1
+        ],
+        [
+          "掛かり",
+          "かかり・5",
+          5
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [
+        "掛 is often used for government offices, railways, etc."
+      ],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "charge"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "duty"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "person in charge"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "official"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "clerk"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "id": "1199250",
+  "kanji": [
+    {
+      "common": true,
+      "text": "解放",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "かいほう",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vt"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "release"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "unleashing"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "liberation"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "emancipation"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "setting free"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vt"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [
+        "comp"
+      ],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "deallocation (of computer memory)"
+        }
+      ]
+    }
+  ]
+}

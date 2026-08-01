@@ -1,0 +1,94 @@
+{
+  "id": "1922480",
+  "kanji": [],
+  "kana": [
+    {
+      "common": false,
+      "text": "とろい",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "トロい",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adj-i"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "dull"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "stupid"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "thickheaded"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adj-i"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "slow"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "sluggish"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,138 @@
+{
+  "id": "1655700",
+  "kanji": [
+    {
+      "common": false,
+      "text": "拠り所",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "拠",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "拠りどころ",
+      "tags": [
+        "sK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "より所",
+      "tags": [
+        "sK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "拠所",
+      "tags": [
+        "sK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "依り所",
+      "tags": [
+        "sK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "依りどころ",
+      "tags": [
+        "sK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "よりどころ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "grounds"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "foundation"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "authority"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "support"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "prop"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "something upon which to rely"
+        }
+      ]
+    }
+  ]
+}

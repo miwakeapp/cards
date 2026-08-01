@@ -1,0 +1,99 @@
+{
+  "id": "1005580",
+  "kanji": [
+    {
+      "common": true,
+      "text": "屡々",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "屡屡",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "屡",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "数数",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "数々",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "数",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "しばしば",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adv"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "度々",
+          "たびたび"
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk",
+        "on-mim"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "often"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "again and again"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "frequently"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "repeatedly"
+        }
+      ]
+    }
+  ]
+}

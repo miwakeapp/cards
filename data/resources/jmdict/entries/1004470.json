@@ -1,0 +1,149 @@
+{
+  "id": "1004470",
+  "kanji": [
+    {
+      "common": false,
+      "text": "拘り",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "拘わり",
+      "tags": [
+        "sK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "こだわり",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "obsession"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "fixation"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "hangup"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "determination"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "fastidiousness"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "pickiness about (trait, style, etc.)"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "complaining"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "criticizing"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "speciality (e.g. of a restaurant)"
+        }
+      ]
+    }
+  ]
+}

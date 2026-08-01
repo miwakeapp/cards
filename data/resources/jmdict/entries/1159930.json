@@ -1,0 +1,61 @@
+{
+  "id": "1159930",
+  "kanji": [
+    {
+      "common": true,
+      "text": "医師",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "醫師",
+      "tags": [
+        "sK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "いし",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "doctor"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "physician"
+        }
+      ]
+    }
+  ]
+}

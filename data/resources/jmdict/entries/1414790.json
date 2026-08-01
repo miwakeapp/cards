@@ -1,0 +1,112 @@
+{
+  "id": "1414790",
+  "kanji": [
+    {
+      "common": true,
+      "text": "大半",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "たいはん",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "adj-no"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "majority"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "more than half"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "most (of)"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n",
+        "adv"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "mostly"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "largely"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "mainly"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "predominately"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "nearly"
+        }
+      ]
+    }
+  ]
+}

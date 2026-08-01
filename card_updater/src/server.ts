@@ -5,12 +5,14 @@
 
 import { serveDir } from "@std/http/file-server";
 import * as path from "@std/path";
+import type { GenerationCache } from "card_field_generation";
+import { findAllEntriesBySpelling, type SpellingIndex } from "card_resolution";
 import { ac, type ACInvoke, applyNoteUpdate, openNoteInAnki } from "./anki.ts";
 import { applyRestrictionReason } from "./client/apply_policy.ts";
 import type { AnalyzedCard } from "./analyze.ts";
 import type { ReviewItem, ReviewMeta, ReviewPayload } from "./review_api.ts";
-import { suggestedKey, suggestForCard, type Suggestion, type SuggestionCache } from "./suggest.ts";
-import { type DecisionRecord, type ReviewState, saveSuggestionCache } from "./state.ts";
+import { suggestedKey, suggestForCard, type Suggestion } from "./suggest.ts";
+import { type DecisionRecord, type ReviewState } from "./state.ts";
 
 const CLIENT_DIRECTORY = path.resolve(import.meta.dirname!, "client");
 const BUILD_DIRECTORY = path.resolve(import.meta.dirname!, "../build");
@@ -18,7 +20,8 @@ const BUILD_DIRECTORY = path.resolve(import.meta.dirname!, "../build");
 export interface ServerOptions {
   cards: AnalyzedCard[];
   suggestions: Map<number, Suggestion>;
-  suggestionCache: SuggestionCache;
+  spellingIndex: SpellingIndex;
+  generationCache: GenerationCache;
   state: ReviewState;
   meta: Omit<ReviewMeta, "counts">;
   port: number;
@@ -31,7 +34,7 @@ export function impliedDecision(card: AnalyzedCard): "accept" | "none" {
 }
 
 export function startServer(options: ServerOptions): Deno.HttpServer {
-  const { cards, suggestions, suggestionCache, state, meta } = options;
+  const { cards, suggestions, spellingIndex, generationCache, state, meta } = options;
   const invoke = options.invoke ?? ac;
   const cardsByNoteId = new Map(cards.map((card) => [card.note.noteId, card]));
   const allKeys = new Set(cards.map((card) => card.note.fields.key));
@@ -125,14 +128,19 @@ export function startServer(options: ServerOptions): Deno.HttpServer {
       if (!card || card.newParsed === null) {
         return json({ error: `Cannot suggest for note ${body.noteId}` }, 400);
       }
-      const { suggestion, cacheEntry } = await suggestForCard(card, {
-        modelId: meta.modelId,
-        cache: suggestionCache,
+      const suggestion = await suggestForCard(card, {
+        sameSpellingEntries: findAllEntriesBySpelling(
+          spellingIndex,
+          card.parsedKey!.spelling,
+        ),
+        ...(meta.modelOverride === undefined ? {} : { modelId: meta.modelOverride }),
+        generationCache,
         force: true,
       });
       suggestions.set(card.note.noteId, suggestion);
-      suggestionCache[String(card.note.noteId)] = cacheEntry;
-      await saveSuggestionCache(suggestionCache);
+      meta.modelConfigurationIds = [
+        ...new Set([...meta.modelConfigurationIds, ...suggestion.modelConfigurationIds]),
+      ].toSorted();
       return json({ suggestion });
     }
 
@@ -187,6 +195,7 @@ export function startServer(options: ServerOptions): Deno.HttpServer {
       noteId,
       expect: {
         key: card.note.fields.key,
+        recognitionTarget: card.note.fields.recognitionTarget,
         reading: card.note.fields.reading,
         dictionaryEntry: card.note.fields.dictionaryEntry,
         hint: card.note.fields.hint,

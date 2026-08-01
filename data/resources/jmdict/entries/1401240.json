@@ -1,0 +1,230 @@
+{
+  "id": "1401240",
+  "kanji": [
+    {
+      "common": true,
+      "text": "相当",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "そうとう",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vi",
+        "adj-no"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "corresponding to (in meaning, function, etc.)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "being equivalent to"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adj-na",
+        "adj-no"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "appropriate"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "suitable"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "befitting"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "proportionate"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "vs",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to be proportionate to"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to be in keeping with"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to be deserving of"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to be worthy of"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adj-na",
+        "adj-no"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "considerable"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "substantial"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adv"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "considerably"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "rather"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "quite"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "fairly"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "pretty"
+        }
+      ]
+    }
+  ]
+}

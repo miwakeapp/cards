@@ -1,0 +1,115 @@
+{
+  "id": "1984300",
+  "kanji": [
+    {
+      "common": false,
+      "text": "盆暗",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "ぼんくら",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "ボンクラ",
+      "tags": [],
+      "appliesToKanji": []
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adj-na",
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "stupid"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "half-witted"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "dull-witted"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "thickheaded"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "blockhead"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "idiot"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "dimwit"
+        }
+      ]
+    }
+  ]
+}

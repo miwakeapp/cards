@@ -1,0 +1,106 @@
+{
+  "id": "1308660",
+  "kanji": [
+    {
+      "common": true,
+      "text": "市販",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "しはん",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vt"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "putting on the market"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "putting on sale"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "making commercially available"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adj-no"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "commercial"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "off-the-shelf"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "store-bought"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "over-the-counter"
+        }
+      ]
+    }
+  ]
+}

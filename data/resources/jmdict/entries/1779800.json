@@ -1,0 +1,98 @@
+{
+  "id": "1779800",
+  "kanji": [
+    {
+      "common": false,
+      "text": "鉄壁",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "てっぺき",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "iron wall"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "impregnable fortress"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adj-no"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "impregnable"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "invulnerable"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "unassailable"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "cast-iron"
+        }
+      ]
+    }
+  ]
+}

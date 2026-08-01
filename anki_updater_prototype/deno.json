@@ -9,17 +9,22 @@
     "animecards:enrich": "deno run --env-file=../.env --allow-net --allow-env --allow-read --allow-write=generated --allow-sys=hostname animecards/enrich.ts",
     "animecards:apply": "deno run --allow-net --allow-read --allow-write=generated animecards/apply.ts",
     "animecards:report": "deno run --allow-read --allow-write=generated animecards/report.ts",
-    "create-from-csv": "deno run --env-file=../.env --allow-net --allow-read --allow-env --allow-sys=hostname jlpt/create_from_csv.ts",
+    "create-from-csv": "deno run --env-file=../.env --allow-net --allow-read --allow-write=generated --allow-env --allow-sys=hostname jlpt/create_from_csv.ts",
     "report-unresolved-csv": "deno run --allow-read --allow-write jlpt/report_unresolved_csv.ts",
     "recover-resolved-from-report": "deno run --allow-read --allow-write jlpt/recover_resolved_from_report.ts",
     "report-vocab-appearances": "deno run --allow-read --allow-write jlpt/report_vocab_appearances.ts"
   },
   "test": {
     "permissions": {
-      "read": true
+      "read": true,
+      "sys": [
+        "hostname"
+      ]
     }
   },
   "fmt": {
-    "exclude": ["*.html"]
+    "exclude": [
+      "*.html"
+    ]
   }
 }

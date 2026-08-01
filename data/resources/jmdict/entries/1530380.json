@@ -1,0 +1,86 @@
+{
+  "id": "1530380",
+  "kanji": [
+    {
+      "common": true,
+      "text": "無線",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "むせん",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "radio (communication)"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adj-no",
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [
+        [
+          "有線",
+          1
+        ]
+      ],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "wireless"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "not using wires"
+        }
+      ]
+    }
+  ]
+}

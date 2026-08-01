@@ -1,0 +1,57 @@
+{
+  "id": "1095190",
+  "kanji": [],
+  "kana": [
+    {
+      "common": false,
+      "text": "ハイタッチ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "ハイ・タッチ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [
+        {
+          "lang": "eng",
+          "full": true,
+          "wasei": true,
+          "text": "high touch"
+        }
+      ],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "high five"
+        }
+      ]
+    }
+  ]
+}

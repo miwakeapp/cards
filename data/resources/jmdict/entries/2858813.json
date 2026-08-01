@@ -1,0 +1,111 @@
+{
+  "id": "2858813",
+  "kanji": [
+    {
+      "common": true,
+      "text": "裏面",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "裡面",
+      "tags": [
+        "rK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "りめん",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "back (side)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "reverse"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "the inside"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "background"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "dark side (e.g. of society)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "behind the scenes"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "beneath the surface"
+        }
+      ]
+    }
+  ]
+}

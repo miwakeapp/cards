@@ -306,6 +306,10 @@ export function buildConversionReport(manifest: ConversionManifest): string {
         selection = "none";
         compatible = resolution.compatibleSenses.join(",");
         model = resolution.model;
+      } else if (resolution.status === "ambiguous") {
+        selection = `ambiguous: ${resolution.possibleSenses.join(",")}`;
+        compatible = resolution.compatibleSenses.join(",");
+        model = resolution.model;
       } else if (resolution.status === "failed") {
         selection = "failed";
         compatible = resolution.compatibleSenses.join(",");

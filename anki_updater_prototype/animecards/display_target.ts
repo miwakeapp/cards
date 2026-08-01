@@ -1,10 +1,12 @@
 import { escape } from "@std/html/entities";
 import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
-import { compatibleSenseNumbersForJMDictUsage, type MiwakeCard } from "card_creator";
+import {
+  jmdictAlternativesForCardFront,
+  jmdictUsagesForSpelling,
+  type MiwakeCard,
+} from "card_creator";
 
 const NOTATION_MARKER_PATTERN = /[~〜～]/u;
-const PREFIX_PARTS_OF_SPEECH = new Set(["pref", "n-pref"]);
-const SUFFIX_PARTS_OF_SPEECH = new Set(["suf", "n-suf", "ctr"]);
 
 type BoundaryPattern = "leading" | "trailing" | "both";
 
@@ -36,40 +38,6 @@ function displayedBoundaryPattern(target: string): BoundaryPattern | undefined {
   return undefined;
 }
 
-function senseBoundaryPattern(
-  entry: JMdictWord,
-  senseNumber: number,
-): BoundaryPattern | undefined {
-  const partsOfSpeech = entry.sense[senseNumber - 1]?.partOfSpeech ?? [];
-  if (
-    partsOfSpeech.length > 0 &&
-    partsOfSpeech.every((partOfSpeech) => SUFFIX_PARTS_OF_SPEECH.has(partOfSpeech))
-  ) {
-    return "leading";
-  }
-  if (
-    partsOfSpeech.length > 0 &&
-    partsOfSpeech.every((partOfSpeech) => PREFIX_PARTS_OF_SPEECH.has(partOfSpeech))
-  ) {
-    return "trailing";
-  }
-  return undefined;
-}
-
-function senseNumbersForSpelling(entry: JMdictWord, spelling: string): number[] {
-  if (entry.kana.some(({ text }) => text === spelling)) {
-    return compatibleSenseNumbersForJMDictUsage(entry, spelling, undefined);
-  }
-  if (!entry.kanji.some(({ text }) => text === spelling)) return [];
-
-  const numbers = entry.kana
-    .filter(({ appliesToKanji }) =>
-      appliesToKanji.includes("*") || appliesToKanji.includes(spelling)
-    )
-    .flatMap(({ text }) => compatibleSenseNumbersForJMDictUsage(entry, spelling, text));
-  return [...new Set(numbers)];
-}
-
 /**
  * Omits a separate hint only when boundary notation fully distinguishes the selected usage.
  *
@@ -87,23 +55,14 @@ export function disambiguationHintForJMDictUsage(
 ): string | undefined {
   if (hint === undefined) return undefined;
   const pattern = displayedBoundaryPattern(displayTarget);
-  if (pattern === undefined) return hint;
-  if (
-    selectedSenseNumbers.some((senseNumber) =>
-      senseBoundaryPattern(selectedEntry, senseNumber) !== pattern
-    )
-  ) {
-    return hint;
-  }
+  if (pattern === undefined || pattern === "both") return hint;
 
-  const selectedSenseNumberSet = new Set(selectedSenseNumbers);
-  const hasSamePatternCompetitor = sameSpellingEntries.some((entry) =>
-    senseNumbersForSpelling(entry, spelling).some((senseNumber) =>
-      (entry.id !== selectedEntry.id || !selectedSenseNumberSet.has(senseNumber)) &&
-      senseBoundaryPattern(entry, senseNumber) === pattern
-    )
+  const contrastingUsages = jmdictAlternativesForCardFront(
+    { entry: selectedEntry, senseNumbers: selectedSenseNumbers },
+    jmdictUsagesForSpelling(sameSpellingEntries, spelling),
+    { displayedAffixNotation: pattern },
   );
-  return hasSamePatternCompetitor ? hint : undefined;
+  return contrastingUsages.length > 0 ? hint : undefined;
 }
 
 /**

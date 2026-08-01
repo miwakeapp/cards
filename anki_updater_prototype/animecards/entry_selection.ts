@@ -1,18 +1,19 @@
 import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
+import { jmdictAlternativesForCardFront, jmdictUsagesForSpelling } from "card_creator";
 import {
-  CARD_FIELD_GENERATION_CACHE_VERSION,
-  generateContrastiveHint,
-  type GeneratedSenseAndHint,
-  generateSenseAndHintFields,
-  type ModelId,
-  type SenseAndHintGenerationInput,
+  generateSourceGroundedHint,
+  type GenerationOptions,
+  selectApplicableSenses,
 } from "card_field_generation";
+import { markResolvedContextTargetWithinAnchor } from "../shared/anchored_context.ts";
 import { kanaScriptsMatch } from "./html.ts";
 import type { ConversionCandidate } from "./types.ts";
 
 export interface UnresolvedJMDictEntry {
   /** Plain-text source evidence used to distinguish the competing entries. */
   context: string;
+  /** Accepted Full context used to anchor the intended occurrence within wider evidence. */
+  fullContext: string;
   /** Exact undecorated JMDict spelling used by every candidate entry. */
   recognitionTarget: string;
   /** Best reading evidence recoverable from the Animecard. */
@@ -59,8 +60,12 @@ export type JMDictEntrySelection =
   | ({ status: "selected" } & JMDictEntrySelectionOverride)
   | { status: "no-match" }
   | { status: "no-reading-match" }
-  | { status: "hint-unavailable"; selectedJMDictId: string }
-  | { status: "ambiguous"; selectedJMDictIds: string[] }
+  | { status: "ambiguous"; possibleJMDictIds: string[] }
+  | {
+    status: "sense-ambiguous";
+    possibleJMDictId: string;
+    possibleSenseNumbers: number[];
+  }
   | { status: "disallowed"; selectedJMDictId: string }
   | {
     status: "reading-conflict";
@@ -68,69 +73,86 @@ export type JMDictEntrySelection =
     compatibleReadings: string[];
   };
 
+/** Entry-selection disposition plus the exact focused-generation configurations it used. */
+export type GeneratedJMDictEntrySelection = JMDictEntrySelection & {
+  modelConfigurationIds: string[];
+};
+
 interface CombinedSense {
   jmdictId: string;
   senseNumber: number;
+}
+
+function allows(values: readonly string[], value: string): boolean {
+  return values.includes("*") || values.includes(value);
+}
+
+/**
+ * Returns the original sense numbers structurally available for one entry and target spelling.
+ *
+ * The broad Animecard pass intentionally considers every reading that the entry allows for the
+ * spelling: its reading evidence is weak, and a semantically correct entry may expose that the
+ * Animecard reading is wrong. A trusted or explicitly rechecked reading narrows this set. For a
+ * kana spelling, JMDict sense restrictions can still refer indirectly to the kanji spellings
+ * allowed by that kana form, matching Card Creator's usage-resolution rules.
+ */
+function structurallyApplicableSenseNumbers(
+  entry: JMdictWord,
+  recognitionTarget: string,
+  kanaReading: string | undefined,
+): number[] {
+  const kanjiForm = entry.kanji.find(({ text }) => text === recognitionTarget);
+  const kanaForm = entry.kana.find(({ text }) => text === recognitionTarget);
+  const applicableKanaForms = kanaForm === undefined
+    ? entry.kana.filter(({ text, appliesToKanji }) =>
+      allows(appliesToKanji, recognitionTarget) &&
+      (kanaReading === undefined || kanaScriptsMatch(text, kanaReading))
+    )
+    : kanaReading === undefined || kanaScriptsMatch(kanaForm.text, kanaReading)
+    ? [kanaForm]
+    : [];
+
+  if (kanjiForm === undefined && kanaForm === undefined) return [];
+
+  return entry.sense.flatMap((sense, index) => {
+    const applies = applicableKanaForms.some((applicableKanaForm) => {
+      if (!allows(sense.appliesToKana, applicableKanaForm.text)) return false;
+      if (kanjiForm !== undefined) {
+        return allows(sense.appliesToKanji, recognitionTarget);
+      }
+
+      const compatibleKanjiSpellings = applicableKanaForm.appliesToKanji.includes("*")
+        ? new Set(entry.kanji.map(({ text }) => text))
+        : new Set(applicableKanaForm.appliesToKanji);
+      return sense.appliesToKanji.includes("*") ||
+        sense.appliesToKanji.some((spelling) => compatibleKanjiSpellings.has(spelling));
+    });
+    return applies ? [index + 1] : [];
+  });
 }
 
 function uniqueForms<T>(forms: T[]): T[] {
   return [...new Map(forms.map((form) => [JSON.stringify(form), form])).values()];
 }
 
-const GLOSS_STOP_WORDS = new Set([
-  "an",
-  "and",
-  "as",
-  "at",
-  "by",
-  "esp",
-  "for",
-  "from",
-  "in",
-  "of",
-  "on",
-  "one",
-  "or",
-  "the",
-  "to",
-  "with",
-]);
-
-function glossVocabulary(entry: JMdictWord, senseNumbers?: readonly number[]): Set<string> {
-  const senses = senseNumbers === undefined
-    ? entry.sense
-    : senseNumbers.map((number) => entry.sense[number - 1]);
-  return new Set(
-    senses
-      .flatMap((sense) => sense.gloss)
-      .filter(({ lang }) => lang === "eng")
-      .flatMap(({ text }) => text.toLowerCase().match(/[a-z]+/gu) ?? [])
-      .filter((word) => word.length > 1 && !GLOSS_STOP_WORDS.has(word)),
-  );
+export interface EntrySelectionDependencies {
+  selectSenses?: typeof selectApplicableSenses;
+  generateHint?: typeof generateSourceGroundedHint;
 }
 
-/**
- * Conservatively declines to invent a semantic contrast when JMDict's English glosses share
- * meaningful vocabulary. This catches duplicate entries split primarily by reading or register;
- * false negatives merely leave a card for multi-reading support or manual review.
- */
-function entriesHaveSharedGlossVocabulary(
-  selectedEntry: JMdictWord,
-  applicableSenseNumbers: readonly number[],
-  contrastingEntries: readonly JMdictWord[],
-): boolean {
-  const selectedWords = glossVocabulary(selectedEntry, applicableSenseNumbers);
-  const contrastingWords = new Set(
-    contrastingEntries.flatMap((entry) => [...glossVocabulary(entry)]),
-  );
-  return selectedWords.intersection(contrastingWords).size > 0;
-}
+type EntrySelectionGenerationOptions = GenerationOptions;
 
-type GenerateSenseAndHint = (
-  input: SenseAndHintGenerationInput,
-  model: ModelId,
-) => Promise<GeneratedSenseAndHint>;
-type GenerateContrastiveHint = typeof generateContrastiveHint;
+async function markedSelectionContext(request: UnresolvedJMDictEntry): Promise<string> {
+  const partOfSpeech = request.candidateEntries.flatMap((entry) =>
+    entry.sense.flatMap((sense) => sense.partOfSpeech)
+  );
+  return await markResolvedContextTargetWithinAnchor(
+    request.context,
+    request.fullContext,
+    request.recognitionTarget,
+    partOfSpeech,
+  );
+}
 
 /** Revalidates cached selections against reading evidence that is not entrusted to the model. */
 export function readingConflictForJMDictEntrySelection(
@@ -163,6 +185,7 @@ export function readingConflictForJMDictEntrySelection(
 function combinedEntry(
   request: UnresolvedJMDictEntry,
   candidateEntries: readonly JMdictWord[],
+  kanaReading: string | undefined,
 ): {
   entry: JMdictWord;
   senses: CombinedSense[];
@@ -171,16 +194,6 @@ function combinedEntry(
   if (candidates.length === 0) {
     throw new Error("JMDict entry selection requires at least one candidate entry.");
   }
-  const senses = candidates.flatMap((entry) =>
-    entry.sense.map((_, index) => ({
-      jmdictId: entry.id,
-      senseNumber: index + 1,
-    }))
-  );
-  if (senses.length === 0) {
-    throw new Error("JMDict entry selection requires at least one candidate sense.");
-  }
-
   const exactKanjiForms = candidates.flatMap((entry) =>
     entry.kanji.filter(({ text }) => text === request.recognitionTarget)
   );
@@ -195,6 +208,15 @@ function combinedEntry(
     );
   }
 
+  const senses = candidates.flatMap((entry) =>
+    structurallyApplicableSenseNumbers(entry, request.recognitionTarget, kanaReading).map(
+      (senseNumber) => ({
+        jmdictId: entry.id,
+        senseNumber,
+      }),
+    )
+  );
+
   return {
     entry: {
       id: `entry-selection:${candidates.map(({ id }) => id).join(",")}`,
@@ -202,16 +224,12 @@ function combinedEntry(
       // The exact-target check above prevents this temporary combined view from admitting a novel
       // recognition-target spelling.
       kanji: uniqueForms(candidates.flatMap(({ kanji }) => kanji)),
-      kana: uniqueForms(candidates.flatMap(({ kana }) => kana)).concat(
-        exactKanaForms.length > 0 ? [] : [{
-          common: false,
-          text: request.kanaReading,
-          tags: [],
-          appliesToKanji: ["*"],
-        }],
-      ),
+      kana: uniqueForms(candidates.flatMap(({ kana }) => kana)),
       // The combined sense number is the stable bridge back to its original entry and sense.
-      sense: candidates.flatMap((entry) => entry.sense.map((sense) => structuredClone(sense))),
+      sense: senses.map(({ jmdictId, senseNumber }) => {
+        const sourceEntry = candidates.find(({ id }) => id === jmdictId)!;
+        return structuredClone(sourceEntry.sense[senseNumber - 1]);
+      }),
     },
     senses,
   };
@@ -220,88 +238,139 @@ function combinedEntry(
 /**
  * Selects one of several same-spelling entries by presenting their senses as one numbered list.
  *
- * Reusing the canonical sense-and-hint operation makes entry selection obey the same prompt,
- * output schema, hint-length limit, and semantic validation as ordinary sense selection.
+ * The intended surface is marked deterministically before the focused sense-selection and
+ * source-grounded-hint operations run. The temporary combined entry gives those operations one
+ * stable sense-number namespace that can be mapped back to the original entries.
  */
 export async function selectJMDictEntry(
   request: UnresolvedJMDictEntry,
-  model: ModelId,
-  generate: GenerateSenseAndHint = generateSenseAndHintFields,
-  generateHint: GenerateContrastiveHint = generateContrastiveHint,
-): Promise<JMDictEntrySelection> {
+  options: EntrySelectionGenerationOptions,
+  {
+    selectSenses = selectApplicableSenses,
+    generateHint = generateSourceGroundedHint,
+  }: EntrySelectionDependencies = {},
+): Promise<GeneratedJMDictEntrySelection> {
+  const context = await markedSelectionContext(request);
   const readingCompatibleEntries = request.candidateEntries.filter((entry) =>
     readingConflictForJMDictEntrySelection(request, entry.id) === null
   );
   const initialEntries = request.kanaReadingEvidence === "source-ruby"
     ? readingCompatibleEntries
     : request.candidateEntries;
-  if (initialEntries.length === 0) return { status: "no-reading-match" };
+  if (initialEntries.length === 0) {
+    return { status: "no-reading-match", modelConfigurationIds: [] };
+  }
 
   async function evaluate(
     candidateEntries: readonly JMdictWord[],
-  ): Promise<JMDictEntrySelection> {
-    const { entry, senses } = combinedEntry(request, candidateEntries);
-    const generated = await generate({
-      context: request.context,
+    narrowToRequestReading: boolean,
+  ): Promise<GeneratedJMDictEntrySelection> {
+    const { entry, senses } = combinedEntry(
+      request,
+      candidateEntries,
+      narrowToRequestReading ? request.kanaReading : undefined,
+    );
+    if (senses.length === 0) {
+      return { status: "no-match", modelConfigurationIds: [] };
+    }
+    const generated = await selectSenses({
+      context,
       recognitionTarget: request.recognitionTarget,
       jmdictEntry: entry,
-      kanaReading: request.kanaReading,
       compatibleSenseNumbers: senses.map((_, index) => index + 1),
-    }, model);
-    if (generated.applicableSenses === null) return { status: "no-match" };
+    }, options);
+    const modelConfigurationIds = [generated.metadata.modelConfigurationId];
+    if (generated.value.outcome === "no-match") {
+      return { status: "no-match", modelConfigurationIds };
+    }
 
-    const combinedSenseNumbers = generated.applicableSenses.length === 0
-      ? senses.map((_, index) => index + 1)
-      : generated.applicableSenses;
-    const selectedSenses = combinedSenseNumbers.map((number) => senses[number - 1]);
+    if (generated.value.outcome === "ambiguous") {
+      const possibleSenses = generated.value.possibleSenseNumbers.map((number) =>
+        senses[number - 1]
+      );
+      const possibleJMDictIds = [...new Set(possibleSenses.map(({ jmdictId }) => jmdictId))]
+        .toSorted();
+      if (possibleJMDictIds.length === 1) {
+        return {
+          status: "sense-ambiguous",
+          possibleJMDictId: possibleJMDictIds[0],
+          possibleSenseNumbers: possibleSenses.map(({ senseNumber }) => senseNumber),
+          modelConfigurationIds,
+        };
+      }
+      return { status: "ambiguous", possibleJMDictIds, modelConfigurationIds };
+    }
+
+    const selectedSenses = generated.value.senseNumbers.map((number) => senses[number - 1]);
     const selectedJMDictIds = [
       ...new Set(selectedSenses.map(({ jmdictId }) => jmdictId)),
     ].toSorted();
     if (selectedJMDictIds.length !== 1) {
-      return { status: "ambiguous", selectedJMDictIds };
+      return {
+        status: "ambiguous",
+        possibleJMDictIds: selectedJMDictIds,
+        modelConfigurationIds,
+      };
     }
 
     const jmdictId = selectedJMDictIds[0];
     if (!request.allowedJMDictIds.includes(jmdictId)) {
-      return { status: "disallowed", selectedJMDictId: jmdictId };
+      return { status: "disallowed", selectedJMDictId: jmdictId, modelConfigurationIds };
     }
     const readingConflict = readingConflictForJMDictEntrySelection(request, jmdictId);
-    if (readingConflict !== null) return readingConflict;
+    if (readingConflict !== null) return { ...readingConflict, modelConfigurationIds };
     const applicableSenseNumbers = selectedSenses.map(({ senseNumber }) => senseNumber);
     const selectedEntry = candidateEntries.find(({ id }) => id === jmdictId)!;
-    const contrastingEntries = request.candidateEntries.filter(({ id }) => id !== jmdictId);
-    const hint = generated.hint ?? (
-      entriesHaveSharedGlossVocabulary(
-          selectedEntry,
-          applicableSenseNumbers,
-          contrastingEntries,
-        )
-        ? null
-        : await generateHint({
-          context: request.context,
-          recognitionTarget: request.recognitionTarget,
-          selectedEntry,
-          applicableSenseNumbers,
-          contrastingEntries,
-        }, model)
+    // Reading is shown only on the back, so every sense reachable through the exact front-side
+    // spelling remains a contrast even when it uses another reading. The same rule applies across
+    // entries. Automatic `～` notation also removes only competitors with a different affix
+    // boundary, while same-boundary affix usages still require a hint.
+    const frontSideUsages = jmdictUsagesForSpelling(
+      [
+        selectedEntry,
+        ...request.candidateEntries
+          .filter(({ id }) => id !== jmdictId)
+          .toSorted((left, right) => left.id.localeCompare(right.id)),
+      ],
+      request.recognitionTarget,
     );
-    if (hint === null) {
-      return { status: "hint-unavailable", selectedJMDictId: jmdictId };
+    const contrastingUsages = jmdictAlternativesForCardFront(
+      { entry: selectedEntry, senseNumbers: applicableSenseNumbers },
+      frontSideUsages,
+    );
+    let hint: string | null = null;
+    if (contrastingUsages.length > 0) {
+      const hintResult = await generateHint({
+        context,
+        recognitionTarget: request.recognitionTarget,
+        selectedUsage: {
+          entry: selectedEntry,
+          senseNumbers: applicableSenseNumbers,
+        },
+        contrastingUsages,
+      }, options);
+      modelConfigurationIds.push(hintResult.metadata.modelConfigurationId);
+      if (hintResult.value.outcome === "generated") hint = hintResult.value.hint;
     }
+    const distinctModelConfigurationIds = [...new Set(modelConfigurationIds)];
     return {
       status: "selected",
       jmdictId,
       recognitionTarget: request.recognitionTarget,
       applicableSenseNumbers,
       hint,
-      model,
+      model: distinctModelConfigurationIds.join(", "),
       generatedAt: new Date().toISOString(),
       candidateJMDictIds: request.candidateEntries.map(({ id }) => id).toSorted(),
       allowedJMDictIds: [...request.allowedJMDictIds].toSorted(),
+      modelConfigurationIds: distinctModelConfigurationIds,
     };
   }
 
-  const initial = await evaluate(initialEntries);
+  const initial = await evaluate(
+    initialEntries,
+    request.kanaReadingEvidence === "source-ruby",
+  );
   if (request.kanaReadingEvidence === "source-ruby") return initial;
 
   const eligibleAllowedEntries = readingCompatibleEntries.filter(({ id }) =>
@@ -313,7 +382,9 @@ export async function selectJMDictEntry(
     : initial.status === "reading-conflict"
     ? [initial.selectedJMDictId]
     : initial.status === "ambiguous"
-    ? initial.selectedJMDictIds
+    ? initial.possibleJMDictIds
+    : initial.status === "sense-ambiguous"
+    ? [initial.possibleJMDictId]
     : [];
   if (
     selectedIds.length === 0 ||
@@ -327,30 +398,7 @@ export async function selectJMDictEntry(
 
   // The broad comparison preferred an entry that contradicts the Animecard reading. Recheck the
   // one linked, reading-compatible entry on its own: it is accepted only if its own senses fit the
-  // context and yield the contrastive hint required for a shared spelling.
-  return await evaluate(eligibleAllowedEntries);
-}
-
-/** Fingerprints every semantic input, including the current JMDict data, for durable AI caching. */
-export async function entrySelectionInputFingerprint(
-  request: UnresolvedJMDictEntry,
-  model: ModelId,
-): Promise<string> {
-  const value = JSON.stringify({
-    version: 4,
-    cardFieldGenerationVersion: CARD_FIELD_GENERATION_CACHE_VERSION,
-    model,
-    context: request.context,
-    recognitionTarget: request.recognitionTarget,
-    kanaReading: request.kanaReading,
-    kanaReadingEvidence: request.kanaReadingEvidence,
-    candidateEntries: request.candidateEntries.toSorted((left, right) =>
-      left.id.localeCompare(right.id)
-    ),
-    allowedJMDictIds: [...request.allowedJMDictIds].toSorted(),
-  });
-  const digest = new Uint8Array(
-    await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value)),
-  );
-  return [...digest].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+  // context and either yield the required contrastive hint or become unambiguous through affix
+  // notation.
+  return await evaluate(eligibleAllowedEntries, true);
 }

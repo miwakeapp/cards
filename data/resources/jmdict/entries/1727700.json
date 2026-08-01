@@ -1,0 +1,103 @@
+{
+  "id": "1727700",
+  "kanji": [
+    {
+      "common": false,
+      "text": "一丁前",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "いっちょうまえ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "一人前",
+          2
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "adult"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "grown-up"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "person who has come of age"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adj-no"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "fully fledged"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "established"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "qualified"
+        }
+      ]
+    }
+  ]
+}

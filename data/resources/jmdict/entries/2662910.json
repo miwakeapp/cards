@@ -1,0 +1,132 @@
+{
+  "id": "2662910",
+  "kanji": [],
+  "kana": [
+    {
+      "common": false,
+      "text": "てんでバラバラ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "てんでばらばら",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "てんでんばらばら",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "てんでんバラバラ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "テンデンバラバラ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "テンデバラバラ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adj-na"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "various"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "diverse"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "divergent"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "disorderly"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "uncoordinated"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adj-na"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "each according to one's own wishes"
+        }
+      ]
+    }
+  ]
+}

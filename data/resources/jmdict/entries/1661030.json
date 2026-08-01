@@ -1,0 +1,92 @@
+{
+  "id": "1661030",
+  "kanji": [
+    {
+      "common": true,
+      "text": "大綱",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "たいこう",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "fundamental principles"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "main lines"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "outline"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "summary"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "general features"
+        }
+      ]
+    }
+  ]
+}

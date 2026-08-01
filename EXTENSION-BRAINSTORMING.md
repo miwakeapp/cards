@@ -110,7 +110,7 @@ JMDict restrictions and source ruby should run first. AI is needed only when mul
 
 For the current one-reading design, the wrapper must settle on exactly one kana reading and pass it as `CreateCardInput.kanaReading`. If it cannot do so confidently, the card should be flagged for review rather than smuggling ambiguity into `CreateCardInput`.
 
-A hint is generated only when the resolved spelling and applicable senses would otherwise be impractical to distinguish on the front of the card.
+A hint is generated only when the resolved spelling and applicable senses would otherwise be impractical to distinguish on the front of the card. A successful proposal contains a broad exact source-evidence span and a nested sentence-local hint-source span, so reviewers can audit the semantic decision independently from the compact final wording. `not-needed` and `source-insufficient` are explicit outcomes. The latter means the usage itself is sufficiently resolved but the encounter cannot support a fair short cue, so the wrapper creates the otherwise-useful card unhinted instead of fabricating a hint. Genuinely insufficient evidence for the selected entry or senses still defers card creation.
 
 ### Source metadata
 
@@ -152,6 +152,7 @@ The Animecards converter is an early example of this wrapper architecture:
 - Its larger source passage comes from an EPUB corpus rather than a captured page.
 - Existing fields provide extra reading and source evidence, but may be stale or malformed.
 - Deterministic deinflection, source restoration, and ruby handling resolve most easy cards.
-- AI is used for the remaining target ambiguity, source-context selection, sense selection, hints, and context minimization.
+- Unresolved target ambiguity is deferred or supplied through an audited override; it is not guessed by the current AI operations.
+- AI is used for source-context selection, sense selection, hints, and context minimization.
 
 The converter does not need to be a reusable extension library. Its value is demonstrating that very different acquisition pipelines can converge on the same small, deterministic `card_creator` contract.

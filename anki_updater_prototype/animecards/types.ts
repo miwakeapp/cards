@@ -60,6 +60,13 @@ export type SenseResolution =
     compatibleSenses: number[];
   }
   | {
+    status: "ambiguous";
+    model: string;
+    generatedAt: string;
+    compatibleSenses: number[];
+    possibleSenses: number[];
+  }
+  | {
     status: "failed";
     model: string;
     attemptedAt: string;
@@ -194,6 +201,7 @@ export type DeferredReason =
   | "full-context-source-unavailable"
   | "full-context-restoration-failed"
   | "no-applicable-jmdict-sense"
+  | "ambiguous-jmdict-sense"
   | "ai-enrichment-failed"
   | "manual-hold";
 
@@ -207,6 +215,9 @@ export function deferredReason(candidate: ConversionCandidate): DeferredReason |
   }
   if (candidate.senseResolution.status === "no-match") {
     return "no-applicable-jmdict-sense";
+  }
+  if (candidate.senseResolution.status === "ambiguous") {
+    return "ambiguous-jmdict-sense";
   }
   if (
     candidate.minimizedContextResolution.status === "failed" ||

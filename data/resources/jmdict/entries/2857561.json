@@ -1,0 +1,92 @@
+{
+  "id": "2857561",
+  "kanji": [],
+  "kana": [
+    {
+      "common": false,
+      "text": "ティタン",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "チタン",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [
+        "grmyth"
+      ],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [
+        {
+          "lang": "grc",
+          "full": true,
+          "wasei": false,
+          "text": null
+        }
+      ],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "Titan (pre-Olympian god)"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "タイタン",
+          2
+        ]
+      ],
+      "antonym": [],
+      "field": [
+        "astron"
+      ],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "Titan (moon of Saturn)"
+        }
+      ]
+    }
+  ]
+}

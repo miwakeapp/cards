@@ -1,0 +1,102 @@
+{
+  "id": "1223615",
+  "kanji": [
+    {
+      "common": true,
+      "text": "貴方",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "貴女",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "貴男",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "あなた",
+      "tags": [
+        "gikun"
+      ],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "pn"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [
+        "trad. polite in ref. to someone of equal or lower status, now oft. regarded as rude or distant"
+      ],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "you"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "pn"
+      ],
+      "appliesToKanji": [
+        "貴方",
+        "貴男"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "fam",
+        "uk"
+      ],
+      "info": [
+        "used by wives addressing their husbands"
+      ],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "dear"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "honey"
+        }
+      ]
+    }
+  ]
+}

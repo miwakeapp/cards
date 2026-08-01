@@ -1,0 +1,51 @@
+{
+  "id": "2829770",
+  "kanji": [],
+  "kana": [
+    {
+      "common": false,
+      "text": "シャー",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "hist"
+      ],
+      "info": [],
+      "languageSource": [
+        {
+          "lang": "per",
+          "full": true,
+          "wasei": false,
+          "text": null
+        }
+      ],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "shah (royal title used by Iranian monarchs)"
+        }
+      ]
+    }
+  ]
+}

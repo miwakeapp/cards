@@ -1,0 +1,178 @@
+{
+  "id": "1397340",
+  "kanji": [
+    {
+      "common": true,
+      "text": "素直",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "すなお",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adj-na",
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "obedient"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "meek"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "docile"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "unaffected"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adj-na",
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "honest"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "frank"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "upfront (about one's feelings)"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adj-na",
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "straight (e.g. hair)"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adj-na",
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "without peculiarity"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "without mannerisms"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "standard"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "neat (e.g. handwriting)"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+{
+  "id": "1339010",
+  "kanji": [
+    {
+      "common": true,
+      "text": "出産",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "しゅっさん",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vt",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "childbirth"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "(giving) birth"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "delivery"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "parturition"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vt",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "production (of goods)"
+        }
+      ]
+    }
+  ]
+}

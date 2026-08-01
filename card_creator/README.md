@@ -12,7 +12,7 @@ const card = await createCard({
   recognitionTarget: "頼る",
   kanaReading: "たよる",
   applicableSenseNumbers: [1],
-  fullContext: "同じように、<mark>頼った</mark>り<mark>頼られた</mark>りすればいいと思うよ。",
+  fullContext: "同じように、<mark>頼ったり</mark><mark>頼られたり</mark>すればいいと思うよ。",
   source: {
     text: "『作品名』",
     lang: "ja",
@@ -37,6 +37,8 @@ See the exported `CreateCardInput` and `CardSource` documentation for the exact 
 `formatReadingForAnki()` formats a selected spelling and reading using Anki's bracket-based furigana syntax. It returns `null` when the local furigana data cannot determine precise placement.
 
 `compatibleSenseNumbersForJMDictUsage()` applies JMDict's spelling and reading restrictions before a caller makes any contextual choice among senses. It uses the same validation and compatibility rules as `createCard()`.
+
+The package also exposes the deterministic JMDict/card-front rules needed to prepare a fully decided card without duplicating renderer semantics. `jmdictUsagesForSpelling()` enumerates every usage an undecorated spelling can represent, while `jmdictAlternativesForCardFront()` removes alternatives already distinguished by the front's `～` notation. Surviving alternatives are candidates for a separate semantic hint decision; their presence does not by itself prove that a hint is useful.
 
 Card construction uses JMDict furigana data and the compact spelling-to-readings index from the `data` package. Refresh the full local resources with:
 

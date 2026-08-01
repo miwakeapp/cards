@@ -1,0 +1,70 @@
+{
+  "id": "1566970",
+  "kanji": [
+    {
+      "common": false,
+      "text": "憑き物",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "つき物",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "憑物",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "つきもの",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "evil spirit (that possesses someone)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "demon"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "devil"
+        }
+      ]
+    }
+  ]
+}

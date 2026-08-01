@@ -1,0 +1,109 @@
+{
+  "id": "1184330",
+  "kanji": [
+    {
+      "common": false,
+      "text": "下っ端",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "下っぱ",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "したっぱ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "underling"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "person of low standing"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "grunt"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adj-no"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "petty (work, official, etc.)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "minor"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "lowly"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "humble"
+        }
+      ]
+    }
+  ]
+}

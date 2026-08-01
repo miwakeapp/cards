@@ -1,0 +1,118 @@
+{
+  "id": "1284250",
+  "kanji": [
+    {
+      "common": true,
+      "text": "号泣",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "ごうきゅう",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "crying loudly"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "bawling"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "wailing"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "lamentation"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "col"
+      ],
+      "info": [
+        "non-standard usage"
+      ],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "crying one's eyes out (without making noise)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "breaking into a flood of tears"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "crying buckets"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "weeping"
+        }
+      ]
+    }
+  ]
+}

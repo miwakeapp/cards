@@ -1,0 +1,145 @@
+{
+  "id": "1608970",
+  "kanji": [
+    {
+      "common": false,
+      "text": "鷹揚",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "大様",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "おうよう",
+      "tags": [],
+      "appliesToKanji": [
+        "鷹揚"
+      ]
+    },
+    {
+      "common": false,
+      "text": "おおよう",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "ようよう",
+      "tags": [],
+      "appliesToKanji": [
+        "鷹揚"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adj-na",
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "large-hearted"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "generous"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "liberal"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "open-handed"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "magnanimous"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "easygoing"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adj-na",
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "placid"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "composed"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "cool"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "collected"
+        }
+      ]
+    }
+  ]
+}

@@ -5,7 +5,7 @@ import {
   deriveLookupSpellings,
   findEntriesBySpelling,
   type SpellingIndex,
-} from "./recognition_target_lookup.ts";
+} from "card_resolution";
 
 export interface CSVRow {
   sentence: string;

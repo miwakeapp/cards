@@ -1,0 +1,60 @@
+{
+  "id": "1596730",
+  "kanji": [
+    {
+      "common": true,
+      "text": "続々",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "続続",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "ぞくぞく",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adv",
+        "adv-to"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "successively"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "one after another"
+        }
+      ]
+    }
+  ]
+}

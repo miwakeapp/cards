@@ -1,0 +1,103 @@
+{
+  "id": "1167880",
+  "kanji": [
+    {
+      "common": false,
+      "text": "稲子",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "蝗",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "いなご",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "こう",
+      "tags": [],
+      "appliesToKanji": [
+        "蝗"
+      ]
+    },
+    {
+      "common": false,
+      "text": "イナゴ",
+      "tags": [],
+      "appliesToKanji": []
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "rice grasshopper (of genus Oxya)"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "grasshopper"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "locust (of family Catantopidae)"
+        }
+      ]
+    }
+  ]
+}

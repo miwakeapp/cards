@@ -1,0 +1,114 @@
+{
+  "id": "1272580",
+  "kanji": [
+    {
+      "common": true,
+      "text": "交流",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "こうりゅう",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "exchange (e.g. cultural)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "interchange"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "interaction"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "mingling"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "mixing"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "coming together"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [
+        "elec"
+      ],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "alternating current"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "AC"
+        }
+      ]
+    }
+  ]
+}

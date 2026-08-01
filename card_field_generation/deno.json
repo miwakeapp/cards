@@ -1,12 +1,26 @@
 {
   "name": "card_field_generation",
   "exports": {
-    ".": "./src/mod.ts"
+    ".": "./src/mod.ts",
+    "./eval-metadata": "./src/eval_metadata.ts",
+    "./file-cache": "./src/file_cache.ts",
+    "./model-presets": "./src/model_presets.ts"
   },
   "imports": {
     "zod": "npm:zod@^4.1.13"
   },
   "tasks": {
-    "doc:check": "deno doc --lint src/mod.ts"
+    "doc:check": "deno doc --lint src/mod.ts src/eval_metadata.ts src/file_cache.ts src/model_presets.ts"
+  },
+  "test": {
+    "permissions": {
+      "read": [
+        "./generated/test",
+        "../data/resources/jmdict/entries",
+        "../data/resources/jmdict/tags.json"
+      ],
+      "sys": ["hostname"],
+      "write": ["./generated/test"]
+    }
   }
 }

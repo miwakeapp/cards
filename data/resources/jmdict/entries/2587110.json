@@ -1,0 +1,70 @@
+{
+  "id": "2587110",
+  "kanji": [
+    {
+      "common": false,
+      "text": "簇々",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "簇簇",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "そうそう",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "ぞくぞく",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adv-to",
+        "adj-t"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "obs"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "gathering"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "swarming"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "id": "2833774",
+  "kanji": [
+    {
+      "common": true,
+      "text": "一行",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "いっこう",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "party"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "group"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "troop"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "company"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "one act"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "one action"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "one deed"
+        }
+      ]
+    }
+  ]
+}

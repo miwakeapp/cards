@@ -1,0 +1,95 @@
+{
+  "id": "1534870",
+  "kanji": [
+    {
+      "common": true,
+      "text": "木綿",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "木棉",
+      "tags": [
+        "rK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "もめん",
+      "tags": [],
+      "appliesToKanji": [
+        "木綿"
+      ]
+    },
+    {
+      "common": false,
+      "text": "きわた",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "cotton (material)"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "きわた"
+      ],
+      "related": [
+        [
+          "パンヤの木"
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "red silk-cotton tree (Bombax ceiba)"
+        }
+      ]
+    }
+  ]
+}

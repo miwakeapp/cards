@@ -1,0 +1,115 @@
+{
+  "id": "1295490",
+  "kanji": [
+    {
+      "common": true,
+      "text": "細々",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "細細",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "ほそぼそ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adv",
+        "adv-to"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "poor (living)"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adv",
+        "adv-to"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "barely continuing"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "just scraping along"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adj-f"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [
+        "as ... とした"
+      ],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "very narrow"
+        }
+      ]
+    }
+  ]
+}

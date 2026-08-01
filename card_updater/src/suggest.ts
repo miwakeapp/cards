@@ -1,19 +1,32 @@
 /**
  * AI re-targeting suggestions for cards whose targeted senses may have changed.
  *
- * Sense and hint determination uses the shared, evaluated card-field prompt with only those two
- * outputs enabled. Confidence is derived deterministically by comparing the generated selection
- * against the structural sense alignment.
+ * Sense selection and source-grounded hint generation use the shared focused operations.
+ * Confidence is derived deterministically by comparing the generated selection against the
+ * structural sense alignment.
  */
 
-import { DEFAULT_MODEL_ID, generateSenseAndHintFields, type ModelId } from "card_field_generation";
-import { compatibleSenseNumbersForJMDictUsage } from "card_creator";
+import { DOMParser, Node, type Text } from "@b-fuze/deno-dom";
+import {
+  generateSourceGroundedHint,
+  type GenerationCache,
+  type GenerationResult,
+  type ModelId,
+  selectApplicableSenses,
+} from "card_field_generation";
+import {
+  compatibleSenseNumbersForJMDictUsage,
+  jmdictAlternativesForCardFront,
+  jmdictUsagesForSpelling,
+} from "card_creator";
 import { formatMiwakeKey } from "card_creator/keys";
+import { ankiFuriganaToSurface } from "card_resolution";
+import type { JMDictWord } from "data";
 import type { AnalyzedCard } from "./analyze.ts";
+import { splitAffixNotation } from "./affix_notation.ts";
 import { parseAnkiReading } from "./anki_reading.ts";
-import { sha256OfJSON } from "./hash.ts";
 
-export type SuggestionConfidence = "high" | "medium" | "low";
+export type SuggestionConfidence = "high" | "medium";
 
 export interface Suggestion {
   /** 1-indexed applicable senses in the new entry; empty means all senses apply. */
@@ -28,112 +41,156 @@ export interface Suggestion {
   confidence: SuggestionConfidence;
   /** Deterministic explanation of how the suggestion relates to the entry changes. */
   explanation: string;
-  modelId: string;
+  /** Actual model-and-effort identities used by the focused operation(s). */
+  modelConfigurationIds: string[];
   fromCache: boolean;
 }
 
-export interface SuggestionCacheEntry {
-  inputHash: string;
-  modelId: string;
-  generatedAt: string;
-  applicableSenses: number[];
-  hint: string | null;
-}
-
-export type SuggestionCache = Record<string, SuggestionCacheEntry>;
-
-export function suggestionInputHash(
-  card: AnalyzedCard,
-  modelId: string,
-): Promise<string> {
-  return sha256OfJSON([
-    modelId,
-    card.note.fields.key,
-    card.note.fields.recognitionTarget,
-    card.note.fields.reading,
-    card.note.fields.hint,
-    card.note.fields.dictionaryEntry,
-    card.latestEntryHTML,
-    card.note.fields.fullContext,
-  ]);
-}
-
-/** Prepares the stored `Full context` field for the shared sense-and-hint prompt. */
+/** Preserves stored HTML and target marks while removing front-side Anki furigana. */
 export function contextForPrompt(fullContext: string): string {
-  return fullContext
-    .replace(/<\/?mark>/gi, "")
-    .replace(/<br\s*\/?>/gi, "\n")
-    .trim();
+  const document = new DOMParser().parseFromString(fullContext.trim(), "text/html");
+  const visit = (node: Node): void => {
+    for (const child of node.childNodes) {
+      if (child.nodeType === Node.TEXT_NODE) {
+        (child as Text).data = ankiFuriganaToSurface(child.textContent);
+      } else {
+        visit(child);
+      }
+    }
+  };
+  visit(document.body);
+  return document.body.innerHTML;
 }
 
 export async function suggestForCard(
   card: AnalyzedCard,
   {
-    modelId = DEFAULT_MODEL_ID,
-    cache = {},
+    sameSpellingEntries,
+    modelId,
+    generationCache,
     force = false,
-    generate = generateSenseAndHintFields,
+    selectSenses = selectApplicableSenses,
+    generateHint = generateSourceGroundedHint,
   }: {
+    /** Every JMDict entry containing the card's exact undecorated front-side spelling. */
+    sameSpellingEntries: readonly JMDictWord[];
     modelId?: ModelId;
-    cache?: SuggestionCache;
+    generationCache?: GenerationCache;
     force?: boolean;
-    generate?: typeof generateSenseAndHintFields;
-  } = {},
-): Promise<{ suggestion: Suggestion; cacheEntry: SuggestionCacheEntry }> {
+    selectSenses?: typeof selectApplicableSenses;
+    generateHint?: typeof generateSourceGroundedHint;
+  },
+): Promise<Suggestion> {
   if (card.latestWord === null || card.newParsed === null || card.parsedKey === null) {
     throw new Error(`Card ${card.note.noteId} has no latest entry to suggest against.`);
   }
   const parsedKey = card.parsedKey;
-
-  const inputHash = await suggestionInputHash(card, modelId);
-  const cached = cache[String(card.note.noteId)];
-  const fromCache = !force && cached !== undefined && cached.inputHash === inputHash &&
-    cached.modelId === modelId;
-
-  let applicableSenses: number[];
-  let aiHint: string | null;
-  if (fromCache) {
-    applicableSenses = cached.applicableSenses;
-    aiHint = cached.hint;
-  } else {
-    const kanaReading = selectedKanaReading(card);
-    const compatibleSenseNumbers = compatibleSenseNumbersForJMDictUsage(
-      card.latestWord,
-      parsedKey.spelling,
-      card.latestWord.kanji.some(({ text }) => text === parsedKey.spelling)
-        ? kanaReading
-        : undefined,
+  if (card.note.fields.fullContext.trim() === "") {
+    throw new Error(
+      `Card ${card.note.noteId} has no Full context, so a source-grounded suggestion cannot be generated.`,
     );
-    const fields = await generate({
-      context: contextForPrompt(card.note.fields.fullContext),
-      recognitionTarget: parsedKey.spelling,
-      jmdictEntry: card.latestWord,
-      kanaReading,
-      compatibleSenseNumbers,
-    }, modelId);
-    if (fields.applicableSenses === null) {
-      throw new Error(
-        `No sense in the latest JMDict entry ${JSON.stringify(card.latestWord.id)} applies to ` +
-          `recognition target ${JSON.stringify(parsedKey.spelling)} in the stored context.`,
-      );
-    }
-    applicableSenses = senseNumbersForKey(
-      fields.applicableSenses,
-      compatibleSenseNumbers,
-      card.newParsed.senses.length,
-    );
-    aiHint = fields.hint;
   }
 
-  const suggestion = buildSuggestion(card, applicableSenses, aiHint, modelId, fromCache);
-  const cacheEntry: SuggestionCacheEntry = {
-    inputHash,
-    modelId,
-    generatedAt: new Date().toISOString(),
-    applicableSenses,
-    hint: aiHint,
+  let aiHint: string | null;
+  const focusedResults: GenerationResult<unknown>[] = [];
+  const kanaReading = selectedKanaReading(card);
+  const compatibleSenseNumbers = compatibleSenseNumbersForJMDictUsage(
+    card.latestWord,
+    parsedKey.spelling,
+    card.latestWord.kanji.some(({ text }) => text === parsedKey.spelling) ? kanaReading : undefined,
+  );
+  const spellingUsages = jmdictUsagesForSpelling(sameSpellingEntries, parsedKey.spelling);
+  const selectedEntryUsage = spellingUsages.find(({ entry }) => entry.id === card.latestWord!.id);
+  if (selectedEntryUsage === undefined) {
+    throw new Error(
+      `sameSpellingEntries must include latest JMDict entry ${
+        JSON.stringify(card.latestWord.id)
+      } ` +
+        `with exact spelling ${JSON.stringify(parsedKey.spelling)} for card ${card.note.noteId}.`,
+    );
+  }
+  const context = contextForPrompt(card.note.fields.fullContext);
+  const generationOptions = {
+    ...(modelId === undefined ? {} : { modelId }),
+    cache: generationCache,
+    cacheMode: force ? "refresh" as const : "use" as const,
+    maxAttempts: 3,
   };
-  return { suggestion, cacheEntry };
+  const senseResult = await selectSenses({
+    context,
+    recognitionTarget: parsedKey.spelling,
+    jmdictEntry: card.latestWord,
+    compatibleSenseNumbers,
+  }, generationOptions);
+  focusedResults.push(senseResult);
+  const senseOutcome = senseResult.value;
+  if (senseOutcome.outcome === "no-match") {
+    throw new Error(
+      `Focused sense selection found no sense in latest JMDict entry ${
+        JSON.stringify(card.latestWord.id)
+      } that matches recognition target ${
+        JSON.stringify(parsedKey.spelling)
+      } in the stored context.`,
+    );
+  }
+  if (senseOutcome.outcome === "ambiguous") {
+    throw new Error(
+      `Focused sense selection could not distinguish between possible senses ${
+        JSON.stringify(senseOutcome.possibleSenseNumbers)
+      } in latest JMDict entry ${JSON.stringify(card.latestWord.id)} for recognition target ${
+        JSON.stringify(parsedKey.spelling)
+      } in the stored context.`,
+    );
+  }
+  const selectedSenseNumbers = [...senseOutcome.senseNumbers];
+  const applicableSenses = senseNumbersForKey(
+    senseOutcome.senseNumbers,
+    card.newParsed.senses.length,
+  );
+  aiHint = null;
+  const contrastingUsages = jmdictAlternativesForCardFront(
+    { entry: card.latestWord, senseNumbers: selectedSenseNumbers },
+    spellingUsages,
+    {
+      // Recognition target is user-editable and the updater never rewrites it. Hint generation
+      // must therefore use the notation actually displayed, not what a newly created card would
+      // derive from the latest JMDict tags.
+      displayedAffixNotation: displayedAffixNotation(card.note.fields.recognitionTarget),
+    },
+  );
+  if (contrastingUsages.length > 0) {
+    const hintResult = await generateHint({
+      context,
+      recognitionTarget: parsedKey.spelling,
+      selectedUsage: {
+        entry: card.latestWord,
+        senseNumbers: selectedSenseNumbers,
+      },
+      contrastingUsages,
+    }, generationOptions);
+    focusedResults.push(hintResult);
+    if (hintResult.value.outcome === "generated") {
+      aiHint = hintResult.value.hint;
+    }
+  }
+
+  const generationWasCached = focusedResults.length > 0 &&
+    focusedResults.every(({ metadata }) => metadata.cacheStatus !== "miss");
+  return buildSuggestion(
+    card,
+    applicableSenses,
+    aiHint,
+    [
+      ...new Set(focusedResults.map(({ metadata }) => metadata.modelConfigurationId)),
+    ],
+    generationWasCached,
+  );
+}
+
+function displayedAffixNotation(
+  recognitionTarget: string,
+): "leading" | "none" | "trailing" {
+  return splitAffixNotation(recognitionTarget).notation;
 }
 
 function selectedKanaReading(card: AnalyzedCard): string {
@@ -142,10 +199,14 @@ function selectedKanaReading(card: AnalyzedCard): string {
 
   const recognitionTarget = card.note.fields.recognitionTarget || spelling;
   let reading = card.note.fields.reading;
-  if (recognitionTarget === `～${spelling}` && reading.startsWith("～")) {
-    reading = reading.slice(1).trimStart();
-  } else if (recognitionTarget === `${spelling}～` && reading.endsWith("～")) {
-    reading = reading.slice(0, -1).trimEnd();
+  const targetAffix = splitAffixNotation(recognitionTarget);
+  const readingAffix = splitAffixNotation(reading);
+  if (
+    targetAffix.content === spelling &&
+    targetAffix.notation !== "none" &&
+    targetAffix.notation === readingAffix.notation
+  ) {
+    reading = readingAffix.content;
   }
   const readings = parseAnkiReading(reading, spelling);
   if (readings === null || readings.length !== 1) {
@@ -160,42 +221,36 @@ function selectedKanaReading(card: AnalyzedCard): string {
 }
 
 /**
- * Adapts the generator's “all compatible senses” shorthand to the key's “all entry senses”
- * shorthand, retaining explicit numbers when JMDict form restrictions exclude a sense.
+ * Adapts the generator's explicit selection to the key's “all entry senses” shorthand, retaining
+ * explicit numbers when JMDict form restrictions exclude a sense.
  */
 function senseNumbersForKey(
-  generatedSenseNumbers: number[],
-  compatibleSenseNumbers: number[],
+  generatedSenseNumbers: readonly number[],
   totalSenseCount: number,
 ): number[] {
-  const selected = generatedSenseNumbers.length === 0
-    ? compatibleSenseNumbers
-    : generatedSenseNumbers;
-  return selected.length === totalSenseCount ? [] : selected;
+  return generatedSenseNumbers.length === totalSenseCount ? [] : [...generatedSenseNumbers];
 }
 
 function buildSuggestion(
   card: AnalyzedCard,
   senses: number[],
   aiHint: string | null,
-  modelId: string,
+  modelConfigurationIds: string[],
   fromCache: boolean,
 ): Suggestion {
   const allApply = senses.length === 0;
   const currentHint = card.note.fields.hint;
 
-  // Existing hints are kept by default (they may be hand-edited); see DESIGN.md.
-  const defaultHint = allApply ? null : (currentHint || aiHint);
+  // Existing hints may be hand-edited and can distinguish this entry from another JMDict entry
+  // with the same spelling, even when every sense in the selected entry applies. Preserve them by
+  // default for every selection; reviewers can still clear a hint that became redundant.
+  const defaultHint = currentHint || aiHint;
 
   const expected = card.mappedTargetSenses;
   const sensesMatchExpectation = expected.length > 0 &&
     JSON.stringify(senses) === JSON.stringify(expected);
-  const hasContext = card.note.fields.fullContext.trim() !== "";
-
   let confidence: SuggestionConfidence;
-  if (!hasContext) {
-    confidence = "low";
-  } else if (sensesMatchExpectation) {
+  if (sensesMatchExpectation) {
     confidence = "high";
   } else if (allApply && card.parsedKey!.senseNumbers === null) {
     // The card targeted all senses and the AI still thinks all senses apply.
@@ -209,8 +264,8 @@ function buildSuggestion(
     aiHint,
     defaultHint,
     confidence,
-    explanation: buildExplanation(card, senses, sensesMatchExpectation, hasContext),
-    modelId,
+    explanation: buildExplanation(card, senses, sensesMatchExpectation),
+    modelConfigurationIds,
     fromCache,
   };
 }
@@ -219,7 +274,6 @@ function buildExplanation(
   card: AnalyzedCard,
   senses: number[],
   sensesMatchExpectation: boolean,
-  hasContext: boolean,
 ): string {
   const parts: string[] = [];
   const oldCount = card.oldParsed!.senses.length;
@@ -249,10 +303,6 @@ function buildExplanation(
     );
   } else if (card.removedTargetedSenses.length > 0) {
     parts.push("The previously targeted sense has no counterpart in the new entry.");
-  }
-
-  if (!hasContext) {
-    parts.push("No mined context is stored on this card, so this is a weak guess.");
   }
 
   return parts.join(" ");

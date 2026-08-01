@@ -11,6 +11,7 @@ import type {
   ReviewPayload,
 } from "../review_api.ts";
 import type { Suggestion, SuggestionConfidence } from "../suggest.ts";
+import { furiganaToRuby } from "../anki_furigana.ts";
 import { applyRestrictionReason } from "./apply_policy.ts";
 
 /* ---------- state ---------- */
@@ -142,13 +143,6 @@ function renderContextHTML(raw: string): string {
     return html;
   };
   return walk(doc.body);
-}
-
-function furiganaToRuby(escapedText: string): string {
-  return escapedText.replace(
-    /(?:^|[  ])([^  \[\]]+)\[([^\]]+)\]/g,
-    (_match, base, reading) => `<ruby>${base}<rt>${reading}</rt></ruby>`,
-  );
 }
 
 function readingTransitionHTML(item: ReviewItem): string {
@@ -410,7 +404,6 @@ function renderRetargetBanner(): void {
   const byConfidence: Record<SuggestionConfidence | "none", ReviewItem[]> = {
     high: [],
     medium: [],
-    low: [],
     none: [],
   };
   for (const item of list) {
@@ -424,16 +417,15 @@ function renderRetargetBanner(): void {
   if (byConfidence.medium.length) {
     parts.push(`<span class="conf-dot medium"></span> ${byConfidence.medium.length} medium`);
   }
-  if (byConfidence.low.length) {
-    parts.push(`<span class="conf-dot low"></span> ${byConfidence.low.length} low`);
-  }
   if (byConfidence.none.length) parts.push(`${byConfidence.none.length} without AI`);
 
   const suggested = list.filter((item) => item.suggestion).length;
   container.innerHTML = `
     <div class="banner banner-ai">
       <div class="banner-text">
-        <strong>✨ ${escapeHTML(meta.modelId)}</strong> pre-worked ${suggested} of ${list.length}
+        <strong>✨ ${
+    escapeHTML(meta.modelConfigurationIds.join(", ") || "evaluated operation defaults")
+  }</strong> pre-worked ${suggested} of ${list.length}
         · ${parts.join(" · ")}
       </div>
       <button class="btn-ai" id="acceptHighButton" ${undecidedHigh.length === 0 ? "disabled" : ""}>
@@ -499,7 +491,7 @@ function renderFocusCard(): void {
   const suggestion = item.suggestion;
   const matchesAI = suggestion !== null &&
     JSON.stringify(selection) === JSON.stringify([...suggestion.senses].sort((a, b) => a - b)) &&
-    ((allOrNone ? null : work.hint.trim() || null) === suggestion.defaultHint);
+    (work.hint.trim() || null) === suggestion.defaultHint;
   const index = list.indexOf(item);
   const decidedCount = list.filter((entry) => entry.decision || entry.applied).length;
 
@@ -531,7 +523,7 @@ function renderFocusCard(): void {
         <div class="ai-head">
           ✨ AI suggestion ${matchesAI ? "" : '(edited — <a href="#" id="resetToAI">reset</a>)'}
           <span class="chip chip-ai" style="border:0;background:none;padding:0"><span class="conf-dot ${suggestion.confidence}"></span>${suggestion.confidence}</span>
-          <span class="ai-model">${escapeHTML(suggestion.modelId)}</span>
+          <span class="ai-model">${escapeHTML(suggestion.modelConfigurationIds.join(", "))}</span>
         </div>
         <div class="ai-reason">${escapeHTML(suggestion.explanation)}</div>
       </div>`
@@ -541,17 +533,16 @@ function renderFocusCard(): void {
         <div class="ai-reason">Select the applicable senses manually, or run the AI for this card.</div>
       </div>`;
 
-  const hintDisabled = allOrNone;
-  const hintValue = hintDisabled ? "" : work.hint;
+  const hintValue = work.hint;
   const hintChips = [];
-  if (!hintDisabled && suggestion?.aiHint && suggestion.aiHint !== hintValue) {
+  if (suggestion?.aiHint && suggestion.aiHint !== hintValue) {
     hintChips.push(
       `<button type="button" class="chip chip-ai chip-button" id="useAIHint" title="Use the AI-generated hint">✨ <span lang="ja">${
         escapeHTML(suggestion.aiHint)
       }</span></button>`,
     );
   }
-  if (!hintDisabled && item.hint && item.hint !== hintValue) {
+  if (item.hint && item.hint !== hintValue) {
     hintChips.push(
       `<button type="button" class="chip chip-button" id="useCardHint" title="Restore the hint currently on the card"><span lang="ja">${
         escapeHTML(item.hint)
@@ -614,17 +605,15 @@ function renderFocusCard(): void {
           <div class="sense-picker">${senseRows}${removedRows}</div>
           <div class="all-senses-note">${
     allOrNone
-      ? "<strong>All senses apply</strong> — key gets no sense list, hint is cleared."
+      ? "<strong>All senses apply</strong> — key gets no sense list; any existing hint is preserved."
       : "&nbsp;"
   }</div>
         </div>
         ${aiPanel}
         <div class="hint-row">
           <label for="hintInput">Hint</label>
-          <input id="hintInput" lang="ja" ${hintDisabled ? "disabled" : ""} value="${
-    escapeHTML(hintValue)
-  }"
-                 placeholder="${hintDisabled ? "no hint — all senses apply" : "e.g. 変化に富む"}">
+          <input id="hintInput" lang="ja" value="${escapeHTML(hintValue)}"
+                 placeholder="e.g. 変化に富む">
           ${hintChips.join("")}
         </div>
       </div>
@@ -744,7 +733,7 @@ function acceptFocus(): void {
   const work = getWorking(item);
   const selection = [...work.senses].sort((a, b) => a - b);
   const allOrNone = selection.length === 0 || selection.length === item.totalNewSenses;
-  const hint = allOrNone ? null : (work.hint.trim() || null);
+  const hint = work.hint.trim() || null;
   const suggestion = item.suggestion;
   const matchesAI = suggestion !== null &&
     JSON.stringify(selection) === JSON.stringify([...suggestion.senses].sort((a, b) => a - b)) &&

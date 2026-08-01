@@ -352,10 +352,6 @@ section[id] {
   &.medium {
     background: #e0b23f;
   }
-
-  &.low {
-    background: #d4685c;
-  }
 }
 
 .banner {

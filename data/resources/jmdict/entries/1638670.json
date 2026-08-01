@@ -1,0 +1,63 @@
+{
+  "id": "1638670",
+  "kanji": [],
+  "kana": [
+    {
+      "common": true,
+      "text": "カチューシャ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [
+        "after a character in Tolstoy's novel \"Resurrection\""
+      ],
+      "languageSource": [
+        {
+          "lang": "rus",
+          "full": true,
+          "wasei": false,
+          "text": "Katyusha"
+        }
+      ],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "Alice band"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "(horseshoe-shaped) headband (worn over the forehead)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "hairband"
+        }
+      ]
+    }
+  ]
+}

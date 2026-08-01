@@ -1,0 +1,79 @@
+{
+  "id": "1208890",
+  "kanji": [
+    {
+      "common": false,
+      "text": "樺",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "桜皮",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "かば",
+      "tags": [],
+      "appliesToKanji": [
+        "樺"
+      ]
+    },
+    {
+      "common": false,
+      "text": "かんば",
+      "tags": [],
+      "appliesToKanji": [
+        "樺"
+      ]
+    },
+    {
+      "common": false,
+      "text": "かにわ",
+      "tags": [
+        "ok"
+      ],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "カバ",
+      "tags": [],
+      "appliesToKanji": []
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "birch (esp. Japanese white birch)"
+        }
+      ]
+    }
+  ]
+}

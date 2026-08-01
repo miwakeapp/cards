@@ -1,0 +1,97 @@
+{
+  "id": "1825730",
+  "kanji": [
+    {
+      "common": false,
+      "text": "思わせぶり",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "思わせ振り",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "おもわせぶり",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adj-na"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "significant"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "suggestive"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "insinuating"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "meaningful"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "words or behaviour that hints at a deeper meaning"
+        }
+      ]
+    }
+  ]
+}

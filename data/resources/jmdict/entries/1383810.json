@@ -1,0 +1,119 @@
+{
+  "id": "1383810",
+  "kanji": [
+    {
+      "common": true,
+      "text": "切りがない",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "切りが無い",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "きりがない",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "キリがない",
+      "tags": [],
+      "appliesToKanji": []
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "exp",
+        "adj-i"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "切りのない"
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "endless"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "boundless"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "innumerable"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "exp",
+        "adj-i"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "endless"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "never-ending"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "going on forever"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1457 @@
+{
+  "schemaVersion": 1,
+  "cases": [
+    {
+      "id": "historical-context-かけがえのない",
+      "provenance": {
+        "corpus": "Historical card_creator evals",
+        "artifact": "git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/inputs/かけがえのない.json + git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/goldens/かけがえのない.json"
+      },
+      "input": {
+        "fullContext": "彼女の優しさのお蔭で、わたしは失いかけていた社会性をもう一度取り戻せたし、<mark>かけがえのない</mark>ものを知った。"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "<mark>かけがえのない</mark>ものを知った。",
+          "彼女の優しさのお蔭で、わたしは<mark>かけがえのない</mark>ものを知った。"
+        ],
+        "rubricNotes": [
+          "The target's object is enough to make this usage intelligible; the preceding causal autobiography is expendable.",
+          "The reference is silver evidence, not the only acceptable wording."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Historical model-promoted golden agent-reviewed for this operation."
+      }
+    },
+    {
+      "id": "historical-context-はしゃぐ",
+      "provenance": {
+        "corpus": "Historical card_creator evals",
+        "artifact": "git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/inputs/はしゃぐ.json + git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/goldens/はしゃぐ.json"
+      },
+      "input": {
+        "fullContext": "数分間の電話が終わって部屋に戻ると、アロハが猫とじゃれ合っていた。じゃれ合うというよりは取っ組み合いのように、転げまわって<mark>はしゃいで</mark>いる。"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "アロハが猫と取っ組み合いのように転げまわって<mark>はしゃいで</mark>いる。",
+          "アロハが猫と転げまわって<mark>はしゃいで</mark>いる。",
+          "アロハが猫とじゃれ合って、転げまわって<mark>はしゃいで</mark>いる。"
+        ],
+        "rubricNotes": [
+          "Keep who is frolicking, with whom, and the physical manner; drop the unrelated phone-call transition.",
+          "Do not reduce this to the target alone."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Historical model-promoted golden agent-reviewed for this operation."
+      }
+    },
+    {
+      "id": "historical-context-目減り",
+      "provenance": {
+        "corpus": "Historical card_creator evals",
+        "artifact": "git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/inputs/目減り.json + git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/goldens/目減り.json"
+      },
+      "input": {
+        "fullContext": "不採用の連絡を受けるたびに、やっぱりわたしなんかが社会に出て働くのは無理なんだと自分を見限る気持ちが膨れ、<mark>目減り</mark>していく通帳の残額がそれを増幅させる。"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "通帳の残額が<mark>目減り</mark>していく。"
+        ],
+        "rubricNotes": [
+          "Retain what is diminishing; the emotional causal chain is not needed to understand this concrete usage.",
+          "Do not invent a reason for the balance decreasing."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Historical model-promoted golden agent-reviewed for this operation."
+      }
+    },
+    {
+      "id": "historical-context-願わくば",
+      "provenance": {
+        "corpus": "Historical card_creator evals",
+        "artifact": "git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/inputs/願わくば.json + git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/goldens/願わくば.json"
+      },
+      "input": {
+        "fullContext": "<mark>願わくば</mark>、彼女がいましあわせでありますように。"
+      },
+      "expected": {
+        "disposition": "keep-full-context",
+        "acceptableMinimizedContexts": [],
+        "rubricNotes": [
+          "This is already one short, self-contained sentence.",
+          "Changing spelling or punctuation without making review easier is not minimization."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Historical null golden agent-reviewed as an already-concise boundary case."
+      }
+    },
+    {
+      "id": "historical-context-外泊",
+      "provenance": {
+        "corpus": "Historical card_creator evals",
+        "artifact": "git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/inputs/外泊.json + git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/goldens/外泊.json"
+      },
+      "input": {
+        "fullContext": "そんな美音子ちゃんがこれだけは厳守しろと言ったルールは、男女関係なく決して他人を泊まらせないこと、<mark>外泊</mark>禁止のふたつだった。"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "ルールは<mark>外泊</mark>禁止だった。",
+          "美音子ちゃんが厳守しろと言ったルールは、決して他人を泊まらせないこと、<mark>外泊</mark>禁止のふたつだった。"
+        ],
+        "rubricNotes": [
+          "Preserve the rule/prohibition relationship; the other rule and attribution are unnecessary.",
+          "A concise source-grounded clause is preferable to a paraphrase of what 外泊 means."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Historical model-promoted golden agent-reviewed for this operation."
+      }
+    },
+    {
+      "id": "historical-context-大袈裟",
+      "provenance": {
+        "corpus": "Historical card_creator evals",
+        "artifact": "git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/inputs/大袈裟.json + git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/goldens/大袈裟.json"
+      },
+      "input": {
+        "fullContext": "どちらかと言えば、子どもが親を思い慕う感情に近い。<mark>大袈裟</mark>かもしれないけれど、神を崇拝するような感じと言ってもいい。"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "<mark>大袈裟</mark>かもしれないけれど、神を崇拝するような感じと言ってもいい。"
+        ],
+        "rubricNotes": [
+          "The marked sentence contains its own qualification and comparison.",
+          "Dropping the first comparison does not change what the marked usage modifies."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Historical model-promoted golden agent-reviewed for this operation."
+      }
+    },
+    {
+      "id": "historical-context-断罪",
+      "provenance": {
+        "corpus": "Historical card_creator evals",
+        "artifact": "git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/inputs/断罪.json + git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/goldens/断罪.json"
+      },
+      "input": {
+        "fullContext": "<mark>断罪</mark>という言葉がちらりと頭をよぎった。罪は、誰かに告白してきちんと裁かれなければならないのだろう。"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "<mark>断罪</mark>という言葉がちらりと頭をよぎった。"
+        ],
+        "rubricNotes": [
+          "The first sentence is a complete usage; the following reflection is thematically related but unnecessary for vocabulary review."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Paired with 頭をよぎる to test that the same source can be minimized appropriately for different targets."
+      }
+    },
+    {
+      "id": "historical-context-頭をよぎる",
+      "provenance": {
+        "corpus": "Historical card_creator evals",
+        "artifact": "git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/inputs/頭をよぎる.json + git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/goldens/頭をよぎる.json"
+      },
+      "input": {
+        "fullContext": "断罪という言葉がちらりと<mark>頭をよぎった</mark>。罪は、誰かに告白してきちんと裁かれなければならないのだろう。"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "断罪という言葉がちらりと<mark>頭をよぎった</mark>。"
+        ],
+        "rubricNotes": [
+          "Retain the thought that crossed the speaker's mind; drop the following reflection.",
+          "Do not make a generic sentence with an invented thought."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Paired with 断罪 to test target-sensitive retention within identical source context."
+      }
+    },
+    {
+      "id": "historical-context-後ろめたい",
+      "provenance": {
+        "corpus": "Historical card_creator evals",
+        "artifact": "git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/inputs/後ろめたい.json + git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/goldens/後ろめたい.json"
+      },
+      "input": {
+        "fullContext": "父に対する多少の<mark>後ろめたさ</mark>以外には、なんの痛みも苦悩もない。"
+      },
+      "expected": {
+        "disposition": "keep-full-context",
+        "acceptableMinimizedContexts": [],
+        "rubricNotes": [
+          "The short contrast is useful for understanding the feeling and leaves little redundant material.",
+          "A different sentence ending alone would not justify a minimized field."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Historical null golden agent-reviewed as an already-concise boundary case."
+      }
+    },
+    {
+      "id": "historical-context-捏造",
+      "provenance": {
+        "corpus": "Historical card_creator evals",
+        "artifact": "git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/inputs/捏造.json + git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/goldens/捏造.json"
+      },
+      "input": {
+        "fullContext": "待って、それ美晴だから。思い出を<mark>捏造</mark>しないで。"
+      },
+      "expected": {
+        "disposition": "keep-full-context",
+        "acceptableMinimizedContexts": [],
+        "rubricNotes": [
+          "Both short sentences are useful: the first supplies the correction that motivates the accusation.",
+          "Removing only the first sentence makes the utterance less self-contained."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Historical null golden agent-reviewed as a short causal-dialogue boundary case."
+      }
+    },
+    {
+      "id": "historical-context-脳裏に浮かぶ",
+      "provenance": {
+        "corpus": "Historical card_creator evals",
+        "artifact": "git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/inputs/脳裏に浮かぶ.json + git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/goldens/脳裏に浮かぶ.json"
+      },
+      "input": {
+        "fullContext": "携帯をじっと握りしめる。するとある番号が<mark>脳裏に浮かんだ</mark>。"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "ある番号が<mark>脳裏に浮かんだ</mark>。"
+        ],
+        "rubricNotes": [
+          "The number must remain the thing that comes to mind.",
+          "Once すると is removed, the target sentence is self-contained and the phone-gripping setup is expendable."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Relabeled during final model review: the generated target sentence is a faithful, materially cleaner review context."
+      }
+    },
+    {
+      "id": "historical-context-酒代",
+      "provenance": {
+        "corpus": "Historical card_creator evals",
+        "artifact": "git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/inputs/酒代.json + git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/goldens/酒代.json"
+      },
+      "input": {
+        "fullContext": "キナコと暮らすと<mark>酒代</mark>が嵩んでしょうがないだろうし、困るかもねえ"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "キナコと暮らすと<mark>酒代</mark>が嵩んでしょうがないだろう。"
+        ],
+        "rubricNotes": [
+          "Keep キナコ as the cause and preserve the source modality.",
+          "The separate 困るかもねえ consequence only restates the burden and may be removed."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Relabeled during final model review: removing the redundant consequence is a useful shortening, not cosmetic punctuation cleanup."
+      }
+    },
+    {
+      "id": "live-context-1601969325570-身内",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1601969325570,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "<mark>身内</mark>に医者がいると、何かと安心だ。"
+      },
+      "expected": {
+        "disposition": "keep-full-context",
+        "acceptableMinimizedContexts": [],
+        "rubricNotes": [
+          "Already one short, natural sentence with a useful consequence."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Accepted live context and minimization agent-reviewed before promotion to a prompt example."
+      }
+    },
+    {
+      "id": "live-context-1601969325655-敢えて",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1601969325655,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "友達だからこそ、<mark>敢えて</mark>厳しい忠告もする。"
+      },
+      "expected": {
+        "disposition": "keep-full-context",
+        "acceptableMinimizedContexts": [],
+        "rubricNotes": [
+          "The concessive motivation is the useful context for 敢えて and should not be removed."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "live-context-1601969326109-ごしごし",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1601969326109,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "お風呂の床を<mark>ごしごし</mark>と磨く。"
+      },
+      "expected": {
+        "disposition": "keep-full-context",
+        "acceptableMinimizedContexts": [],
+        "rubricNotes": [
+          "Already a minimal natural example with object and action."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "live-context-1601969326616-弁える",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1601969326616,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "日本人は身分を<mark>弁えて</mark>敬語を使う。"
+      },
+      "expected": {
+        "disposition": "keep-full-context",
+        "acceptableMinimizedContexts": [],
+        "rubricNotes": [
+          "The subject, object, and resulting action all help disambiguate the usage; the sentence is already short."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "live-context-1601969326811-乗り込む",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1601969326811,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "ぎゅうぎゅうの満員電車に<mark>乗り込んだ</mark>。"
+      },
+      "expected": {
+        "disposition": "keep-full-context",
+        "acceptableMinimizedContexts": [],
+        "rubricNotes": [
+          "Already a minimal natural example retaining the destination and its salient condition."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "live-context-1601969326959-正常",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1601969326959,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "健康診断の結果は全て<mark>正常</mark>だった。"
+      },
+      "expected": {
+        "disposition": "keep-full-context",
+        "acceptableMinimizedContexts": [],
+        "rubricNotes": [
+          "Already a compact sentence with a concrete referent for 正常."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "exposure-context-1676941579319-臨時",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1676941579319,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-easy-batch-final.json"
+      },
+      "input": {
+        "fullContext": "定休日ではないのに、僕があの店に行く日に限って<mark><ruby>臨<rt>りん</rt></ruby><ruby>時<rt>じ</rt></ruby></mark>休業している。"
+      },
+      "expected": {
+        "disposition": "keep-full-context",
+        "acceptableMinimizedContexts": [],
+        "rubricNotes": [
+          "Organic ruby markup must not confuse rendered-text extraction.",
+          "The ironic contrast and restriction are useful context, and the sentence is already compact."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay",
+        "reviewNote": "Uses the original Exposure front HTML, replacing only its target <strong> with <mark>."
+      }
+    },
+    {
+      "id": "exposure-context-1680607505186-絵の具",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1680607505186,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-easy-batch-final.json"
+      },
+      "input": {
+        "fullContext": "この<mark>絵の具</mark>は中身が<ruby>漏<rt>も</rt></ruby>れる恐れがあるから袋に入れてください。"
+      },
+      "expected": {
+        "disposition": "keep-full-context",
+        "acceptableMinimizedContexts": [],
+        "rubricNotes": [
+          "Ruby outside the target must not appear as duplicate phonetic text in the model input.",
+          "The warning and requested action form one concise causal sentence."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay",
+        "reviewNote": "Uses the original Exposure front HTML, replacing only its target <strong> with <mark>."
+      }
+    },
+    {
+      "id": "live-context-1644812056080-就く",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1644812056080,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "「それに、愛はこれから病院にかからないといけないわね。学校も、場合によっては特別支援学級を探さなければならないでしょう。三島さんはこれから仕事に<mark>就いて</mark>、そして仕事と、愛を社会に戻すための諸々を並行して行わなければならなくなります。それが果たしてできますか？　難しいでしょう？」"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "三島さんはこれから仕事に<mark>就いて</mark>、そして仕事と、愛を社会に戻すための諸々を並行して行わなければならなくなります。"
+        ],
+        "rubricNotes": [
+          "Keep the subject and what taking the job must be balanced with.",
+          "The preceding medical/school details and trailing rhetorical question may be dropped."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The accepted card establishes corpus provenance; the minimize disposition and illustrative output were independently re-adjudicated against current policy."
+      }
+    },
+    {
+      "id": "live-context-1728543585195-つかえる",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1728543585195,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "僕はキャベツを撫でながら、ゆっくりと手紙を読み直した。何度も何度も読み直した。でもいつも最後のところで<mark>つかえて</mark>しまう。"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "僕はゆっくりと手紙を読み直した。でもいつも最後のところで<mark>つかえて</mark>しまう。"
+        ],
+        "rubricNotes": [
+          "Resolve what has a final part by retaining the letter-reading action.",
+          "Drop the unrelated physical action and repetitive narration without losing the concessive relationship."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The accepted card establishes corpus provenance; the minimize disposition and illustrative output were independently re-adjudicated against current policy."
+      }
+    },
+    {
+      "id": "live-context-1729685823441-のたれ死ぬ",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1729685823441,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "「あの年齢でコンビニバイトをクビになるって、終わってますよね。あのまま<mark>のたれ死んで</mark>くれればいいのに！」"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "あのまま<mark>のたれ死んで</mark>くれればいいのに！"
+        ],
+        "rubricNotes": [
+          "The marked wish is self-contained without the preceding insult.",
+          "Balanced quotation marks are unnecessary when retaining only the standalone sentence."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The accepted card establishes corpus provenance; the minimize disposition and illustrative output were independently re-adjudicated against current policy."
+      }
+    },
+    {
+      "id": "live-context-1730871791204-異端者",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1730871791204,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "「いいですか。ムラのためにならない人間には、プライバシーなんてないんです。皆、いくらだって土足で踏み込んでくるんですよ。結婚して子供を産むか、狩りに行って金を稼いでくるか、どちらかの形でムラに貢献しない人間はね、<mark>異端者</mark>なんですよ。だからムラの奴等はいくらだって干渉してくる」"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "ムラに貢献しない人間は<mark>異端者</mark>なんですよ。"
+        ],
+        "rubricNotes": [
+          "Retain the criterion that makes someone an outsider.",
+          "The detailed examples, privacy claim, and resulting interference are unnecessary."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The accepted card establishes corpus provenance; the minimize disposition and illustrative output were independently re-adjudicated against current policy."
+      }
+    },
+    {
+      "id": "live-context-1737981970795-しっくり来る",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1737981970795,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "「正直いうと、<mark>しっくりこない</mark>。話に矛盾はない。筋は通っている。だけど、何となく納得できない。単純な言い方をすると、あの男があんなことをするとは思えない、という気持ちだ。だけど、それを上司にいったところで、相手にはしてもらえない」"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "正直いうと、<mark>しっくりこない</mark>。話に矛盾はない。筋は通っている。だけど、何となく納得できない。"
+        ],
+        "rubricNotes": [
+          "Retain the nearby explanation that the story is internally consistent yet somehow unconvincing; the opening sentence alone gives too little evidence for the target's meaning.",
+          "The later speculation about the man and the workplace consequence are unnecessary."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The accepted card establishes corpus provenance; the minimize disposition and illustrative output were independently re-adjudicated against current policy."
+      }
+    },
+    {
+      "id": "live-context-1738587711374-償う",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1738587711374,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "「あたしたちだけが幸せになるなんて……そんなの無理です。あたしも<mark>償い</mark>ます。罰を受けます。石神さんと一緒に罰を受けます。あたしに出来ることはそれだけです。あなたのために出来ることはそれだけです。ごめんなさい。ごめんなさい」"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "あたしも<mark>償い</mark>ます。罰を受けます。",
+          "「あたしも<mark>償い</mark>ます。罰を受けます。石神さんと一緒に罰を受けます」",
+          "あたしも<mark>償い</mark>ます。石神さんと一緒に罰を受けます。",
+          "あたしも<mark>償い</mark>ます。罰を受けます。石神さんと一緒に罰を受けます。"
+        ],
+        "rubricNotes": [
+          "The immediately following sentence clarifies what 償う entails here.",
+          "Drop repeated elaboration and apologies, without widening the source target boundary."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The following sentence concretizes 償う as accepting punishment; the omitted remainder only repeats and elaborates that decision."
+      }
+    },
+    {
+      "id": "live-context-1739082506679-境目",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1739082506679,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "「彼とは本当の友だちになったのですか？　それともあくまで演技だったんですか？」<br>家福はそれについて考えた。「両方だよ。その<mark>境目</mark>は僕自身にもだんだんわからなくなっていった。真剣に演技をするというのは、つまりそういうことだから」"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "<p>「彼とは本当の友だちになったのですか？　それともあくまで演技だったんですか？」</p>\n\n<p>「両方だよ。その<mark>境目</mark>は僕自身にもだんだんわからなくなっていった。」</p>",
+          "「彼とは本当の友だちになったのですか？　それともあくまで演技だったんですか？」家福はそれについて考えた。「両方だよ。本当の友だちと演技の<mark>境目</mark>は僕自身にもだんだんわからなくなっていった」",
+          "「彼とは本当の友だちになったのですか？　それともあくまで演技だったんですか？」家福はそれについて考えた。「両方だよ。本当の友だちなのか演技なのか、その<mark>境目</mark>は僕自身にもだんだんわからなくなっていった」"
+        ],
+        "rubricNotes": [
+          "Retain the friendship-versus-performance contrast so その境目 has a clear antecedent.",
+          "Retain the source dialogue rather than recasting one speaker's question and the other's answer as private thought or narration."
+        ],
+        "observedBadMinimizedContexts": [
+          "本当の友だちになったのか、演技だったのか、その<mark>境目</mark>は僕自身にもだんだんわからなくなっていった。"
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Exercises a line-break boundary between two speakers and an anaphor whose antecedent must survive minimization."
+      }
+    },
+    {
+      "id": "live-context-1740394659498-執刀",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1740394659498,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "<p>「そうです。目が落ちくぼみ、顔が紙のように色を失っていきました。足取りもよろよろしてまともに歩けなくなり、メスも持っていられないようになりました。もちろん手術なんてできる状態じゃありません。幸い腕の良いアシスタントがいたものですから、彼が当座、先生の代わりに<mark>執刀</mark>するようになりました。でもそんなことをいつまでも続けるわけにはいきません。僕はあちこちに電話をかけて、入っていた予約を片端からキャンセルし、クリニックは実質的に休業状態に近づいていきました。やがて先生はクリニックにまったく姿を見せないようになりました。十月も終わりの頃のことです。先生の住まいに電話をかけても誰も出ません。まる二日間連絡が取れない状態が続きました。僕は先生のアパートメントの鍵を預かっていたので、三日目の朝、それを使って先生の部屋に入りました。本当はそんなことをしてはいけないのですが、なにしろ心配でたまらなかったのです。</p>\n\n<p>ドアを開けると、部屋の中はひどい匂いがしました。床には見渡す限り、いろんなものが散らかっていました。衣類も脱ぎっぱなしです。スーツから、ネクタイから、下着まで。何ヶ月も片づけられていなかったみたいに見えました。窓は閉めっきりで空気が 淀[よど]んでいました。そして先生はベッドに入って、ただじっと静かに横になっていました」</p>"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "幸い腕の良いアシスタントがいたものですから、彼が当座、先生の代わりに<mark>執刀</mark>するようになりました。"
+        ],
+        "rubricNotes": [
+          "This deliberately extreme multi-paragraph case should retain the substitute surgeon and omit the surrounding medical decline and later discovery.",
+          "Never preserve the entire quoted passage merely because the target occurs inside one speech."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "High-value regression for prior overlong dialogue behavior. The accepted card establishes corpus provenance; the minimize disposition and illustrative output were independently re-adjudicated against current policy."
+      }
+    },
+    {
+      "id": "live-context-1740803371826-何かの拍子",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1740803371826,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "「うまくいけば、<mark>何かの拍子</mark>にそのほんの一部だけが思い出せる。あくまで突発的に、小さな覗き穴から壁の向こうを覗くみたいにね。そこにある光景のほんの一画しか見ることはできない。あなたは自分の前世のことが何か思い出せる？」"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "うまくいけば、<mark>何かの拍子</mark>に前世のほんの一部だけが思い出せる。"
+        ],
+        "rubricNotes": [
+          "Resolve その to the source-grounded antecedent 前世 before dropping the follow-up question.",
+          "The analogy and other elaboration may be removed."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The earlier accepted minimization left その without an antecedent."
+      }
+    },
+    {
+      "id": "live-context-1741612765906-居心地の良い",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1741612765906,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "「ここは僕ばかりではなく、きっと誰にとっても<mark>居心地の良い</mark>場所だったのでしょう」とカミタは言った。"
+      },
+      "expected": {
+        "disposition": "keep-full-context",
+        "acceptableMinimizedContexts": [],
+        "rubricNotes": [
+          "This is already one clear sentence, and the source-faithful dialogue attribution identifies the speaker.",
+          "The user rejected appending the next narrative sentence from the book; removing a few words here would not materially improve review."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Historical review records rejection of a previous expansion that appended an unrelated following sentence."
+      }
+    },
+    {
+      "id": "live-context-1762485237716-取り返しのつかない",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1762485237716,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "俺は、使用するソードスキルをごく初歩的なものに限定し、わざと時間をかけてゴブリンたちと戦った。それが、最終的に<mark>取り返しのつかない</mark>過[あやま]ちへと 繫[つな]がることになるとも知らずに。"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "<mark>取り返しのつかない</mark>過ちへと繫がることになるとも知らず、俺はゴブリンたちと戦った。",
+          "<mark>取り返しのつかない</mark>過ちへと繫がることになるとも知らず、俺はわざと時間をかけてゴブリンたちと戦った。",
+          "<mark>取り返しのつかない</mark>過[あやま]ちへと 繫[つな]がることになるとも知らず、俺はわざと時間をかけてゴブリンたちと戦った。"
+        ],
+        "rubricNotes": [
+          "Retain the irreversible-mistake relationship and a compact main action while eliminating the unresolved それ.",
+          "Drop the detailed fighting strategy and repair the dependent ending without changing ことになる to a completed event."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The earlier accepted minimization began with an unresolved それ."
+      }
+    },
+    {
+      "id": "live-context-1766929666075-強迫観念",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1766929666075,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "「あそこでああしないと、結局どこかでわたしは自殺していたと思うんだ。罪悪感に潰れて、生きていられなかった。でも、一度死にかけたことで、『死ななくてはならない』っていう<mark>強迫観念</mark>みたいなものが嘘みたいに消えたの」"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "一度死にかけたことで、『死ななくてはならない』っていう<mark>強迫観念</mark>みたいなものが嘘みたいに消えたの。"
+        ],
+        "rubricNotes": [
+          "Keep the cause and the content of the obsession.",
+          "Earlier suicidal explanation is not needed once those local relationships remain."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The accepted card establishes corpus provenance; the minimize disposition and illustrative output were independently re-adjudicated against current policy."
+      }
+    },
+    {
+      "id": "live-context-1768113667372-癒える",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1768113667372,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "しかし、まだ若く美しい彼女にとって、この痛手は致命傷ではない。必ず<mark>癒える</mark>と時江の年齢からは 俯[ふ] 瞰[かん]できる。"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "この痛手は致命傷ではない。必ず<mark>癒える</mark>と時江の年齢からは 俯[ふ] 瞰[かん]できる。"
+        ],
+        "rubricNotes": [
+          "Retain what will heal and the source's evidential framing of that prediction.",
+          "Drop the opening description, but do not promote 必ず癒える from an embedded claim to an unqualified assertion or change whose perspective supports it."
+        ],
+        "observedBadMinimizedContexts": [
+          "彼女の痛手は必ず<mark>癒える</mark>と時江には俯瞰できる。"
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The accepted reference was corrected during model selection to preserve the source's evidential frame."
+      }
+    },
+    {
+      "id": "live-context-1725606363508-かぐ-repeated",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1725606363508,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "それからアロハは自分の中の好奇心に負けたのか、きのこの山を手に取り、匂いを<mark>かぎ</mark>、右から左からじっくりと眺め、また匂いを<mark>かぎ</mark>、恐る恐る口元に持っていく。"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "匂いを<mark>かぎ</mark>、また匂いを<mark>かぎ</mark>、恐る恐る口元に持っていく。",
+          "アロハはきのこの山を手に取り、匂いを<mark>かぎ</mark>、恐る恐る口元に持っていく。"
+        ],
+        "rubricNotes": [
+          "Any retained repeated occurrence must remain marked, but the first complete smell action may be omitted when the remaining sequence is self-contained.",
+          "Remove scene-setting and the intervening visual inspection."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Every retained recognition-target occurrence must be highlighted; minimization may omit a complete repetition rather than leave it unmarked."
+      }
+    },
+    {
+      "id": "live-context-1768798198514-オチ-repeated",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1768798198514,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "<p>「もう怒ってもしゃあないし、脱力したから、 襟[えり]か脇のところに布のちっちゃい端切れがついてるはずやからそれ探せ言うてんやん。そしたらタグは見つかったんやけど……」</p>\n\n<p><mark>オチ</mark>は！　<mark>オチ</mark>はどこや！</p>"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "<mark>オチ</mark>は！　<mark>オチ</mark>はどこや！"
+        ],
+        "rubricNotes": [
+          "The second paragraph is a complete emphatic utterance when retained, and every retained occurrence must stay marked.",
+          "The long setup can be omitted; alternatively, one complete repeated occurrence may be omitted while the immediately relevant setup is retained."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The accepted card establishes corpus provenance; the minimize disposition and illustrative output were independently re-adjudicated against current policy."
+      }
+    },
+    {
+      "id": "live-context-1771911990182-はじ-repeated",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1771911990182,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "「夕方の打ち合わせが長引いてさ。信じられる？　取引先の部長、書類を<mark>はじ</mark>から<mark>はじ</mark>まで読みあげさせるんだよ。こんな小さい字で書いてある注釈まで」"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "取引先の部長、書類を<mark>はじ</mark>から<mark>はじ</mark>まで読みあげさせるんだよ。"
+        ],
+        "rubricNotes": [
+          "The fixed repeated construction requires both occurrences and both marks.",
+          "Meeting setup and the trailing complaint are unnecessary."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The accepted card establishes corpus provenance; the minimize disposition and illustrative output were independently re-adjudicated against current policy."
+      }
+    },
+    {
+      "id": "live-context-1782887106791-神秘-repeated",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1782887106791,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "内臓がまだまだ<mark>神秘</mark>を秘めているというのに、ことばだけがどうして神から与えられた人間唯一の<mark>神秘</mark>だといえるだろう。"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "内臓がまだまだ<mark>神秘</mark>を秘めている。"
+        ],
+        "rubricNotes": [
+          "A repeated target occurrence may be omitted entirely when one concrete usage is sufficient.",
+          "Never leave an omitted occurrence's target text behind unmarked."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Agent-reviewed during model selection as a safe repeated-occurrence deletion with a small ending repair."
+      }
+    },
+    {
+      "id": "live-context-1744522505848-血眼",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1744522505848,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "「……俺も最近、あっちの世界のことをまるで思い出さない日がある。俺だけじゃないな……この 頃[ごろ]は、クリアだ脱出だって<mark>血[ち] 眼[まなこ]</mark>になる 奴[やつ]が少なくなった」"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "この頃は、クリアだ脱出だって<mark>血[ち] 眼[まなこ]</mark>になる奴が少なくなった。"
+        ],
+        "rubricNotes": [
+          "Preserve Anki furigana syntax inside the marked target.",
+          "Drop the prior personal reflection while retaining the pursuit and change in prevalence."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The accepted card establishes corpus provenance; the minimize disposition and illustrative output were independently re-adjudicated against current policy."
+      }
+    },
+    {
+      "id": "live-context-1777456230605-竹刀",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1777456230605,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "「……相手が眠ろうとすると水をかける、<mark>竹刀[しない]</mark>で殴る、強い光線をあてる、そんな風にして囚人の睡眠をずたずたに分断してしまうんだ。……」"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "相手が眠ろうとすると水をかける、<mark>竹刀[しない]</mark>で殴る。"
+        ],
+        "rubricNotes": [
+          "Preserve target furigana and enough parallel action to make the instrument usage natural.",
+          "The later light and consequence can be omitted."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The accepted card establishes corpus provenance; the minimize disposition and illustrative output were independently re-adjudicated against current policy."
+      }
+    },
+    {
+      "id": "live-context-1740391568555-艘",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1740391568555,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "彼女の心が動けば、私の心もそれにつれて引っ張られます。ロープで繫がった二<mark>艘</mark>のボートのように。"
+      },
+      "expected": {
+        "disposition": "keep-full-context",
+        "acceptableMinimizedContexts": [],
+        "rubricNotes": [
+          "The first sentence supplies what the tied boats are comparing, while the second supplies the concrete counter usage.",
+          "Keeping only ロープで繫がった二艘のボートのように would leave a dependent simile fragment.",
+          "This two-sentence full context reflects the user's reviewed boundary; do not append the following book sentence."
+        ],
+        "observedBadMinimizedContexts": [
+          "彼女の心が動けば、私の心も引っ張られます。ロープで繫がった二<mark>艘</mark>のボートのように動くのです。"
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Historical review records retaining the preceding sentence while rejecting only the following sentence."
+      }
+    },
+    {
+      "id": "live-context-1735713088549-素性",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1735713088549,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "『貴女が頻繁に会っている男性の<mark>素性</mark>をつきとめた。写真を撮っていることから、そのことはおわかりいただけると思う。……』"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "貴女が頻繁に会っている男性の<mark>素性</mark>をつきとめた。",
+          "『貴女が頻繁に会っている男性の<mark>素性</mark>をつきとめた。』"
+        ],
+        "rubricNotes": [
+          "Retain whose background was investigated.",
+          "The explanation about photographs and the letter quotation frame are unnecessary."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Regression for the rare case where retaining an entire quotation produced excessive context."
+      }
+    },
+    {
+      "id": "live-context-1735713099436-貴女",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1735713099436,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "『<mark>貴女</mark>が頻繁に会っている男性の素性をつきとめた。写真を撮っていることから、そのことはおわかりいただけると思う。……』"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "<mark>貴女</mark>が頻繁に会っている男性の素性をつきとめた。"
+        ],
+        "rubricNotes": [
+          "The first sentence supplies a complete addressee usage.",
+          "The explanation and letter quotation frame are unnecessary."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Same source as 素性, testing target-sensitive minimization."
+      }
+    },
+    {
+      "id": "live-context-1782615805279-武装解除",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1782615805279,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "「ＵＮＯＳＯＭⅣは、展開当初から 外注化[アウトソーシング]を前提として計画された」ＤＩＡがセイルズ女史を補足して、「現地に展開している軍事力はほぼ民間のものだ。赤十字や<mark>武装解除</mark>にあたる国連とＮＧＯの連中の警備だけでなく、現地の武装勢力と実際に交戦し制圧する戦争遂行業務も、彼女の部隊をはじめとする 民間軍事請負業者[ＰＭＦ]に委託している」"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "赤十字や<mark>武装解除</mark>にあたる国連とＮＧＯの連中の警備も、民間軍事請負業者に委託している。",
+          "「現地に展開している軍事力はほぼ民間のものだ。赤十字や<mark>武装解除</mark>にあたる国連とＮＧＯの連中の警備も、民間軍事請負業者に委託している」",
+          "ＤＩＡが補足して、「現地に展開している軍事力はほぼ民間のものだ。赤十字や<mark>武装解除</mark>にあたる国連とＮＧＯの連中の警備も 民間軍事請負業者[ＰＭＦ]に委託している」"
+        ],
+        "rubricNotes": [
+          "Preserve the source coordination: 赤十字 is the Red Cross, coordinated with 武装解除にあたる国連とＮＧＯの連中; both groups' security is outsourced.",
+          "Do not rewrite 赤十字 as an activity performed by the UN and NGOs.",
+          "This is a regression for fluent but relationship-changing compression."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The current accepted minimized field is useful silver evidence; this reference makes the source coordination explicit for review."
+      }
+    },
+    {
+      "id": "live-context-1780038487784-鳩が豆鉄砲を食ったよう",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1780038487784,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "目と口をまん丸に開け、馬締は動きを止めた。「<mark>鳩が豆鉄砲を食ったよう</mark>な顔」とは、これのことを言うのだな。"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "馬締は目と口をまん丸に開けた。「<mark>鳩が豆鉄砲を食ったよう</mark>な顔」とは、これのことを言うのだな。",
+          "馬締は目と口をまん丸に開けた。「<mark>鳩が豆鉄砲を食ったよう</mark>な顔」とはこれのことだな。"
+        ],
+        "rubricNotes": [
+          "Keep the exact marked surface; adjacent な may remain outside the mark.",
+          "The surprised physical reaction and subject should survive without inventing a direct subject–predicate relationship from the metalinguistic source construction."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The reference was corrected during model selection to preserve the source's metalinguistic relationship as well as the exact target boundary."
+      }
+    },
+    {
+      "id": "live-context-1784600629889-親衛隊",
+      "provenance": {
+        "corpus": "Accepted Miwake collection",
+        "sourceNoteId": 1784600629889,
+        "artifact": "SurfacePro11 AnkiConnect read-only sample, 2026-07-29"
+      },
+      "input": {
+        "fullContext": "「仕事だから。十九世紀の夜明けからこのかた、仕事だから仕方がないという言葉が虫も殺さぬ凡庸な人間たちから、どれだけの残虐さを引き出すことに成功したか、きみは知っているのかね。仕事だから、ナチはユダヤ人をガス室に送れた。仕事だから、東ドイツの国境警備隊は西への脱走者を射殺することができた。仕事だから、仕事だから。兵士や<mark>親衛隊</mark>である必要はない。すべての仕事は、人間の良心を麻痺させるために存在するんだよ。資本主義を生み出したのは、仕事に打ちこみ貯蓄を良しとするプロテスタンティズムだ。つまり、仕事とは宗教なのだよ。信仰の度合において、そこに明確な違いはない。そのことにみんな薄々気がついてはいるようだがね。誰もそれを直視したくはない」"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "仕事だから、ナチはユダヤ人をガス室に送れた。……兵士や<mark>親衛隊</mark>である必要はない。すべての仕事は、人間の良心を麻痺させるために存在するんだよ。"
+        ],
+        "rubricNotes": [
+          "Keep the concrete Nazi context needed for the marked use of 親衛隊 and the source's following statement about conscience.",
+          "When non-adjacent source sentences are retained, use the Japanese ellipsis …… to make the omitted material explicit instead of silently creating a new discourse adjacency.",
+          "Do not retain the whole monologue or invent a direct syntactic relationship between the retained sentences."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Exercises source-grounded selection across a long dialogue without requiring contiguous extraction. The accepted card establishes corpus provenance; the minimize disposition and illustrative output were independently re-adjudicated against current policy."
+      }
+    },
+    {
+      "id": "historical-context-ザル",
+      "provenance": {
+        "corpus": "Historical card_creator evals",
+        "artifact": "git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/inputs/ザル.json + git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/goldens/ザル.json"
+      },
+      "input": {
+        "fullContext": "「あ、酷い。わたしそんなにお酒飲まないもん！」<br>\n<br>\n「いやいや、こんなに<mark>ザル</mark>だとは思わなかったよね。最初、ビールを半分ほど飲んで顔を真っ赤にしてたころが懐かしいよ。あのころのキナコだったら、考えてあげてもいいけど」"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "<p>「わたしそんなにお酒飲まないもん！」</p>\n\n<p>「こんなに<mark>ザル</mark>だとは思わなかったよね。」</p>",
+          "「こんなに<mark>ザル</mark>だとは思わなかったよね。最初、ビールを半分ほど飲んで顔を真っ赤にしてたころが懐かしいよ」",
+          "「わたしそんなにお酒飲まないもん！」「いやいや、こんなに<mark>ザル</mark>だとは思わなかったよね」",
+          "「あ、酷い。わたしそんなにお酒飲まないもん！」「いやいや、こんなに<mark>ザル</mark>だとは思わなかったよね」"
+        ],
+        "rubricNotes": [
+          "Retain the adjacent speaker's alcohol cue so the figurative heavy-drinker usage remains clear.",
+          "Drop the later recollection and negotiation; the old golden's target sentence alone is weaker evidence than this short exchange."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Historical model-promoted golden agent-reviewed; its context-free shortening was not retained as an acceptable reference."
+      }
+    },
+    {
+      "id": "historical-context-ベタ惚れ",
+      "provenance": {
+        "corpus": "Historical card_creator evals",
+        "artifact": "git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/inputs/ベタ惚れ.json + git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/goldens/ベタ惚れ.json"
+      },
+      "input": {
+        "fullContext": "匠くんというわたしたちよりひとつ年下の彼とは一度食事に行ったけれど、マルチーズみたいな雰囲気の可愛らしい子だった。そして、美晴に<mark>ベタ惚れ</mark>だった。"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "匠くんは美晴に<mark>ベタ惚れ</mark>だった。",
+          "美晴に<mark>ベタ惚れ</mark>だった。",
+          "匠くんは、美晴に<mark>ベタ惚れ</mark>だった。"
+        ],
+        "rubricNotes": [
+          "Retain the person with whom he is infatuated; the omitted subject remains natural Japanese and is not needed to understand this target usage.",
+          "The age, meal, and physical-description setup can be removed. If the subject is retained, reconnect it without a dangling そして."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Historical model-promoted golden agent-reviewed; the old output's dangling そして was corrected, while subject omission is accepted."
+      }
+    },
+    {
+      "id": "historical-context-取捨選択",
+      "provenance": {
+        "corpus": "Historical card_creator evals",
+        "artifact": "git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/inputs/取捨選択.json + git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/goldens/取捨選択.json"
+      },
+      "input": {
+        "fullContext": "手帳は先の予定で埋まるようになり、休日ともなると<mark>取捨選択</mark>を迫られることもあった。"
+      },
+      "expected": {
+        "disposition": "keep-full-context",
+        "acceptableMinimizedContexts": [],
+        "rubricNotes": [
+          "The first clause supplies the scheduling pressure that makes the otherwise abstract forced selection intelligible.",
+          "This is already one reasonably short sentence; changing 休日ともなると to 休日は, as the old golden did, is neither source-faithful nor a material review improvement."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Historical model-promoted golden agent-rejected in favor of the full-context boundary."
+      }
+    },
+    {
+      "id": "historical-context-夏期",
+      "provenance": {
+        "corpus": "Historical card_creator evals",
+        "artifact": "git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/inputs/夏期.json + git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/goldens/夏期.json"
+      },
+      "input": {
+        "fullContext": "<mark>夏期</mark>講習でアンさんがずっと忙しくしていて、そのせいでなかなか会えなくて、二ヶ月ぶりに三人で会った。"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "<mark>夏期</mark>講習でアンさんがずっと忙しくしていた。",
+          "<mark>夏期</mark>講習でアンさんがずっと忙しくしていて、なかなか会えなかった。"
+        ],
+        "rubricNotes": [
+          "Keep the full 夏期講習 compound and a natural predicate explaining its effect on アン.",
+          "The later inability to meet and eventual reunion are consequences that do not help interpret the target."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Historical model-promoted golden agent-reviewed for connective-ending adjustment."
+      }
+    },
+    {
+      "id": "historical-context-手帳",
+      "provenance": {
+        "corpus": "Historical card_creator evals",
+        "artifact": "git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/inputs/手帳.json + git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/goldens/手帳.json"
+      },
+      "input": {
+        "fullContext": "<mark>手帳</mark>は先の予定で埋まるようになり、休日ともなると取捨選択を迫られることもあった。"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "<mark>手帳</mark>は先の予定で埋まるようになった。"
+        ],
+        "rubricNotes": [
+          "The target and what fills it make a complete, useful review context.",
+          "The later consequence about choosing among holiday plans does not help interpret 手帳 and may be removed with a faithful clause-ending repair."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Relabeled during final model review: the clause-ending repair preserves the source fact and removes an irrelevant consequence."
+      }
+    },
+    {
+      "id": "historical-context-酔い",
+      "provenance": {
+        "corpus": "Historical card_creator evals",
+        "artifact": "git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/inputs/酔い.json + git:8a4945d101cb3ac7d3a0d8bb85d68393abeb090d:card_creator_evals/goldens/酔い.json"
+      },
+      "input": {
+        "fullContext": "トムさんは、酒を飲み、深く<mark>酔い</mark>、まるで夢を見るように話し続けた。"
+      },
+      "expected": {
+        "disposition": "keep-full-context",
+        "acceptableMinimizedContexts": [],
+        "rubricNotes": [
+          "This is already one short, coherent sentence whose alcohol cue, degree, and dreamlike speech all contextualize the continuative target.",
+          "Deleting only one manner phrase does not improve review enough to justify duplicating the context."
+        ],
+        "observedBadMinimizedContexts": []
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Agent-reviewed from the raw historical input; no model-promoted minimization golden existed."
+      }
+    },
+    {
+      "id": "preference-worksheet-なめらか",
+      "provenance": {
+        "corpus": "2026-07-30 card-generation preference worksheet",
+        "artifact": "Preference worksheet completed 2026-07-30"
+      },
+      "input": {
+        "fullContext": "トラさん。馬締は顔に載せたままだった腕をのばし、<mark>なめらか</mark>な毛並みを撫でてやろうと、腹のあたりを探った。"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "馬締は、<mark>なめらか</mark>な毛並みを撫でる。"
+        ],
+        "observedBadMinimizedContexts": [],
+        "rubricNotes": [
+          "Prefer a short, natural sentence focused on the target's noun phrase and its directly supported action over preserving the scene's arm movement, intention framing, and search around the cat's belly.",
+          "The user wrote the preferred sentence without terminal punctuation; the fixture adds 。 to satisfy the standalone-sentence field invariant."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic supplied this write-in as the nicest minimized context in the 2026-07-30 preference worksheet."
+      }
+    },
+    {
+      "id": "preference-worksheet-先刻",
+      "provenance": {
+        "corpus": "2026-07-30 card-generation preference worksheet",
+        "artifact": "Preference worksheet completed 2026-07-30"
+      },
+      "input": {
+        "fullContext": "<mark>先刻</mark>は、もしかしたら草薙に頼まれて何かを探りにきたのかと疑ったのだが、どうやら考えすぎらしいと石神は思った。"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "<mark>先刻</mark>は、草薙に頼まれて何かを探りにきたのかと疑った。"
+        ],
+        "observedBadMinimizedContexts": [],
+        "rubricNotes": [
+          "Remove the later reconsideration and the incidental uncertainty marker もしかしたら; neither is needed to interpret 先刻 in the retained suspicion.",
+          "The result should be the shortest natural freestanding sentence, not a mechanically conservative extract."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic selected the variant without もしかしたら in the 2026-07-30 preference worksheet."
+      }
+    },
+    {
+      "id": "preference-worksheet-たしなみ",
+      "provenance": {
+        "corpus": "2026-07-30 card-generation preference worksheet",
+        "artifact": "Preference worksheet completed 2026-07-30"
+      },
+      "input": {
+        "fullContext": "キャベツは公園をぐるっと一周して、子どもたちと<mark>たしなみ</mark>程度に戯れ、ベンチに座って将棋を指していた老人たちに向かって「どいて欲しいでござる」と言う。"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "子どもたちと<mark>たしなみ</mark>程度に戯れた。"
+        ],
+        "observedBadMinimizedContexts": [],
+        "rubricNotes": [
+          "Japanese permits the source subject to be omitted when the remaining target-bearing clause is natural and self-contained enough for review.",
+          "The walk around the park and exchange with the old men do not help interpret たしなみ程度."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic selected the subjectless variant in the 2026-07-30 preference worksheet."
+      }
+    },
+    {
+      "id": "preference-worksheet-芽生える",
+      "provenance": {
+        "corpus": "2026-07-30 card-generation preference worksheet",
+        "artifact": "Preference worksheet completed 2026-07-30"
+      },
+      "input": {
+        "fullContext": "「まず一日目。世界は暗闇だったんですね。そこに神様が光をつくって、昼と夜ができたわけ。で、二日目。神様は天をつくり、三日目に地をつくった。天地創造です！　それで海が生まれて、植物が<mark>芽生えた</mark>と」"
+      },
+      "expected": {
+        "disposition": "minimize",
+        "acceptableMinimizedContexts": [
+          "海が生まれて、植物が<mark>芽生えた</mark>。"
+        ],
+        "observedBadMinimizedContexts": [],
+        "rubricNotes": [
+          "The target-bearing creation statement stands naturally without the long chronological setup, quotation marks, or trailing evidential と.",
+          "Quotation and attribution framing are expendable when removing them leaves a natural statement directly supported by the source."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic selected the bare unquoted assertion in the 2026-07-30 preference worksheet."
+      }
+    }
+  ]
+}

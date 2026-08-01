@@ -1,0 +1,114 @@
+{
+  "id": "1000360",
+  "kanji": [],
+  "kana": [
+    {
+      "common": true,
+      "text": "あっさり",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "アッサリ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adv",
+        "adv-to",
+        "vs"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "on-mim"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "easily"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "readily"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "quickly"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "flatly (refuse)"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adv",
+        "adv-to",
+        "vs"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "on-mim"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "lightly (seasoned food, applied make-up, etc.)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "plainly"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "simply"
+        }
+      ]
+    }
+  ]
+}

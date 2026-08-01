@@ -1,0 +1,99 @@
+{
+  "id": "1590720",
+  "kanji": [
+    {
+      "common": true,
+      "text": "枯れ木",
+      "tags": []
+    },
+    {
+      "common": true,
+      "text": "枯木",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "かれき",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "こぼく",
+      "tags": [],
+      "appliesToKanji": [
+        "枯木"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "dead tree"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "withered tree"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "leafless tree"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "bare tree"
+        }
+      ]
+    }
+  ]
+}
