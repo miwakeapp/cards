@@ -1,0 +1,154 @@
+{
+  "id": "1003560",
+  "kanji": [
+    {
+      "common": false,
+      "text": "刻々",
+      "tags": [
+        "rK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "段々",
+      "tags": [
+        "rK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "刻刻",
+      "tags": [
+        "rK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "段段",
+      "tags": [
+        "rK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "ギザギザ",
+      "tags": [],
+      "appliesToKanji": []
+    },
+    {
+      "common": false,
+      "text": "ぎざぎざ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "on-mim",
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "notches"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "serration"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "indentation"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "jaggies (stair-step artifacts in computer images)"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adj-na",
+        "adv",
+        "adv-to",
+        "vs"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "on-mim",
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "notched"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "serrated"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "jagged"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "corrugated"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "milled"
+        }
+      ]
+    }
+  ]
+}

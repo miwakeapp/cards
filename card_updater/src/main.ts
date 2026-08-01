@@ -14,13 +14,19 @@
  */
 
 import { parseArgs } from "@std/cli/parse-args";
-import { DEFAULT_MODEL_ID, MODEL_IDS, type ModelId } from "card_field_generation";
+import {
+  type GenerationCache,
+  isAIQuotaError,
+  MODEL_IDS,
+  type ModelId,
+} from "card_field_generation";
 import { allJMDictEntries } from "data";
+import { buildSpellingIndex, findAllEntriesBySpelling, type SpellingIndex } from "card_resolution";
 import { createACInvoke, DEFAULT_ANKI_CONNECT_URL, fetchMiwakeNotes } from "./anki.ts";
 import { analyzeCard, type AnalyzedCard } from "./analyze.ts";
 import { ensureLatestFurigana, ensureLatestJMDict } from "data/download";
 import { startServer } from "./server.ts";
-import { loadSuggestionCache, ReviewState, saveSuggestionCache } from "./state.ts";
+import { createGenerationCache, ReviewState } from "./state.ts";
 import { suggestForCard, type Suggestion } from "./suggest.ts";
 
 const DEFAULT_QUERY = 'deck:Mining card:"Miwake Card"';
@@ -30,7 +36,7 @@ const AI_CONCURRENCY = 4;
 interface Options {
   query: string;
   limit: number | undefined;
-  modelId: ModelId;
+  modelId: ModelId | undefined;
   port: number;
   ankiConnectURL: string;
   dryRun: boolean;
@@ -47,21 +53,20 @@ function parseArguments(args: string[]): Options {
     string: ["query", "model", "limit", "port", "anki-connect-url"],
     default: {
       query: DEFAULT_QUERY,
-      model: DEFAULT_MODEL_ID,
       port: DEFAULT_PORT,
       "anki-connect-url": DEFAULT_ANKI_CONNECT_URL,
       open: true,
     },
   });
 
-  if (!(MODEL_IDS as readonly string[]).includes(flags.model)) {
+  if (flags.model !== undefined && !(MODEL_IDS as readonly string[]).includes(flags.model)) {
     exitWithUsage(`--model must be one of: ${MODEL_IDS.join(", ")}`);
   }
 
   return {
     query: flags.query,
     limit: flags.limit === undefined ? undefined : positiveInteger(flags.limit, "--limit"),
-    modelId: flags.model as ModelId,
+    modelId: flags.model as ModelId | undefined,
     port: positiveInteger(flags.port, "--port"),
     ankiConnectURL: validateAnkiConnectURL(flags["anki-connect-url"]),
     dryRun: flags["dry-run"],
@@ -104,9 +109,19 @@ function exitWithUsage(message: string): never {
 async function generateSuggestions(
   cards: AnalyzedCard[],
   options: Options,
+  generationCache: GenerationCache,
+  spellingIndex: SpellingIndex,
 ): Promise<Map<number, Suggestion>> {
   const suggestions = new Map<number, Suggestion>();
-  const targets = cards.filter((card) => card.needsAI && card.newParsed !== null);
+  const potentialTargets = cards.filter((card) => card.needsAI && card.newParsed !== null);
+  const targets = potentialTargets.filter((card) => card.note.fields.fullContext.trim() !== "");
+  const contextlessCount = potentialTargets.length - targets.length;
+  if (contextlessCount > 0) {
+    console.error(
+      `Skipping AI suggestions for ${contextlessCount} cards without Full context; ` +
+        `source-grounded sense and hint generation is unavailable.`,
+    );
+  }
   if (targets.length === 0 || options.skipAI) {
     if (targets.length > 0) {
       console.error(`Skipping AI suggestions for ${targets.length} cards (--skip-ai).`);
@@ -114,29 +129,47 @@ async function generateSuggestions(
     return suggestions;
   }
 
-  const cache = await loadSuggestionCache();
-  console.error(`Generating AI suggestions for ${targets.length} cards (${options.modelId})...`);
+  console.error(
+    `Generating AI suggestions for ${targets.length} cards (${
+      options.modelId === undefined
+        ? "evaluated operation defaults"
+        : `${options.modelId} override with operation-specific efforts`
+    })...`,
+  );
   let completed = 0;
   let fromCache = 0;
+  let generated = 0;
+  let failed = 0;
 
   const queue = [...targets];
+  let quotaError: unknown;
   async function worker() {
-    while (true) {
+    while (quotaError === undefined) {
       const card = queue.shift();
       if (card === undefined) {
         return;
       }
       try {
-        const { suggestion, cacheEntry } = await suggestForCard(card, {
-          modelId: options.modelId,
-          cache,
+        const suggestion = await suggestForCard(card, {
+          sameSpellingEntries: findAllEntriesBySpelling(
+            spellingIndex,
+            card.parsedKey!.spelling,
+          ),
+          ...(options.modelId === undefined ? {} : { modelId: options.modelId }),
+          generationCache,
         });
         suggestions.set(card.note.noteId, suggestion);
-        cache[String(card.note.noteId)] = cacheEntry;
         if (suggestion.fromCache) {
           ++fromCache;
+        } else {
+          ++generated;
         }
       } catch (error) {
+        if (isAIQuotaError(error)) {
+          quotaError = error;
+          return;
+        }
+        ++failed;
         console.error(`  AI suggestion failed for ${card.note.fields.key}: ${error}`);
       }
       ++completed;
@@ -146,10 +179,14 @@ async function generateSuggestions(
     }
   }
   await Promise.all(Array.from({ length: AI_CONCURRENCY }, worker));
+  if (quotaError !== undefined) {
+    throw new Error("AI provider quota or credit is exhausted; stopped generating suggestions.", {
+      cause: quotaError,
+    });
+  }
 
-  await saveSuggestionCache(cache);
   console.error(
-    `AI suggestions ready (${targets.length - fromCache} generated, ${fromCache} from cache).`,
+    `AI suggestions ready (${generated} generated, ${fromCache} from cache, ${failed} failed).`,
   );
   return suggestions;
 }
@@ -192,6 +229,7 @@ console.error(
 console.error("Loading local JMDict...");
 const entries = await allJMDictEntries();
 console.error(`Loaded ${entries.size} JMDict entries.`);
+const spellingIndex = buildSpellingIndex(entries.values());
 
 console.error(`Querying Anki at ${options.ankiConnectURL}: ${options.query}`);
 const notes = await fetchMiwakeNotes(options.query, {
@@ -219,14 +257,20 @@ console.error(
     `${counts.routine} routine, ${counts.retarget} re-target, ${counts.exception} exceptions.`,
 );
 
-const suggestions = await generateSuggestions(cards, options);
-const suggestionCache = await loadSuggestionCache();
+const generationCache = createGenerationCache();
+const suggestions = await generateSuggestions(cards, options, generationCache, spellingIndex);
+const modelConfigurationIds = [
+  ...new Set(
+    [...suggestions.values()].flatMap((suggestion) => suggestion.modelConfigurationIds),
+  ),
+].toSorted();
 const state = await ReviewState.load(cards);
 
 startServer({
   cards,
   suggestions,
-  suggestionCache,
+  spellingIndex,
+  generationCache,
   state,
   meta: {
     generatedAt,
@@ -235,7 +279,8 @@ startServer({
     ankiProfile,
     limit: options.limit,
     dryRun: options.dryRun,
-    modelId: options.modelId,
+    ...(options.modelId === undefined ? {} : { modelOverride: options.modelId }),
+    modelConfigurationIds,
     jmdict,
     furigana: furiganaUpdate,
     scannedCount: cards.length,

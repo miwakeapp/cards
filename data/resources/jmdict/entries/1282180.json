@@ -1,0 +1,177 @@
+{
+  "id": "1282180",
+  "kanji": [
+    {
+      "common": true,
+      "text": "行方",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "行衛",
+      "tags": [
+        "ateji",
+        "rK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "行くえ",
+      "tags": [
+        "sK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "ゆくえ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "(one's) whereabouts"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "destination"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "where one is headed"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "outcome"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "course (of events)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "development"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "direction"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "tide"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "future"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "journey ahead"
+        }
+      ]
+    }
+  ]
+}

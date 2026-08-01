@@ -1,17 +1,18 @@
 /**
- * On-disk persistence for review decisions, the AI suggestion cache, and the apply log.
+ * On-disk persistence for review decisions, the focused-generation cache, and the apply log.
  * Everything lives under `card_updater/generated/` (gitignored).
  */
 
 import * as path from "@std/path";
+import type { GenerationCache } from "card_field_generation";
+import { JSONLGenerationCache } from "card_field_generation/file-cache";
 import type { AnalyzedCard } from "./analyze.ts";
 import type { AppliedFieldValues } from "./anki.ts";
 import { sha256OfJSON } from "./hash.ts";
-import type { SuggestionCache } from "./suggest.ts";
 
 const GENERATED_DIRECTORY = path.resolve(import.meta.dirname!, "../generated");
 const DECISIONS_PATH = path.join(GENERATED_DIRECTORY, "decisions.json");
-const AI_CACHE_PATH = path.join(GENERATED_DIRECTORY, "ai-cache.json");
+const GENERATION_CACHE_PATH = path.join(GENERATED_DIRECTORY, "card-field-generation-cache.jsonl");
 const APPLY_LOG_PATH = path.join(GENERATED_DIRECTORY, "apply-log.jsonl");
 
 export type DecisionKind = "accept" | "hold" | "reject";
@@ -41,6 +42,7 @@ export interface AppliedRecord {
 export function cardFingerprint(card: AnalyzedCard): Promise<string> {
   return sha256OfJSON([
     card.note.fields.key,
+    card.note.fields.recognitionTarget,
     card.note.fields.reading,
     card.note.fields.hint,
     card.note.fields.dictionaryEntry,
@@ -150,10 +152,7 @@ export class ReviewState {
   }
 }
 
-export function loadSuggestionCache(): Promise<SuggestionCache> {
-  return readJSONFile<SuggestionCache>(AI_CACHE_PATH, {});
-}
-
-export function saveSuggestionCache(cache: SuggestionCache): Promise<void> {
-  return writeJSONFile(AI_CACHE_PATH, cache);
+/** Creates the content-addressed cache shared by the updater's focused generation operations. */
+export function createGenerationCache(): GenerationCache {
+  return new JSONLGenerationCache(GENERATION_CACHE_PATH);
 }

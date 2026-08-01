@@ -1,13 +1,16 @@
 import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
 import { compatibleSenseNumbersForJMDictUsage, createCard, type MiwakeCard } from "card_creator";
 import { toHiragana } from "japanese_text";
-import { markContextTargets, markedContextHasRuby } from "../shared/mark_context.ts";
 import {
   deriveLookupSpellings,
-  findEntriesBySpelling,
-  findSurfaceFormsForLookupSpelling,
+  findAllEntriesBySpelling,
+  markContextTargetOccurrences,
+  markContextTargets,
+  markedContextHasRuby,
+  type RenderedTextOccurrence,
+  resolveContextTarget,
   type SpellingIndex,
-} from "../shared/jmdict_resolution/recognition_target_lookup.ts";
+} from "card_resolution";
 import { normalizeRecognitionTarget } from "../shared/jmdict_resolution/csv_resolution.ts";
 import {
   applyDisplayTargetOverride,
@@ -29,12 +32,11 @@ import {
   parseRecognitionTargetField,
   readingFieldCandidates,
 } from "./html.ts";
-import { needsAIMinimizedContext } from "card_field_generation";
+import { needsAIMinimizedContext } from "../shared/context_minimization_policy.ts";
 import {
   analyzeEPUBContext,
   cardSourceFromResolution,
   type EPUBContextMatch,
-  epubContextPlainText,
   epubSenseSelectionContext,
   type EPUBSourceCorpus,
   expandEPUBContextToIncludeTarget,
@@ -103,6 +105,7 @@ function entrySpellings(entry: JMdictWord): string[] {
 
 interface SurfaceFormMatches {
   surfaces: string[];
+  occurrences: RenderedTextOccurrence[];
   byLookupSpelling: Array<{
     lookupSpelling: string;
     surfaces: string[];
@@ -212,7 +215,7 @@ async function resolveEntry(
     entry = found;
   } else if (extractedIds.length > 1) {
     const lookupSpelling = removeBoundaryNotation(word);
-    const sameSpellingIds = findEntriesBySpelling(spellingIndex, lookupSpelling)
+    const sameSpellingIds = findAllEntriesBySpelling(spellingIndex, lookupSpelling)
       .map(({ id }) => id);
     return {
       reason: "multiple-jmdict-ids",
@@ -228,7 +231,7 @@ async function resolveEntry(
     }
     entry = found;
   } else {
-    const matches = findEntriesBySpelling(spellingIndex, word);
+    const matches = findAllEntriesBySpelling(spellingIndex, word);
     if (matches.length === 0) {
       return { reason: "no-jmdict-id-or-exact-match" };
     }
@@ -354,6 +357,7 @@ function chooseReading(
 
 function buildUnresolvedJMDictEntry(
   context: string,
+  fullContext: string,
   recognitionTarget: string,
   existingReadingHTML: string,
   candidateIds: string[],
@@ -409,6 +413,7 @@ function buildUnresolvedJMDictEntry(
 
   return {
     context,
+    fullContext,
     recognitionTarget,
     kanaReading,
     kanaReadingEvidence,
@@ -534,6 +539,7 @@ export async function convertAnimecardsNote(
     if (resolution.candidateIds !== undefined && resolution.allowedIds !== undefined) {
       const unresolved = buildUnresolvedJMDictEntry(
         senseSelectionContext(),
+        context,
         removeBoundaryNotation(word),
         fieldValue(note, options.sourceFields.reading),
         resolution.candidateIds,
@@ -570,24 +576,32 @@ export async function convertAnimecardsNote(
 
   async function findSurfaceForms(
     lookupSpellings: Iterable<string>,
-    sentence = context,
+    candidateContextHTML = contextHTML,
     allowSingleCharacterSubstring = false,
   ): Promise<SurfaceFormMatches> {
     const surfaces: string[] = [];
+    const occurrences = new Map<string, RenderedTextOccurrence>();
     const byLookupSpelling: SurfaceFormMatches["byLookupSpelling"] = [];
     const partOfSpeech = new Set(entry.sense.flatMap((sense) => sense.partOfSpeech));
     for (const lookupSpelling of new Set(lookupSpellings)) {
-      const found = await findSurfaceFormsForLookupSpelling(sentence, lookupSpelling, {
+      const resolved = await resolveContextTarget(candidateContextHTML, lookupSpelling, {
         partOfSpeech,
         allowSingleCharacterSubstring,
       });
-      if (found.length > 0) {
-        byLookupSpelling.push({ lookupSpelling, surfaces: found });
-        surfaces.push(...found);
+      if (resolved !== null) {
+        byLookupSpelling.push({
+          lookupSpelling,
+          surfaces: [...resolved.surfaces],
+        });
+        surfaces.push(...resolved.surfaces);
+        for (const occurrence of resolved.occurrences) {
+          occurrences.set(`${occurrence.start}:${occurrence.end}`, occurrence);
+        }
       }
     }
     return {
       surfaces: [...new Set(surfaces)],
+      occurrences: [...occurrences.values()].sort((left, right) => left.start - right.start),
       byLookupSpelling,
     };
   }
@@ -601,7 +615,7 @@ export async function convertAnimecardsNote(
   if (surfaceMatches.surfaces.length === 0 && epubContextMatch !== null) {
     const sourceSurfaceMatches = await findSurfaceForms(
       [recognitionTarget, ...readings, ...entrySpellings(entry)],
-      epubContextPlainText(epubContextMatch),
+      epubContextMatch.paragraphs.map(({ html }) => `<p>${html}</p>`).join(""),
       true,
     );
     if (sourceSurfaceMatches.surfaces.length === 1) {
@@ -613,7 +627,11 @@ export async function convertAnimecardsNote(
       if (recoveredContextHTML !== null) {
         contextHTML = normalizeContextHTML(recoveredContextHTML);
         context = contextPlainText(contextHTML);
-        surfaceMatches = sourceSurfaceMatches;
+        surfaceMatches = await findSurfaceForms(
+          [recognitionTarget, ...readings, ...entrySpellings(entry)],
+          contextHTML,
+          true,
+        );
         fullContextResolution = {
           status: "pending",
           source: epubContextMatch.source,
@@ -642,7 +660,7 @@ export async function convertAnimecardsNote(
   if (readings.length === 0) {
     return skip(note.noteId, word, "no-applicable-reading");
   }
-  const recognitionTargetIsAmbiguous = findEntriesBySpelling(
+  const recognitionTargetIsAmbiguous = findAllEntriesBySpelling(
     options.spellingIndex,
     recognitionTarget,
   ).length > 1;
@@ -706,10 +724,11 @@ export async function convertAnimecardsNote(
     };
 
   try {
-    const markedContext = markContextTargets(
-      contextHTML,
-      uniqueSurfaceForms as [string, ...string[]],
-    );
+    const markedContext = targetInContextResolution.method === "ai"
+      // An audited override explicitly identifies a complete phrase intended at every occurrence.
+      // It has no dictionary spelling from which deterministic lexical ranges could be recovered.
+      ? markContextTargets(contextHTML, uniqueSurfaceForms as [string, ...string[]])
+      : markContextTargetOccurrences(contextHTML, surfaceMatches.occurrences);
     const usesReadingField = entry.kanji.some(({ text }) => text === recognitionTarget);
     const entrySelectionOverride = options.jmdictEntrySelectionOverride;
     if (
@@ -819,7 +838,7 @@ export async function convertAnimecardsNote(
       recognitionTargetOverride,
     );
     const keyRecognitionTarget = recognitionTarget;
-    const sameSpellingEntries = findEntriesBySpelling(
+    const sameSpellingEntries = findAllEntriesBySpelling(
       options.spellingIndex,
       keyRecognitionTarget,
     );
@@ -841,6 +860,7 @@ export async function convertAnimecardsNote(
       if (!overrideCoversAmbiguity) {
         const unresolved = buildUnresolvedJMDictEntry(
           senseSelectionContext(),
+          context,
           keyRecognitionTarget,
           fieldValue(note, options.sourceFields.reading),
           sameSpellingIds,

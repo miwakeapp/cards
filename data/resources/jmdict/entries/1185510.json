@@ -1,0 +1,98 @@
+{
+  "id": "1185510",
+  "kanji": [
+    {
+      "common": true,
+      "text": "下水",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "げすい",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "drainage"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "ditch"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "gutter"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "sewerage"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "sewage"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "black water"
+        }
+      ]
+    }
+  ]
+}

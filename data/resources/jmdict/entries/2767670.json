@@ -1,0 +1,61 @@
+{
+  "id": "2767670",
+  "kanji": [
+    {
+      "common": false,
+      "text": "仕込み",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "じこみ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n-suf"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "仕込み",
+          1
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [
+        "after a place name"
+      ],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "learned at ..."
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "acquired at ..."
+        }
+      ]
+    }
+  ]
+}

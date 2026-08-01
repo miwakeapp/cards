@@ -1,0 +1,92 @@
+{
+  "id": "1817440",
+  "kanji": [
+    {
+      "common": false,
+      "text": "士族",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "しぞく",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "family of samurai lineage"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "person with samurai ancestors"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "族称"
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "hist"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "shizoku"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": "explanation",
+          "text": "the second of three official classes in Japan in 1869-1947, consisting of former samurai"
+        }
+      ]
+    }
+  ]
+}

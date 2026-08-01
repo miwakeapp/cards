@@ -1,0 +1,14 @@
+{
+  "name": "card_resolution",
+  "exports": {
+    ".": "./src/mod.ts"
+  },
+  "tasks": {
+    "doc:check": "deno doc --lint src/mod.ts"
+  },
+  "test": {
+    "permissions": {
+      "read": true
+    }
+  }
+}

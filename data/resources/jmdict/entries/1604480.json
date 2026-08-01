@@ -1,0 +1,168 @@
+{
+  "id": "1604480",
+  "kanji": [
+    {
+      "common": true,
+      "text": "見込み",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "見込",
+      "tags": [
+        "sK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "見こみ",
+      "tags": [
+        "sK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "みこみ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "hope"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "promise"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "possibility"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "chance"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "probability"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "likelihood"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "expectation"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "anticipation"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "forecast"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "estimate"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "見付",
+          "みつけ・2",
+          2
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "side of a structural member"
+        }
+      ]
+    }
+  ]
+}

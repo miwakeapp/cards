@@ -76,38 +76,34 @@ After that setup is complete, the unobtrusive indicator changes color. From now 
 
 - **Key**: the card's actual primary key (for disallowing duplicates); it consists of the spelling targeted for recognition + JMDict ID + ✨ sense(s) identified as applicable for this card. (The latter are omitted if all senses apply, or if there is only one sense.) This is the first field in the model so Anki gives it precedence, and the spelling is first so that it's more visible in the card browser.
 
-  - Sample: `ひたと | 1430680 | 2,3`
+  - Sample: `ひたと | 1430680 | 2`
   - Sample: `相性 | 1586070`
 
 - **Recognition target**: what is shown on the front of the card, containing just the spelling targeted for recognition.
 
-  - For cases where the word is always used in a certain pattern, we can ✨ automatically add the appropriate prefix or suffix. Example: [うつつを抜かす](https://takoboto.jp/?w=2033950) can become ～にうつつを抜かす in this field, as there is enough information in the dictionary entry to assemble this.
+  - When every selected sense is unambiguously a prefix or every selected sense is unambiguously a suffix, the renderer adds the corresponding trailing or leading full-width `～`. The key retains the undecorated JMDict spelling. Richer usage patterns such as ～にうつつを抜かす are not derivable from part-of-speech metadata alone; they can be supplied by the acquisition workflow or added later as a user edit.
 
-  - This generally never contains furigana, even for cases where the originally mined text used furigana and the word is highly ambiguous. (Such as 番 being either ばん or つがい.) Instead, the hint field can contain appropriate context, including furigana if necessary.
+  - This generally never contains furigana, even for cases where the originally mined text used furigana and the word is highly ambiguous. (Such as 番 being either ばん or つがい.) The selected reading belongs in the Reading field; the Hint field should not give away a reading on the front.
 
-- **Reading** (optional): if the spelling in question contains any Kanji, this field exists and contains the same spelling, but with [mono-ruby](https://www.w3.org/International/questions/qa-ruby.en#mono)-when-possible furigana. Usually it contains the specific reading used in the mined context. If neither the context nor frequency data establishes a dominant reading, it repeats the spelling for each accepted reading, separated by `/`; for example, `明日[あした] / 明日[あす]`. This field uses Anki's `[]`-suffix microsyntax for ruby.
+- **Reading** (optional): when the recognition target selects one of JMDict's non-kana (`kanji`) forms, this field contains the same spelling with [mono-ruby](https://www.w3.org/International/questions/qa-ruby.en#mono)-when-possible furigana. This follows JMDict's form categories rather than testing the characters visually, so even a non-Han spelling stored as a `kanji` form receives a Reading. A recognition target selected from JMDict's `kana` forms leaves the field empty. The current card-creation pipeline records one exact reading, usually the reading used in the mined context, using Anki's `[]`-suffix microsyntax. Supporting several accepted readings on one card remains a future design problem.
 
-- **Hint** (optional): a sparingly-used disambiguation field for when multiple senses or JMDict entries match the same spelling, such that it would be roughly impossible to tell which was intended without the hint. It is not used when there is only a single JMDict entry for a given spelling and all of its senses are applicable. The hint is a Japanese phrase or fragment that uses the word in extremely-minimal context. AI-generated initially ✨, but users can edit this and the software should not interfere with that.
+- **Hint** (optional): a sparingly-used disambiguation field for when the recognition target alone does not make the intended meaning clear. It is a short Japanese phrase or fragment drawn from the original encounter. A hint is omitted when there is nothing meaningful to distinguish or when the source does not support a fair short clue. AI can generate it initially ✨, but users can edit it, and maintenance never replaces an existing hint without explicit review. See the [generated hint policy](#generated-hint-policy) for details.
 
-  - Leading or trailing `～` notation can itself supply the minimal usage-pattern hint. The separate Hint field is omitted only when every selected sense has that boundary pattern and no unselected sense or same-spelling JMDict entry has the same pattern. For example, `～ヅラ` needs no additional hint when it uniquely identifies the suffix entry, but another suffix entry or another selected-entry suffix sense would still require one.
+- **Full context**: the original complete passage in which the term was encountered. Uses `<mark>` for the term in question.
 
-  - Sample: for sense 2 of [飾り物](https://takoboto.jp/?q=%E9%A3%BE%E3%82%8A%E7%89%A9), a good hint would be "Xさんは飾り物だ": a minimal sentence/sentence fragment that makes it clear we're looking for the sense that applies to a person.
-
-  - Sample: a hint for 番 meaning ["pair (esp. of mated animals), brace, couple"](https://takoboto.jp/?w=2199920) instead of ["number (in a series)"](https://takoboto.jp/?w=2022640) could be "魂の番".
-
-- **Full context**: the original full context sentence(s) in which the term was encountered. Uses `<mark>` for the term in question.
-
-  - This is extracted from the content being read ✨ automatically. It will at least be a single full sentence, but if the AI judges that more context is necessary, it can expand to two or three sentences. (See [expanding unhelpful context](#expanding-unhelpful-context).)
+  - This is extracted from the content being read ✨ automatically. It contains at least one complete sentence or natural complete utterance. When that is not understandable by itself, the extractor adds the smallest useful amount of adjacent context, normally stopping after two or three sentences. (See [expanding unhelpful context](#expanding-unhelpful-context).)
 
   - Dialogue should normally include its opening and closing quotation marks. Exceptionally long dialogue can be elided at paragraph boundaries: keep the target paragraph, add one adjacent paragraph when the target paragraph is too short to stand alone, and use the Japanese ellipsis `……` to make omitted text explicit while retaining balanced quotation marks.
 
   - If the original context included furigana, they are preserved (although translated to Anki's `[]`-suffix microsyntax). Additionally, many books substitute full-sized kana in place of small kana in furigana position (as a kind of poor-man's `text-transform: full-size-kana`); the software corrects this back as part of the extraction and translation.
 
+  - Once the recognition target and reading are resolved, locating and marking their contextual surface forms is deterministic. Structured HTML processing and JMDict-aware inflection matching mark every intended occurrence without asking a model to reproduce or edit the source text.
+
   - Sample: `これまでずっと<mark>殺伐</mark>とした最前線でのみ暮らし、ＳＡＯを──いや 全[すべ]てのＭＭＯＲＰＧをリソースの奪い合いとしか理解していなかった俺にとって、彼らのやり取りは 微[ほほ] 笑[え]ましく、そして 眩[まぶ]しいものに映った。`
 
-- **Minimized context** (optional): a trimmed-by-AI ✨ version of the context sentence(s) which preserves the context, but reduces redundant clauses or emphasis elements so as to make it easier to read when quickly doing flashcards. The result is still a well-formed full Japanese sentence, even if originally the word was located in, e.g., a descriptive clause.
+- **Minimized context** (optional): a trimmed-by-AI ✨ version of the full context which preserves the context, but reduces redundant clauses or emphasis elements so as to make it easier to read when quickly doing flashcards. The result is still a complete Japanese passage, usually one sentence, even if originally the word was located in, e.g., a descriptive clause.
 
-  If the original full context was short enough as-is, this is omitted.
+  If the original full context is already quick and easy to review, this is omitted. Length is a useful shortcut for deciding whether minimization is worth trying, but a short passage can still be difficult and a long sentence can already work well. See the [context minimization policy](#context-minimization-policy) for details.
 
   - Sample: the above becomes `これまでずっと<mark>殺伐</mark>とした最前線でのみ暮らしていた。`
 
@@ -129,7 +125,7 @@ After that setup is complete, the unobtrusive indicator changes color. From now 
 
 The core data model discussed above forms the foundation for displaying Miwake cards with some amount of flexibility and customizability. A default display will be provided, but it might evolve over time as my opinions on the best flashcard format change, or it can be customized by advanced users.
 
-The default display uses the [Anki templating language](https://docs.ankiweb.net/templates/intro.html) to display a simple front side with the **Word** field, and the **Hint** field if present. The back side contains the **Reading** (or a repeat of the **Word** if there is no **Reading** field), the **Dictionary entry**, and the **Minimized context sentence**. The **Full context sentence** is hidden by default but can be shown with a disclosure button. The **Source** field is included when present.
+The default display uses the [Anki templating language](https://docs.ankiweb.net/templates/intro.html) to display a simple front side with the **Recognition target** field, and the **Hint** field if present. The back side contains the **Reading** (or a repeat of the **Recognition target** if there is no **Reading** field), the **Dictionary entry**, and the **Minimized context**. The **Full context** is hidden by default but can be shown with a disclosure button. The **Source** field is included when present.
 
 The HTML used for displaying these will be highly semantic, allowing customization with CSS. The default styling will work with both dark and light modes, keying off of Anki's `.night-mode` selector. (TODO or should we use `@media`? What are the tradeoffs, in modern Anki?)
 
@@ -164,7 +160,9 @@ By default, this update process will be manual. A button from within the add-on 
 1. Scan the user's collection.
 1. Automatically perform "trivial" updates. For now, trivial updates are defined as cases where the dictionary entry has one sense both in old and new versions. These will be displayed to the user for one-click acceptance.
 1. Create a set of recommended updates for manual review and acceptance, which can be done either one-by-one or in batch.
-   - These recommended updates are derived by asking the AI. Roughly, `Entry before: <...>; Hint before: <...>; Applicable senses before: <...>; Entry after: <...>. Produce a new hint, or use the existing one if it still makes sense. Produce a new set of applicable senses.`
+   - Reconsider which senses apply by comparing the original context with the updated dictionary entry.
+   - If the front of the card could now mean something else, propose a short hint drawn from the original context.
+   - Keep any existing user-written hint as the default unless the user explicitly accepts a replacement.
 1. Create a set of exceptional cases where the AI cannot derive a good suggestion. Examples could include (but are not limited to):
    - If the spelling under review is removed from that dictionary entry.
    - If the dictionary entry was deleted.
@@ -192,11 +190,10 @@ Given this flow, most card fields can be modified by the user, if they find it e
 
 - **Key**: this is core to the data model.
 - **Dictionary entry**: modifications to this will be overwritten in future dictionary updates.
-- **Hint**: modifications to this _can_ be overridden in future dictionary updates.
 
-Notably, the **Word** field _can_ be modified, since only the **Key** field is used by the maintenance and curation parts of the software. For example, if a user finds [然](https://takoboto.jp/?w=1394690) to not be sufficiently helpful and would prefer ～然とする, they can modify the card as such.
+Notably, the **Recognition target** field _can_ be modified, since only the **Key** field is used by the maintenance and curation parts of the software. For example, if a user finds [然](https://takoboto.jp/?w=1394690) to not be sufficiently helpful and would prefer ～然とする, they can modify the card as such.
 
-The **Hint** field not being freely editable is a bit suboptimal, but it might be fine to handle this by having sufficiently-clear UI during the [card update process](#updating-existing-cards-for-jmdict-updates), e.g., never overwriting the hint by default.
+The **Hint** field is also user-editable. A dictionary update can make a different hint useful, so maintenance may offer an AI-generated alternative, but the existing hint remains the review default and is never replaced without explicit acceptance.
 
 ## Design details
 
@@ -252,11 +249,11 @@ For examples, including tricky cases like multiple readings, multiple senses, et
 
 ### Reading field and furigana placement
 
-The **Reading** field of the card contains the reading or readings that the user should accept for the recognition target and optional context hint. Usually the mined context selects one specific reading. When it does not, frequency evidence determines whether one reading is dominant or several should be listed, instead of turning an arbitrary choice into part of the test.
+The **Reading** field of a currently supported card contains the single reading that the user should accept for the recognition target and optional context hint. Usually the mined context selects that reading. When the available evidence does not support one reading well enough, acquisition defers the card instead of turning an arbitrary choice into part of the test. Supporting several accepted readings on one card is discussed as future work below.
 
-In some cases, the reading will come directly from the context sentence: for example, rare kanji often get their reading spelled out in the source book. But in most cases, we need to identify the valid reading or readings from the JMDict entry. Deterministic restrictions, including senses' `appliesToKana` and readings' `appliesToKanji`, narrow the candidates first. AI ✨ can then use the full JSON entry and context to choose between the remaining candidates.
+In some cases, the reading will come directly from the context sentence: for example, rare kanji often get their reading spelled out in the source book. But in most cases, we need to identify the valid reading from the JMDict entry. Deterministic restrictions, including senses' `appliesToKana` and readings' `appliesToKanji`, narrow the candidates first. An acquisition workflow can then use context, frequency evidence, or AI ✨ to choose between the remaining candidates.
 
-Once we have the front recognition target and its reading or readings, precise furigana placement for each is done using the [Lorenzi's Jisho](https://jisho.hlorenzi.com/) furigana file. The resulting association of furigana over the correct kanji helps the user reinforce kanji readings organically, over the course of many reviews.
+Once we have the front recognition target and its reading, precise furigana placement is done using the [Lorenzi's Jisho](https://jisho.hlorenzi.com/) furigana file. The resulting association of furigana over the correct kanji helps the user reinforce kanji readings organically, over the course of many reviews.
 
 Using the [JmdictFurigana project](https://github.com/Doublevil/JmdictFurigana) was considered, but some quick smoke-testing revealed [it's missing at least one obvious case](https://github.com/Doublevil/JmdictFurigana/issues/25), so I lost confidence in the project.
 
@@ -331,17 +328,17 @@ TODO: continue roadmap.
 
 Creating a card requires choosing several related but independent things: the recognition target, a JMDict entry, the applicable senses within that entry, the reading used in context, and enough context to justify those choices. Treating these as a single "dictionary result" is the source of many bad cards.
 
-The cases below cover each point at which the simple one-spelling, one-entry, one-sense, one-reading path can branch. Before using AI, the program should apply JMDict's spelling and reading restrictions to eliminate structurally impossible combinations. AI should resolve the remaining contextual ambiguity. When the available data is still insufficient, the program should make its best supported choice and flag the card as suboptimal instead of adding an interactive clarification step to the mining flow.
+The cases below cover each point at which the simple one-spelling, one-entry, one-sense, one-reading path can branch. Before using AI, the program should apply JMDict's spelling and reading restrictions to eliminate structurally impossible combinations. AI should resolve the remaining contextual ambiguity. When the available dictionary or source evidence is still insufficient to make a fair card, the acquisition workflow should defer it with a durable reason instead of silently turning a guess into something the learner is tested on.
 
-| Ambiguity                               | How the card represents the choice                                          |
-| --------------------------------------- | --------------------------------------------------------------------------- |
-| Several senses in one entry             | Sense numbers in the **Key**, plus a **Hint** when disambiguation is useful |
-| Several entries with distinct meanings  | JMDict ID in the **Key**, plus a required **Hint**                          |
-| Equivalent senses split across entries  | One semantic anchor, with equivalent references supplying accepted readings |
-| Several spellings for one entry         | Recognition target at the start of the **Key**                              |
-| Several readings for one spelling       | Dominant reading, or multiple forms in **Reading**                          |
-| Several possible word boundaries        | Prefer the longest JMDict expression supported by the context               |
-| Insufficient dictionary data or context | Best supported choice, plus a persistent suboptimal-card flag               |
+| Ambiguity                               | How the card represents the choice                                                            |
+| --------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Several senses in one entry             | Sense numbers in the **Key**, plus a **Hint** when disambiguation is useful                   |
+| Several entries with distinct meanings  | JMDict ID in the **Key**, plus a source-grounded **Hint** when the context distinguishes them |
+| Equivalent senses split across entries  | Defer and tag for future equivalent-entry support                                             |
+| Several spellings for one entry         | Recognition target at the start of the **Key**                                                |
+| Several readings for one spelling       | Use one evidence-supported reading; otherwise defer for future multi-reading support          |
+| Several possible word boundaries        | Prefer the longest JMDict expression supported by the context                                 |
+| Insufficient dictionary data or context | Defer creation and record a persistent, actionable reason                                     |
 
 ### Selecting senses within one entry
 
@@ -375,6 +372,16 @@ Another example is where the different senses are just grammatical variations of
 
 Here, JMDict separates the verbal sense "to fret; to brood" from the adverbial sense "worriedly; constantly fretting". The くよくよして construction does not create a useful semantic distinction between them, so the appropriate key is `くよくよ | 1003930`, with no hint.
 
+The same principle applies when two definitions describe one encountered relationship from slightly different angles. In `スタンドアロンRPGにはつきものの勝利ファンファーレ`, [つきもの](https://takoboto.jp/?w=1495730) is both a natural accompaniment and an inevitable part of that kind of game, so senses 1 and 2 both apply. Conversely, a specialized setting can select the narrower sense even when a broader gloss sounds superficially possible: `高く上がったボールを見事にキャッチした` targets the baseball catch sense of [キャッチ](https://takoboto.jp/?w=1041530), not the entry's general catch-or-obtain-information sense.
+
+Conventional proper names can also unite tightly linked facets that would be artificial to split for recognition. In `甲子園出場を賭けた地区大会`, [甲子園](https://takoboto.jp/?w=2092720) invokes the stadium together with the spring and summer national high-school tournaments identified by it. The card therefore keeps all three senses rather than forcing a venue-versus-event distinction.
+
+#### The source does not distinguish genuinely different senses
+
+Selecting all senses is correct only when they express the same learned fact or the usage genuinely invokes their overlap. It is not a fallback for inadequate evidence. For example, merely calling a woman 義姉 does not reveal whether she is a sister-in-law, an older stepsister, or an older adopted sister. Those senses describe different relationships and cannot all be asserted just because the excerpt leaves each possible.
+
+Sense resolution therefore distinguishes three outcomes: a complete selected subset, a positive judgment that no compatible sense matches, and unresolved ambiguity among non-equivalent senses. The last outcome defers card creation and records the senses still possible. It must not be collapsed into “all senses apply” or “no sense applies”: the former would teach unsupported meanings, while the latter would incorrectly suggest a JMDict gap or wrong entry.
+
 #### One sense combines distinct usages
 
 Sometimes a JMDict sense covers multiple associations that deserve separate cards. Before [this accepted change I submitted to 甘い](https://www.edrdg.org/jmwsgi/entr.py?svc=jmdict&g=1213400.1~2375061), one sense combined being indulgent or lenient toward someone with having naive or overly optimistic thinking. A card for 子供に甘い and one for 考えが甘い could both target that sense accurately, but they would receive the same key even though they teach different associations.
@@ -387,25 +394,23 @@ A different problem occurs when the entry is correct but none of its senses adeq
 
 > 不味い。彼との約束を忘れてた。
 
-The adjective sense "awkward; problematic; troublesome" was related, but it did not accurately represent the standalone "oh no; this is bad" interjection. In this situation, the program should use the closest existing sense only as a provisional anchor and flag the card as having no accurate JMDict sense. The hint and context can preserve the intended usage, but they cannot make the dictionary-backed sense selection correct.
-
-As in the too-broad-sense case, the product should encourage a JMDict correction while keeping the card managed. Once a later release adds the missing sense, normal card maintenance can retarget the card to it, update the key and dictionary entry, and clear the flag.
+The adjective sense "awkward; problematic; troublesome" was related, but it did not accurately represent the standalone "oh no; this is bad" interjection. In this situation, the program should not create a managed card against the closest sense: the hint and context cannot make the dictionary-backed sense selection correct. It should defer the encounter as needing a JMDict update, retain enough evidence to draft that update, and retry it after a later dictionary release adds the missing sense.
 
 ### Selecting between multiple dictionary entries
 
 Different JMDict entries can share the exact same spelling. [はさみ meaning pincers or claws](https://takoboto.jp/?w=2029540) and [はさみ meaning scissors or a hole punch](https://takoboto.jp/?w=1573820) are separate entries, so the JMDict ID keeps their keys distinct. The popup should show them separately and rank them using the context; the result the user selects supplies the intended entry without an additional clarification step.
 
-Every card in this situation requires a hint, such as 蟹のはさみ or はさみで切る, even when no conflicting card currently exists in the deck. Otherwise the first card becomes unfair as soon as the second is added. This requirement is nonlocal: card creation must search the whole JMDict for other entries containing the same recognition target before deciding whether a hint is optional.
+Every card in this situation requires a hint when a semantic distinction exists, such as 蟹のはさみ or はさみで切る, even when no conflicting card currently exists in the deck. Otherwise the first card becomes unfair as soon as the second is added. This requirement is nonlocal: card creation must search the whole JMDict for other entries containing the same recognition target before deciding whether a hint is optional. The wording still has to be supported by the source encounter; if the available context does not supply a short semantic distinction, the generator must not invent one.
 
-[包む](https://takoboto.jp/?w=1584060), usually つつむ, and [包む](https://takoboto.jp/?w=2831360), read くるむ, are harder: the entries overlap in both spelling and meaning. Context or source furigana may identify the entry, but some unannotated uses will remain ambiguous. These cards still always require a hint. If a semantic hint cannot distinguish them, the hint must include the reading; this is a justified exception to the general preference against front-side furigana.
+[包む](https://takoboto.jp/?w=1584060), usually つつむ, and [包む](https://takoboto.jp/?w=2831360), read くるむ, are harder: the entries overlap in both spelling and meaning. Context or source furigana may identify the reading, but no honest semantic hint distinguishes the entries. The generator returns no hint instead of putting a reading on the front. Until equivalent-entry and multiple-reading support can represent this case on the back, the acquisition workflow should defer and tag it for later rather than create an unfair card.
 
-#### Equivalent senses split across entries
+#### Equivalent senses split across entries (future)
 
 A different case arises when JMDict divides what is pedagogically one meaning across entries whose relevant distinction is their reading. [後々 read あとあと](https://www.edrdg.org/jmwsgi/entr.py?svc=jmdict&g=1578610.1~2098131) and [後々 read のちのち](https://www.edrdg.org/jmwsgi/entr.py?svc=jmdict&g=2841372.1~2099180), for example, currently have the same "future; distant future" sense and the same part-of-speech information. A learner shown unannotated 後々 should recognize that shared meaning while treating either sufficiently-supported pronunciation as acceptable. Separate cards or a hint that artificially selects one entry would test JMDict's lexicographic partition instead of native-text recognition.
 
-The card should retain one entry and sense as its primary semantic anchor while recording the other equivalent entry and sense as provenance. Its **Reading** may then contain accepted readings supported by any of those references. Duplicate detection and hint generation should operate on the equivalence group: the equivalent entries should not produce duplicate cards, and no hint is needed merely to distinguish identical meanings. When JMDict updates, maintenance tooling must revalidate the equivalence and request review if the referenced senses have diverged.
+The current card model cannot record this equivalence or readings supplied by several entries, so acquisition defers and tags these cases for future support. One possible design would retain one entry and sense as the primary semantic anchor while recording equivalent entry/sense references as provenance, then make duplicate detection, hint generation, and maintenance operate on that reviewed equivalence group. That representation is not yet part of the card key or any other field.
 
-Matching English glosses are not enough to establish equivalence automatically. Readings can differ in register, distribution, or contextual suitability even when JMDict does not encode that distinction clearly, so equivalence groups must be explicitly curated or reviewed. End-to-end support for readings sourced from equivalent entries depends on general multiple-reading support and is tracked in [issue #18](https://github.com/miwakeapp/cards/issues/18).
+Matching English glosses would not be enough to establish equivalence automatically. Readings can differ in register, distribution, or contextual suitability even when JMDict does not encode that distinction clearly, so any future equivalence groups would need explicit curation or review. End-to-end support for readings sourced from equivalent entries depends on general multiple-reading support and is tracked in [issue #18](https://github.com/miwakeapp/cards/issues/18).
 
 ### Selecting a spelling within one entry
 
@@ -431,17 +436,13 @@ Publishers also use ruby position for explanatory annotations. For example, a so
 
 A mismatching annotation cannot simply be assumed to be explanatory. It can instead reveal a missing JMDict reading, a wrong JMDict entry, or a bad source extraction. The 薬物局所輸送 example adds another structural problem when the recognition target 局所 covers only part of the annotated base. Until the pipeline has a principled way to classify and represent such ruby without weakening pronunciation validation, it should defer these cards for manual review.
 
-#### More than one reading is acceptable
+#### More than one reading may be acceptable (future)
 
 Some spellings have multiple readings without a corresponding difference in meaning. [明日](https://takoboto.jp/?w=1584660), for example, can mean "tomorrow" as あした, あす, or みょうにち, with register and context influencing the natural choice. These alternatives should not produce duplicate cards: the front and meaning being learned are the same.
 
-The decision order is:
+The current pipeline records one reading when source ruby or other evidence identifies it. If several readings remain materially plausible and no one reading is supported well enough, acquisition defers and tags the encounter for multi-reading support rather than manufacturing a front-side hint or making an arbitrary pronunciation part of the test.
 
-1. If the source contains furigana, record that encountered reading.
-1. Otherwise, eliminate readings incompatible with the selected spelling, senses, or context.
-1. Compare the remaining readings using corpus frequency data. If one accounts for more than 70% of observed use, make it the sole required reading. Otherwise, include each reading with material usage—provisionally at least 5%—in descending frequency order.
-
-The [EDRDG Google n-gram lookup](https://www.edrdg.org/~jwb/ngramcounts.html), for example, reports 67.3% for あした, 32.6% for あす, and 0.1% for みょうにち when those kana forms are compared. Under this policy, an unannotated, register-neutral occurrence becomes `明日[あした] / 明日[あす]`: neither of the first two readings dominates, while みょうにち is too rare to require without contextual evidence. The n-gram data is a useful proxy rather than unquestionable truth—it comes from a 2007 web corpus and cannot always distinguish how a kanji spelling was read—so newer corpora and explicit source evidence take precedence.
+A future design may repeat the spelling for each accepted reading in the **Reading** field, separated by `/`, and use corpus frequency as evidence for which readings have meaningful usage. The exact representation, evidence sources, inclusion policy, duplicate semantics, and updater behavior remain open questions; no frequency threshold is currently part of the product.
 
 ### Selecting the right word boundary
 
@@ -461,11 +462,13 @@ The popup should therefore search for all matches beginning at the selected text
 
 The recognition target is normally a dictionary form, but the literal text in the source may be conjugated, inflected, or derived. For example, a card for 後ろめたい may come from 後ろめたさ, and a card for 頭をよぎる may come from 頭をよぎった. The program should keep the dictionary form as the recognition target and key, while separately identifying the exact `targetInContext` so it can mark the correct source substring.
 
-If the context contains several occurrences derived from the same recognition target, the program should mark all of them. There is no need to guess which occurrence prompted the card, since every occurrence reinforces the same recognition target and dictionary entry. For example, a card whose recognition target is 頼る should render:
+If the selected excerpt contains several occurrences derived from the same recognition target and usage, the program should mark all of them. The clicked or otherwise anchored occurrence identifies the usage first; an identical surface elsewhere in a long excerpt may belong to a different entry or sense and must not be swept in blindly. For example, a card whose recognition target is 頼る should render:
 
-> 同じように、<mark>頼った</mark>り<mark>頼られた</mark>りすればいいと思うよ。
+> 同じように、<mark>頼ったり</mark><mark>頼られたり</mark>すればいいと思うよ。
 
-This matching must account for ordinary conjugation and derivation without swallowing unrelated auxiliaries or nearby text. The clicked occurrence normally identifies which source substring is being mined. If it remains ambiguous whether a candidate substring is actually derived from the recognition target, the program should use its best-supported set of matches and flag the card as suboptimal rather than interrupting the flow.
+This matching must account for ordinary conjugation and derivation without swallowing unrelated auxiliaries or nearby text. The clicked occurrence normally identifies which source substring is being mined. If it remains ambiguous whether a candidate substring is actually derived from the recognition target, the acquisition workflow should defer the card for review rather than mark a potentially unrelated word.
+
+Inflectional material that completes the encountered verb form belongs inside the mark when it is part of what the learner saw. This includes voice and finite morphology, together with an attached connective such as the `り` in `頼ったり`, but excludes a following desiderative auxiliary: `呼び捨てにされたくない` marks `<mark>呼び捨てにされ</mark>たくない`. For example, `横になったら、ついうとうとしてしまった` marks `<mark>横になったら</mark>`, including the conditional `たら`. This does not license repairing a different lexical form by inserting a missing internal particle: the colloquial `様子見てくら` is not an encountered form of the JMDict expression `様子を見る`, so that source/target pairing should not produce a card.
 
 ### Expanding unhelpful context
 
@@ -477,4 +480,28 @@ This contains too little information to remind the learner what prompted the rea
 
 > 終電はもう出た後で、タクシーに乗るお金もなかった。途方にくれた。
 
-The context extractor should start with the containing sentence, then pull in adjacent sentences until pronouns, omitted subjects, reactions, and causal links are understandable, normally stopping after two or three sentences. The expanded passage belongs in **Full context**. The minimizer can then produce a compact, self-contained version such as 終電はもう出た後でタクシー代もなく、途方にくれた。 for routine review. It must not invent facts that are absent from the available source. If the surrounding text still does not resolve the ambiguity, the card should be added to a suboptimal-card list with an "insufficient source context" reason. That flag is not automatically fixable, since no later dictionary update can restore context that was never captured.
+The context extractor should start with the containing sentence, then pull in adjacent sentences until pronouns, omitted subjects, reactions, and causal links are understandable, normally stopping after two or three sentences. The expanded passage belongs in **Full context**. The minimizer can then produce a compact, self-contained version such as 終電はもう出た後でタクシー代もなく、途方にくれた。 for routine review. It must not invent facts that are absent from the available source. If the available surrounding text still does not resolve the ambiguity, acquisition should defer with an "insufficient source context" reason; a later dictionary update cannot restore context that was never captured.
+
+## Appendix: AI-generated field policy
+
+### Generated hint policy
+
+Generated hints are grounded in the encounter rather than generic dictionary collocations. The generator keeps a broad exact rendered-text `semanticEvidenceSpan` that makes the semantic decision auditable, plus a nested sentence-local `hintSourceSpan` that bounds the words and relationships available to the final hint. The evidence and hint have different jobs: the evidence may retain a broader fact needed to establish the meaning, while the hint need not repeat every contrastive detail or prove the selection by itself. The hint retains the learned word, possibly with a source-grounded normalized final inflection; surrounding context alone is not a hint.
+
+Exact extraction is preferred, but the generator may reconnect or reorder source words and supply necessary grammatical particles when extraction would leave an awkward fragment. Such reconstruction must preserve the source facts, content-word orthography, participants, roles, voice, negation, modality, and relationships. A source human participant may be generalized to the neutral placeholder `Xさん` when being a person is itself the complete reusable cue; this must not change the participant's role or invent an agent, object, relationship, synonym, kanji spelling, expanded proper name, or plausible-but-unseen collocation. There is no arbitrary character limit and constructions with の are not mechanically compressed; the goal is a fair learning cue, not a formal proof that excludes every dictionary contrast.
+
+Predicate normalization has a deliberate scope. A hint may discard the source proposition and form a smaller nonassertive collocation, normalizing its final predicate to dictionary form. If it retains the proposition—or a clause whose interpretation depends on it—it must preserve source voice, negation, modality, aspect, participants, and relationships. It must not keep half a proposition while stripping its operators. Conversely, a compact source fragment such as `あっさりOK` does not gain anything from an appended `する`; normalization is not a requirement to force every hint into predicate form.
+
+When the selected usage is sufficiently supported but the encounter supplies no fair short cue that distinguishes it, omit the Hint instead of fabricating a generic collocation or deferring solely because that field would be empty. This exception does not relax sense or entry selection: genuinely insufficient evidence for the selected dictionary usage still defers the card.
+
+Leading or trailing `～` notation can itself supply the minimal usage-pattern hint. The separate Hint field is omitted only when every selected sense has that boundary pattern and no unselected sense or same-spelling JMDict entry has the same pattern. For example, `～ヅラ` needs no additional hint when it uniquely identifies the suffix entry, but another suffix entry or another selected-entry suffix sense would still require one.
+
+For example, if the source says `彼は社長とは名ばかりの飾り物だった`, both `彼は飾り物だ` and `Xさんは飾り物だ` are good hints for sense 2 of [飾り物](https://takoboto.jp/?q=%E9%A3%BE%E3%82%8A%E7%89%A9). The person-shaped usage cue is enough; the longer 名ばかり phrase is not required. When the encountered source phrase is `魂の番`, it can serve as a hint for 番 meaning ["pair (esp. of mated animals), brace, couple"](https://takoboto.jp/?w=2199920) instead of ["number (in a series)"](https://takoboto.jp/?w=2022640).
+
+### Context minimization policy
+
+A plain-text length threshold can avoid obviously unnecessary model calls, but it does not decide whether the resulting card is good. Short but cumbersome context can benefit from minimization, while a long clean sentence can be left alone.
+
+The model receives rendered text with opaque, occurrence-addressed target sentinels, not HTML. It should prefer deletion and exact extraction, but its goal is the shortest natural freestanding review passage, not a mechanically conservative excerpt. It may reconnect or reorder source clauses, replace a retained reference with its source antecedent, omit a recoverable subject, remove quotation or evidential framing, discard an incidental hedge, or smooth a directly supported predicate when those changes do not alter the target's learned usage or core relationship. It must not invent a participant, object, synonym, event, or relationship; reverse polarity; or turn a merely adjacent fact into a new dependency.
+
+Code enforces hard structural invariants—exact retained target identities and surfaces, source-supported lexical characters, balanced punctuation, resolved opening references, and a substantive reduction—then escapes the result and restores `<mark>` together with the original inline markup from each retained target. Semantic faithfulness still depends on the evaluated model and prompt; character-level validation is not presented as proof of meaning. Full context remains the source-faithful record and preserves all source ruby, so Minimized context can prioritize a concise natural study cue instead of duplicating every source operator. Minimized context preserves target ruby deterministically but may omit incidental ruby outside the target; HTML is never entrusted to the model.

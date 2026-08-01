@@ -1,0 +1,49 @@
+{
+  "id": "1077730",
+  "kanji": [],
+  "kana": [
+    {
+      "common": true,
+      "text": "チタン",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [
+        {
+          "lang": "ger",
+          "full": true,
+          "wasei": false,
+          "text": "Titan"
+        }
+      ],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "titanium (Ti)"
+        }
+      ]
+    }
+  ]
+}

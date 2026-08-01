@@ -1,0 +1,105 @@
+{
+  "id": "1751860",
+  "kanji": [
+    {
+      "common": false,
+      "text": "卑怯者",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "ひきょう者",
+      "tags": [
+        "sK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "ひきょうもの",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "coward"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "chicken"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "yellow-belly"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "sneaky person"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "underhanded person"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "dastardly person"
+        }
+      ]
+    }
+  ]
+}

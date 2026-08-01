@@ -1,0 +1,103 @@
+{
+  "id": "1898580",
+  "kanji": [
+    {
+      "common": true,
+      "text": "怒涛",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "怒濤",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "どとう",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "surging waves"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "raging billows"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adj-no"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "turbulent"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "tempestuous"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "tumultuous"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "chaotic"
+        }
+      ]
+    }
+  ]
+}

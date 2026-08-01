@@ -1,0 +1,2864 @@
+{
+  "schemaVersion": 1,
+  "description": "Tracked explicit sense-resolution outcomes. A selected outcome lists every compatible sense that applies; ambiguous means the source cannot safely distinguish the listed possible senses.",
+  "cases": [
+    {
+      "id": "animecards-focused-1726739466292",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1726739466292,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "『マトリックス』で語られるその言葉。\n\n世界から何かが消えるという事象と、そこに関連するリアリティはまったく別物なのだと思う。物理的に失われることの直接的影響よりも、何か<mark>数値</mark>では測れない大きな欠落がそこに起きている。それは一見分からない。だがそれは、誰の目にもつかないまま、確かに状況を大きく変えていくのだろう。\n\n何より心が痛んだ。映画を愛していた彼女、全世界の映画を愛する人々。そのすべてから映画を奪うのだ。罪は重い。",
+        "recognitionTarget": "数値",
+        "jmdictId": "1373160",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The context uses a numerical value or quantity; it gives no evidence for the separate figure-or-numeral sense."
+      }
+    },
+    {
+      "id": "animecards-focused-1729411534434",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1729411534434,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "「あ、新しい人だー！今日からよろしくお願いします！」\n\n菅原さんの声は、店長が８人目になってからますます大きくなっている気がする。何だか薄気味悪いなあと思っていると、いつの間にか菅原さんも白羽さんも<mark>身支度</mark>を終えていた。\n\n「よし、じゃあ今日は俺が朝礼やるかー」",
+        "recognitionTarget": "身支度",
+        "jmdictId": "1705810",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "rationale": "身支度を終える describes completing one's personal preparations; it does not denote the clothes or outfit themselves."
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The source predicates completion of preparations, not possession or selection of an outfit."
+      }
+    },
+    {
+      "id": "animecards-focused-1730536860449",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1730536860449,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "「泊まる……」\n\nそわそわとしだした白羽さんは、「いや、でも僕は、けっこう<mark>潔癖症</mark>なので……きちんと準備しないとちょっと……」と小さな声で言った。\n\n「潔癖症なら、布団はつらいかもしれませんね。しばらく使ってないし、干してもいないし。この部屋、古いのでゴキブリもけっこう出るんです」",
+        "recognitionTarget": "潔癖症",
+        "jmdictId": "2434300",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1732106909136",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1732106909136,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "白羽さんの質問に、義妹は鼻で笑って言った。\n\n「前にもお<mark>義兄</mark>さん、家賃を滞納して実家までお金を借りにきたことがあったでしょ。あのとき、こんなことになる気がして、旦那に頼んでお義兄さんの携帯に追跡アプリ入れてもらってたんですよ。だからここにいることはわかってたんで、コンビニに出かけたところを捕まえたんです」\n\n白羽さんは義妹さんにまったく信用されてなかったんだなあ、としみじみ思った。",
+        "recognitionTarget": "義兄",
+        "jmdictId": "1225790",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1733659682487",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1733659682487,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "「殺される五日前……ですか」\n\n「靖子のことをあれこれ訊いて帰ったそうだ。ここまでいえば俺が何をいいたいのか、<mark>ぼんくら</mark>なおまえでもわかるだろ」間宮は草薙たちの背後を指差した。「さっさと裏を取ってこい。取れないなら、靖子のところへ行け」\n\n５",
+        "recognitionTarget": "ぼんくら",
+        "jmdictId": "1984300",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1734502442358",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1734502442358,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "「なあ、どうして急に今度の事件に興味を持ったんだ。おまえから、捜査の進捗状況を教えてくれというなんて珍しいじゃないか」\n\n「興味というほどのことはない。何となく気になっただけさ。<mark>鉄壁</mark>のアリバイとかっていう話は嫌いじゃない」\n\n「鉄壁というか、確認しにくいアリバイだから弱ってるんだ」",
+        "recognitionTarget": "鉄壁",
+        "jmdictId": "1779800",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "鉄壁のアリバイ is figurative and unassailable, not a literal iron wall or fortress."
+      }
+    },
+    {
+      "id": "animecards-focused-1734611360445",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1734611360445,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "大人の対応といったのがおかしかったらしく、皆が笑った。石神も苦笑した。\n\n「俺が大変だと思ってくれるんなら、今度の追試で合格してくれ。範囲は<mark>微分</mark>積分だけだ。どうってことない」\n\n森岡は大きく舌打ちした。横にはみ出させた脚を組んだ。",
+        "recognitionTarget": "微分",
+        "jmdictId": "1486140",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "rationale": "微分積分 names differentiation and integration; the passage does not denote a differential or derivative result."
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "animecards-focused-1734611363834",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1734611363834,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "大人の対応といったのがおかしかったらしく、皆が笑った。石神も苦笑した。\n\n「俺が大変だと思ってくれるんなら、今度の追試で合格してくれ。範囲は微分<mark>積分</mark>だけだ。どうってことない」\n\n森岡は大きく舌打ちした。横にはみ出させた脚を組んだ。",
+        "recognitionTarget": "積分",
+        "jmdictId": "1383070",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "rationale": "微分積分 names differentiation and integration; the passage does not denote an integral or integration result."
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Corrected inherited all-compatible senses after independently reviewing the operation/result distinction; this is parallel to the paired 微分 fixture."
+      }
+    },
+    {
+      "id": "animecards-focused-1735634937623",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1735634937623,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "「他人の自転車に勝手に乗るなよ」\n\n「大丈夫だ。これの持ち主は<mark>当分</mark>現れない」\n\n「どうしてそんなことがわかる」",
+        "recognitionTarget": "当分",
+        "jmdictId": "1449230",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1739447288000",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1739447288000,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "木は自分の左右の手のひらをぴったりと合わせた。\n\n「それで、そのまま二人仲良く大学にすんなり進学できたら、人生何の破綻もなし、万事<mark>めでたしめでたし</mark>やったんやけど、おれは大学受験にみごと失敗して、ごらんのとおりや。どこでどうなってしもたのかは知らんけど、いろんなことがちょっとずつうまくいかんようになってきた。もちろんそういうのは誰のせいでもなく、みんなおれ自身のせいやねんけどな」\n\n僕は黙って話を聞いていた。",
+        "recognitionTarget": "めでたしめでたし",
+        "jmdictId": "2221830",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            2
+          ]
+        },
+        "rationale": "万事めでたしめでたし describes the hypothetical outcome ending without incident, rather than quoting the stock fairy-tale closing formula."
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "animecards-focused-1739591524036",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1739591524036,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "「君はそう思う？」\n\n「樹木がたくましく大きくなるには、厳しい冬をくぐり抜けることが必要なみたいに。いつも温かく穏やかな気候だと、<mark>年輪</mark>だってできないでしょう」\n\n僕は自分の中にある年輪を想像してみた。それは三日前のバームクーヘンの残りのようにしか見えなかった。僕がそう言うと彼女は笑った。",
+        "recognitionTarget": "年輪",
+        "jmdictId": "1469260",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1739688887199",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1739688887199,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "＊\n\n彼女が栗谷えりかであることは一目でわかった。僕はそれまで二度しか彼女に会っていなかったし、最後に会ってから既に十六年が経過していた。それでも見違えようはなかった。昔とおなじように表情が生き生きとして、美しかった。黒いレース地のワンピースに、黒いハイヒール、細い首に<mark>二重</mark>の真珠のネックレスをかけていた。彼女も僕のことをすぐに思い出してくれた。場所は赤坂のホテルで開かれたワイン・テイスティング・パーティーの会場だった。ブラックタイの催しということで、僕もいちおうダークスーツを着て、ネクタイを締めていた。僕がどうしてそんな場所にいたのかについては、説明すると話がけっこう長くなる。彼女はそのパーティーを主催した広告代理店の担当者だった。いかにも有能そうに立ち働いていた。\n\n「ねえ、谷村くん、どうしてあのあと連絡をくれなかったの？あなたともっとゆっくりお話ししたいと思っていたのに」",
+        "recognitionTarget": "二重",
+        "jmdictId": "1462080",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1740400221354",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1740400221354,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "それから僕は電気剃刀を使って、先生の髭を剃りました。濡れたタオルで顔も拭きました。まったく抵抗はしません。何をしてもただなされるままになっていただけです。そのあとで僕はかかりつけの医者に電話をかけました。事情を説明すると医者はすぐにやってきました。そして診察し、簡単な検査をしました。そのあいだも渡会先生はまったく口をききません。ただその感情を込めていない虚ろな目で、じっと私たちの顔を見ているだけです。\n\nなんと言えばいいのでしょうか、こんな表現は不適当かもしれませんが、先生はもう生きている人のようには見えませんでした。本当は地中に埋められ、断食をしたままミイラになっていなくてはならないはずの人が、<mark>煩悩</mark>を振り払えず、ミイラになりきれずに地上に這い出してきた、そんな感じでした。ひどい言い方だと思います。でもそれがそのときに私がまさに感じたことなのです。魂はもう失われてしまっている。それが戻ってくる見込みもない。なのに身体器官だけはあきらめきれずに独立して動いている。そういう感じでした」\n\n青年はそこで何度か首を振った。",
+        "recognitionTarget": "煩悩",
+        "jmdictId": "1481980",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        },
+        "rationale": "The ascetic Buddhist setting positively supports klesha, while worldly desires describes the same use."
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "animecards-focused-1741611169910",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1741611169910,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "「そう、蛇というのはもともと両義的な生き物なのよ。そして中でもいちばん大きくて賢い蛇は、自分が殺されることのないよう、心臓を別のところに隠しておくの。だからもしその蛇を殺そうと思ったら、留守のときに隠れ家に行って、脈打つ心臓を見つけ出し、それを二つに切り裂かなくちゃならないの。もちろん簡単なことじゃないけど」\n\n木野は伯母の<mark>博識</mark>に感心した。\n\n「このあいだＮＨＫを見ていたら、世界の神話を比較する番組で、どこかの大学の先生がそういう話をしていた。テレビってけっこう役に立つことを教えてくれる。馬鹿にできないわよ。暇ができたら、あなたももっとテレビを見るといい」",
+        "recognitionTarget": "博識",
+        "jmdictId": "1474660",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1741865071540",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1741865071540,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "ドアを叩いているのが誰なのか、木野にはわかる。彼がベッドを出てドアを内側から開けることを、そのノックは求めている。強く、執拗に。その誰かには外からドアを開けるだけの力はない。ドアは内側から木野自身の手によって開けられなくてはならない。\n\n木野はその訪問が、自分が何より求めてきたことであり、同時に何より恐れてきたものであることをあらためて悟った。そう、両義的であるというのは結局のところ、両極の中間に<mark>空洞</mark>を抱え込むことなのだ。「傷ついたんでしょう、少しくらいは？」と妻は彼に尋ねた。「僕もやはり人間だから、傷つくことは傷つく」と木野は答えた。でもそれは本当ではない。少なくとも半分は噓だ。おれは傷つくべきときに十分に傷つかなかったんだ、と木野は認めた。本物の痛みを感じるべきときに、おれは肝心の感覚を押し殺してしまった。痛切なものを引き受けたくなかったから、真実と正面から向かい合うことを回避し、その結果こうして中身のない虚ろな心を抱き続けることになった。蛇たちはその場所を手に入れ、冷ややかに脈打つそれらの心臓をそこに隠そうとしている。\n\n「ここは僕ばかりではなく、きっと誰にとっても居心地の良い場所だったのでしょう」とカミタは言った。彼の言おうとしていたことが、木野にも今ようやく理解できた。",
+        "recognitionTarget": "空洞",
+        "jmdictId": "1245930",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        },
+        "rationale": "A cavity in the middle and a hollow middle are noun and adjectival restatements of the same metaphor."
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The cavity noun and hollow adjectival formulations express the same learned fact in this metaphorical usage."
+      }
+    },
+    {
+      "id": "animecards-focused-1742102162484",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1742102162484,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "カミタはひょっとして、なんらかのかたちであの前庭の古い柳の木に結びついているのかもしれない、木野はふとそう思った。あの柳の木が自分を、そして小さな家を保護してくれていたのだ。よく理屈のわからないことだが、いったんそういう考えが頭に浮かぶと、話が節々で繫がるような気がした。\n\n豊かな緑の枝を地面近くまで垂らした柳の姿を、木野は頭に思い浮かべた。夏にはそれは涼しい陰をささやかな前庭に落としてくれた。雨の日には無数の銀色の水滴を柔らかな枝に輝かせていた。風のない日にはそれは深く静かに思索し、風のある日には定まりきらぬ心をあてもなく揺らせた。小さな鳥たちがやってきて、高く鋭い声で語り合いながら、細く<mark>しなう</mark>枝に器用にとまり、やがてまた飛び立っていった。鳥たちが飛び去ったあとの枝は、しばらくのあいだ楽しげに左右に揺れていた。\n\n木野は布団の中で身体を虫のように丸め、目を固く閉じ、ただ柳の木のことを思った。その色やその形やその動きを、ひとつひとつ具体的に頭に思い浮かべた。そして夜明けの訪れを念じた。あたりが次第に明るくなり、カラスや小鳥たちが目を覚まして一日の活動を始めるのを、こうして耐えて待つしかない。世界中の鳥たちを信じるしかない。翼を持ち、嘴を具えたすべての鳥たちを。それまでいっときも心を空っぽにしてはならない。空白が、そこに生じる真空が、それらを引き寄せるのだ。",
+        "recognitionTarget": "しなう",
+        "jmdictId": "2097560",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1743599386624",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1743599386624,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "即座に右手を振り、メニュー画面を呼び出す。パネルを操作する指ももどかしくアイテム欄を開くと、果たして新規入手品の一番上にその名前があった。《ラグー・ラビットの肉》、プレイヤー間の取引では十万コルは下らないという代物だ。最高級のオーダーメイド武器をしつらえても釣りが来る額である。\n\nそんな値段がつく理由はいたって単純。この世界に存在する無数の食材アイテムの中で、最高級の<mark>美味</mark>に設定されているからだ。\n\n食べることのみがほとんど唯一の快楽と言ってよいＳＡＯ内で、普段口にできるものと言えば欧州田舎風──なのか知らないが素朴なパンだのスープばかりで、ごく少ない例外が、料理スキルを選択している職人プレイヤーが少しでも幅を広げようと工夫して作る食い物なのだが、職人の数が圧倒的に少ない上に高級な食材アイテムが意外に入手しにくいという事情もあっておいそれと食べられるものでもなく、ほとんど全てのプレイヤーは慢性的に美味に餓えているという状況なのだ。",
+        "recognitionTarget": "美味",
+        "jmdictId": "1486640",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1747303905124",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1747303905124,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "掠れた声で、それだけを言った途端、旧友の両眼の縁に小さく光るものが生まれ、次々に滴った。\n\n<mark>たちまち</mark>のうちに滂沱の涙を溢れさせながら、クラインは再び起き上がろうと激しくもがき、喉が張り裂けんばかりに絶叫した。\n\n「て……てめえ！キリト！謝ってんじゃねえ！今謝るんじゃねえよ!!許さねえぞ！ちゃんと向こうで、メシのひとつも奢ってからじゃねえと、絶対許さねえからな!!」",
+        "recognitionTarget": "たちまち",
+        "jmdictId": "1288480",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1748079052813",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1748079052813,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "だが。猛攻の末に二匹目のバーをレッド領域にまで減少させ、とどめの強攻撃を見舞うべく距離を取った瞬間、またしても横合いから無理やり割り込まれた。三匹目のドランクエイプだ。見ると、最初の猿はもうほとんどＨＰをフル回復させてしまっている。\n\nこれでは<mark>キリがない</mark>。口の奥に、焦りの味がじわじわと広がっていく。\n\nシリカは、そもそもソロでモンスターと戦った経験がほとんどなかった。レベル的な安全マージンというのはあくまで数値の話であって、プレイヤー自身のスキルはまた別の問題だ。想定外の事態に際して、シリカの中に生まれた焦りは徐々にパニックの色彩を帯び始める。徐々にミスアタックが増加し、それは同時に敵の反撃も呼ぶ。",
+        "recognitionTarget": "キリがない",
+        "jmdictId": "1383810",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The two senses are grammatical restatements of the same learned meaning of endlessness."
+      }
+    },
+    {
+      "id": "animecards-focused-1749973473168",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1749973473168,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "数十分かけて全ての新聞を調べ終わり、二人は顔を見合わせて肩を落とした。あとはいよいよ少女が目を覚まし、話を聞けるまで待つしかない。\n\nいつもの夜なら、二人とも<mark>宵っ張り</mark>ということもあって他愛ない話をしたり簡単なゲームをしたり、あるいは夜の散歩としゃれ込んだりとすることは山ほどあるのだが、今夜はとてもそんな気になれなかった。\n\n「今日はもう寝よっか」",
+        "recognitionTarget": "宵っ張り",
+        "jmdictId": "1605830",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1750486067347",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1750486067347,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "そのひと言を聞いた途端。\n\nぎりっ、と食い縛られたアスナの歯が鳴った。事が<mark>穏便</mark>に収まればそれが一番と思っていたが、恐怖に震える少年たちを見た時点で、すでに憤激は限界を超えていた。\n\n「……キリト君、ユイちゃんをお願い」",
+        "recognitionTarget": "穏便",
+        "jmdictId": "1183620",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1751172890871",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1751172890871,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "「はい……。全部、説明します──キリトさん、アスナさん」\n\nその丁寧な言葉を聞いた途端、アスナの胸はやるせない<mark>予感</mark>にぎゅっと締め付けられた。何かが終わってしまったのだという、切ない確信。\n\n四角い部屋の中に、ユイの言葉がゆっくりと流れ始めた。",
+        "recognitionTarget": "予感",
+        "jmdictId": "1542910",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1762403619330",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1762403619330,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "ほんの三日ほど前、片手直剣スキルが熟練度九五〇に達すると同時に剣技リストに出現したこの単発重攻撃技は、その使い勝手の良さで俺を驚かせた。技後の硬直時間はやや長いが、刀身の倍以上のリーチと、両手用の重槍に匹敵する威力はそれを補って余りある。無論、対人戦でこうも使いまくればすぐにタイミングを読まれてしまうだろうが、単純なＡＩの動かすモンスター相手なら関係ない。遠慮なしに連発し、押し寄せる敵群を真紅のライトエフェクトとともに吹き飛ばしていく。\n\n──とは言え、わずかな松明の灯りの中一時間近くもぶっとおしで続く戦闘に、さすがに集中力が尽きかけているのを俺は自覚していた。大顎による嚙み付きと、そこから吐き出す<mark>酸性</mark>の粘液だけという単純な攻撃パターンに少し前から即応できなくなりつつある。大アリどもは、数は多いが決して雑魚ではない。現在の最前線フロアである四十九層からほんの三層下に棲息する、充分に強力なモンスターだ。レベル的には安全マージン内だが、数匹に囲まれて立て続けに攻撃を受ければ、ＨＰバーはたちまち黄色くなるだろう。\n\nそんな危険を冒してまで既攻略層で単身戦闘を続ける理由はただ一つ、この場所が、現在知られているなかで最も効率のよい経験値稼ぎが可能な人気スポットだからだ。周囲のガケに幾つも開いている巣穴からぞろぞろ湧き出す巨大アリは、攻撃力は高いがＨＰ、防御力ともに低いタイプのモンスターで、攻撃さえ避けつづけられれば短時間で大量に倒すことができる。もっとも、前述したとおり四方を囲まれて攻撃を被弾すると、体勢を立て直す間もなく一気にゲージを持っていかれるので、とてもソロ向けの狩場とは言えない。人気スポットゆえに一パーティー一時間まで、という協定が張られているが、順番待ちの列に単独で並ぶのは俺だけだ。今も、谷の入り口で顔馴染みのギルドの連中が俺の狩りが終わるのを待っているが、その首の上には判を押したように呆れ面が並んでいるはずだ。いや、呆れられるならまだいい方かもしれない。仲間意識の強い大ギルドのプレイヤーたちからは、《最強バカ》《はぐれビーター》と笑い者扱いらしい。──だが、もちろん、知ったことではない。",
+        "recognitionTarget": "酸性",
+        "jmdictId": "1304330",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1762494821521",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1762494821521,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "口ではそう言いながらも、俺は内心で、そんな大層なもんじゃない、と思っていた。攻略組を攻略組たらしめているモチベーションはただ一つ、数千人のプレイヤーの頂点に立つ最強剣士で有り続けたいという執着心それ自体だ。その証拠に、ＳＡＯ攻略、プレイヤー保護だけが目的なら、トッププレイヤーたちは手に入れた情報とアイテムを最大限、中層プレイヤーに提供するべきなのだ。そうすることでプレイヤー全体のレベルが底上げされ、攻略組に加わる者の数も今とは比較にならないほど増加するはずだった。\n\nそれをしないのは、自分たちが常に最強でいたいからだ。もちろん俺も例外ではなかった。その頃の俺は、深夜になると宿屋を抜け出し、最前線に移動してソロでレベル上げを続けていた。その行為が黒猫団メンバーとのレベル差を拡大させ、結果として彼らを裏切り続けることになると解っていた<mark>にもかかわらず</mark>。\n\nだが、あの頃、俺は少しだけ信じてもいたのだ。もし本当に黒猫団のレベルが急上昇し、最前線で戦うプレイヤーたちに加わるようなことがあれば、その時こそケイタの理想が、閉塞的な攻略組の雰囲気を変えていくということも有り得るかもしれない、と。",
+        "recognitionTarget": "にもかかわらず",
+        "jmdictId": "1612900",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1762763162355",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1762763162355,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "俺は、その時ばかりは放置することを主張した。しかし、理由を聞かれた時、この層からトラップの難易度が一段上がるから、とは言えずに、何となくやばそうだから、と口ごもることしかできなかった。\n\nアラームトラップがけたたましく鳴り響き、三つあった部屋の入り口から<mark>怒濤</mark>のようにモンスターが押し寄せてきた。これはムリだと瞬間的に判断した俺は、全員に転移クリスタルで緊急脱出しろと叫んだ。しかし、その部屋はクリスタル無効エリアに指定されており──その時点で、俺を含む全員が、程度の軽重はあれパニックに陥った。\n\n最初に死んだのは、アラームを鳴らしたシーフだった。次にメイサーのテツオが死に、槍使いの男が続いた。",
+        "recognitionTarget": "怒濤",
+        "jmdictId": "1898580",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1763968776936",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1763968776936,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "ダメ元で訊いたのだったが、村中はあっさりと答えた。\n\n「数ヶ月前に、中学の同級生が<mark>子連れ</mark>でこっちに戻って来たんだ。障害があって喋れないって聞いてる」\n\n「あ！それだと思う。ねえ、その琴美ってひととは仲が良いの？」",
+        "recognitionTarget": "子連れ",
+        "jmdictId": "1825370",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        },
+        "rationale": "The classmate is simultaneously a parent with a child and taking that child along."
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "animecards-focused-1765353950480",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1765353950480,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "「うん、本気。しなくていい苦労はたくさんしたし、我慢しなくていいことも我慢してきた。私が辛い目に遭ってんのに、あいつはムシみたいにぼんやり生きてるだけ。そんなのをどう大事にしろっての。無理でしょ」\n\n唇を歪めて、琴美が笑う。ちっとも役に立たない、足手まといになるばかりの子どもなんて、いらない。あんな<mark>虫けら</mark>みたいなもの産むんじゃなかったって毎日思ってる。てか、虫けらだったらパンって潰してそれで終わりにできるのにね。だから虫けらより性質が悪い。\n\n耳を塞ぎたくなるような琴美の言葉に、泣き出しそうになる。あの子はこんな呪詛みたいなものをずっと聞かされていたのだろうか。",
+        "recognitionTarget": "虫けら",
+        "jmdictId": "1771300",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "rationale": "The marked word is the literal comparison vehicle: the following sentences explicitly contrast the child with an insect that could be crushed, rather than using 虫けら directly as an insult meaning an insignificant person."
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Re-reviewed during model selection: the marked 虫けら is the literal comparison vehicle, while its insulting pragmatic effect does not itself realize the separate person-denoting sense."
+      }
+    },
+    {
+      "id": "animecards-focused-1765373848971",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1765373848971,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "言うと、ペンを握った52は躊躇いながらも『お父さんのおばあちゃん』と書く。\n\n「<mark>父方</mark>の祖母ってことね。そのおばあちゃんがあんたのお世話をしてくれてたってところかな。お父さんは？」\n\n『知らない』",
+        "recognitionTarget": "父方",
+        "jmdictId": "1497700",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1767419759519",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1767419759519,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "著者の出世作であり令和文学の傑作といえる『52ヘルツのクジラたち』が発売されたタイミングは、あたかもシナリオがあったかのようにドラマティックである。著者の町田そのこは、今でこそ揺るぎない人気作家となったが、まさに『52ヘルツのクジラたち』を出したことによって、その声がたくさんの読者に届いたのである。良き物語はそのストーリー自体にも、物語にしかなしえない奇跡があるが、それだけでは埋もれてしまう。読者の手に渡るまでにも大いなるドラマがあるのだ。\n\n本書を語るうえで、記憶に刻んでおかねばならないのは二〇二一年本屋大賞の大賞作品となったことであろう。しかし、決してはじめから順風満帆に売れ行きを伸ばしていたわけではない。むしろ前途多難なスタートであった。振り返ってみれば、町田そのこは二〇一六年「女による女のためのＲ－18文学賞」でデビュー以降、『夜空に泳ぐチョコレートグラミー』や『ぎょらん』といった好著を世に送り、文芸ファンの間で評価されていたが全国的にはまだ無名の存在。初版部数も極めて少なく予定されていた。しかし初の長編作品である『52ヘルツのクジラたち』の最初の読者でもあった担当編集者が一念発起したのだ。あまりにも素晴らしい原稿が手元に届き、一読して衝撃を受け、<mark>号泣</mark>を超えて「鼻血が出た」という（この強烈なフレーズは後に店頭ＰＯＰでも活用されることとなる）。「編集人生を懸けて世に送り出したい」と情熱をもって編集仲間や営業担当、書店員にゲラを配って応援を募り、社内を説得して初版部数を引き上げた。このマグマのような熱意が原動力となって、本屋大賞受賞につながったことは間違いない。\n\nしかしながら単行本発売の二〇二〇年四月は新型コロナウイルス感染症拡大による緊急事態宣言が発令されたまさにその時。頼りにしていた書店も休業や時短営業を余儀なくされ、販売機会が大きく失われてしまった。新型ウイルス蔓延という未曽有の危機。錯綜する情報により、平穏な日常を過ごしていた我々の生命の不安も高まり、ステイホームによって当たり前の生活も崩壊した。非日常が日常となってしまった状況の中で、人々の心の拠りどころとなったのが『52ヘルツのクジラたち』だった。迷える多くの人たちのチューニングに見事にはまったのであろう。喪失の哀しみや孤独の痛みを抱える登場人物たちに、ままならない現実の状況が絶妙に重なって、書店員たちの間でもＳＮＳを通じて共感の輪が広がっていった。こういう時だからこそ、売りたい、届けたいという想いが目に見えるカタチとなっていった。発売二か月後に重版が決まり、話題書コーナーで展開。その後、新聞宣伝やテレビ番組での紹介、年末ベスト本での取上げ、本屋大賞ノミネート、そして悲願の本屋大賞受賞とつながり国民的ベストセラーへと駆け上っていったのである。",
+        "recognitionTarget": "号泣",
+        "jmdictId": "1284250",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "ambiguous",
+          "possibleSenseNumbers": [
+            1,
+            2
+          ]
+        },
+        "rationale": "The phrase only says the reaction went beyond 号泣; it does not establish whether the crying was loud or the colloquial silent flood-of-tears usage."
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "provisional",
+        "reviewNote": "The restored source does not distinguish the standard loud-crying sense from the non-standard colloquial sense."
+      }
+    },
+    {
+      "id": "animecards-focused-1768221952904",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1768221952904,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "それを聞いてカツヤはハッと鼻で笑った。\n\n「<mark>下らん</mark>こと気にして生きてるんやな、女は。お前も<mark>下らん</mark>うちの一匹か」\n\n付き合いは一年ほどになるのでカツヤの口の悪さは知っているが、たまにクリティカルで看過できない暴言が出る。これが出るとミサのほうも黙って我慢はできない質だ。",
+        "recognitionTarget": "下らん",
+        "jmdictId": "2175080",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1770034270203",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1770034270203,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "思わず顔をしかめたくなるほど甲高い声で呼ばわったのは、派手なひらひらワンピースを着たおばさんの集団――の中の一人。四、五人がそろいもそろって派手なアクセサリーで身を飾り、冬も深まったこの季節、コートは色とりどりのフェイクファー。\n\n持っている鞄も<mark>女子大生</mark>が憧れるようなブランド物ばかりだ。\n\nイトーさんはまだ前の車両で席を探してうろうろしていたらしく、大声で呼ばれて少し驚いたように二両目にやってきた。呼んだおばさんはミサの向かいの座席をすでに数人で占拠している。",
+        "recognitionTarget": "女子大生",
+        "jmdictId": "1761890",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            2
+          ]
+        },
+        "rationale": "The passage means female university students generally; it gives no evidence for the narrower women's-college sense."
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "animecards-focused-1770034727876",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1770034727876,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "気の利いた相槌が思いつかず、ミサが懸命に頷いている間に女性はすっと腰を伸ばし、空席がもうほとんど残っていない車両を次の車両へと歩き去っていった。\n\n他のおばさんに比べてちょっと<mark>とろ</mark>そうなイトーさんは「ごめんなさいねえ」とバッグを投げた本人に返しながらミサの隣に座った。\n\n違う。あんたが謝らなあかんのは今歩いていったあのお姉さんや。ミサは自然と険しい表情になりながら、せめて気持ちを落ち着かそうと鞄からテキストを取り出して開いた。",
+        "recognitionTarget": "とろい",
+        "jmdictId": "1922480",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "rationale": "The surrounding action demonstrates social cluelessness: Ito apologizes to the person who threw the bag instead of the woman who was inconvenienced. This supports dull or thickheaded, not physical sluggishness."
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "animecards-focused-1770036377673",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1770036377673,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "誰も執り成してくれないことがミサに自分の立場を思い知らせた。\n\n今までの自分たちの『名案』は、他人からは苦々しく思われる<mark>小賢しさ</mark>だったのだ。\n\n「お待たせ！席取っといてくれてありがと！」",
+        "recognitionTarget": "小賢しい",
+        "jmdictId": "1744610",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        },
+        "rationale": "The scare-quoted 名案 and others’ resentment leave both clever-clever impertinence and cunning live."
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "provisional",
+        "reviewNote": "The source supports overlap but does not securely exclude either singleton interpretation."
+      }
+    },
+    {
+      "id": "animecards-focused-1770463757554",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1770463757554,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "バーゲンでもみくちゃになりながら奪い取った商品でも、百貨店の品は百貨店の品だ。\n\nでも、本当に上品な主婦層だったら――このグループがなりたがっているような主婦層だったら、多分バーゲン時期は外して百貨店に行って、ゆっくり商品を見て、<mark>鷹揚</mark>に定価で買うだろう。\n\nそれに――",
+        "recognitionTarget": "鷹揚",
+        "jmdictId": "1608970",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1770465694458",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1770465694458,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "ひとまずベンチに座らせてもらい、痛みの山を越えるまで体を折り畳む。\n\n「おばちゃん、歩けるようになったら言うて。確か踏切り渡ったところに内科もやってる<mark>婦人科</mark>があったと思うし」\n\n確か、というその前置きで彼女のいつも使う駅がここではないことが分かる。",
+        "recognitionTarget": "婦人科",
+        "jmdictId": "1496680",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "rationale": "ところに婦人科があった denotes a clinic or department, not gynecology as an abstract discipline."
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "animecards-focused-1771144355413",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1771144355413,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "何でもかんでも正攻法な美帆ちゃん、それは俺が気まずいと分かってほしかった――とはいえその件について先輩に当たる友達からは適切なアドバイスがあったようで、その後はそのときに痛がる美帆の顔を見ずに済んでいる。\n\nやはり<mark>正攻法</mark>にはそれなりの価値があったのだろう。\n\n＊",
+        "recognitionTarget": "正攻法",
+        "jmdictId": "1377110",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1771918028811",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1771918028811,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "「うわ、それ遺影じゃん。親父の。懐かしいな」\n\n「遺影？まだお元気なのに？しかもこんな若い頃の写真」<mark>義姉</mark>が首をかしげる。\n\n「冗談でそう呼んでたのよ」",
+        "recognitionTarget": "義姉",
+        "jmdictId": "1225800",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "ambiguous",
+          "possibleSenseNumbers": [
+            1,
+            2
+          ]
+        },
+        "rationale": "Calling the woman 義姉 does not reveal whether she is a sister-in-law, stepsister, adopted sister, or another non-blood-related older sister."
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The excerpt identifies the woman only as 義姉 and supplies no relationship evidence that distinguishes either compatible sense."
+      }
+    },
+    {
+      "id": "animecards-focused-1772268725026",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1772268725026,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "結衣は無視して画面を繰った。インパール作戦について書かれたページを読む。\n\n牟田口司令官が提案したこの作戦に反対したのは、補給の専門家である小畑少将だけではなかった。大本営内でも「無茶苦茶だ」と<mark>当初</mark>は反対されていたらしい。\n\nしかし、ちょうどその頃、アメリカが太平洋側で攻勢に転じ、日本軍の資源輸送を脅かしていた。そこで大本営は、太平洋の反対側にあるビルマを独立させてインドを刺激し、イギリスに揺さぶりをかけようと考えた。そのような状況の中、大本営は、インド北東部に位置し、ビルマからも近いインパールを突破する、という牟田口司令官の作戦に、幻想ともいえる期待を抱きはじめた。",
+        "recognitionTarget": "当初",
+        "jmdictId": "1449110",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1772438583085",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1772438583085,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "会社全体の案件を監視し、予算、利益率、社員の稼働率などを管理するのが管理部の仕事だ。メンバーは十人。元制作部の社員が多い。幾つものプロジェクトを成功に導いたベテランばかりだ。\n\nそのトップである石黒の机は、部屋の奥にあった。真っ赤で<mark>ギザギザ</mark>した髪が二十七インチのモニターから覗いてる。\n\n「グロ、来たよ」結衣は入り口から声をかける。",
+        "recognitionTarget": "ギザギザ",
+        "jmdictId": "1003560",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1772507199204",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1772507199204,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "「将来は一戸建てに住みたいね」東山家に向かう道すがら、巧は夢を語っていた。「うちの実家みたいにさ、ガレージとか付いてないと、趣味のものも置けないし。駐車場も欲しいしさ。……あ、ここが結衣ちゃんち？」\n\n結衣はうなずきながら、自分の<mark>生家</mark>が哀れになった。狭小住宅。庭はない。車は近所の月極駐車場に停めている。今でも父が住宅ローンを払っているはずだ。\n\n「結衣ちゃんと一緒で、なんか気が抜けていいね」",
+        "recognitionTarget": "生家",
+        "jmdictId": "1378830",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1775535991076",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1775535991076,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "「それなのに、経営者だのマネジャーだの、負担の大きいことばかりやらされて、さぞかし苦しかったでしょうね。私、ずっと見てました。福永さんは頑張っていました。よくやっていました。……なのに、みんなして酷い！」\n\n福永のスマートフォンを、晃太郎から奪う。床に叩き付ける直前、「<mark>卑怯者</mark>」という文字が見えた。\n\n「こんなこと言われたら、福永さんの心が深く傷ついてしまう」",
+        "recognitionTarget": "卑怯者",
+        "jmdictId": "1751860",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1776059447108",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1776059447108,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "葬儀の日、僕は早稲田から都電に乗った。終点近くの駅で降りて区分地図を広げてみたが、地図は地球儀と同じ程度にしか役に立たなかった。おかげで彼女の家に辿りつくまでに幾つも煙草を買い、何度も道を訊ねねばならなかった。\n\n彼女の家は茶色い板塀に囲まれた古い木造住宅だった。門をくぐると、左手には何かの役には立つかもしれないといった程度の狭い庭があった。庭の隅には<mark>使いみち</mark>のなくなった古い陶製の火鉢が放り出され、火鉢の中には十五センチも雨水がたまっていた。庭の土は黒く、じっとりと湿っていた。\n\n彼女が十六の歳に家を飛び出したきり、というせいもあって、葬儀は身内だけのひっそりとしたものだった。参列者の殆んどが年寄りの親戚で、三十を過ぎたばかりの彼女の兄だか義理の兄だかが葬儀をとりしきっていた。",
+        "recognitionTarget": "使いみち",
+        "jmdictId": "1305900",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "使いみちのなくなった means that the brazier no longer has a purpose or use, not a method of using it."
+      }
+    },
+    {
+      "id": "animecards-focused-1776846107846",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1776846107846,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "しかしその母屋の右手にどこかの剽軽な建築家がそれにあわせるつもりで同傾向と同系色の別棟をくっつけていた。狙いは悪くないのだけれど、そのふたつの棟はまるで似合ってはいなかった。ちょうど銀の平皿にシャーベットとブロッコリをもりあわせたような感じだった。そのようにして何十年かが無為に流れ、そのわきに石造りの塔のようなものが加わった。そして塔のてっぺんには装飾的な避雷針がとりつけられた。それがまちがいのもとだった。おそらく雷に焼かれてしまうべきだったのだ。\n\n塔からは荘重な屋根つきの<mark>渡り廊下</mark>が出ていて、それは一直線に別館へとつながっていた。この別館というのがまた奇妙な代物ではあったが、少くともそれには一貫したテーマが感じられた。「思想の相反性」とでもいうべきものである。一頭の驢馬が左右に同量のかいばを置かれて、どちらから食べ始めればいいのかを決めかねたまま餓死しつつあるといった類いの哀しみがそこには漂っていた。\n\n母屋の左手にはそれと対照的に平家の日本家屋が長く伸びていた。生垣があり、よく手入れされた松があり、品の良い廊下がボウリング・レーンみたいにまっすぐ続いている。",
+        "recognitionTarget": "渡り廊下",
+        "jmdictId": "1444670",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1777089505072",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1777089505072,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "それから次は職捜しだ。これもまたいろんな人と仲良くなるというところから始まる。君ならきっとうんざりするだろうけれど（僕だってそれなりにうんざりしてるんだぜ）、どうせ四ヵ月も住みやしないんだ。誰と仲良くなったって、どうってこともないさ。まず街の若い連中が集まる喫茶店かスナックをみつけて（どこの街にだってこういうのはある。街のへそみたいなもんだ）、そこの常連になり、知りあいを作って仕事を紹介してもらうんだ。もちろん名前も身の上話も適当にでっちあげる。そんなわけで、僕は今では君の想像もつかないくらいたくさんの名前と身の上を持っている。時々、本来の僕がどんな風だったかさえ忘れてしまいそうなほどだ。\n\n仕事だって実にいろんな仕事をした。大抵は退屈な仕事だったけれど、それでも働くのは楽しい。いちばん多かったのはガソリン・スタンドだね。それからスナックのバーテン。本屋の<mark>店番</mark>もしたし、放送局で働いたこともある。土方もやった。化粧品のセールスもやった。セールスマンとしての僕の評判はかなりのものだった。それからいろんな女の子と寝た。違った名前と違った身の上で女の子と寝るというのもなかなか悪くない。\n\nまあ、そんなくりかえしさ。",
+        "recognitionTarget": "店番",
+        "jmdictId": "1440790",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1777187257984",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1777187257984,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "それが僕がジェイについて知っていることのすべてだった。彼は猫を飼っていて、一日に一箱煙草を吸い、酒は一滴も飲まない。\n\n僕は鼠と知りあうまで、いつも一人でジェイズ・バーに通いつづけた。僕はちびちびとビールを飲み、煙草を吸い、ジュークボックスに小銭を入れてレコードを聴いた。その頃のジェイズ・バーは大抵すいていて、僕とジェイはカウンターごしにいろんな話をした。どんな話をしたのかはまるで思い出せない。十七歳の無口な高校生と<mark>男やもめ</mark>の中国人のあいだにいったいどんな話題があったのだろう？\n\n僕が十八の歳に街を離れると鼠がそのあとを継いでビールを飲みつづけた。一九七三年に鼠が街を出てしまうと、そのあとを継ぐものは誰もいなかった。そしてその半年後には道路拡張のために店も移転することになった。そのようにして二代目のジェイズ・バーをめぐる我々の伝説は終った。",
+        "recognitionTarget": "男やもめ",
+        "jmdictId": "1792750",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "ambiguous",
+          "possibleSenseNumbers": [
+            1,
+            2
+          ]
+        },
+        "rationale": "The passage identifies J as an unattached man but does not say whether he is widowed, divorced, or a long-term bachelor."
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "provisional",
+        "reviewNote": "The relationship history needed to distinguish the two senses is absent."
+      }
+    },
+    {
+      "id": "animecards-focused-1778301012100",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1778301012100,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "羊博士の息子であるいるかホテル支配人の話によれば、羊博士のこれまでの人生は決して幸福なものではなかった。\n\n「父親は一九〇五年に仙台の旧<mark>士族</mark>の長男として生まれました」と息子は言った。「西暦年号で話すことになりますが、よろしいでしょうか？」\n\n「どうぞどうぞ」と僕は言った。",
+        "recognitionTarget": "士族",
+        "jmdictId": "1817440",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        },
+        "rationale": "旧士族 and the 1905 birth date identify the official historical shizoku class, while being born its eldest son also positively invokes a family of samurai lineage."
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Relabeled during model selection because 旧士族の長男 positively invokes both the historical class and the samurai-lineage family."
+      }
+    },
+    {
+      "id": "animecards-focused-1778652347663",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1778652347663,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "春がやってきた。二人の子供が生まれ、部落の人口は二十一人になった。妊婦は出産の二時間前まで野良で働き、翌朝にはもう畑に出ていた。新しい畑には玉蜀黍や馬鈴薯が植えられ、男たちは木を切り根を焼いて荒地を開墾した。生命が地表に顔を出し、若い実を結び、人々がほっと一息ついた頃にいなごの大群がやってきた。\n\n<mark>いなご</mark>の大群は山を越えてやってきた。はじめのうち、それは巨大な暗雲に見えた。次にぶうんという地鳴りがやってきた。いったい何が起ころうとしているのか、誰にもわからなかった。アイヌの青年だけがそれを知っていた。彼は男たちに命じて畑のあちこちに火を焚かせた。洗いざらいの家具に洗いざらいの石油をかけて火をつけた。そして女たちには鍋をもたせ、すりこぎで力いっぱい叩かせた。彼は（あとで誰もが認めたように）やれるだけのことはやったのだ。しかし全ては無駄だった。何十万といういなごは畑に降りて作物を思う存分食い荒した。あとには何ひとつ残らなかった。\n\nいなごが去ってしまうと青年は畑につっぷして泣いた。農民たちは誰も泣かなかった。彼らは死んだいなごをひとまとめにして焼き、焼き終るとすぐに開墾のつづきにかかった。",
+        "recognitionTarget": "いなご",
+        "jmdictId": "1167880",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1779592098102",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1779592098102,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "「誰に口止めされたんだい？」\n\n羊男は貝のように押し黙った。風が<mark>枯木</mark>のあいだで音を立てた。\n\n「誰も聞いてないよ」と僕はそっと言った。",
+        "recognitionTarget": "枯木",
+        "jmdictId": "1590720",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1779857318796",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1779857318796,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "「駄目です」と運転手が言う。「一度開けると二度と閉じることはできないんです。そんなことになったら、我々はみんな死んでしまいます」\n\n誰かが窓を開ける。ひどく寒い。<mark>かもめ</mark>の声が聞こえる。彼らのとがった声は僕の肌を切り裂く。\n\n「あなたは猫の名前を覚えていますか？」",
+        "recognitionTarget": "かもめ",
+        "jmdictId": "1181750",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The context identifies a gull but supplies no species evidence for the narrower common-gull sense."
+      }
+    },
+    {
+      "id": "animecards-focused-1779935783700",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1779935783700,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "はじめて自分だけの辞書を手に入れた荒木は、この書物に夢中になった。\n\n荒木の両親は荒物屋を営んでおり、仕入れや店番で忙しかった。必然的に息子に対しては、「他人さまに迷惑をかけず、元気でやっているならそれでいい」という教育方針だった。わざわざ辞書を買い与え、「勉強しろ」と言うような発想は両親にはなかった。荒木の両親にかぎらず、当時の大人の<mark>大半</mark>がそうだった。\n\n荒木ももちろん、勉強よりも外で友だちと遊ぶほうが好きだったから、小学生のころは、教室に一冊だけ置いてあった国語辞書のことなど、たいして気にもとめていなかった。たまに背表紙が視界に入るだけの、置物にすぎなかった。",
+        "recognitionTarget": "大半",
+        "jmdictId": "1414790",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        },
+        "rationale": "The majority of adults were so and adults were mostly so express the same learned fact through grammatical variants."
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "animecards-focused-1779936137431",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1779936137431,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "言われてみればそのとおりだ、と荒木は思った。「声」にはたしかに、「季節・時期などが近づくけはい」の意味もある。「犬」の一語に、多様な意味がこめられているのと同じように。語釈を読むと、ふだんから使っている言葉に思いがけない広がりと奥行きがあることに気づかされるのだった。\n\nそれにしても、「のどにある特殊器官」という説明は<mark>思わせぶり</mark>だ。荒木は父親に叱られたことも、かまってほしがってまとわりついてくる弟のこともほっぽって、なおも辞書を引いた。\n\nとくしゅ【特殊】①普通とは質的に違うこと。性質が特別であること。②［哲学］普遍に対し、その個個の場合・事物になるもの。",
+        "recognitionTarget": "思わせぶり",
+        "jmdictId": "1825730",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1780462805929",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1780462805929,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "「差し障りねえ……。あるんだな、これが」\n\n荒木に怒られ慣れている西岡は、まるでひるむところがない。「まじめのやつ、『新明解』の恋愛の項を引いては、<mark>一丁前</mark>に物思いにふけってんです。ぷぷぷ」\n\n物思いにふけりつつも、西岡よりよっぽど作業を進捗させたはずなのだけれど、そう反論して事を荒立てるのは馬締の本意ではない。",
+        "recognitionTarget": "一丁前",
+        "jmdictId": "1727700",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            2
+          ]
+        },
+        "rationale": "The adverbial 一丁前に describes the fully fledged manner in which he broods; it does not denote an adult person."
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Relabeled during model selection to distinguish semantic denotation from the related adult mockery implied by the speaker."
+      }
+    },
+    {
+      "id": "animecards-focused-1780465848016",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1780465848016,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "入って右手にある白木のカウンターには、八席。左手に四人がけのテーブルが三つ。奥は小上がりになっているようだ。こざっぱりとした空間は活気にあふれ、ほぼ満席だった。\n\nからの盆を持った香具矢が、小上がりから出てきた。一番<mark>下っ端</mark>の香具矢は、給仕係も兼任しているらしい。板前姿が、馬締の目にまぶしく映る。白い上着に、白い前掛け。髪はうしろでひとつに束ね、小さな白い板前帽をかぶっている。\n\n「いらっしゃいませ」",
+        "recognitionTarget": "下っ端",
+        "jmdictId": "1184330",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        },
+        "rationale": "Kaguya is both the underling and the lowest-ranking or lowly member."
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "animecards-focused-1780644311276",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1780644311276,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "「『謹啓吹く風に冬将軍の訪れ間近なるを感じる今日このごろですが、ますますご清栄のことと存じます』って、なんだそりゃ！」\n\n馬締の恋文執筆を隣から見守っていた西岡が、頬杖をはずして身を乗りだしてきた。「堅いんだよ、まじめは。企業のお詫び広告だって、そこまで<mark>しゃちほこばって</mark>ないぞ」\n\n「まずいでしょうか」",
+        "recognitionTarget": "しゃちほこばる",
+        "jmdictId": "2218980",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "rationale": "An apology advertisement can be overly formal or ceremonious but cannot itself become nervous or tense."
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "animecards-focused-1780646215312",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1780646215312,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "馬締は「いただきます」と頭を下げ、白菜の切れっ端に楊枝を刺した。心臓がうるさいほど鳴っていた。馬締の恋心を、タケおばあさんは快く思っていないのかもしれない。それはそうだろう。単なる店子のはずの馬締が、早雲荘の一階を本で侵食しつくすのみならず、孫娘にまで魔の手をのばそうというのだから。\n\nこれはもしかして、タケおばあさんにとっては、「<mark>庇を貸して母屋を取られる</mark>」を地でいく行為なのではあるまいか？いやいや、「魔の手」ってことはない。俺は真剣に香具矢さんと交際したいと思っている。もし、香具矢さんが了承してくれるのなら。\n\n「俺はほとんどまともにしゃべれなかったので、香具矢さんは退屈したのではないかと思います」",
+        "recognitionTarget": "庇を貸して母屋を取られる",
+        "jmdictId": "2419470",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1780889469082",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1780889469082,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "「そうだ！」\n\n馬締は突然叫び、手近にあった辞書を引きはじめた。「『<mark>おませ</mark>』は子どもの性別を問わず使いますが、『おしゃま』は女の子に対してしか言いませんよね。そのニュアンスのちがいを、どう表したらいいだろう」\n\n馬締はすぐ、べつのことを考えだすので、会話が中断してしまうのもしばしばだ。そのときも西岡は馬締を手伝い、「おませ」と「おしゃま」について、用例採集カードや各種辞書を調べるはめになった。",
+        "recognitionTarget": "おませ",
+        "jmdictId": "2019710",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The metalinguistic passage applies おませ to a child; the adjectival and noun senses express the same precocious-child fact."
+      }
+    },
+    {
+      "id": "animecards-focused-1780889472267",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1780889472267,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "「そうだ！」\n\n馬締は突然叫び、手近にあった辞書を引きはじめた。「『おませ』は子どもの性別を問わず使いますが、『<mark>おしゃま</mark>』は女の子に対してしか言いませんよね。そのニュアンスのちがいを、どう表したらいいだろう」\n\n馬締はすぐ、べつのことを考えだすので、会話が中断してしまうのもしばしばだ。そのときも西岡は馬締を手伝い、「おませ」と「おしゃま」について、用例採集カードや各種辞書を調べるはめになった。",
+        "recognitionTarget": "おしゃま",
+        "jmdictId": "2066430",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1781153489336",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1781153489336,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "直されたくないなら、もっと真剣に書け。あんな原稿を使えるわけないだろ。辞書読んだことないのか、おっさん。西岡は微笑みを崩さず、口を開いた。\n\n「大変申し訳ありません。しかし、辞書は<mark>文体</mark>を統一しなければならないので……。どうかご了承いただけないでしょうか」\n\n「あの訂正案を書いたのは、西岡さんですか」",
+        "recognitionTarget": "文体",
+        "jmdictId": "1505510",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "In this editorial dispute, 文体を統一する means standardizing the contributors' writing style. The context does not contrast classical and modern forms of written language."
+      }
+    },
+    {
+      "id": "animecards-focused-1781492220965",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1781492220965,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "「辞書の編纂に疲れた。楽しい気分になりたい。そう思う編集部員は、西岡正志までご一報を。masanishi@genbushobo.co.jp」\n\n西岡さん？たしか、宣伝広告部だか販売部だかにいる、まじめさんと同じぐらいの年のひとだ。岸辺は記憶を探る。話したことはないけれど、顔はわかる。チャラチャラした恰好で、よく本館の廊下を歩いている。浮ついた外見とは裏腹に、子どもが四人もいて、しかもけっこう<mark>子煩悩</mark>らしいという噂も聞いた。本当かどうかはわからない。\n\n岸辺は、「疲れた」などと言えるような身ではない。なにしろ辞書編集部に来て、まだ三日だ。それでも、「楽しい気分になりたい」のはたしかだし、戸惑いや不安を話せる相手が欲しい。かつて辞書編集部に在籍していた西岡なら、岸辺の相談に乗ってくれるのではないか。",
+        "recognitionTarget": "子煩悩",
+        "jmdictId": "1308040",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1781672963533",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1781672963533,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "岸辺が不服そうに言ったからか、宮本は首をひねった。\n\n「ええと、<mark>ニューハーフ</mark>も入れたほうがいいとか、そういうことですか」\n\n「性別を男と女に二分して説明するのが、生物学的観点からしても、やや時代遅れなのではないかと。ひとつの言葉を説明するために、もうひとつの言葉を持ちだして、『これではないもの』と定義づけるのは、辞書ではよく見られる手法です。だけど、『右』と『左』だって、記述が工夫されてるんですよ」",
+        "recognitionTarget": "ニューハーフ",
+        "jmdictId": "1637800",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1781848660170",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1781848660170,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "赤シャツはいつも、妙な節をつけて馬締を呼ぶ。\n\n「ありがとうございます。しかし、これはもしや、銀の<mark>箔押し</mark>ですか？」\n\n馬締は箱とカバーを指して言った。箔押しだと豪華さは出るが、金がかかりすぎる。",
+        "recognitionTarget": "箔押し",
+        "jmdictId": "1690690",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "rationale": "The source explicitly says silver foil stamping, excluding the gold-tooling sense."
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "animecards-focused-1781933019442",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1781933019442,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "会場の奥には腰ぐらいの高さのテーブルが設置され、『大渡海』と松本先生の遺影が花に囲まれて飾られていた。二合の酒とお猪口も供えられており、祭壇のようだ。来場した松本先生の奥さんが、まぶしそうに先生と辞書を見つめた。\n\n学生アルバイトのみなさんを呼べなかったのは残念です。馬締はそう思いつつ、立食形式の会場内をまわって出席者に礼を述べた。総勢五十名を超える学生がパーティーに来たら、<mark>イナゴ</mark>の群れに襲われた田んぼのように料理が跡形もなくなってしまう。玄武書房の経費はそこまで潤沢ではないので、学生はべつの日に、居酒屋で労をねぎらうことに決まったのだった。\n\n今夜は、主な書店や大学図書館の関係者も招かれている。二週間ほどまえに発売となった『大渡海』は、評判も上々。書店での売れゆきは、いまのところ当初の予想を上回る好調ぶりだ。パーティーはさらなる注文を取る好機とばかりに、玄武書房の営業部の面々は張り切っていた。販売部や宣伝広告部の人員も、お酌をしたり談笑したりと、関係者への接待に忙しい。",
+        "recognitionTarget": "イナゴ",
+        "jmdictId": "1167880",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            2
+          ]
+        },
+        "rationale": "The analogy invokes ordinary swarming locust behavior. A rice field does not identify genus Oxya, so the narrower taxonomic rice-grasshopper sense must not be assumed."
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The locust analogy supplies no taxonomic evidence for the narrower genus Oxya sense."
+      }
+    },
+    {
+      "id": "animecards-focused-1782102133357",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1782102133357,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "これまでぼくはたくさんの人間を殺してきた。おもに銃と弾丸で。\n\n刃物で殺したこともあるが、正直言ってあまり好きなやりかたじゃない。同僚にはその種のやりかたを専門に請け負うプロフェッショナルが<mark>おおぜい</mark>いる。背後から音もなく接近し、喉笛を切り裂き、次いで得物を構えた両腕の腱を断ち、そのまま内腿の大動脈を切り裂いて、最後に心臓に突き立てるまで、三秒とかからない連中が。\n\nその種の技術を極めようとは思わないが、必要とあらばこなす自信はもちろんあるし、それになにより馴染みぶかい銃と弾丸で、ぼくはこれからまだしばらくは殺しつづけるだろう。というのも、二〇〇一年のある朝、ニューヨークに建っていたのっぽなふたつのビルに、航空機が勢いよく突っこんだからだ。",
+        "recognitionTarget": "おおぜい",
+        "jmdictId": "1414220",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1782105636112",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1782105636112,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "次に殺す相手の顔に、名前に、行動パターンに、家族構成に、政治的傾向に、すべての情報に、その人物の人生が染みついていた。特殊部隊員は人間を観察する手法を多かれ少なかれ訓練で叩きこまれている。というのも、特殊部隊というのは別にドンパチだけが専門ではなく、むしろ後進国の軍隊を訓練したり、敵対勢力内にある現地人を医療や教育や灌漑によって教化したりするといった任務のほうが多いからだ。そういう現場で大切なのはコミュニケーション技術なので、つまるところ人付き合いの苦手な一匹狼は特殊作戦の世界には向かない。そういう人間はむしろ傭兵になる──と言いたいところだが、傭兵の仕事も貧乏国軍の戦術指導だったりするから、同じようなもんだ。\n\n特殊検索群ｉ分遣隊の連中はそれに加えて、心理チャートを読みこんでその人物像を明確に想定することができるような、心理学の教練課程を受けている。実行に際して政治的リスク──倫理的バイアスと言い換えてもいい──が減ったとはいえ、暗殺そのものはいまだに困難でデリケートな任務だ。一二三三三号が発せられた背景に、ＣＩＡの<mark>立案</mark>した作戦の山ほどの失敗があったように、暗殺というのは素人の手に負えるものではない。\n\n準軍事作戦、と言ってみたところで、その言葉が意味するのは結局のところＣＩＡによる軍隊のママゴトにすぎなかった。だからこそ、情報軍とその特殊作戦部門である特殊検索群のような、新しいカテゴリの軍隊が生まれたのだ。かつてＣＩＡが担っていた諜報能力のいくぶんかを引き継いだ軍事集団。スパイと兵士のハイブリッド。二十一世紀のインテリジェンス活動は、文民的であるより軍事的であることが求められている。戦場の情報は流動的であり、そしていまやあらゆる場所が戦場だからだ。",
+        "recognitionTarget": "立案",
+        "jmdictId": "1551590",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1782189652548",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1782189652548,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "シンプルな世界観だった。ウィリアムズはどんな形であれ国というものの無謬性をまだ信じている。もちろん、それはこの仕事が要請したシンプルさであり、盲目さでもあるだろう。そういう世界観を維持しなければ、見ず知らずの個人を意識して殺し、殺して、殺し続けることなどできはしまい。\n\n心の健康を保つためには、深く考えないのがいちばんだし、そのためにはシンプルなイデオロギーに主体を明け渡すのが<mark>ラクチン</mark>だ。\n\n倫理の崖っぷちに立たせられたら、疑問符などかなぐり捨てろ。",
+        "recognitionTarget": "ラクチン",
+        "jmdictId": "1983530",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1782276880544",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1782276880544,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "なぜ、対立がここまで深刻になったのか。なぜ、虐殺が引き起こされるまでに、憎悪が急速に膨張していったのか。それこそ指数的な勢いで。それに関するまともな仮説を立てられる学者は、いまのところいなかった。\n\n敵との遭遇は絶対に避けなければならなかった。とりわけ、標的を暗殺する前は。見つかったら最後、<mark>無線</mark>連絡が標的を目標地点から遠ざけてしまう。多少の軍勢に囲まれても、ぼくたちの練度と装備ならば、脱出地点まで逃げ切るのはそう難しいことではないだろうが、作戦そのものは失敗だ。\n\n二時間分の強行軍ののち、ぼくらは一休みすることにした。ほとんど走るようなスピードで来たために、ウィリアムズは息が上がる寸前だったし、ぼくもかなりつらかった。草むらに隠れて横たわると、ナノコーティングが周囲の色相をスキャンして、リアルタイムで変化するパターンを生成する。環境追従迷彩。潜伏にはありがたいテクノロジーの魔法だ。",
+        "recognitionTarget": "無線",
+        "jmdictId": "1530380",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1782530981329",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1782530981329,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "それ以外選べなかった手段としての自殺ではあるけれど、方法を選ぶことはできたようだ。父は誰もいない家で、何度か首をつろうとして失敗したあと、結局はこの国でいちばん人気のある方法に落ち着いたらしい。つまりは手っ取り早く銃で頭を撃ちぬいたのだ。アメリカ人の自殺者の半分はこれを使う。それは父が死んで二十年以上たったいまも変わらない。銃は自由をもたらす。お手軽に死ぬ自由さえも──どれくらいお手軽かというと、成人となると七割がたこれなのだ。ホームレスからＣＥＯまで、銃はあまねく合衆国市民に自死する機会を与えてくれる。ヘミングウェイもハンター・トンプソンもカート・コバーンも銃で頭を撃ちぬいたし、準備もそれほど必要ないから、ポケットからさくっと取り出していきなり死んで見せることもできる。バド・ドワイヤーが記者会見でいきなり自分の頭を撃ちぬいて見せた映像は、まだまだウェブの至るところに落ちているはずだ。残念ながら、銃が身近にない未成年者は首をつったりするしかない。これがアメリカの自殺人気では二番手だ。\n\n正確な死亡時刻はわからない。というのも、その頃はまだ銃を登録する制度そのものがなくて、当然ながら<mark>市販</mark>されている銃器はタグ付けされていなかった。いまなら銃を使って自殺すれば、グリップに埋めこまれた連邦統合銃火器管理タグが、発砲の一発一発を記録してアルコール・タバコ・火器・爆発物取締局のデータベースへと送信しているから、その銃がいつ自分の所有者の頭をぶち抜いたかが秒単位でわかる。データベースに記録されたその数字が、自殺者の墓標になるわけだ。が、父さんの時代にはそんな便利な仕組みはなく、父さんは皆が出払っていた家で、午後のどこか、漠然とした時間帯に死んだ。\n\nどうして父が少しばかり面倒くさい二番人気を最初に試したのか、当然ながらいまもってわからない。なぜ死んだのですか、どうして銃を使おうと思ったのですか。死人に自殺のディテールを訊くことはできない。死人には問うことも、許しを請うこともできない。",
+        "recognitionTarget": "市販",
+        "jmdictId": "1308660",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        },
+        "rationale": "市販されている simultaneously says that the guns were put on the market and are commercially available."
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "animecards-focused-1782959244591",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1782959244591,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "会社や役所の中で、それを統合してデータを共有したならば煩雑な手仕事が圧倒的に減るはずなのに、開発陣の人間関係やらシステムの発注先やらの歴史的経緯で、リンクされないままになっているインフラがあったりはしないだろうか。そんなあほらしい非効率を国家単位──それも世界最大の──にまで拡大したのが、かつてのアメリカ合衆国の情報システムだった。\n\n仕事がかぶっていることも知らずに、現場で出会いがしらにパニックに陥る。デジタルデータがあるのにファックスで送らせて手打ちで再入力する。あの機関が知っていれば作戦が成功したはずの情報を別の機関が持っていることに気がつかないで、悲惨な状況へまっしぐら。おのおのが自分の機関の殻に引き籠もって矮小な「社会」を築きながら、<mark>てんでばらばら</mark>に動く。それが情報機関の日常風景だった。\n\nとはいうものの、ＷＴＣがニューヨークから消えたあとの世界では、そういうわけにもいかなくなった。",
+        "recognitionTarget": "てんでばらばら",
+        "jmdictId": "2662910",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "おのおのが自分の and the uncoordinated action support both grammatical formulations of acting separately."
+      }
+    },
+    {
+      "id": "animecards-focused-1783053643750",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1783053643750,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "拠点にまっすぐ帰るわけにはいかない。ルツィアに気づかれないよう裏に回ってはいるものの、いくらなんでも真正面の建物に入ったら、ついてきた尾行者に笑われてしまう。尾行者はすでに、ぼくらがルツィアの家の前で覗きをしていることに気がついているだろうか。\n\nもちろん、想定された事態だ。ジョン・ポールのものかどうかわからないが、組織的存在を<mark>相手にする</mark>ことを想定してはいたから、チェコにも時差をおいて入国したし、ルツィアの部屋にいるときでも、身に着けた各種センサの情報を無線でリアルタイムにデータ転送することは避けてきた。\n\nぼくは後頭部を搔いた。尾行があるということをウィリアムズに知らせるためだ。ぼくはプラハの街中に出て、尾行の正体を確かめることにする。",
+        "recognitionTarget": "相手にする",
+        "jmdictId": "2572400",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        },
+        "rationale": "Dealing with the organization and taking it on as an adversary overlap in this security context."
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "組織的存在を相手にする means taking the organization on as an opponent, while also literally dealing with it; JMDict’s two formulations overlap for this use."
+      }
+    },
+    {
+      "id": "animecards-focused-1783315144908",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1783315144908,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "「やめてくれ」\n\n「人間は脳細胞だし、水だし、炭素化合物だ。とてつもなく長いけれど、ちっぽけなＤＮＡの塊だ。人間は生きているときから物質なんですよ。その人工筋肉と同じように、ね。この物質以外に魂を求めたって、そこから倫理や<mark>崇高</mark>さが出てくるように思うのは欺瞞ですよ。罪も地獄も、まさにそこにあるんです」\n\n石畳が吹き飛んだ。",
+        "recognitionTarget": "崇高",
+        "jmdictId": "1372860",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1783393651646",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1783393651646,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "そう、たしかにいま生死の境を彷徨っているのはほかならぬ自分の母親だ。とはいえ、息切らせてあわただしく病院へ駆けつけるには、ぼくの職業は死が日常すぎ、馴染み深い風景でありすぎた。身近な範囲に限っても、ある日突然いなくなってしまった父がいて、小児ガンで死んでしまった友達がいて、これだけ人がぼくの目の前から消えていってしまっているのに、いまさらどうしてあわてるなどという贅沢が許されよう。\n\nぼくは歩いた。自分の<mark>宿舎</mark>から、飛行機に乗ってワシントンへ飛び、タクシーを拾い、病院にたどり着くまでのあいだ、一歩も走ることはなかった。悲しみに胸を塞がれてはいたが、残酷なことにぼくにとってこれは突然の不幸などではなく、世界というものがそうあるべき唐突さを、またあらためて剝き出しにしたにすぎなかった。世界はいつも突然だ。いつもそうあるものに驚くことはできない。\n\n夏だった。八月のうだるワシントンからひんやりした病院に入り、受付で認証する。オルタナによるガイドをお望みですか、と訊かれて、ぼくははじめてコンタクトを忘れてきたことに気がついた。空港でも、タクシーのなかでも、ぼくはオルタナのことをすっかり忘れていたのだ。デバイスをつけてこなかったと答えると、病院はぼくを誘導すべき人物と認識してくれて、足許の床に誘導マーカーが現れる。床を池とした魚のように、黒いマーカーは病院の圧力抑滑素材の床面を泳ぎ、ぼくをＩＣＵのほうに連れてゆく。患者たちを誘導するマーカーで、病院の床面はにぎやかだ。",
+        "recognitionTarget": "宿舎",
+        "jmdictId": "1337240",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "rationale": "The source establishes lodging but gives no positive evidence for government-employee housing."
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "animecards-focused-1784011606705",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1784011606705,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "倫理的ノイズ。確かに戦場において、度を越した倫理道徳の類は致命傷になりうる。感情とは価値判断のショートカットだ。理性による判断はどうしても処理に時間を要する。というより究極的には、理性に価値判断を任せていては人間は物事を一切決定することができない。完全に理性的な存在があったとして、それがすべての条件を考慮したならば、なにかを決めるということ自体不可能だろう。\n\nかといって野獣では任務をこなしようがない。殺すべき相手、負傷させるべき相手、それを<mark>適宜</mark>判断し戦う。殺すのは獣にでもできるが、戦うのは人間にしかできない。本能ではなく、あくまで自由意思から、相手を無力化するという行為は。\n\n「人間の行動や思考は、脳内の膨大なモジュールの連合として生成されるものです。行動や判断のライブラリを参照しながらね。良心もそうです。生存にプラスである協力的行動、利他的行動をとるよう、人間の神経回路は接続されています。良心の座は、人間の脳に実体としてあるんですよ。眼窩前頭皮質や上側頭溝、扁頭体に分散する特定の座標ですね」",
+        "recognitionTarget": "適宜",
+        "jmdictId": "1437380",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        },
+        "rationale": "Judging appropriately and making a suitable judgment are adverbial and adjectival restatements of the same use."
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "animecards-focused-1784012278746",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1784012278746,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "「では、意識はないのですね」\n\n母さんの容態について、その質問、というよりも確認を、ぼくは何度しなければならなかったのだろうか。いまとなっては憶えているはずもないけれど、相当数のカウントになるだろう。その<mark>設問</mark>自体が間違っていることを呑みこむのに、ぼくは相当の努力を要した。努力によって理解が得られたか、それについても自信がない。\n\n医者は壁のスライス画像を見つめ、再び口をつぐんで思考のなかに退いてゆく。ややあってから、考えがまとまったのか口を開いた。",
+        "recognitionTarget": "設問",
+        "jmdictId": "1386080",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1784516631870",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1784516631870,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "「こっちが本業さ」\n\nぼくは<mark>防塵</mark>ゴーグル越しにジョン・ポールの瞳を覗きこみ、\n\n「ルツィアはどこだ」",
+        "recognitionTarget": "防塵",
+        "jmdictId": "1520460",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1784601920981",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1784601920981,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "ジョン・ポールのそうした指摘に、ぼくはまったく反論できなかった。\n\nしかし──プラハの夜と違って、ジョン・ポールはちくちくとぼくを言葉で突くことにいささか興奮を覚えているようだ。<mark>進退窮まって</mark>恐怖で饒舌になっているのだろうか。ジョン・ポールはよく喋った。この状況を楽しんでいるようにすら見える。焦りの色を隠しているのだとしても、この朗らかさはちょっとありえない。恐怖から発した明るさ特有の、恍惚に似た異常さが見られない。この男には妙な余裕がある。\n\nそこでぼくは唐突に思い至る。",
+        "recognitionTarget": "進退窮まる",
+        "jmdictId": "1884050",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1784770345539",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1784770345539,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "応答はなかった。\n\nぼくは客車の陰に隠れるようにして、慎重に、だが可能な限り急ぎながら進んでいった。意識を取り戻した乗客たちの悲鳴やうめき声が<mark>合唱</mark>となって奇妙な音楽をかたちづくる。これがＥの字の連中が言っていた「リゲティ」だろうか。客車の外へ這い出てきて、逃げ出すものも多くなってきた。運のいい生存者たちが回復しはじめているようだ。\n\nと、目の前を横切ろうとした負傷者の頭が吹っ飛んだ。ぼくを狙って飛んできた弾丸だ。",
+        "recognitionTarget": "合唱",
+        "jmdictId": "1284870",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "animecards-focused-1785043743117",
+      "provenance": {
+        "corpus": "Animecards focused review",
+        "sourceNoteId": 1785043743117,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json"
+      },
+      "input": {
+        "context": "体重がなくなって、ポッドが宙に放たれたのがわかる。直後、轟音がしてポッドがめちゃめちゃに揺すぶられた。シーウィードにミサイルが当たったのかもしれない。しかし、懸架装置を通じた有線を断って無線封鎖状態に入ったぼくには、もはやパイロットはおろかウィリアムズと連絡をとることもできなかった。\n\n思えばジョン・ポールがらみの作戦はいつも、ポッドによるＨＡＬＯ侵入だな、とぼくは思う。<mark>陸路</mark>や海岸からの侵入は、ことジョン・ポールに関する限り一度もなかった。例外といえるのは、プラハでやったスパイの真似事だけだ。ジョン・ポールに会うときは、いつもこうして、何かから生まれなければならないのだろうか。まるで儀式だ。呪い師の謁見を賜るための。\n\n投下地点のずれと衝撃波によるコースの乱れを計算したポッドが、すばやく判断して全身のスラスターを調整する。ヴィクトリア湖がいくら広いとはいえ、切り離し時の状況と高度を考えれば、無事湖面のどこかに着水できるかどうかは楽観できない。",
+        "recognitionTarget": "陸路",
+        "jmdictId": "1551150",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "corpus-replay"
+      }
+    },
+    {
+      "id": "design-見込み-multiple-sense-subset",
+      "provenance": {
+        "corpus": "Miwake Cards design examples",
+        "artifact": "DESIGN.md"
+      },
+      "input": {
+        "context": "来年3月に学校を卒業する<mark>見込み</mark>だ。",
+        "recognitionTarget": "見込み",
+        "jmdictId": "1604480",
+        "compatibleSenseNumbers": [
+          1,
+          2,
+          3
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        },
+        "rationale": "Both possibility or likelihood and expectation or forecast describe the expected graduation, while the structural-member sense does not."
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Normative multiple-sense-subset example from DESIGN.md."
+      }
+    },
+    {
+      "id": "known-failure-キャッチ-physical-ball",
+      "provenance": {
+        "corpus": "Ankidrone JLPT Tango N1",
+        "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Ankidrone JLPT Tango N1",
+          "entry": "キャッチ"
+        }
+      },
+      "input": {
+        "context": "高く上がったボールを見事に<mark>キャッチ</mark>した。",
+        "recognitionTarget": "キャッチ",
+        "jmdictId": "1041530",
+        "compatibleSenseNumbers": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            2
+          ]
+        },
+        "rationale": "The high fly-ball context demonstrates the baseball-specific catch sense rather than the entry's broader catch or obtain-information sense."
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic selected sense 2 only in the 2026-07-30 preference worksheet."
+      }
+    },
+    {
+      "id": "known-failure-息が切れる-exertion",
+      "provenance": {
+        "corpus": "Ankidrone JLPT Tango N1",
+        "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Ankidrone JLPT Tango N1",
+          "entry": "息が切れる"
+        }
+      },
+      "input": {
+        "context": "そんなに頑張りすぎると、途中で<mark>息が切れる</mark>よ。",
+        "recognitionTarget": "息が切れる",
+        "jmdictId": "2656000",
+        "compatibleSenseNumbers": [
+          1,
+          2,
+          3
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "ambiguous",
+          "possibleSenseNumbers": [
+            1,
+            2
+          ]
+        },
+        "rationale": "頑張りすぎる and 途中で exclude death but do not settle literal breathlessness versus figuratively running out of steam."
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "頑張りすぎる and 途中 exclude death but do not distinguish physical breathlessness from figuratively running out of steam."
+      }
+    },
+    {
+      "id": "prompt-control-くよくよ-grammatical-overlap",
+      "provenance": {
+        "corpus": "Reviewed prompt control",
+        "artifact": "card_field_generation/src/sense_selection_few_shots.ts"
+      },
+      "input": {
+        "context": "失敗は誰にでもあるのだから、いつまでも<mark>くよくよ</mark>していないで。",
+        "recognitionTarget": "くよくよ",
+        "jmdictId": "1003930",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        },
+        "rationale": "くよくよして expresses the same fretting fact through the entry's suru and adverbial grammatical formulations."
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Both senses describe the same learned fretting behavior in this construction."
+      }
+    },
+    {
+      "id": "prompt-control-木綿-song-title",
+      "provenance": {
+        "corpus": "Reviewed prompt control",
+        "artifact": "card_field_generation/src/sense_selection_few_shots.ts"
+      },
+      "input": {
+        "context": "箸をマイクにして『<mark>木綿</mark>のハンカチーフ』を熱唱している。",
+        "recognitionTarget": "木綿",
+        "jmdictId": "1534870",
+        "compatibleSenseNumbers": [
+          1
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "rationale": "The compositional song title uses 木綿 for the handkerchief's cotton material."
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Being inside a title does not make this material noun opaque; the title composition supplies its ordinary meaning."
+      }
+    },
+    {
+      "id": "animecards-null-1734329958347-金子",
+      "provenance": {
+        "corpus": "Animecards conversion",
+        "sourceNoteId": 1734329958347,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-all-compatible-v3.enriched.json"
+      },
+      "input": {
+        "context": "石神の丸い背中が通りに出ていくのを見送りながら、世捨て人の雰囲気のある彼にも訪ねてくる友人がいるのだなと意外に思った。\n\n朝のピーク時が過ぎると、いつものように奥で小代子たちと休憩を取ることにした。小代子は甘いものが好きだ。大福を彼女は出してくれた。辛党の米沢は関心がなさそうな顔をして茶を啜っている。バイトの<mark>金子</mark>は配達中だ。\n\n「昨日は、あれからもう何もいってこなかった？」茶を一口飲んでから小代子が訊いた。",
+        "recognitionTarget": "金子",
+        "jmdictId": "1630340",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "no-match"
+        },
+        "rationale": "金子 is a person's surname here, so neither the money nor gold-coin sense applies."
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "animecards-null-1780037843564-さかしま",
+      "provenance": {
+        "corpus": "Animecards conversion",
+        "sourceNoteId": 1780037843564,
+        "artifact": "anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-all-compatible-v3.enriched.json"
+      },
+      "input": {
+        "context": "「うん。では、『しま』だったら、どう説明する」\n\n「ストライプ、アイランド、地名の志摩、『よこしま』や『<mark>さかしま</mark>』のしま、揣摩憶測するの揣摩、仏教用語の四魔……」\n\n馬締が、「しま」という音から導きだされる単語の候補を次々に挙げだしたので、荒木は急いでさえぎった。",
+        "recognitionTarget": "さかしま",
+        "jmdictId": "1445760",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "no-match"
+        },
+        "rationale": "The speaker cites さかしま only as an example containing the sound しま; neither dictionary meaning is used."
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "animecards-wrong-entry-1727935576331-一行",
+      "provenance": {
+        "corpus": "Animecards manual correction",
+        "sourceNoteId": 1727935576331,
+        "artifact": "anki_updater_prototype/generated/surfacepro11-jmdict-corrections-final-2026-07-28.context.json"
+      },
+      "input": {
+        "context": "百年の出来事でも、歴史の本にまとめてしまうと十ページにおさまってしまう。下手したら<mark>一行</mark>なんていうこともある。",
+        "recognitionTarget": "一行",
+        "jmdictId": "2833774",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "no-match"
+        },
+        "rationale": "一行 means one line of text here, so neither the party/group sense nor the one-act sense in the supplied entry applies. The card was manually corrected to JMDict entry 1576020."
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "The user explicitly accepted correcting this Animecard from the wrong entry 2833774 to the one-line entry 1576020."
+      }
+    },
+    {
+      "id": "known-failure-大綱-outline",
+      "provenance": {
+        "corpus": "known-failures",
+        "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Animecards conversion",
+          "entry": "大綱"
+        }
+      },
+      "input": {
+        "context": "羊博士は本土と満州とモンゴルにおける緬羊増産計画の<mark>大綱</mark>をまとめた後、現地視察のために翌年の春満州に渡った。",
+        "recognitionTarget": "大綱",
+        "jmdictId": "1661030",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        },
+        "rationale": "In 計画の大綱をまとめる, the plan's main lines and its outline express the same learned fact; retain both overlapping JMDict formulations."
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "known-failure-甲子園-qualification",
+      "provenance": {
+        "corpus": "known-failures",
+        "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Animecards conversion",
+          "entry": "甲子園"
+        }
+      },
+      "input": {
+        "context": "<mark>甲子園</mark>出場を賭けた地区大会で優勝した時の写真もある。",
+        "recognitionTarget": "甲子園",
+        "jmdictId": "2092720",
+        "compatibleSenseNumbers": [
+          1,
+          2,
+          3
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2,
+            3
+          ]
+        },
+        "rationale": "In this conventional proper-name usage, the stadium and the two national high-school tournaments are tightly linked facets of 甲子園; the card should teach all three rather than force a distinction the encounter does not pedagogically require."
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic selected all three senses in the 2026-07-30 preference worksheet, overturning the previous agent-reviewed [2,3] ambiguity label."
+      }
+    },
+    {
+      "id": "known-failure-摘む-tasting",
+      "provenance": {
+        "corpus": "known-failures",
+        "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Ankidrone JLPT Tango N1",
+          "entry": "摘む",
+          "context": "盛り付けの前に、少し摘んで味見をする。"
+        }
+      },
+      "input": {
+        "context": "盛り付けの前に、少し<mark>摘んで</mark>味見をする。",
+        "recognitionTarget": "摘む",
+        "jmdictId": "1598080",
+        "compatibleSenseNumbers": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        },
+        "rationale": "味見 establishes both picking up a small amount and eating it, so the physical and eating senses overlap in this event."
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "known-failure-摘む-nose",
+      "provenance": {
+        "corpus": "known-failures",
+        "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Ankidrone JLPT Tango N1",
+          "entry": "摘む",
+          "context": "変な臭いがして鼻を摘んだ。"
+        }
+      },
+      "input": {
+        "context": "変な臭いがして鼻を<mark>摘んだ</mark>。",
+        "recognitionTarget": "摘む",
+        "jmdictId": "1598080",
+        "compatibleSenseNumbers": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "rationale": "鼻を摘む is physically pinching or holding the nose between the fingers."
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-sense-1685762713860-勢い",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1685762713860,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-sense-results.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "subsection": "Duplicate-aware batch",
+          "entry": "勢い"
+        }
+      },
+      "input": {
+        "context": "あの<mark>勢い</mark>でお代わりされると、ご飯が足りなくなる恐れがある。",
+        "recognitionTarget": "勢い",
+        "jmdictId": "1375040",
+        "compatibleSenseNumbers": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            3
+          ]
+        },
+        "rationale": "あの勢いでお代わりされる describes both the vigor or force of the repeated action and continuing at that pace or momentum. Those ordinary readings overlap here; the context excludes authority and the adverbial inevitability sense."
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Added during final hint audit after discovering that the historical hint fixture supplied an incomplete selected usage. Opus chose sense 3, Sonnet chose sense 1, and Gemini and GPT-5.6 Sol independently selected both; the overlap is appropriate under the multi-label policy."
+      }
+    },
+    {
+      "id": "preference-worksheet-つきもの-overlap",
+      "provenance": {
+        "corpus": "2026-07-30 card-generation preference worksheet",
+        "artifact": "Preference worksheet completed 2026-07-30"
+      },
+      "input": {
+        "context": "スタンドアロンRPGには<mark>つきもの</mark>の勝利ファンファーレが聞こえてきそうだ。",
+        "recognitionTarget": "つきもの",
+        "jmdictId": "1495730",
+        "compatibleSenseNumbers": [
+          1,
+          2,
+          3
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        },
+        "rationale": "A victory fanfare is both a natural accompaniment to this kind of RPG and an expected part and parcel of it; the encounter genuinely invokes the overlap between senses 1 and 2."
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic selected senses 1 and 2 in the 2026-07-30 preference worksheet."
+      }
+    },
+    {
+      "id": "preference-worksheet-ひたと-staring",
+      "provenance": {
+        "corpus": "2026-07-30 card-generation preference worksheet",
+        "artifact": "DESIGN.md and preference worksheet completed 2026-07-30"
+      },
+      "input": {
+        "context": "ヒースクリフは<mark>ひたと</mark>こちらを見据えた。",
+        "recognitionTarget": "ひたと",
+        "jmdictId": "1430680",
+        "compatibleSenseNumbers": [
+          1,
+          2,
+          3
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            2
+          ]
+        },
+        "rationale": "見据えた directly demonstrates the adverbial staring sense; neither physical closeness nor suddenly stopping applies."
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic selected sense 2 only in the 2026-07-30 preference worksheet, independently confirming the existing DESIGN.md example."
+      }
+    },
+    {
+      "id": "preference-worksheet-不味い-interjection",
+      "provenance": {
+        "corpus": "Ankidrone JLPT Tango N1",
+        "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Ankidrone JLPT Tango N1",
+          "entry": "不味い"
+        }
+      },
+      "input": {
+        "context": "<mark>不味い</mark>。彼との約束を忘れてた。",
+        "recognitionTarget": "不味い",
+        "jmdictId": "1495000",
+        "compatibleSenseNumbers": [
+          4,
+          5
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            5
+          ]
+        },
+        "rationale": "The standalone reaction announces a newly realized problem, which is the lexicalized interjection sense. The following sentence supplies its trigger; it does not make the adjectival problematic or unwise sense an additional learner-facing analysis."
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic selected sense 5 only in the blinded 2026-07-30 preference worksheet."
+      }
+    }
+  ]
+}

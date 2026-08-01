@@ -1,0 +1,86 @@
+{
+  "id": "1376260",
+  "kanji": [
+    {
+      "common": false,
+      "text": "整理券",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "せいりけん",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "numbered ticket (e.g. to determine order of service in shop, etc.)"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "zone ticket"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "boarding ticket"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": "explanation",
+          "text": "bus ticket dispensed at boarding, used to show where one boarded"
+        }
+      ]
+    }
+  ]
+}

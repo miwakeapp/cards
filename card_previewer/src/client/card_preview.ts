@@ -73,7 +73,7 @@ const cardStage = document.querySelector<HTMLElement>(".card-stage")!;
 let fixtures: PreviewFixture[] = [];
 let currentFields: CardFields;
 let modelAssets: ModelAssets;
-let renderTimer: number | undefined;
+let renderTimer: ReturnType<typeof setTimeout> | undefined;
 
 initialize().catch((error) => {
   console.error(error);

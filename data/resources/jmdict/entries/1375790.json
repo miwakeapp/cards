@@ -1,0 +1,96 @@
+{
+  "id": "1375790",
+  "kanji": [
+    {
+      "common": true,
+      "text": "成長",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "せいちょう",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "growth"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "development"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "growing up"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "becoming an adult"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "growth (of a company, the economy, etc.)"
+        }
+      ]
+    }
+  ]
+}

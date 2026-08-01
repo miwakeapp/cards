@@ -143,8 +143,14 @@ export async function fetchMiwakeNotes(
 export interface NoteFieldUpdate {
   noteId: number;
   /** Values the fields must still have for the update to proceed. */
-  expect: { key: string; reading: string; dictionaryEntry: string; hint: string };
-  /** New field values; only present keys are written. */
+  expect: {
+    key: string;
+    recognitionTarget: string;
+    reading: string;
+    dictionaryEntry: string;
+    hint: string;
+  };
+  /** New field values; only present keys are written. Recognition target is never updated. */
   set: { key?: string; reading?: string; dictionaryEntry?: string; hint?: string };
 }
 
@@ -189,6 +195,9 @@ export async function applyNoteUpdate(
   const mismatches: string[] = [];
   if (snapshot.fields.key !== update.expect.key) {
     mismatches.push("Key");
+  }
+  if (snapshot.fields.recognitionTarget !== update.expect.recognitionTarget) {
+    mismatches.push("Recognition target");
   }
   if (snapshot.fields.reading !== update.expect.reading) {
     mismatches.push("Reading");

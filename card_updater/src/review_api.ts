@@ -11,7 +11,10 @@ export interface ReviewMeta {
   ankiProfile: string;
   limit: number | undefined;
   dryRun: boolean;
-  modelId: ModelId;
+  /** Explicit provider model override used for on-demand reruns, if the CLI supplied one. */
+  modelOverride?: ModelId;
+  /** Actual model-and-effort identities represented by pre-worked suggestions. */
+  modelConfigurationIds: string[];
   jmdict: EnsureLatestResult;
   furigana: EnsureLatestFuriganaResult;
   scannedCount: number;

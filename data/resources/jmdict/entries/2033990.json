@@ -1,0 +1,151 @@
+{
+  "id": "2033990",
+  "kanji": [
+    {
+      "common": false,
+      "text": "掛かり",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "掛り",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "がかり",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "suf"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "taking a quantity (of time, people, etc.)"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "suf"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "similar to ..."
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "suf"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "dependent on ..."
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "reliant on ..."
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "suf"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [
+        "after the -masu stem of a verb"
+      ],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "while ..."
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "when ..."
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "in the midst of ..."
+        }
+      ]
+    }
+  ]
+}

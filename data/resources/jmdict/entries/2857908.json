@@ -1,0 +1,56 @@
+{
+  "id": "2857908",
+  "kanji": [],
+  "kana": [
+    {
+      "common": true,
+      "text": "ポーチ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "パウチ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "pouch"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "accessory case"
+        }
+      ]
+    }
+  ]
+}

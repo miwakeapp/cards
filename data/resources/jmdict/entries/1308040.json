@@ -1,0 +1,105 @@
+{
+  "id": "1308040",
+  "kanji": [
+    {
+      "common": false,
+      "text": "子煩悩",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "子ぼんのう",
+      "tags": [
+        "sK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "こぼんのう",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adj-na"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "doting (on one's children)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "(overly) fond"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "indulgent"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "loving"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "adoring parent"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "doting parent"
+        }
+      ]
+    }
+  ]
+}

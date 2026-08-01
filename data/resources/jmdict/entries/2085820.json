@@ -1,0 +1,70 @@
+{
+  "id": "2085820",
+  "kanji": [
+    {
+      "common": false,
+      "text": "妓夫",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "牛",
+      "tags": [
+        "ateji",
+        "rK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "ぎゅう",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "ぎふ",
+      "tags": [],
+      "appliesToKanji": [
+        "妓夫"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "pimp"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "brothel tout"
+        }
+      ]
+    }
+  ]
+}

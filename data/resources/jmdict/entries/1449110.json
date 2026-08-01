@@ -1,0 +1,106 @@
+{
+  "id": "1449110",
+  "kanji": [
+    {
+      "common": true,
+      "text": "当初",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "とうしょ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "adj-no"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "beginning"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "start"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "outset"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n",
+        "adv"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "at first"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "at the beginning"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "initially"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "originally"
+        }
+      ]
+    }
+  ]
+}

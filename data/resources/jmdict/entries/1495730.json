@@ -1,0 +1,167 @@
+{
+  "id": "1495730",
+  "kanji": [
+    {
+      "common": false,
+      "text": "付き物",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "つき物",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "付物",
+      "tags": [
+        "sK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "付きもの",
+      "tags": [
+        "sK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "つきもの",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "natural accompaniment"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "inseparable pair"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "something that naturally goes with (another thing)"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "inevitable aspect (of something)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "part and parcel"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "something that unavoidably comes with (another thing)"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "supplementary printed insert (in a book or magazine)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "appendix"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "book cover"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "obi strip"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+{
+  "id": "1474660",
+  "kanji": [
+    {
+      "common": false,
+      "text": "博識",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "はくしき",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "extensive knowledge"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "erudition"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adj-na"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "learned"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "erudite"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "well-informed"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "knowledgeable"
+        }
+      ]
+    }
+  ]
+}

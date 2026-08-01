@@ -184,6 +184,6 @@ export interface MiwakeCard {
   /** Semantic HTML rendered from the complete selected JMDict entry. */
   dictionaryEntry: string;
 
-  /** Escaped semantic HTML for the source, or `null` when no source was supplied. */
+  /** Rendered source HTML, or `null` when no source was supplied. */
   source: string | null;
 }

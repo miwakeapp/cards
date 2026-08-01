@@ -1,0 +1,96 @@
+{
+  "id": "1792750",
+  "kanji": [
+    {
+      "common": false,
+      "text": "男やもめ",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "男寡",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "男鰥",
+      "tags": [
+        "rK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "おとこやもめ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "女やもめ"
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "widower"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "divorced man not remarried"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "(long-term) bachelor"
+        }
+      ]
+    }
+  ]
+}

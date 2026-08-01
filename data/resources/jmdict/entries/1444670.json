@@ -1,0 +1,92 @@
+{
+  "id": "1444670",
+  "kanji": [
+    {
+      "common": false,
+      "text": "渡り廊下",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "わたりろうか",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "roofed corridor connecting two buildings"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "connecting passageway"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "skyway"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "skybridge"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "skywalk"
+        }
+      ]
+    }
+  ]
+}

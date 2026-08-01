@@ -1,0 +1,109 @@
+{
+  "id": "1744610",
+  "kanji": [
+    {
+      "common": false,
+      "text": "小賢しい",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "小ざかしい",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "こざかしい",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adj-i"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "smart-alecky"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "clever-clever"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "cheeky"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "impertinent"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adj-i"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "cunning"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "crafty"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "shrewd"
+        }
+      ]
+    }
+  ]
+}

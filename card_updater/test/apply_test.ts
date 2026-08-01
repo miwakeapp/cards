@@ -48,6 +48,7 @@ Deno.test("applyNoteUpdate: writes only changed fields when the snapshot still m
     noteId: 42,
     expect: {
       key: "掬う | 1226200 | 1",
+      recognitionTarget: "掬う",
       reading: "掬[すく]う",
       dictionaryEntry: '<ol class="senses"><li>old</li></ol>',
       hint: "",
@@ -88,6 +89,7 @@ Deno.test("applyNoteUpdate: refuses when the note changed since analysis", async
     noteId: 42,
     expect: {
       key: "掬う | 1226200 | 1",
+      recognitionTarget: "掬う",
       reading: "掬[すく]う",
       dictionaryEntry: '<ol class="senses"><li>old</li></ol>',
       hint: "",
@@ -104,7 +106,13 @@ Deno.test("applyNoteUpdate: refuses when the note no longer exists", async () =>
   const { invoke } = fakeAnki(null);
   const result = await applyNoteUpdate({
     noteId: 42,
-    expect: { key: "掬う | 1226200 | 1", reading: "掬[すく]う", dictionaryEntry: "", hint: "" },
+    expect: {
+      key: "掬う | 1226200 | 1",
+      recognitionTarget: "掬う",
+      reading: "掬[すく]う",
+      dictionaryEntry: "",
+      hint: "",
+    },
     set: { dictionaryEntry: "y" },
   }, invoke);
 
@@ -118,6 +126,7 @@ Deno.test("applyNoteUpdate: key and hint changes are written together", async ()
     noteId: 42,
     expect: {
       key: "掬う | 1226200 | 1",
+      recognitionTarget: "掬う",
       reading: "掬[すく]う",
       dictionaryEntry: '<ol class="senses"><li>old</li></ol>',
       hint: "",
@@ -143,6 +152,7 @@ Deno.test("applyNoteUpdate: guards and records Reading changes", async () => {
     noteId: 42,
     expect: {
       key: "食べる | 1358280",
+      recognitionTarget: "食べる",
       reading: "食[た]べる",
       dictionaryEntry: '<ol class="senses"><li>old</li></ol>',
       hint: "",
@@ -167,6 +177,7 @@ Deno.test("applyNoteUpdate: refuses a Reading edited after analysis", async () =
     noteId: 42,
     expect: {
       key: "食べる | 1358280",
+      recognitionTarget: "食べる",
       reading: "食[た]べる",
       dictionaryEntry: '<ol class="senses"><li>old</li></ol>',
       hint: "",
@@ -176,5 +187,27 @@ Deno.test("applyNoteUpdate: refuses a Reading edited after analysis", async () =
 
   assertEquals(result.ok, false);
   assertEquals(result.error?.includes("Reading"), true);
+  assertEquals(calls.some((call) => call.action === "updateNoteFields"), false);
+});
+
+Deno.test("applyNoteUpdate: refuses a Recognition target edited after analysis", async () => {
+  const { invoke, calls } = fakeAnki({
+    ...CURRENT_FIELDS,
+    "Recognition target": "～掬う",
+  });
+  const result = await applyNoteUpdate({
+    noteId: 42,
+    expect: {
+      key: "掬う | 1226200 | 1",
+      recognitionTarget: "掬う",
+      reading: "掬[すく]う",
+      dictionaryEntry: '<ol class="senses"><li>old</li></ol>',
+      hint: "",
+    },
+    set: { dictionaryEntry: '<ol class="senses"><li>new</li></ol>' },
+  }, invoke);
+
+  assertEquals(result.ok, false);
+  assertEquals(result.error?.includes("Recognition target"), true);
   assertEquals(calls.some((call) => call.action === "updateNoteFields"), false);
 });

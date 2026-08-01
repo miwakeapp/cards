@@ -1,0 +1,196 @@
+{
+  "id": "1253790",
+  "kanji": [
+    {
+      "common": true,
+      "text": "隙間",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "すき間",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "透き間",
+      "tags": [
+        "rK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "透間",
+      "tags": [
+        "sK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "隙き間",
+      "tags": [
+        "sK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "すきま",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "gap"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "opening"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "aperture"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "crevice"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "crack"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "chink"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "space"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "dated"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "spare moment"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "interval"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "break"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "dated"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "unguarded moment"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "carelessness"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "chink in one's armor"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "weak spot"
+        }
+      ]
+    }
+  ]
+}

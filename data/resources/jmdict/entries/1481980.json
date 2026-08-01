@@ -1,0 +1,95 @@
+{
+  "id": "1481980",
+  "kanji": [
+    {
+      "common": true,
+      "text": "煩悩",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "煩惱",
+      "tags": [
+        "oK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "ぼんのう",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "worldly desires"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "evil passions"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "appetites of the flesh"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [
+        "Buddh"
+      ],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "klesha (polluting thoughts such as greed, hatred and delusion, which result in suffering)"
+        }
+      ]
+    }
+  ]
+}

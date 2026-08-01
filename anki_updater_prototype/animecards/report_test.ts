@@ -39,7 +39,7 @@ Deno.test("buildConversionReport groups exact final source HTML strings", () => 
         targetInContextResolution: {
           method: "ai",
           surface: "舟",
-          model: "gemini-3.5-flash",
+          model: "gemini-3.6-flash",
           generatedAt: "2026-07-22T00:00:00.000Z",
         },
         fullContextResolution: { status: "restored", method: "exact" },
@@ -80,7 +80,7 @@ Deno.test("buildConversionReport groups exact final source HTML strings", () => 
           status: "failed",
           source: "容疑者Xの献身",
           requiredContextHTML: "微塵も疑わない。",
-          model: "gemini-3.5-flash",
+          model: "gemini-3.6-flash",
           attemptedAt: "2026-07-21T00:00:00.000Z",
           error: "Could not derive a complete reading",
         },
@@ -110,7 +110,7 @@ Deno.test("buildConversionReport groups exact final source HTML strings", () => 
         fullContextResolution: { status: "restored", method: "exact" },
         minimizedContextResolution: {
           status: "failed",
-          model: "gemini-3.5-flash",
+          model: "gemini-3.6-flash",
           attemptedAt: "2026-07-21T00:00:00.000Z",
           error: "Invalid JSON response",
         },
@@ -137,7 +137,7 @@ Deno.test("buildConversionReport groups exact final source HTML strings", () => 
   assertStringIncludes(report, "Failed AI enrichments: 1");
   assertStringIncludes(report, "private or temporary/unlinked");
   assertStringIncludes(report, "Target-in-context resolution: ai=1");
-  assertStringIncludes(report, "| 1 | `～舟` | `舟` | gemini-3.5-flash |");
+  assertStringIncludes(report, "| 1 | `～舟` | `舟` | gemini-3.6-flash |");
   assertStringIncludes(report, "| 1 | `～舟` | `舟` | `舟 \\| 1` |");
   assertStringIncludes(report, "| 1 | `multiple-jmdict-ids` |");
 
@@ -176,7 +176,7 @@ Deno.test("buildConversionReport shows selected and compatible senses", () => {
       minimizedContextResolution: { status: "not-needed" },
       senseResolution: {
         status: "generated",
-        model: "gemini-3.5-flash",
+        model: "gemini-3.6-flash",
         generatedAt: "2026-07-26T00:00:00.000Z",
         compatibleSenses: [1, 2, 3],
         applicableSenses: [2],
@@ -206,7 +206,7 @@ Deno.test("buildConversionReport shows selected and compatible senses", () => {
   assertStringIncludes(report, "## Sense selections");
   assertStringIncludes(
     report,
-    "| 42 | `大小` | `manual-hold` | `generated` | `2 / 1,2,3` | `大小 \\| 1414110 \\| 2` | `規模大小` | gemini-3.5-flash | `物の大小を比べる。` | `前段。物の大小を比べる。後段。` |",
+    "| 42 | `大小` | `manual-hold` | `generated` | `2 / 1,2,3` | `大小 \\| 1414110 \\| 2` | `規模大小` | gemini-3.6-flash | `物の大小を比べる。` | `前段。物の大小を比べる。後段。` |",
   );
   assertStringIncludes(report, "## JMDict entry selections");
   assertStringIncludes(
@@ -242,7 +242,7 @@ Deno.test("buildConversionReport audits no-match sense selections", () => {
       minimizedContextResolution: { status: "not-needed" },
       senseResolution: {
         status: "no-match",
-        model: "gpt-5.6",
+        model: "gpt-5.6-sol",
         generatedAt: "2026-07-26T00:00:00.000Z",
         compatibleSenses: [1, 2],
       },
@@ -262,9 +262,62 @@ Deno.test("buildConversionReport audits no-match sense selections", () => {
   const report = buildConversionReport(manifest);
   assertStringIncludes(
     report,
-    "| 43 | `金子` | `no-applicable-jmdict-sense` | `no-match` | `none / 1,2` | `金子 \\| 1630340` | `` | gpt-5.6 |",
+    "| 43 | `金子` | `no-applicable-jmdict-sense` | `no-match` | `none / 1,2` | `金子 \\| 1630340` | `` | gpt-5.6-sol |",
   );
   assertStringIncludes(report, "| 1 | `no-applicable-jmdict-sense` |");
+});
+
+Deno.test("buildConversionReport audits ambiguous sense selections distinctly", () => {
+  const manifest = {
+    version: CONVERSION_MANIFEST_VERSION,
+    generatedAt: "2026-07-29T00:00:00.000Z",
+    query: 'note:"Animecards"',
+    sourceModel: "Animecards",
+    targetModel: "Miwake",
+    sourceFields: {},
+    candidates: [{
+      noteId: 44,
+      approved: true,
+      jmdictId: "1414110",
+      recognitionTarget: "大小",
+      keyRecognitionTarget: "大小",
+      readingKana: "だいしょう",
+      senseSelectionContext: "物の大小を比べる。",
+      sourceResolution: {
+        name: "Test",
+        method: "source-field",
+        url: null,
+        urlIsPublic: false,
+      },
+      targetInContextResolution: { method: "deterministic", surface: "大小" },
+      fullContextResolution: { status: "restored", method: "exact" },
+      minimizedContextResolution: { status: "not-needed" },
+      senseResolution: {
+        status: "ambiguous",
+        model: "claude-opus-5",
+        generatedAt: "2026-07-29T00:00:00.000Z",
+        compatibleSenses: [1, 2, 3],
+        possibleSenses: [1, 3],
+      },
+      original: { fields: {} },
+      target: {
+        fields: {
+          Source: '<span lang="en">Test</span>',
+          Key: "大小 | 1414110",
+          Hint: "",
+          "Full context": "物の<mark>大小</mark>を比べる。",
+        },
+      },
+    }],
+    skipped: [],
+  } as unknown as ConversionManifest;
+
+  const report = buildConversionReport(manifest);
+  assertStringIncludes(
+    report,
+    "| 44 | `大小` | `ambiguous-jmdict-sense` | `ambiguous` | `ambiguous: 1,3 / 1,2,3` |",
+  );
+  assertStringIncludes(report, "| 1 | `ambiguous-jmdict-sense` |");
 });
 
 Deno.test("buildConversionReport audits individual deferred entry selections", () => {

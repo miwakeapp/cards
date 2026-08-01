@@ -1,0 +1,166 @@
+{
+  "id": "1588930",
+  "kanji": [
+    {
+      "common": false,
+      "text": "お菜",
+      "tags": [
+        "rK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "お数",
+      "tags": [
+        "rK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "御菜",
+      "tags": [
+        "sK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "御数",
+      "tags": [
+        "sK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "おかず",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "オカズ",
+      "tags": [
+        "sk"
+      ],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [
+        "food"
+      ],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "small dish (usu. one of several accompanying rice)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "side dish"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [
+        "music"
+      ],
+      "dialect": [],
+      "misc": [
+        "uk",
+        "col"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "fill"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "fill-in (drumming)"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk",
+        "vulg",
+        "sl"
+      ],
+      "info": [
+        "oft. as オカズ"
+      ],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "jack-off material"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "something to masturbate to"
+        }
+      ]
+    }
+  ]
+}

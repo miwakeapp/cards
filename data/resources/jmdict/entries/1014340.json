@@ -1,0 +1,134 @@
+{
+  "id": "1014340",
+  "kanji": [],
+  "kana": [
+    {
+      "common": true,
+      "text": "アイドル",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "performer (usu. in a boy band or girl group) with an image cultivated to foster a dedicated fan following"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "Japanese idol"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "(cultural) icon"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "idol"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "star"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "celebrity"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "person who is greatly admired"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "偶像"
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "idol (object of worship)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "image"
+        }
+      ]
+    }
+  ]
+}

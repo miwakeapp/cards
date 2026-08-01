@@ -1,0 +1,4648 @@
+{
+  "schemaVersion": 1,
+  "description": "Tracked three-way hint decisions with selected dictionary evidence. preferredHints are good generated references, not an exhaustive exact-match set. The audited 圧巻 card is intentionally excluded: with no contrasting usage, whether to request a hint is an upstream acquisition-policy decision rather than a hint-generation case.",
+  "cases": [
+    {
+      "id": "exposure-1673449877905-可愛がる",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1673449877905,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-easy-batch-final.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "可愛がる"
+        }
+      },
+      "input": {
+        "context": "彼には愛嬌があって、確かに<mark>可愛がられて</mark>いる。",
+        "recognitionTarget": "可愛がる",
+        "selectedUsage": {
+          "jmdictId": "1190730",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1190730",
+            "senseNumbers": [
+              2,
+              3,
+              4
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "愛嬌があって可愛がられる"
+        ],
+        "observedBadHints": [
+          "部下を可愛がる"
+        ],
+        "rubricNotes": [
+          "Preserve the source's passive voice; do not invent an agent or object.",
+          "The hint must retain enough source evidence to distinguish affection from favouritism, petting, and ironic rough treatment."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic selected this exact passive, source-grounded hint in the 2026-07-30 preference worksheet."
+      }
+    },
+    {
+      "id": "exposure-1675852231147-打合せ",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1675852231147,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-easy-batch-final.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "打合せ"
+        }
+      },
+      "input": {
+        "context": "<mark>打合せ</mark>を中心に計画を立ててくれないと、話がなかなか先に進みません。",
+        "recognitionTarget": "打合せ",
+        "selectedUsage": {
+          "jmdictId": "1588140",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1588140",
+            "senseNumbers": [
+              2,
+              3
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "打合せを中心に",
+          "打合せを中心に計画を立てる"
+        ],
+        "observedBadHints": [
+          "事前打合せ"
+        ],
+        "rubricNotes": [
+          "Preserve the source relationship 打合せを中心に; do not invent a different modifier."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1676005658876-移転",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1676005658876,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-easy-batch-final.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "移転"
+        }
+      },
+      "input": {
+        "context": "万が一<mark>移転</mark>することになったら、僕の仕事は君にお願いしたい。",
+        "recognitionTarget": "移転",
+        "selectedUsage": {
+          "jmdictId": "1158390",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1158390",
+            "senseNumbers": [
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "The source does not say what is moving, so it cannot fairly distinguish relocation from transfer of property or deeds."
+        ],
+        "disposition": "source-insufficient"
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The earlier preferred string 移転することになる restated the target's grammar without adding contrastive evidence; 事務所移転 was source-unsupported."
+      }
+    },
+    {
+      "id": "exposure-1678246299999-すれ違う",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1678246299999,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-easy-batch-final.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "すれ違う"
+        }
+      },
+      "input": {
+        "context": "昨日<mark>すれ違った</mark>の、まさか君じゃないよね？",
+        "recognitionTarget": "すれ違う",
+        "selectedUsage": {
+          "jmdictId": "1595920",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1595920",
+            "senseNumbers": [
+              2,
+              3
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "君とすれ違った？",
+          "昨日すれ違ったの、まさか君じゃないよね",
+          "昨日すれ違ったの、まさか君じゃないよね？"
+        ],
+        "acceptableHints": [
+          "昨日すれ違ったの、君じゃないよね？"
+        ],
+        "observedBadHints": [
+          "道ですれ違う"
+        ],
+        "rubricNotes": [
+          "Preserve the source participant 君 and the speaker's uncertainty; do not replace either with an invented location or a factual assertion."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1679112999042-雇う",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1679112999042,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-easy-batch-final.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "雇う"
+        }
+      },
+      "input": {
+        "context": "いろいろ面接した末に、大企業に<mark>雇われた</mark>んだ。",
+        "recognitionTarget": "雇う",
+        "selectedUsage": {
+          "jmdictId": "1605570",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1605570",
+            "senseNumbers": [
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "大企業に雇われる"
+        ],
+        "observedBadHints": [
+          "人を雇う"
+        ],
+        "rubricNotes": [
+          "Preserve the named employer and passive voice; do not replace them with a generic object."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1679538832807-お出掛け",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1679538832807,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-easy-batch-final.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "お出掛け"
+        }
+      },
+      "input": {
+        "context": "急用が入ったので、<mark>お出掛け</mark>どころではなくなった。",
+        "recognitionTarget": "お出掛け",
+        "selectedUsage": {
+          "jmdictId": "1338475",
+          "senseNumbers": [
+            2
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1338475",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "お出掛けどころではない",
+          "お出掛けどころではなくなった"
+        ],
+        "observedBadHints": [
+          "お出掛け先"
+        ],
+        "rubricNotes": [
+          "Preserve the source grammar pattern; do not invent a destination."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1679541681407-怒る",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1679541681407,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-easy-batch-final.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "怒る"
+        }
+      },
+      "input": {
+        "context": "彼はあれだけ<mark>怒られて</mark>悲しんでいるかと思ったら、すぐに笑いだした。",
+        "recognitionTarget": "怒る",
+        "selectedUsage": {
+          "jmdictId": "1445690",
+          "senseNumbers": [
+            2
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1445690",
+            "senseNumbers": [
+              1
+            ]
+          },
+          {
+            "jmdictId": "2859682",
+            "senseNumbers": [
+              1,
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "怒られる"
+        ],
+        "observedBadHints": [
+          "子供を怒る"
+        ],
+        "rubricNotes": [
+          "Preserve the source's passive voice; do not invent a child as the object."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1680313421985-バレる",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1680313421985,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-easy-batch-final.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "バレる"
+        }
+      },
+      "input": {
+        "context": "知らないふうにしていたが、顔に出て<mark>バレて</mark>しまった。",
+        "recognitionTarget": "バレる",
+        "selectedUsage": {
+          "jmdictId": "1010350",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1010350",
+            "senseNumbers": [
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "顔に出てバレる",
+          "顔に出てバレてしまう"
+        ],
+        "observedBadHints": [
+          "嘘がバレる"
+        ],
+        "rubricNotes": [
+          "Preserve the source cause 顔に出て; do not invent a lie."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1680499507180-あっさり",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1680499507180,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-easy-batch-final.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "あっさり"
+        }
+      },
+      "input": {
+        "context": "嫌がられるかと思ったら、<mark>あっさり</mark>OKしてくれた。",
+        "recognitionTarget": "あっさり",
+        "selectedUsage": {
+          "jmdictId": "1000360",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1000360",
+            "senseNumbers": [
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "あっさりOK"
+        ],
+        "acceptableHints": [
+          "あっさりOKする",
+          "あっさりOKしてくれる"
+        ],
+        "observedBadHints": [
+          "あっさり承諾"
+        ],
+        "rubricNotes": [
+          "Preserve the source's OK wording; do not paraphrase it with a synonym.",
+          "The compact source phrase あっさりOK is already a natural cue; do not add する merely to verbalize it."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic preferred あっさりOK over the verbalized and inflected alternatives in the 2026-07-30 preference worksheet."
+      }
+    },
+    {
+      "id": "exposure-1680518892466-慌てる",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1680518892466,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-easy-batch-final.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "慌てる"
+        }
+      },
+      "input": {
+        "context": "あなたの部下には<mark>慌てて</mark>計画の実装を終えるように命じてくれたまえ。",
+        "recognitionTarget": "慌てる",
+        "selectedUsage": {
+          "jmdictId": "1278830",
+          "senseNumbers": [
+            2
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1278830",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "慌てて実装を終える",
+          "慌てて終える"
+        ],
+        "observedBadHints": [
+          "慌てる実装"
+        ],
+        "rubricNotes": [
+          "Attach the target to the source's actual predicate instead of creating an unnatural noun phrase."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1681123689263-触る",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1681123689263,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-easy-batch-final.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "触る"
+        }
+      },
+      "input": {
+        "context": "今日は鑑賞だけということだから、<mark>触って</mark>はいけません。",
+        "recognitionTarget": "触る",
+        "selectedUsage": {
+          "jmdictId": "1357980",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1357980",
+            "senseNumbers": [
+              2,
+              3
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "触ってはいけない",
+          "鑑賞だけということだから、触ってはいけない",
+          "鑑賞だけということだから、触ってはいけません"
+        ],
+        "observedBadHints": [
+          "展示に触る"
+        ],
+        "rubricNotes": [
+          "Preserve the source prohibition; do not invent an exhibit."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1681362708348-素直",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1681362708348,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-easy-batch-final.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "素直",
+          "context": "素直であるということは、君の表情からも分かります。"
+        }
+      },
+      "input": {
+        "context": "<mark>素直</mark>であるということは、君の表情からも分かります。",
+        "recognitionTarget": "素直",
+        "selectedUsage": {
+          "jmdictId": "1397340",
+          "senseNumbers": [
+            2
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1397340",
+            "senseNumbers": [
+              1,
+              3,
+              4
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "The source does not distinguish honest/frank from obedient/meek; do not invent a contrastive use."
+        ],
+        "disposition": "source-insufficient"
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The previous preferred string 素直である was merely the target's copular form and supplied no contrastive evidence; 素直な気持ち was also source-unsupported."
+      }
+    },
+    {
+      "id": "exposure-1681829026049-優勝",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1681829026049,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-easy-batch-final.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "優勝"
+        }
+      },
+      "input": {
+        "context": "肉体をさらに強化できれば、来年は<mark>優勝</mark>も夢ではない。",
+        "recognitionTarget": "優勝",
+        "selectedUsage": {
+          "jmdictId": "1539280",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1539280",
+            "senseNumbers": [
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "優勝も夢ではない",
+          "来年は優勝も夢ではない"
+        ],
+        "acceptableHints": [
+          "肉体を強化できれば優勝も夢ではない"
+        ],
+        "observedBadHints": [
+          "優勝を目指す"
+        ],
+        "rubricNotes": [
+          "Preserve the source construction 優勝も夢ではない; do not turn it into an aspiration."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1683181415618-旅立つ",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1683181415618,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-easy-batch-final.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "旅立つ"
+        }
+      },
+      "input": {
+        "context": "夜明けと共に<mark>旅立った</mark>。",
+        "recognitionTarget": "旅立つ",
+        "selectedUsage": {
+          "jmdictId": "1553270",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1553270",
+            "senseNumbers": [
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "夜明けと共に旅立つ"
+        ],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "Without death-related context, an ordinary reader naturally interprets departure at dawn as beginning a journey.",
+          "The hint need not eliminate a fanciful poetic death reading."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Relabeled during final qualitative audit to apply the prompt's ordinary-reader threshold instead of requiring deductive exclusion of a poetic death interpretation."
+      }
+    },
+    {
+      "id": "exposure-1685014152374-雪解け",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1685014152374,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-easy-batch-final.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "雪解け"
+        }
+      },
+      "input": {
+        "context": "<mark>雪解け</mark>につれて川や湖の水のかさがさらに増す一方だ。",
+        "recognitionTarget": "雪解け",
+        "selectedUsage": {
+          "jmdictId": "1386530",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1386530",
+            "senseNumbers": [
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "雪解けにつれて",
+          "雪解けにつれて川や湖の水のかさが増す",
+          "雪解けにつれて水のかさが増す"
+        ],
+        "observedBadHints": [
+          "雪解け水"
+        ],
+        "rubricNotes": [
+          "Preserve the source linkage 雪解けにつれて; do not replace it with a related compound."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1687568737569-出産",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1687568737569,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-easy-batch-final.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "出産"
+        }
+      },
+      "input": {
+        "context": "<mark>出産</mark>には、我慢強さが必要です。",
+        "recognitionTarget": "出産",
+        "selectedUsage": {
+          "jmdictId": "1339010",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1339010",
+            "senseNumbers": [
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "出産には我慢強さが必要"
+        ],
+        "observedBadHints": [
+          "出産に耐える"
+        ],
+        "rubricNotes": [
+          "Use the source claim that establishes this sense; do not invent an endurance predicate."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1687692789493-装う",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1687692789493,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-easy-batch-final.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "装う"
+        }
+      },
+      "input": {
+        "context": "思ってもいないのに、好きだと思っているふうに<mark>装う</mark>のは不誠実だ。",
+        "recognitionTarget": "装う",
+        "selectedUsage": {
+          "jmdictId": "1402280",
+          "senseNumbers": [
+            2
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1402280",
+            "senseNumbers": [
+              1
+            ]
+          },
+          {
+            "jmdictId": "2122340",
+            "senseNumbers": [
+              1,
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "好きだと思っているふうに装う"
+        ],
+        "observedBadHints": [
+          "関心を装う"
+        ],
+        "rubricNotes": [
+          "Preserve the source's explicit complement rather than substituting a generic example."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1688437276659-間に合う",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1688437276659,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-easy-batch-final.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "間に合う"
+        }
+      },
+      "input": {
+        "context": "携帯の電池がなくなるところだったが、なんとか<mark>間に合った</mark>。",
+        "recognitionTarget": "間に合う",
+        "selectedUsage": {
+          "jmdictId": "1215260",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1215260",
+            "senseNumbers": [
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "Bunpro example 6485 explicitly translates the selected sense as \"make it in time,\" but the Japanese source does not say what event or deadline was reached.",
+          "With a nearly dead battery, なんとか間に合う remains compatible with both making it in time and managing with something sufficient; defer instead of presenting it as a contrastive hint."
+        ],
+        "disposition": "source-insufficient"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The Bunpro translation establishes the intended sense, but that translation is not part of the Japanese-only generation input."
+      }
+    },
+    {
+      "id": "exposure-1690607870224-下水",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1690607870224,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-easy-batch-final.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "下水"
+        }
+      },
+      "input": {
+        "context": "村にせよ大都市にせよ、近代では<mark>下水</mark>は絶対必要だ。",
+        "recognitionTarget": "下水",
+        "selectedUsage": {
+          "jmdictId": "1185510",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1185510",
+            "senseNumbers": [
+              2
+            ]
+          },
+          {
+            "jmdictId": "2178780",
+            "senseNumbers": [
+              1,
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "近代では下水は絶対必要",
+          "下水は絶対必要だ",
+          "下水は絶対必要"
+        ],
+        "observedBadHints": [
+          "下水設備"
+        ],
+        "rubricNotes": [
+          "Preserve the source necessity statement; do not substitute related infrastructure."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1690691597399-距離",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1690691597399,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-easy-batch-final.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "距離"
+        }
+      },
+      "input": {
+        "context": "この程度の<mark>距離</mark>で音を上げているようでは、本格的な登山に挑戦することなどできない。",
+        "recognitionTarget": "距離",
+        "selectedUsage": {
+          "jmdictId": "1232920",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1232920",
+            "senseNumbers": [
+              2,
+              3
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "この程度の距離で音を上げる"
+        ],
+        "acceptableHints": [
+          "この程度の距離"
+        ],
+        "observedBadHints": [
+          "移動距離"
+        ],
+        "rubricNotes": [
+          "Prefer the exact local predicate この程度の距離で音を上げる, which makes the physical reading clearer without inventing movement.",
+          "The shorter この程度の距離 is faithful and ordinarily physical, but is a weaker contrastive cue."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1696834058807-いかす",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1696834058807,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-easy-batch-final.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "いかす"
+        }
+      },
+      "input": {
+        "context": "マイクは君の妹のこと、とびきり<mark>いかして</mark>るって思ってるんだ。",
+        "recognitionTarget": "いかす",
+        "selectedUsage": {
+          "jmdictId": "1000640",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1587070",
+            "senseNumbers": [
+              1,
+              2,
+              3,
+              4
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "とびきりいかす",
+          "とびきりいかしてる"
+        ],
+        "observedBadHints": [
+          "いかす服"
+        ],
+        "rubricNotes": [
+          "Preserve the source degree adverb; do not invent clothing."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1699935005791-自発",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1699935005791,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-easy-batch-final.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "自発"
+        }
+      },
+      "input": {
+        "context": "彼はいつも<mark>自発</mark>的に掃除をしてくれます。",
+        "recognitionTarget": "自発",
+        "selectedUsage": {
+          "jmdictId": "1318550",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1318550",
+            "senseNumbers": [
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "自発的に掃除する",
+          "自発的に掃除をする",
+          "自発的"
+        ],
+        "acceptableHints": [
+          "自発的に掃除をしてくれる"
+        ],
+        "observedBadHints": [
+          "自発的な行動"
+        ],
+        "rubricNotes": [
+          "Keep the actual source action 掃除 instead of saying only generic 行動."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1670498511281-徐々",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1670498511281,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-source-backed-exceptions-manifest.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "徐々"
+        }
+      },
+      "input": {
+        "context": "列車は<mark>徐々</mark>にスピードを上げた。",
+        "recognitionTarget": "徐々",
+        "selectedUsage": {
+          "jmdictId": "1345600",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1345600",
+            "senseNumbers": [
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "徐々にスピードを上げる"
+        ],
+        "observedBadHints": [
+          "徐々に上がる"
+        ],
+        "rubricNotes": [
+          "Preserve the source object and predicate rather than reversing the relationship."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1670849298532-曖昧",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1670849298532,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-source-backed-exceptions-manifest.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "曖昧"
+        }
+      },
+      "input": {
+        "context": "あの人の説明は、<mark>曖昧</mark>な上に不正確だ。",
+        "recognitionTarget": "曖昧",
+        "selectedUsage": {
+          "jmdictId": "1567920",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1567920",
+            "senseNumbers": [
+              2,
+              3
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "説明は曖昧",
+          "曖昧な説明"
+        ],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "Either the source's subject-predicate framing or its equivalent short attributive phrase preserves the same relationship."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The attributive recast was accepted during model selection as a natural, source-faithful minimal hint."
+      }
+    },
+    {
+      "id": "exposure-1699611968744-貪欲",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1699611968744,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-source-backed-exceptions-manifest.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "貪欲"
+        }
+      },
+      "input": {
+        "context": "普段は<mark>貪欲</mark>ではない人でも、莫大な金額ともなると<mark>貪欲</mark>になるかもしれない。",
+        "recognitionTarget": "貪欲",
+        "selectedUsage": {
+          "jmdictId": "1599350",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "2855863",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "貪欲になる",
+          "莫大な金額ともなると貪欲になるかもしれない"
+        ],
+        "observedBadHints": [
+          "金銭に貪欲"
+        ],
+        "rubricNotes": [
+          "The nonassertive change-of-state collocation 貪欲になる is sufficient and may normalize the final predicate after discarding the larger proposition.",
+          "莫大な金額ともなると is a source condition, not an argument of 貪欲; do not rewrite it as the invented relationship 金銭に貪欲.",
+          "If the monetary conditional is retained, preserve both its relationship and the source modality かもしれない."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1693831464194-見出し",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1693831464194,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-source-backed-exceptions-manifest.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "見出し"
+        }
+      },
+      "input": {
+        "context": "その俳優の死は各紙で大<mark>見出し</mark>で報じられた。",
+        "recognitionTarget": "見出し",
+        "selectedUsage": {
+          "jmdictId": "1259710",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1259710",
+            "senseNumbers": [
+              2,
+              3
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "大見出し",
+          "大見出しで報じられる",
+          "見出しで報じられる"
+        ],
+        "observedBadHints": [
+          "新聞の見出し",
+          "大見出しで報じる"
+        ],
+        "rubricNotes": [
+          "大見出し is the minimal source noun phrase and omits the proposition entirely.",
+          "If 報じる is retained, preserve passive voice while normalizing only its final inflection: 大見出しで報じられる.",
+          "Do not replace the source with a generic newspaper phrase."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1694179518632-ゲロ",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1694179518632,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-source-backed-exceptions-manifest.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "ゲロ"
+        }
+      },
+      "input": {
+        "context": "私は大変気分が悪い。<mark>ゲロ</mark>をはきたいです。",
+        "recognitionTarget": "ゲロ",
+        "selectedUsage": {
+          "jmdictId": "1004280",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1004280",
+            "senseNumbers": [
+              2,
+              3
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "ゲロをはく"
+        ],
+        "acceptableHints": [
+          "ゲロをはきたい"
+        ],
+        "observedBadHints": [
+          "ゲロを吐く"
+        ],
+        "rubricNotes": [
+          "The preceding statement that the speaker feels sick establishes the vomit sense; the final hint may be the compact local encounter cue rather than independently proving the contrast.",
+          "ゲロをはく is the preferred nonassertive collocation; ゲロをはきたい remains faithful but retains unnecessary source modality.",
+          "Preserve the source's kana verb はく; do not silently substitute a kanji synonym."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1695232359330-にらむ",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1695232359330,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-source-backed-exceptions-manifest.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "にらむ"
+        }
+      },
+      "input": {
+        "context": "彼は私を<mark>にらんだ</mark>。",
+        "recognitionTarget": "にらむ",
+        "selectedUsage": {
+          "jmdictId": "1569880",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1569880",
+            "senseNumbers": [
+              2,
+              3,
+              4,
+              5
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "A person as the direct object does not distinguish glaring from staring intensely or watching.",
+          "The selected sense is plausible by conversational default, but the source cannot support a contrastive hint without inventing manner or emotion."
+        ],
+        "disposition": "source-insufficient"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The historical preferred hint 私をにらむ preserved the source object but did not actually distinguish the selected glare sense from the listed contrasts."
+      }
+    },
+    {
+      "id": "exposure-1695603702471-整理券",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1695603702471,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-source-backed-exceptions-manifest.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "整理券"
+        }
+      },
+      "input": {
+        "context": "最悪・・・入場制限を設けるしかないでしょう。<mark>整理券</mark>の配布とかで。",
+        "recognitionTarget": "整理券",
+        "selectedUsage": {
+          "jmdictId": "1376260",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1376260",
+            "senseNumbers": [
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "整理券の配布"
+        ],
+        "observedBadHints": [
+          "整理券配布",
+          "入場制限に整理券を配布する",
+          "入場制限に整理券を配布するとか"
+        ],
+        "rubricNotes": [
+          "The preceding admission-restriction sentence establishes the numbered-service-ticket sense; the final local cue need not repeat every fact from that broader evidence.",
+          "Preserve the source phrase 整理券の配布 instead of mechanically compressing it.",
+          "Do not invent a case-particle relationship between 入場制限 and 整理券を配布."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1702301776995-惚れる",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1702301776995,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-source-backed-exceptions-manifest.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "惚れる"
+        }
+      },
+      "input": {
+        "context": "<mark>惚れた</mark>欲目。",
+        "recognitionTarget": "惚れる",
+        "selectedUsage": {
+          "jmdictId": "1288500",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1288500",
+            "senseNumbers": [
+              2,
+              3
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "惚れた欲目"
+        ],
+        "observedBadHints": [
+          "惚れる欲目"
+        ],
+        "rubricNotes": [
+          "Preserve the fixed expression's source form; lemmatizing it makes the phrase worse."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1703737589427-麗しい",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1703737589427,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-source-backed-exceptions-manifest.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "entry": "麗しい"
+        }
+      },
+      "input": {
+        "context": "<mark>麗しの</mark>友よ、私にとってあなたは永遠に若いのだ。",
+        "recognitionTarget": "麗しい",
+        "selectedUsage": {
+          "jmdictId": "1557920",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1557920",
+            "senseNumbers": [
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "麗しの友"
+        ],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "麗しの友 directly modifies the person as lovely, rather than describing a heartwarming relationship or event. Preserve the source's literary adnominal form."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Re-reviewed after separating the old 麗しい few-shot from the prompt: 友 is the modified person, so this is fair source evidence for the lovely-person sense."
+      }
+    },
+    {
+      "id": "exposure-1674400440197-こだわり",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1674400440197,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-sense-results.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "subsection": "Duplicate-aware batch",
+          "entry": "こだわり"
+        }
+      },
+      "input": {
+        "context": "この車の細部に渡る<mark>こだわり</mark>はさすがですね。",
+        "recognitionTarget": "こだわり",
+        "selectedUsage": {
+          "jmdictId": "1004470",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1004470",
+            "senseNumbers": [
+              2,
+              3
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "細部に渡るこだわり"
+        ],
+        "observedBadHints": [
+          "細部こだわり"
+        ],
+        "rubricNotes": [
+          "Keep the full source modifier and particles; do not compress it into an unnatural compound."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1678412569847-はぐらかす",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1678412569847,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-sense-results.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "subsection": "Duplicate-aware batch",
+          "entry": "はぐらかす"
+        }
+      },
+      "input": {
+        "context": "曖昧なことを言っては<mark>はぐらかし</mark>、嘘をついては逃げようとし、あの人はどうしようもない。",
+        "recognitionTarget": "はぐらかす",
+        "selectedUsage": {
+          "jmdictId": "2009390",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "2009390",
+            "senseNumbers": [
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "曖昧なことを言ってはぐらかす",
+          "曖昧なことを言ってははぐらかす"
+        ],
+        "observedBadHints": [
+          "質問をはぐらかす"
+        ],
+        "rubricNotes": [
+          "Use the source's actual preceding behavior; do not invent a question."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1678412569847-逃げる",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1678412569847,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-sense-results.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "subsection": "Duplicate-aware batch",
+          "entry": "逃げる"
+        }
+      },
+      "input": {
+        "context": "曖昧なことを言ってははぐらかし、嘘をついては<mark>逃げよう</mark>とし、あの人はどうしようもない。",
+        "recognitionTarget": "逃げる",
+        "selectedUsage": {
+          "jmdictId": "1450330",
+          "senseNumbers": [
+            2
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1450330",
+            "senseNumbers": [
+              1,
+              3,
+              4,
+              5
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "嘘をついて逃げる",
+          "嘘をついては逃げようとする",
+          "はぐらかし、嘘をついては逃げようとする"
+        ],
+        "observedBadHints": [
+          "責任から逃げる"
+        ],
+        "rubricNotes": [
+          "嘘をついて逃げる is an acceptable nonassertive collocation formed after discarding the source proposition.",
+          "If the hint retains the source attempt construction, preserve its modality as 嘘をついては逃げようとする; do not retain part of that proposition while turning the attempted escape into an accomplished one.",
+          "Use the source's actual 嘘をついて relationship; do not invent responsibility."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1679307154067-おかず",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1679307154067,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-sense-results.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "subsection": "Duplicate-aware batch",
+          "entry": "おかず"
+        }
+      },
+      "input": {
+        "context": "<mark>おかず</mark>が余ったら持って帰ろうと思ったのに、余りそうにない。",
+        "recognitionTarget": "おかず",
+        "selectedUsage": {
+          "jmdictId": "1588930",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1588930",
+            "senseNumbers": [
+              2,
+              3
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "おかずが余る"
+        ],
+        "acceptableHints": [
+          "おかずが余ったら"
+        ],
+        "observedBadHints": [
+          "夕食のおかず",
+          "おかずを持って帰る"
+        ],
+        "rubricNotes": [
+          "Use the source predicate 余る; do not replace it with a generic meal category.",
+          "Do not discard the source's conditional relationship and volitional modality to make taking it home into an asserted action."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1680230700033-もしかして",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1680230700033,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-sense-results.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "subsection": "Duplicate-aware batch",
+          "entry": "もしかして"
+        }
+      },
+      "input": {
+        "context": "彼は<mark>もしかして</mark>、あきれているのではないだろうか。",
+        "recognitionTarget": "もしかして",
+        "selectedUsage": {
+          "jmdictId": "1012520",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1012520",
+            "senseNumbers": [
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "もしかしてあきれる",
+          "もしかして、あきれているのではないだろうか"
+        ],
+        "observedBadHints": [
+          "もしかして呆れる"
+        ],
+        "rubricNotes": [
+          "Preserve the source's kana spelling あきれる rather than silently changing orthography."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1680313246211-隙間",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1680313246211,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-sense-results.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "subsection": "Duplicate-aware batch",
+          "entry": "隙間"
+        }
+      },
+      "input": {
+        "context": "ここに<mark>隙間</mark>があるということは、欠陥住宅の疑いがある。",
+        "recognitionTarget": "隙間",
+        "selectedUsage": {
+          "jmdictId": "1253790",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1253790",
+            "senseNumbers": [
+              2,
+              3
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "ここに隙間がある"
+        ],
+        "observedBadHints": [
+          "壁の隙間"
+        ],
+        "rubricNotes": [
+          "Preserve the source's deictic statement; do not invent a wall."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1680750998405-訴える",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1680750998405,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-sense-results.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "subsection": "Duplicate-aware batch",
+          "entry": "訴える"
+        }
+      },
+      "input": {
+        "context": "<mark>訴えられて</mark>いるだけで必ずしも有罪となるとは限らない。",
+        "recognitionTarget": "訴える",
+        "selectedUsage": {
+          "jmdictId": "1397720",
+          "senseNumbers": [
+            4
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1397720",
+            "senseNumbers": [
+              1,
+              2,
+              3,
+              5
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "訴えられる",
+          "訴えられるだけで有罪とは限らない",
+          "訴えられているだけで有罪となるとは限らない",
+          "訴えられているだけで必ずしも有罪となるとは限らない"
+        ],
+        "observedBadHints": [
+          "裁判で訴える"
+        ],
+        "rubricNotes": [
+          "Preserve the source's passive voice; do not invent a court."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1681362798233-方針",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1681362798233,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-sense-results.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "subsection": "Duplicate-aware batch",
+          "entry": "方針"
+        }
+      },
+      "input": {
+        "context": "ライバル会社のあの人、まるでうちの会社の<mark>方針</mark>を知っているかのようだ。",
+        "recognitionTarget": "方針",
+        "selectedUsage": {
+          "jmdictId": "1517040",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1517040",
+            "senseNumbers": [
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "会社の方針"
+        ],
+        "observedBadHints": [
+          "経営方針"
+        ],
+        "rubricNotes": [
+          "Preserve the source's company relationship; do not substitute management."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1681386061542-素直",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1681386061542,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-sense-results.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "subsection": "Duplicate-aware batch",
+          "entry": "素直"
+        }
+      },
+      "input": {
+        "context": "彼女はとても<mark>素直</mark>だが、どことなく儚気なのが気になります。",
+        "recognitionTarget": "素直",
+        "selectedUsage": {
+          "jmdictId": "1397340",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1397340",
+            "senseNumbers": [
+              3,
+              4
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "とても素直だ",
+          "彼女は素直だ"
+        ],
+        "observedBadHints": [
+          "素直な性格"
+        ],
+        "rubricNotes": [
+          "Preserve a source participant and predication that identify the personal-character senses; a non-contrastive degree adverb may be omitted.",
+          "Do not replace the source relationship with a generic invented personality phrase."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "provisional",
+        "reviewNote": "The preferred string is weakly contrastive; use the prose rubric and human review rather than exact-string equality."
+      }
+    },
+    {
+      "id": "exposure-1681386061542-気になる",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1681386061542,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-sense-results.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "subsection": "Duplicate-aware batch",
+          "entry": "気になる"
+        }
+      },
+      "input": {
+        "context": "彼女はとても素直だが、どことなく儚気なのが<mark>気になります</mark>。",
+        "recognitionTarget": "気になる",
+        "selectedUsage": {
+          "jmdictId": "1221690",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1221690",
+            "senseNumbers": [
+              2,
+              3
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "儚気なのが気になる"
+        ],
+        "observedBadHints": [
+          "心配で気になる"
+        ],
+        "rubricNotes": [
+          "Preserve the source cause 儚気なの; do not substitute generic worry."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1681471787697-成長",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1681471787697,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-sense-results.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "subsection": "Duplicate-aware batch",
+          "entry": "成長"
+        }
+      },
+      "input": {
+        "context": "日課だからといって、機械的にやっていては<mark>成長</mark>しません。",
+        "recognitionTarget": "成長",
+        "selectedUsage": {
+          "jmdictId": "1375790",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1375790",
+            "senseNumbers": [
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "機械的では成長しない",
+          "日課を機械的にやっていては成長しない",
+          "機械的にやっていては成長しない",
+          "機械的にやっていては成長しません"
+        ],
+        "acceptableHints": [
+          "日課だからといって、機械的にやっていては成長しない"
+        ],
+        "observedBadHints": [
+          "人の成長"
+        ],
+        "rubricNotes": [
+          "Preserve the source's negative causal condition; do not invent a generic person."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1683026775307-くれぐれも",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1683026775307,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-sense-results.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "subsection": "Duplicate-aware batch",
+          "entry": "くれぐれも"
+        }
+      },
+      "input": {
+        "context": "<mark>くれぐれも</mark>この戸を開けてはならない。",
+        "recognitionTarget": "くれぐれも",
+        "selectedUsage": {
+          "jmdictId": "1269140",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1269140",
+            "senseNumbers": [
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "くれぐれも戸を開けない",
+          "くれぐれも開けてはならない"
+        ],
+        "observedBadHints": [
+          "くれぐれも注意"
+        ],
+        "rubricNotes": [
+          "Retain the source prohibition that gives the adverb useful context."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1685762713860-勢い",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1685762713860,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-sense-results.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "subsection": "Duplicate-aware batch",
+          "entry": "勢い"
+        }
+      },
+      "input": {
+        "context": "あの<mark>勢い</mark>でお代わりされると、ご飯が足りなくなる恐れがある。",
+        "recognitionTarget": "勢い",
+        "selectedUsage": {
+          "jmdictId": "1375040",
+          "senseNumbers": [
+            1,
+            3
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1375040",
+            "senseNumbers": [
+              2,
+              4
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "あの勢いでお代わりされる"
+        ],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "The source describes both the vigor of ordering seconds and continuing at that pace or momentum.",
+          "Do not invent a degree such as すごい or misclassify this as authority or adverbial inevitability."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Corrected during final model review after discovering that the historical selected usage incompletely separated two overlapping senses."
+      }
+    },
+    {
+      "id": "exposure-1687063262714-シャッター",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1687063262714,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-sense-results.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "subsection": "Duplicate-aware batch",
+          "entry": "シャッター"
+        }
+      },
+      "input": {
+        "context": "頭をぶつけないように<mark>シャッター</mark>に気をつけよう。",
+        "recognitionTarget": "シャッター",
+        "selectedUsage": {
+          "jmdictId": "1061440",
+          "senseNumbers": [
+            2
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1061440",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "シャッターに気をつける",
+          "頭をぶつけないようにシャッターに気をつける",
+          "頭をぶつけないようにシャッターに気をつけよう"
+        ],
+        "observedBadHints": [
+          "シャッターを下ろす"
+        ],
+        "rubricNotes": [
+          "Preserve the source caution relationship; do not invent the action of closing it."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1687867985297-交流",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1687867985297,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-sense-results.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "subsection": "Duplicate-aware batch",
+          "entry": "交流"
+        }
+      },
+      "input": {
+        "context": "EUで<mark>交流</mark>し合うことは重要だと考えられている。",
+        "recognitionTarget": "交流",
+        "selectedUsage": {
+          "jmdictId": "1272580",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1272580",
+            "senseNumbers": [
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "EUで交流し合う",
+          "交流し合う"
+        ],
+        "observedBadHints": [
+          "文化交流"
+        ],
+        "rubricNotes": [
+          "Preserve the source location and reciprocal action; do not invent cultural exchange."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1688300171859-見学",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1688300171859,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-sense-results.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "subsection": "Duplicate-aware batch",
+          "entry": "見学"
+        }
+      },
+      "input": {
+        "context": "明日の<mark>見学</mark>の際には、身分証明書を持ってきてください。",
+        "recognitionTarget": "見学",
+        "selectedUsage": {
+          "jmdictId": "1259440",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1259440",
+            "senseNumbers": [
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "見学の際に身分証明書を持ってくる",
+          "見学の際には身分証明書を持ってくる"
+        ],
+        "observedBadHints": [
+          "施設見学",
+          "見学の際には身分証明書を持ってきてください"
+        ],
+        "rubricNotes": [
+          "Use the source relationship between 見学 and bringing identification; it distinguishes attendance at a visit or inspection from sitting out.",
+          "The request 持ってきてください may become the nonassertive dictionary-form collocation 持ってくる after the proposition is discarded.",
+          "明日 alone is not contrastive, and a facility must not be invented."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The source identification requirement distinguishes attending a visit or inspection from sitting out; the request can be normalized into a nonassertive collocation."
+      }
+    },
+    {
+      "id": "exposure-1694883675820-譲る",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1694883675820,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-sense-results.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "subsection": "Duplicate-aware batch",
+          "entry": "譲る"
+        }
+      },
+      "input": {
+        "context": "飽くまで<mark>譲らない</mark>タイプの人かと思ったら、かなり柔軟な人でした。",
+        "recognitionTarget": "譲る",
+        "selectedUsage": {
+          "jmdictId": "1357030",
+          "senseNumbers": [
+            3
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1357030",
+            "senseNumbers": [
+              1,
+              2,
+              4,
+              5
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "譲らないタイプ",
+          "飽くまで譲らない"
+        ],
+        "observedBadHints": [
+          "意見を譲る"
+        ],
+        "rubricNotes": [
+          "Preserve the source negative/type construction; do not invent opinions."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1700296065821-済む",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1700296065821,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-sense-results.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "subsection": "Duplicate-aware batch",
+          "entry": "済む"
+        }
+      },
+      "input": {
+        "context": "もっと早くタバコをやめれば健康問題なしに<mark>済んだ</mark>ものを、手遅れになってしまった。",
+        "recognitionTarget": "済む",
+        "selectedUsage": {
+          "jmdictId": "1295070",
+          "senseNumbers": [
+            2
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1295070",
+            "senseNumbers": [
+              1,
+              3,
+              4
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "健康問題なしに済む",
+          "健康問題なしに済んだものを"
+        ],
+        "observedBadHints": [
+          "なしに済む"
+        ],
+        "rubricNotes": [
+          "Retain the concrete health outcome; なしに済む alone is not contrastive enough."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1702693047715-相当",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1702693047715,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-sense-results.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "subsection": "Duplicate-aware batch",
+          "entry": "相当"
+        }
+      },
+      "input": {
+        "context": "あの体つきからいって、<mark>相当</mark>筋トレをしているに違いない。",
+        "recognitionTarget": "相当",
+        "selectedUsage": {
+          "jmdictId": "1401240",
+          "senseNumbers": [
+            5
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1401240",
+            "senseNumbers": [
+              1,
+              2,
+              3,
+              4
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "相当筋トレをする",
+          "相当筋トレをしている"
+        ],
+        "observedBadHints": [
+          "相当筋トレする"
+        ],
+        "rubricNotes": [
+          "Preserve the source particle in 相当筋トレをする."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1705484601882-解放",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1705484601882,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-sense-results.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "subsection": "Duplicate-aware batch",
+          "entry": "解放"
+        }
+      },
+      "input": {
+        "context": "無事<mark>解放</mark>されたとしても、その後の精神的なケアが必要です。",
+        "recognitionTarget": "解放",
+        "selectedUsage": {
+          "jmdictId": "1199250",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1199250",
+            "senseNumbers": [
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "無事解放される",
+          "解放されたとしても、その後の精神的なケアが必要"
+        ],
+        "observedBadHints": [
+          "人質解放"
+        ],
+        "rubricNotes": [
+          "Preserve the source adverb and passive voice; do not invent a hostage."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "exposure-1714329303655-チタン",
+      "provenance": {
+        "corpus": "Exposure migration",
+        "sourceNoteId": 1714329303655,
+        "artifact": "anki_updater_prototype/generated/exposure/exposure-entry-results.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Exposure migration",
+          "subsection": "Duplicate-aware batch",
+          "entry": "チタン"
+        }
+      },
+      "input": {
+        "context": "<mark>チタン</mark>は鋼鉄並みの丈夫さだが、はるかに軽量である。",
+        "recognitionTarget": "チタン",
+        "selectedUsage": {
+          "jmdictId": "1077730",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "2857561",
+            "senseNumbers": [
+              1,
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "チタンは鋼鉄並み",
+          "チタンは鋼鉄並みの丈夫さだが、はるかに軽量である",
+          "チタンは鋼鉄並みの丈夫さだ",
+          "チタンは鋼鉄並みの丈夫さ"
+        ],
+        "observedBadHints": [
+          "チタン製"
+        ],
+        "rubricNotes": [
+          "Preserve the source comparison with steel; do not invent a manufactured-material compound."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "animecards-1771665424915-木綿",
+      "provenance": {
+        "corpus": "Animecards conversion",
+        "sourceNoteId": 1771665424915,
+        "artifact": "anki_updater_prototype/generated/surfacepro11-full-converter-dry-run-2026-07-28.context.enriched.reviewed.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Animecards conversion",
+          "entry": "木綿"
+        }
+      },
+      "input": {
+        "context": "写真の中の回鍋肉のおじさんは箸をマイクにして「<mark>木綿</mark>のハンカチーフ」を熱唱している。",
+        "recognitionTarget": "木綿",
+        "selectedUsage": {
+          "jmdictId": "1534870",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "2261050",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "木綿のハンカチーフ"
+        ],
+        "observedBadHints": [
+          "木綿豆腐"
+        ],
+        "rubricNotes": [
+          "Use the title's cotton association; do not invent an unrelated cotton product.",
+          "Preserve the source particle and lexical choice instead of compressing the title into an invented compound."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "animecards-1762485931491-つきもの",
+      "provenance": {
+        "corpus": "Animecards conversion",
+        "sourceNoteId": 1762485931491,
+        "artifact": "anki_updater_prototype/generated/surfacepro11-full-converter-dry-run-2026-07-28.context.enriched.reviewed.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Animecards conversion",
+          "entry": "つきもの"
+        }
+      },
+      "input": {
+        "context": "スタンドアロンRPGには<mark>つきもの</mark>の勝利ファンファーレが聞こえてきそうだ。",
+        "recognitionTarget": "つきもの",
+        "selectedUsage": {
+          "jmdictId": "1495730",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1495730",
+            "senseNumbers": [
+              2,
+              3
+            ]
+          },
+          {
+            "jmdictId": "1495650",
+            "senseNumbers": [
+              1
+            ]
+          },
+          {
+            "jmdictId": "1566970",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "RPGにはつきもの"
+        ],
+        "observedBadHints": [
+          "つきものの勝利"
+        ],
+        "rubricNotes": [
+          "Choose a natural boundary that states what the target is characteristic of."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "animecards-1725230828463-イエス",
+      "provenance": {
+        "corpus": "Animecards conversion",
+        "sourceNoteId": 1725230828463,
+        "artifact": "anki_updater_prototype/generated/surfacepro11-full-converter-dry-run-2026-07-28.context.enriched.reviewed.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Animecards conversion",
+          "entry": "イエス"
+        }
+      },
+      "input": {
+        "context": "そんで神様、途中で自分の息子さん……<mark>イエス</mark>さんを地球に送り込んだりしたんだけど。",
+        "recognitionTarget": "イエス",
+        "selectedUsage": {
+          "jmdictId": "1021010",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "2843921",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "イエスさん"
+        ],
+        "observedBadHints": [
+          "イエス・キリスト"
+        ],
+        "rubricNotes": [
+          "Do not put the answer-bearing full name on this name-recognition card."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "animecards-1768115818658-沽券",
+      "provenance": {
+        "corpus": "Animecards conversion",
+        "sourceNoteId": 1768115818658,
+        "artifact": "anki_updater_prototype/generated/surfacepro11-full-converter-dry-run-2026-07-28.context.enriched.reviewed.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Animecards conversion",
+          "entry": "沽券"
+        }
+      },
+      "input": {
+        "context": "もちろん<mark>沽券</mark>をかけて父が弁償したが。",
+        "recognitionTarget": "沽券",
+        "selectedUsage": {
+          "jmdictId": "1568610",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1568610",
+            "senseNumbers": [
+              2,
+              3
+            ]
+          },
+          {
+            "jmdictId": "2829305",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "沽券をかける"
+        ],
+        "observedBadHints": [
+          "沽券をかけて"
+        ],
+        "rubricNotes": [
+          "Canonicalize the source predicate to dictionary form without changing its wording."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic selected the dictionary-form collocation in the 2026-07-30 preference worksheet."
+      }
+    },
+    {
+      "id": "animecards-1729409208160-トラック",
+      "provenance": {
+        "corpus": "Animecards conversion",
+        "sourceNoteId": 1729409208160,
+        "artifact": "anki_updater_prototype/generated/surfacepro11-full-converter-dry-run-2026-07-28.context.enriched.reviewed.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Animecards conversion",
+          "entry": "トラック"
+        }
+      },
+      "input": {
+        "context": "<mark>トラック</mark>に乗ったパンとお弁当が届いて並べ始めているころだ。",
+        "recognitionTarget": "トラック",
+        "selectedUsage": {
+          "jmdictId": "1085760",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "2850185",
+            "senseNumbers": [
+              1,
+              2,
+              3
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "トラックに乗る",
+          "トラックに乗ったパン"
+        ],
+        "acceptableHints": [
+          "トラックに乗ったパンとお弁当"
+        ],
+        "observedBadHints": [
+          "トラックに乗った"
+        ],
+        "rubricNotes": [
+          "トラックに乗る is an acceptable nonassertive dictionary-form collocation after omitting the source participant.",
+          "The exact noun phrase トラックに乗ったパン is also complete and preserves the source relationship.",
+          "トラックに乗った alone is an incomplete attributive fragment; past or attributive source morphology is not categorically forbidden."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "animecards-1742698208894-ハイタッチ",
+      "provenance": {
+        "corpus": "Animecards conversion",
+        "sourceNoteId": 1742698208894,
+        "artifact": "anki_updater_prototype/generated/surfacepro11-full-converter-dry-run-2026-07-28.context.enriched.reviewed.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Animecards conversion",
+          "entry": "ハイタッチ"
+        }
+      },
+      "input": {
+        "context": "ばしんと<mark>ハイタッチ</mark>をかわしてから、俺はもう一度笑った。",
+        "recognitionTarget": "ハイタッチ",
+        "selectedUsage": {
+          "jmdictId": "1095190",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "2854382",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "ハイタッチをかわす"
+        ],
+        "observedBadHints": [
+          "ハイタッチを交わす"
+        ],
+        "rubricNotes": [
+          "Preserve the source's kana wording; do not silently replace it with a kanji synonym."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "animecards-1778136651013-白鯨",
+      "provenance": {
+        "corpus": "Animecards conversion",
+        "sourceNoteId": 1778136651013,
+        "artifact": "anki_updater_prototype/generated/surfacepro11-full-converter-dry-run-2026-07-28.context.enriched.reviewed.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Animecards conversion",
+          "entry": "白鯨"
+        }
+      },
+      "input": {
+        "context": "実はメルヴィルの『<mark>白鯨</mark>』にいるかの出てくるシーンがあったからなんです。",
+        "recognitionTarget": "白鯨",
+        "selectedUsage": {
+          "jmdictId": "5592543",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1475110",
+            "senseNumbers": [
+              1,
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "『白鯨』",
+          "メルヴィルの『白鯨』"
+        ],
+        "observedBadHints": [
+          "小説白鯨"
+        ],
+        "rubricNotes": [
+          "Prefer the source's title punctuation over an invented generic title label."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "animecards-1738075375363-ぞくぞく",
+      "provenance": {
+        "corpus": "Animecards conversion",
+        "sourceNoteId": 1738075375363,
+        "artifact": "anki_updater_prototype/generated/external-source-recovery-rebased-2026-07-28.json",
+        "knownFailure": {
+          "artifact": "archive/card_creator_evals/KNOWN_FAILURES.md",
+          "section": "Animecards conversion",
+          "entry": "ぞくぞく"
+        }
+      },
+      "input": {
+        "context": "それを見てうれしくて背筋が<mark>ぞくぞく</mark>した。",
+        "recognitionTarget": "ぞくぞく",
+        "selectedUsage": {
+          "jmdictId": "1007140",
+          "senseNumbers": [
+            3
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1007140",
+            "senseNumbers": [
+              1,
+              2
+            ]
+          },
+          {
+            "jmdictId": "1596730",
+            "senseNumbers": [
+              1
+            ]
+          },
+          {
+            "jmdictId": "2587110",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "preferredHints": [
+          "うれしくてぞくぞく",
+          "うれしくてぞくぞくする"
+        ],
+        "acceptableHints": [
+          "うれしくてぞくぞくした"
+        ],
+        "observedBadHints": [
+          "背筋がぞくぞくする"
+        ],
+        "rubricNotes": [
+          "Preserve the positive emotional cause so the hint distinguishes excitement from fear or cold.",
+          "Preserve the source's hiragana spelling of うれしくて."
+        ],
+        "disposition": "generated"
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "prompt-control-null-包む",
+      "provenance": {
+        "corpus": "Curated prompt control",
+        "artifact": "card_field_generation/src/hint.ts"
+      },
+      "input": {
+        "context": "布で荷物を<mark>包んだ</mark>。",
+        "recognitionTarget": "包む",
+        "selectedUsage": {
+          "jmdictId": "1584060",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "2831360",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "not-needed",
+        "preferredHints": [],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "The two usages are semantic paraphrases here; do not invent a distinction from their different readings."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "animecards-null-1738991357134-生業",
+      "provenance": {
+        "corpus": "Animecards conversion",
+        "sourceNoteId": 1738991357134,
+        "artifact": "anki_updater_prototype/generated/surfacepro11-normal-full-2026-07-28-post-jmdict.json"
+      },
+      "input": {
+        "context": "生身を離れ、演技をまっとうするのが彼の<mark>生業</mark>だ。",
+        "recognitionTarget": "生業",
+        "selectedUsage": {
+          "jmdictId": "1645430",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "2863046",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "not-needed",
+        "preferredHints": [],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "Both entries mean occupation or livelihood in this context; reading and datedness do not justify an invented semantic hint."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "animecards-null-1768797719019-傍目",
+      "provenance": {
+        "corpus": "Animecards conversion",
+        "sourceNoteId": 1768797719019,
+        "artifact": "anki_updater_prototype/generated/surfacepro11-normal-full-2026-07-28-post-jmdict.json"
+      },
+      "input": {
+        "context": "これはこれで年上に夢を見ているタイプだ。――と<mark>傍目</mark>に分析できるほどミサも大人なわけではないが。",
+        "recognitionTarget": "傍目",
+        "selectedUsage": {
+          "jmdictId": "1584140",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1182490",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "not-needed",
+        "preferredHints": [],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "Both entries describe an outsider's perspective; the source supplies no semantic distinction between them."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "animecards-null-1768222289187-裏面",
+      "provenance": {
+        "corpus": "Animecards conversion",
+        "sourceNoteId": 1768222289187,
+        "artifact": "anki_updater_prototype/generated/surfacepro11-normal-full-2026-07-28-post-jmdict.json"
+      },
+      "input": {
+        "context": "<mark>裏面</mark>も出席やったら『御出席』だけマルつけて住所氏名書けばええんとちゃうんやで。",
+        "recognitionTarget": "裏面",
+        "selectedUsage": {
+          "jmdictId": "2858813",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1550670",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "not-needed",
+        "preferredHints": [],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "Both selected senses mean the reverse side; the distinction is pronunciation, which a semantic hint must not invent."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed"
+      }
+    },
+    {
+      "id": "prompt-control-source-insufficient-方針",
+      "provenance": {
+        "corpus": "Curated outcome control",
+        "artifact": "card_field_generation/src/hint.ts"
+      },
+      "input": {
+        "context": "そこには「<mark>方針</mark>」とだけ書かれていた。",
+        "recognitionTarget": "方針",
+        "selectedUsage": {
+          "jmdictId": "1517040",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1517040",
+            "senseNumbers": [
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "source-insufficient",
+        "preferredHints": [],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "The selected policy sense and magnetic-needle contrast are semantically distinct, but this deliberately metalinguistic source excerpt supports neither one. Defer instead of inventing a policy collocation from the selected gloss."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Artificial underspecification control using real JMDict senses."
+      }
+    },
+    {
+      "id": "control-source-insufficient-沽券",
+      "provenance": {
+        "corpus": "Curated outcome control",
+        "artifact": "card_field_generation_evals/cases/hint.json"
+      },
+      "input": {
+        "context": "「<mark>沽券</mark>」という語が出てきた。",
+        "recognitionTarget": "沽券",
+        "selectedUsage": {
+          "jmdictId": "1568610",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1568610",
+            "senseNumbers": [
+              2,
+              3
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "source-insufficient",
+        "preferredHints": [],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "Dignity or reputation differs materially from a deed of sale or sale value, but this deliberately metalinguistic source excerpt contains no fair clue."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Artificial non-prompt-overlap underspecification control using real JMDict senses; it shares the 沽券 lexeme and contrast with a prompt example, so it is development evidence rather than a holdout."
+      }
+    },
+    {
+      "id": "surfacepro11-live-1601969325598-懐く",
+      "provenance": {
+        "corpus": "SurfacePro11 accepted Miwake cards",
+        "sourceNoteId": 1601969325598,
+        "artifact": "SurfacePro11 live Anki collection, read-only audit 2026-07-29"
+      },
+      "input": {
+        "context": "末っ子は父親に中々<mark>懐かない</mark>。",
+        "recognitionTarget": "懐く",
+        "selectedUsage": {
+          "jmdictId": "1200510",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1584090",
+            "senseNumbers": [
+              1,
+              2
+            ]
+          },
+          {
+            "jmdictId": "2844998",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "generated",
+        "preferredHints": [
+          "父親に懐く",
+          "父親に懐かない"
+        ],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "Use the exact source argument 父親に to distinguish becoming attached from embracing or harbouring something.",
+          "The minimal cue 父親に懐く discards the proposition 末っ子は…懐かない before normalizing the target to dictionary form. If a hint retains that proposition instead, it must retain the source negation."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Read-only review of an accepted live card against the current JMDict snapshot."
+      }
+    },
+    {
+      "id": "surfacepro11-live-1703038518657-牛",
+      "provenance": {
+        "corpus": "SurfacePro11 accepted Miwake cards",
+        "sourceNoteId": 1703038518657,
+        "artifact": "SurfacePro11 live Anki collection, read-only audit 2026-07-29"
+      },
+      "input": {
+        "context": "<mark>牛</mark>は優美、温和にして頭が冴えている。",
+        "recognitionTarget": "牛",
+        "selectedUsage": {
+          "jmdictId": "1231490",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1231490",
+            "senseNumbers": [
+              2,
+              3
+            ]
+          },
+          {
+            "jmdictId": "2085820",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "generated",
+        "preferredHints": [
+          "温和な牛",
+          "牛は温和",
+          "牛は頭が冴えている",
+          "優美で温和な牛"
+        ],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "A faithful relative-clause reconstruction of the source predication 牛は…温和 is acceptable.",
+          "The hint must identify cattle rather than beef, the constellation, or the unrelated slang entry without inventing a new fact."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Read-only review of an accepted live card against the current JMDict snapshot."
+      }
+    },
+    {
+      "id": "surfacepro11-live-1703387785741-アイドル",
+      "provenance": {
+        "corpus": "SurfacePro11 accepted Miwake cards",
+        "sourceNoteId": 1703387785741,
+        "artifact": "SurfacePro11 live Anki collection, read-only audit 2026-07-29"
+      },
+      "input": {
+        "context": "<mark>アイドル</mark>歌手の喝采に応えた笑顔が素晴らしかった。",
+        "recognitionTarget": "アイドル",
+        "selectedUsage": {
+          "jmdictId": "1014340",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1014340",
+            "senseNumbers": [
+              2,
+              3
+            ]
+          },
+          {
+            "jmdictId": "2841342",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "generated",
+        "preferredHints": [
+          "アイドル歌手"
+        ],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "Keep the exact source compound, which distinguishes the Japanese performer usage from a cultural icon, an object of worship, and English idle."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Read-only review of an accepted live card against the current JMDict snapshot."
+      }
+    },
+    {
+      "id": "surfacepro11-live-1703559639176-注ぐ",
+      "provenance": {
+        "corpus": "SurfacePro11 accepted Miwake cards",
+        "sourceNoteId": 1703559639176,
+        "artifact": "SurfacePro11 live Anki collection, read-only audit 2026-07-29"
+      },
+      "input": {
+        "context": "勉強であれスポーツであれ何であれ、結果は<mark>注いで</mark>きた努力次第である。",
+        "recognitionTarget": "注ぐ",
+        "selectedUsage": {
+          "jmdictId": "1581730",
+          "senseNumbers": [
+            4
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1581730",
+            "senseNumbers": [
+              1,
+              2,
+              3,
+              5,
+              6
+            ]
+          },
+          {
+            "jmdictId": "2145240",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "generated",
+        "preferredHints": [
+          "努力を注ぐ"
+        ],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "The source's 注いできた努力 may be reconstructed as the natural object-predicate phrase 努力を注ぐ without changing the relationship.",
+          "Do not replace 努力 with a gloss-derived object."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Read-only review of an accepted live card against the current JMDict snapshot."
+      }
+    },
+    {
+      "id": "surfacepro11-live-1703912745005-カバ",
+      "provenance": {
+        "corpus": "SurfacePro11 accepted Miwake cards",
+        "sourceNoteId": 1703912745005,
+        "artifact": "SurfacePro11 live Anki collection, read-only audit 2026-07-29"
+      },
+      "input": {
+        "context": "2トンからの<mark>カバ</mark>が民家に向かって突進したと聞き、その民家が崩れた事を確信した。",
+        "recognitionTarget": "カバ",
+        "selectedUsage": {
+          "jmdictId": "1193590",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1208890",
+            "senseNumbers": [
+              1
+            ]
+          },
+          {
+            "jmdictId": "2833049",
+            "senseNumbers": [
+              1
+            ]
+          },
+          {
+            "jmdictId": "2852793",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "generated",
+        "preferredHints": [
+          "突進するカバ",
+          "カバが突進する",
+          "2トンからのカバ"
+        ],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "A relative-clause reconstruction of the explicit source predication カバが…突進した is faithful and distinguishes the animal from birch, kava, and cava."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Read-only review of an accepted live card against the current JMDict snapshot."
+      }
+    },
+    {
+      "id": "surfacepro11-live-1725606228180-いける",
+      "provenance": {
+        "corpus": "SurfacePro11 accepted Miwake cards",
+        "sourceNoteId": 1725606228180,
+        "artifact": "SurfacePro11 live Anki collection, read-only audit 2026-07-29"
+      },
+      "input": {
+        "context": "<p>「これ、おいしいんですかねえ？」</p>\n\n<p>アロハは、きのこの山とたけのこの里を交互に眺めながら尋ねる。</p>\n\n<p>「結構<mark>いけ</mark>ますよ」</p>",
+        "recognitionTarget": "いける",
+        "selectedUsage": {
+          "jmdictId": "1631370",
+          "senseNumbers": [
+            2
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1631370",
+            "senseNumbers": [
+              1,
+              3
+            ]
+          },
+          {
+            "jmdictId": "1587190",
+            "senseNumbers": [
+              1,
+              2
+            ]
+          },
+          {
+            "jmdictId": "2035430",
+            "senseNumbers": [
+              1,
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "generated",
+        "preferredHints": [
+          "結構いける"
+        ],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "Use the short exact source phrase and normalize its final polite inflection.",
+          "The hint must select tasting good rather than ability, progress, alcohol tolerance, flower arranging, planting, or burying."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Read-only review of an accepted live card against the current JMDict snapshot."
+      }
+    },
+    {
+      "id": "surfacepro11-live-1725695982293-細々",
+      "provenance": {
+        "corpus": "SurfacePro11 accepted Miwake cards",
+        "sourceNoteId": 1725695982293,
+        "artifact": "SurfacePro11 live Anki collection, read-only audit 2026-07-29"
+      },
+      "input": {
+        "context": "隣町で<mark>細々</mark>と時計店を続けていることはたまに聞くけれども、会いに行こうと思ったことは一度もなかった。",
+        "recognitionTarget": "細々",
+        "selectedUsage": {
+          "jmdictId": "1295490",
+          "senseNumbers": [
+            2
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1295490",
+            "senseNumbers": [
+              1,
+              3
+            ]
+          },
+          {
+            "jmdictId": "1295480",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "generated",
+        "preferredHints": [
+          "細々と続ける",
+          "細々と時計店を続ける",
+          "細々と時計店を続けている"
+        ],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "Retain the source particle and predicate that identify something barely continuing rather than poor, narrow, or minutely detailed."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Read-only review of an accepted live card against the current JMDict snapshot."
+      }
+    },
+    {
+      "id": "surfacepro11-live-1728542169818-どうか",
+      "provenance": {
+        "corpus": "SurfacePro11 accepted Miwake cards",
+        "sourceNoteId": 1728542169818,
+        "artifact": "SurfacePro11 live Anki collection, read-only audit 2026-07-29"
+      },
+      "input": {
+        "context": "「<mark>どうか</mark>泣かないで欲しいでござる。いままでお代官様が消してきたものに比べれば拙者なんて些細な存在でござる」",
+        "recognitionTarget": "どうか",
+        "selectedUsage": {
+          "jmdictId": "1632200",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1632200",
+            "senseNumbers": [
+              2,
+              3,
+              4
+            ]
+          },
+          {
+            "jmdictId": "1451960",
+            "senseNumbers": [
+              1,
+              2,
+              3,
+              4
+            ]
+          },
+          {
+            "jmdictId": "1451980",
+            "senseNumbers": [
+              1
+            ]
+          },
+          {
+            "jmdictId": "1454350",
+            "senseNumbers": [
+              1
+            ]
+          },
+          {
+            "jmdictId": "1770780",
+            "senseNumbers": [
+              1
+            ]
+          },
+          {
+            "jmdictId": "1770920",
+            "senseNumbers": [
+              1
+            ]
+          },
+          {
+            "jmdictId": "2229880",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "generated",
+        "preferredHints": [
+          "どうか泣かないで",
+          "どうか泣かないで欲しい"
+        ],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "Preserve the source's request and crucial negation to select please from the other senses and unrelated entries."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Read-only review of an accepted live card against the current JMDict snapshot."
+      }
+    },
+    {
+      "id": "surfacepro11-live-1732548741028-前後",
+      "provenance": {
+        "corpus": "SurfacePro11 accepted Miwake cards",
+        "sourceNoteId": 1732548741028,
+        "artifact": "SurfacePro11 live Anki collection, read-only audit 2026-07-29"
+      },
+      "input": {
+        "context": "『缶男』は五十歳<mark>前後</mark>に見えた。",
+        "recognitionTarget": "前後",
+        "selectedUsage": {
+          "jmdictId": "1392910",
+          "senseNumbers": [
+            3
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1392910",
+            "senseNumbers": [
+              1,
+              2,
+              4,
+              5,
+              6,
+              7,
+              8
+            ]
+          },
+          {
+            "jmdictId": "2629970",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "generated",
+        "preferredHints": [
+          "五十歳前後"
+        ],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "The suffix notation alone does not distinguish all suffix-compatible senses; retain the exact quantified source phrase to select approximately."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Read-only review of an accepted live card against the current JMDict snapshot."
+      }
+    },
+    {
+      "id": "surfacepro11-live-1737176897977-がかり",
+      "provenance": {
+        "corpus": "SurfacePro11 accepted Miwake cards",
+        "sourceNoteId": 1737176897977,
+        "artifact": "SurfacePro11 live Anki collection, read-only audit 2026-07-29"
+      },
+      "input": {
+        "context": "「二人<mark>がかり</mark>で富樫を殺し、死体の顔を潰して指紋を焼き、服も脱がせて焼き、そうして二人して徒歩で現場を立ち去ったというわけか」",
+        "recognitionTarget": "がかり",
+        "selectedUsage": {
+          "jmdictId": "2033990",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "2033990",
+            "senseNumbers": [
+              2,
+              3,
+              4
+            ]
+          },
+          {
+            "jmdictId": "2655350",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "generated",
+        "preferredHints": [
+          "二人がかり"
+        ],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "The suffix notation alone does not distinguish all suffix senses; keep the exact quantified form from the source."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Read-only review of an accepted live card against the current JMDict snapshot."
+      }
+    },
+    {
+      "id": "surfacepro11-live-1728727214998-シャー",
+      "provenance": {
+        "corpus": "SurfacePro11 accepted Miwake cards",
+        "sourceNoteId": 1728727214998,
+        "artifact": "SurfacePro11 live Anki collection, read-only audit 2026-07-29"
+      },
+      "input": {
+        "context": "「さすがお代官様は分かってるでござるなー！」とばかりに、キャベツは<mark>シャー</mark>！　と小さく叫ぶと、バクバクとマグロを食べ始める。",
+        "recognitionTarget": "シャー",
+        "selectedUsage": {
+          "jmdictId": "2829769",
+          "senseNumbers": [
+            2
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "2829769",
+            "senseNumbers": [
+              1,
+              3
+            ]
+          },
+          {
+            "jmdictId": "2829770",
+            "senseNumbers": [
+              1
+            ]
+          },
+          {
+            "jmdictId": "2833069",
+            "senseNumbers": [
+              1,
+              2
+            ]
+          },
+          {
+            "jmdictId": "2869098",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "generated",
+        "preferredHints": [
+          "シャー！と小さく叫ぶ",
+          "シャー！と叫ぶ"
+        ],
+        "observedBadHints": [
+          "シャーと鳴く",
+          "キャベツはシャー"
+        ],
+        "rubricNotes": [
+          "Use the source verb 叫ぶ; do not replace it with the plausible but absent animal verb 鳴く.",
+          "Keep enough exact sound-event wording to distinguish the hiss from water, sizzling, shah, mahjong, and shire."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Read-only review of an accepted live card against the current JMDict snapshot."
+      }
+    },
+    {
+      "id": "surfacepro11-live-1729078524542-しばしば",
+      "provenance": {
+        "corpus": "SurfacePro11 accepted Miwake cards",
+        "sourceNoteId": 1729078524542,
+        "artifact": "SurfacePro11 live Anki collection, read-only audit 2026-07-29"
+      },
+      "input": {
+        "context": "しかし手ぶらで帰ることも<mark>しばしば</mark>だった。",
+        "recognitionTarget": "しばしば",
+        "selectedUsage": {
+          "jmdictId": "1005580",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "2179090",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "generated",
+        "preferredHints": [
+          "手ぶらで帰ることもしばしば",
+          "帰ることもしばしばだった"
+        ],
+        "observedBadHints": [
+          "しばしば起こる"
+        ],
+        "rubricNotes": [
+          "Keep the actual recurring event; do not replace it with the generic invented predicate 起こる."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Read-only review of an accepted live card against the current JMDict snapshot."
+      }
+    },
+    {
+      "id": "surfacepro11-live-1729163000758-ポーチ",
+      "provenance": {
+        "corpus": "SurfacePro11 accepted Miwake cards",
+        "sourceNoteId": 1729163000758,
+        "artifact": "SurfacePro11 live Anki collection, read-only audit 2026-07-29"
+      },
+      "input": {
+        "context": "一度だけ、バックルームに置きっぱなしになっていた<mark>ポーチ</mark>の中を覗き、化粧品の名前とブランドもメモした。",
+        "recognitionTarget": "ポーチ",
+        "selectedUsage": {
+          "jmdictId": "2857908",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1124690",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "generated",
+        "preferredHints": [
+          "ポーチの中の化粧品",
+          "ポーチの中を覗く",
+          "バックルームに置きっぱなしになっていたポーチ"
+        ],
+        "observedBadHints": [
+          "化粧ポーチ"
+        ],
+        "rubricNotes": [
+          "Preserve the source's pouch–contents relationship; do not collapse it into the plausible but unattested compound 化粧ポーチ."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Read-only review of an accepted live card against the current JMDict snapshot."
+      }
+    },
+    {
+      "id": "surfacepro11-live-1732549588897-ふむ",
+      "provenance": {
+        "corpus": "SurfacePro11 accepted Miwake cards",
+        "sourceNoteId": 1732549588897,
+        "artifact": "SurfacePro11 live Anki collection, read-only audit 2026-07-29"
+      },
+      "input": {
+        "context": "だから彼女は独り暮らしだと石神は<mark>ふんで</mark>いる。",
+        "recognitionTarget": "ふむ",
+        "selectedUsage": {
+          "jmdictId": "1450270",
+          "senseNumbers": [
+            5
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1450270",
+            "senseNumbers": [
+              1,
+              2,
+              3,
+              4,
+              6,
+              7
+            ]
+          },
+          {
+            "jmdictId": "2180650",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "generated",
+        "preferredHints": [
+          "独り暮らしだとふむ",
+          "独り暮らしだとふんでいる"
+        ],
+        "observedBadHints": [
+          "そうふむ"
+        ],
+        "rubricNotes": [
+          "Retain the proposition actually being inferred and normalize only the final inflection; そう is absent and insufficiently specific."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Read-only review of an accepted live card against the current JMDict snapshot."
+      }
+    },
+    {
+      "id": "surfacepro11-live-1732714168372-仕込み",
+      "provenance": {
+        "corpus": "SurfacePro11 accepted Miwake cards",
+        "sourceNoteId": 1732714168372,
+        "artifact": "SurfacePro11 live Anki collection, read-only audit 2026-07-29"
+      },
+      "input": {
+        "context": "実際には、店の奥で昼に備えての<mark>仕込み</mark>が始まる。",
+        "recognitionTarget": "仕込み",
+        "selectedUsage": {
+          "jmdictId": "1304920",
+          "senseNumbers": [
+            3
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1304920",
+            "senseNumbers": [
+              1,
+              2,
+              4
+            ]
+          },
+          {
+            "jmdictId": "2767670",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "generated",
+        "preferredHints": [
+          "昼に備えての仕込み"
+        ],
+        "observedBadHints": [
+          "仕込み作業",
+          "店の奥で昼に備えての仕込みが始まる"
+        ],
+        "rubricNotes": [
+          "Keep the exact source relationship to preparing for lunch; 作業 is a plausible gloss-driven addition not present in the encounter."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Read-only review of an accepted live card against the current JMDict snapshot."
+      }
+    },
+    {
+      "id": "surfacepro11-live-1733553049007-しける",
+      "provenance": {
+        "corpus": "SurfacePro11 accepted Miwake cards",
+        "sourceNoteId": 1733553049007,
+        "artifact": "SurfacePro11 live Anki collection, read-only audit 2026-07-29"
+      },
+      "input": {
+        "context": "「だったら、俺たちは歓迎されるはずだぜ。その悪い男が死んだって知らせを届けに行くんだからな。とにかくそんな<mark>しけた</mark>顔をするなよ。こっちまで気が滅入る。──おっと、ここらしいぞ」",
+        "recognitionTarget": "しける",
+        "selectedUsage": {
+          "jmdictId": "1315900",
+          "senseNumbers": [
+            3
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1315900",
+            "senseNumbers": [
+              1,
+              2
+            ]
+          },
+          {
+            "jmdictId": "1320420",
+            "senseNumbers": [
+              1
+            ]
+          },
+          {
+            "jmdictId": "2850367",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "generated",
+        "preferredHints": [
+          "しけた顔",
+          "そんなしけた顔"
+        ],
+        "observedBadHints": [
+          "顔がしける"
+        ],
+        "rubricNotes": [
+          "The exact target-containing phrase しけた顔 already distinguishes the gloomy sense, so stop there.",
+          "If a longer hint retains 顔をするな, it must preserve the source's negative imperative; do not turn it into affirmative 顔をする or the awkward predication 顔がしける."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Read-only review of an accepted live card against the current JMDict snapshot."
+      }
+    },
+    {
+      "id": "surfacepro11-live-1734067642497-カチューシャ",
+      "provenance": {
+        "corpus": "SurfacePro11 accepted Miwake cards",
+        "sourceNoteId": 1734067642497,
+        "artifact": "SurfacePro11 live Anki collection, read-only audit 2026-07-29"
+      },
+      "input": {
+        "context": "髪をまとめるために<mark>カチューシャ</mark>を使った。",
+        "recognitionTarget": "カチューシャ",
+        "selectedUsage": {
+          "jmdictId": "1638670",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "5021877",
+            "senseNumbers": [
+              1,
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "generated",
+        "preferredHints": [
+          "髪をまとめるためにカチューシャを使う"
+        ],
+        "observedBadHints": [
+          "髪留めカチューシャ"
+        ],
+        "rubricNotes": [
+          "Normalize the source's purpose clause and final inflection; do not replace it with the absent dictionary-like description 髪留め."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Read-only review of an accepted live card against the current JMDict snapshot."
+      }
+    },
+    {
+      "id": "surfacepro11-live-1735804694459-自重",
+      "provenance": {
+        "corpus": "SurfacePro11 accepted Miwake cards",
+        "sourceNoteId": 1735804694459,
+        "artifact": "SurfacePro11 live Anki collection, read-only audit 2026-07-29"
+      },
+      "input": {
+        "context": "出来れば二人が一緒にいるところを撮りたかったが、今度こそ工藤に見つかりそうだったし、万一靖子に気づかれたりしたら面倒だと思い、<mark>自重</mark>しておいたのだ。",
+        "recognitionTarget": "自重",
+        "selectedUsage": {
+          "jmdictId": "1317910",
+          "senseNumbers": [
+            2
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1317910",
+            "senseNumbers": [
+              1,
+              3
+            ]
+          },
+          {
+            "jmdictId": "1726230",
+            "senseNumbers": [
+              1,
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "generated",
+        "preferredHints": [
+          "自重しておく",
+          "面倒だと思い、自重しておく"
+        ],
+        "observedBadHints": [
+          "行動を自重する",
+          "面倒だと思い、自重する",
+          "面倒だと思い、自重しておいた"
+        ],
+        "rubricNotes": [
+          "The nonassertive collocation 自重しておく normalizes only the final tense of 自重しておいた while preserving its ておく aspect.",
+          "If the source rationale is retained, preserve its conditional and modal relationships together with the source predicate aspect; do not keep 面倒だと思い while reducing 自重しておいた to 自重する.",
+          "Do not invent the generic object 行動."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": true,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Read-only review of an accepted live card against the current JMDict snapshot."
+      }
+    },
+    {
+      "id": "surfacepro11-live-1703037618897-孫",
+      "provenance": {
+        "corpus": "SurfacePro11 accepted Miwake cards",
+        "sourceNoteId": 1703037618897,
+        "artifact": "SurfacePro11 live Anki collection, read-only audit 2026-07-29"
+      },
+      "input": {
+        "context": "五十歳にして、もう<mark>孫</mark>が二人もいるなんて、あなたはとんでもなく若いおじいちゃんですね！",
+        "recognitionTarget": "孫",
+        "selectedUsage": {
+          "jmdictId": "1406230",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "2843407",
+            "senseNumbers": [
+              3
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "not-needed",
+        "preferredHints": [],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "Both usages mean grandchild; reading and archaic register differences do not justify a semantic hint.",
+          "The accepted live hint 孫が二人 adds no distinction between these duplicate usages."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The fixture isolates only the semantically equivalent competing usage; other distinguishable senses are upstream acquisition concerns."
+      }
+    },
+    {
+      "id": "surfacepro11-live-1705903372066-医師",
+      "provenance": {
+        "corpus": "SurfacePro11 accepted Miwake cards",
+        "sourceNoteId": 1705903372066,
+        "artifact": "SurfacePro11 live Anki collection, read-only audit 2026-07-29"
+      },
+      "input": {
+        "context": "知識と技術を持った<mark>医師</mark>達がどうにも出来ないと言うのだから、もう僕は死を待つ事しか出来ないのだろう…。",
+        "recognitionTarget": "医師",
+        "selectedUsage": {
+          "jmdictId": "1159930",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "2229590",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "not-needed",
+        "preferredHints": [],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "Both entries mean doctor or physician; a number or surrounding activity cannot distinguish a lexicographic duplicate."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The fixture isolates only the semantically equivalent competing usage; other distinguishable senses are upstream acquisition concerns."
+      }
+    },
+    {
+      "id": "surfacepro11-live-1709281165548-行方",
+      "provenance": {
+        "corpus": "SurfacePro11 accepted Miwake cards",
+        "sourceNoteId": 1709281165548,
+        "artifact": "SurfacePro11 live Anki collection, read-only audit 2026-07-29"
+      },
+      "input": {
+        "context": "ハルヒさんの消失から半月以上が過ぎた今日に至っても、彼女の<mark>行方</mark>は未だに知れない。",
+        "recognitionTarget": "行方",
+        "selectedUsage": {
+          "jmdictId": "1282180",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "2150240",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "not-needed",
+        "preferredHints": [],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "Both usages mean someone's whereabouts; dated reading differences do not justify a semantic hint.",
+          "行方が知れない identifies the shared meaning but cannot distinguish these entries."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The fixture isolates only the semantically equivalent competing usage; other distinguishable senses are upstream acquisition concerns."
+      }
+    },
+    {
+      "id": "surfacepro11-live-1727058261328-病",
+      "provenance": {
+        "corpus": "SurfacePro11 accepted Miwake cards",
+        "sourceNoteId": 1727058261328,
+        "artifact": "SurfacePro11 live Anki collection, read-only audit 2026-07-29"
+      },
+      "input": {
+        "context": "ジョンのおばあさんは長い間<mark>病</mark>に伏せていたが、亡くなった。",
+        "recognitionTarget": "病",
+        "selectedUsage": {
+          "jmdictId": "1490160",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1560200",
+            "senseNumbers": [
+              2
+            ]
+          },
+          {
+            "jmdictId": "2701230",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "not-needed",
+        "preferredHints": [],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "The isolated usages all mean illness or disease; reading, register, and form-category differences do not justify a semantic hint.",
+          "病に伏せる identifies the shared illness meaning but cannot distinguish these entries."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The fixture isolates only the semantically equivalent competing usage; other distinguishable senses are upstream acquisition concerns."
+      }
+    },
+    {
+      "id": "surfacepro11-live-1727677157095-打ちのめす",
+      "provenance": {
+        "corpus": "SurfacePro11 accepted Miwake cards",
+        "sourceNoteId": 1727677157095,
+        "artifact": "SurfacePro11 live Anki collection, read-only audit 2026-07-29"
+      },
+      "input": {
+        "context": "あのときの、叫びたくなるような、泣きたくなるような、とにかくこれが映画なのだと、圧倒的な感動に<mark>打ちのめされた</mark>ことをいまでも思い出す。",
+        "recognitionTarget": "打ちのめす",
+        "selectedUsage": {
+          "jmdictId": "1581430",
+          "senseNumbers": [
+            2
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "2859186",
+            "senseNumbers": [
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "not-needed",
+        "preferredHints": [],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "Both usages describe the same devastating or overwhelming blow; their reading difference does not justify a semantic hint.",
+          "The accepted live hint also incorrectly changed the source passive voice, but a corrected phrase would still not distinguish these usages."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The fixture isolates only the semantically equivalent competing usage; other distinguishable senses are upstream acquisition concerns."
+      }
+    },
+    {
+      "id": "surfacepro11-live-1731931069253-揺蕩う",
+      "provenance": {
+        "corpus": "SurfacePro11 accepted Miwake cards",
+        "sourceNoteId": 1731931069253,
+        "artifact": "SurfacePro11 live Anki collection, read-only audit 2026-07-29"
+      },
+      "input": {
+        "context": "それは音楽のように、私の中を流れていた。自分の中に刻まれた、コンビニの 奏[かな]でる、コンビニの作動する音の中を<mark>揺蕩[たゆた]いながら</mark>、私は明日、また働くために、目の前の餌を身体に詰め込んだ。",
+        "recognitionTarget": "揺蕩う",
+        "selectedUsage": {
+          "jmdictId": "2067460",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "2842270",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "not-needed",
+        "preferredHints": [],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "Both usages mean swaying or drifting; reading differences do not justify a semantic hint.",
+          "音の中を揺蕩う identifies the shared meaning but cannot distinguish these entries."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The fixture isolates only the semantically equivalent competing usage; other distinguishable senses are upstream acquisition concerns."
+      }
+    },
+    {
+      "id": "surfacepro11-live-1732794258002-情",
+      "provenance": {
+        "corpus": "SurfacePro11 accepted Miwake cards",
+        "sourceNoteId": 1732794258002,
+        "artifact": "SurfacePro11 live Anki collection, read-only audit 2026-07-29"
+      },
+      "input": {
+        "context": "一度は夫婦になった仲だけに、どこかに<mark>情</mark>が残っていたのかもしれない。",
+        "recognitionTarget": "情",
+        "selectedUsage": {
+          "jmdictId": "1356210",
+          "senseNumbers": [
+            3
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1356220",
+            "senseNumbers": [
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "not-needed",
+        "preferredHints": [],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "Both isolated usages mean affection or love; reading differences do not justify a semantic hint.",
+          "情が残る identifies the shared meaning but cannot distinguish these entries."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The fixture isolates only the semantically equivalent competing usage; other distinguishable senses are upstream acquisition concerns."
+      }
+    },
+    {
+      "id": "surfacepro11-live-1735713099436-貴女",
+      "provenance": {
+        "corpus": "SurfacePro11 accepted Miwake cards",
+        "sourceNoteId": 1735713099436,
+        "artifact": "SurfacePro11 live Anki collection, read-only audit 2026-07-29"
+      },
+      "input": {
+        "context": "『<mark>貴女</mark>が頻繁に会っている男性の素性をつきとめた。写真を撮っていることから、そのことはおわかりいただけると思う。……』",
+        "recognitionTarget": "貴女",
+        "selectedUsage": {
+          "jmdictId": "1577760",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1223615",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "not-needed",
+        "preferredHints": [],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "Both usages mean you; reading and orthographic differences do not justify a semantic hint.",
+          "The accepted live hint 手紙の貴女 is not source wording and cannot distinguish the duplicate usages."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The fixture isolates only the semantically equivalent competing usage; other distinguishable senses are upstream acquisition concerns."
+      }
+    },
+    {
+      "id": "preference-worksheet-飾り物-figurehead",
+      "provenance": {
+        "corpus": "2026-07-30 card-generation preference worksheet",
+        "artifact": "Preference worksheet completed 2026-07-30"
+      },
+      "input": {
+        "context": "彼は社長とは名ばかりの<mark>飾り物</mark>だった。",
+        "recognitionTarget": "飾り物",
+        "selectedUsage": {
+          "jmdictId": "1733760",
+          "senseNumbers": [
+            2
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1733760",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "generated",
+        "preferredHints": [
+          "Xさんは飾り物だ",
+          "彼は飾り物だ"
+        ],
+        "acceptableHints": [],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "Either the source participant 彼 or the reusable human placeholder Xさん makes the figurative figurehead usage clear without carrying over the longer 名ばかり phrase.",
+          "A controlled Xさん substitution may generalize a source human participant, but it must not change that participant's semantic role or invent a new relationship."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic intentionally checked both Xさんは飾り物だ and 彼は飾り物だ in the 2026-07-30 preference worksheet."
+      }
+    },
+    {
+      "id": "preference-worksheet-拠りどころ-no-fair-hint",
+      "provenance": {
+        "corpus": "2026-07-30 card-generation preference worksheet",
+        "artifact": "Preference worksheet completed 2026-07-30"
+      },
+      "input": {
+        "context": "とにかく<mark>拠りどころ</mark>がないのだ。",
+        "recognitionTarget": "拠りどころ",
+        "selectedUsage": {
+          "jmdictId": "1655700",
+          "senseNumbers": [
+            2
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1655700",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "source-insufficient",
+        "preferredHints": [],
+        "acceptableHints": [],
+        "observedBadHints": [],
+        "rubricNotes": [
+          "The encounter supplies no fair short complement that distinguishes support from grounds or foundation, so do not fabricate 心の, 時間的, or another qualifier.",
+          "The absence of a fair generated hint does not by itself require deferring this otherwise useful card; create it unhinted."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic explicitly chose an unhinted card rather than a generic hint or deferral in the 2026-07-30 preference worksheet. The source-insufficient disposition preserves the reason for omitting the hint; callers create the card unhinted."
+      }
+    }
+  ]
+}

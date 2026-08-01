@@ -1,5 +1,10 @@
-import { compatibleSenseNumbersForJMDictUsage, createCard } from "card_creator";
-import type { GeneratedCardFields, GeneratedSenseAndHint } from "card_field_generation";
+import {
+  compatibleSenseNumbersForJMDictUsage,
+  createCard,
+  jmdictAlternativesForCardFront,
+  jmdictUsagesForSpelling,
+} from "card_creator";
+import type { HintGenerationOutcome, SenseSelectionOutcome } from "card_field_generation";
 import type { JMDictWord } from "data";
 import { applyDisplayTargetOverride, disambiguationHintForJMDictUsage } from "./display_target.ts";
 import { cardSourceFromResolution } from "./source.ts";
@@ -10,13 +15,37 @@ import {
   senseResolutionNeedsGeneration,
 } from "./types.ts";
 
-type CandidateGeneratedFields =
-  | GeneratedCardFields
-  | (GeneratedSenseAndHint & Partial<Pick<GeneratedCardFields, "minimizedContext">>);
+export interface CandidateGeneratedFields {
+  /** Present only when this enrichment run was responsible for sense selection. */
+  senseSelection?: SenseSelectionOutcome;
+  /**
+   * Explicit hint disposition for a generated sense selection.
+   *
+   * `null` means the deterministic front-side ambiguity check found no contrasting usage, while
+   * `not-needed` and `source-insufficient` are successful unhinted outcomes from hint generation.
+   * Keeping those states distinct prevents a validated unhinted result from looking like omitted
+   * model output.
+   */
+  hintOutcome?: HintGenerationOutcome | null;
+  /** Present only when this enrichment run was also responsible for context minimization. */
+  minimizedContext?: string | null;
+}
 
-/** Whether a candidate still needs the canonical card-field AI call. */
+export interface CandidateGeneratedFieldProvenance {
+  /** Model-and-effort identities used by sense selection and any required hint generation. */
+  senseSelection?: string;
+  /** Model-and-effort identity used by context minimization. */
+  minimizedContext?: string;
+}
+
+/** Whether a candidate still needs one or more focused card-field operations. */
 export function needsCardFieldEnrichment(candidate: ConversionCandidate): boolean {
-  if (candidate.senseResolution.status === "no-match") return false;
+  if (
+    candidate.senseResolution.status === "no-match" ||
+    candidate.senseResolution.status === "ambiguous"
+  ) {
+    return false;
+  }
   return candidate.fullContextResolution.status === "restored" &&
     (!senseResolutionIsComplete(candidate.senseResolution) ||
       minimizedContextNeedsGeneration(candidate.minimizedContextResolution));
@@ -48,8 +77,9 @@ function validateApplicableSenses(values: number[], compatibleSenses: number[]):
 export async function applyGeneratedCardFields(
   candidate: ConversionCandidate,
   entry: JMDictWord,
+  sameSpellingEntries: readonly JMDictWord[],
   fields: CandidateGeneratedFields,
-  model: string,
+  provenance: CandidateGeneratedFieldProvenance,
   generatedAt: string,
 ): Promise<void> {
   let applicableSenses = candidate.senseResolution.status === "determined" ||
@@ -61,7 +91,12 @@ export async function applyGeneratedCardFields(
   let senseResolution = candidate.senseResolution;
   let minimizedContextResolution = candidate.minimizedContextResolution;
 
-  if (senseResolutionNeedsGeneration(candidate.senseResolution)) {
+  const hasSenseResult = fields.senseSelection !== undefined ||
+    provenance.senseSelection !== undefined;
+  if (senseResolutionNeedsGeneration(candidate.senseResolution) && hasSenseResult) {
+    if (provenance.senseSelection === undefined) {
+      throw new Error("Generated sense fields are missing their model configuration provenance.");
+    }
     const compatibleSenses = compatibleSenseNumbersForJMDictUsage(
       entry,
       candidate.keyRecognitionTarget,
@@ -79,39 +114,102 @@ export async function applyGeneratedCardFields(
         }, but the selected spelling and reading now permit ${JSON.stringify(compatibleSenses)}.`,
       );
     }
-    if (fields.applicableSenses === null) {
-      candidate.senseResolution = {
+    if (fields.senseSelection === undefined) {
+      throw new Error("AI result is missing senseSelection for a candidate that requires it.");
+    }
+    if (fields.senseSelection.outcome === "no-match") {
+      if (fields.hintOutcome !== null) {
+        throw new Error("A no-match sense selection must have a null hintOutcome.");
+      }
+      senseResolution = {
         status: "no-match",
-        model,
+        model: provenance.senseSelection,
         generatedAt,
         compatibleSenses,
       };
-      return;
-    }
-    applicableSenses = validateApplicableSenses(fields.applicableSenses, compatibleSenses);
-    if (applicableSenses.length === 0) {
-      hint = "";
     } else {
-      if (fields.hint === null) {
-        throw new Error("The validated AI sense selection is missing its hint.");
+      const selectedOrPossible = fields.senseSelection.outcome === "ambiguous"
+        ? fields.senseSelection.possibleSenseNumbers
+        : fields.senseSelection.senseNumbers;
+      const validated = validateApplicableSenses([...selectedOrPossible], compatibleSenses);
+      if (fields.senseSelection.outcome === "ambiguous") {
+        if (fields.hintOutcome !== null) {
+          throw new Error("An ambiguous sense selection must have a null hintOutcome.");
+        }
+        if (selectedOrPossible.length === 0) {
+          throw new Error("AI returned an ambiguous sense selection without any possible senses.");
+        }
+        senseResolution = {
+          status: "ambiguous",
+          model: provenance.senseSelection,
+          generatedAt,
+          compatibleSenses,
+          possibleSenses: validated.length === 0 ? [...compatibleSenses] : validated,
+        };
+      } else {
+        applicableSenses = validated;
+        if (!Object.hasOwn(fields, "hintOutcome") || fields.hintOutcome === undefined) {
+          throw new Error("AI result is missing hintOutcome for its selected sense usage.");
+        }
+        // `[]` is the card key's canonical representation of selecting every compatible sense;
+        // the front-side ambiguity check needs the concrete selected sense numbers.
+        const selectedSenseNumbers = applicableSenses.length === 0
+          ? compatibleSenses
+          : applicableSenses;
+        const contrastingUsages = jmdictAlternativesForCardFront(
+          { entry, senseNumbers: selectedSenseNumbers },
+          jmdictUsagesForSpelling(sameSpellingEntries, candidate.keyRecognitionTarget),
+        );
+        if (contrastingUsages.length === 0 && fields.hintOutcome !== null) {
+          throw new Error(
+            "AI returned a hintOutcome even though the selected usage has no front-side contrast.",
+          );
+        }
+        if (contrastingUsages.length > 0 && fields.hintOutcome === null) {
+          throw new Error("The validated AI sense selection is missing its hint outcome.");
+        }
+        hint = fields.hintOutcome?.outcome === "generated" ? fields.hintOutcome.hint : "";
+        // Selecting every reading-compatible sense removes the sense suffix from the key, but it
+        // does not prove that the front spelling is globally unambiguous. A generated hint may be
+        // distinguishing another same-spelling entry or a sense reachable through another reading.
+        senseResolution = {
+          status: "generated",
+          model: provenance.senseSelection,
+          generatedAt,
+          compatibleSenses,
+          applicableSenses,
+        };
       }
-      hint = fields.hint;
     }
-    senseResolution = {
-      status: "generated",
-      model,
-      generatedAt,
-      compatibleSenses,
-      applicableSenses,
-    };
   }
 
-  if (minimizedContextNeedsGeneration(candidate.minimizedContextResolution)) {
+  const hasMinimizedContextResult = Object.hasOwn(fields, "minimizedContext") ||
+    provenance.minimizedContext !== undefined;
+  if (
+    minimizedContextNeedsGeneration(candidate.minimizedContextResolution) &&
+    hasMinimizedContextResult
+  ) {
+    if (provenance.minimizedContext === undefined) {
+      throw new Error(
+        "Generated minimized context is missing its model configuration provenance.",
+      );
+    }
     if (!("minimizedContext" in fields)) {
       throw new Error("AI result is missing minimizedContext for a candidate that requires it.");
     }
     minimizedContext = fields.minimizedContext ?? "";
-    minimizedContextResolution = { status: "generated", model, generatedAt };
+    minimizedContextResolution = {
+      status: "generated",
+      model: provenance.minimizedContext,
+      generatedAt,
+    };
+  }
+
+  if (senseResolution.status === "no-match" || senseResolution.status === "ambiguous") {
+    candidate.target.fields["Minimized context"] = minimizedContext;
+    candidate.senseResolution = senseResolution;
+    candidate.minimizedContextResolution = minimizedContextResolution;
+    return;
   }
 
   const selectedSenses = applicableSenses.length === 0 ? undefined : applicableSenses;
@@ -149,7 +247,7 @@ export async function applyGeneratedCardFields(
           ? candidate.readingKana
           : undefined,
       ),
-      [entry],
+      sameSpellingEntries,
     ) ?? ""
     : card.hint ?? "";
   candidate.target.fields["Full context"] = card.fullContext;

@@ -18,6 +18,7 @@ import {
   type SenseAlignment,
 } from "./entry_text.ts";
 import { formatMiwakeKey, type MiwakeKey, parseMiwakeKey } from "card_creator/keys";
+import { splitAffixNotation } from "./affix_notation.ts";
 
 /**
  * How much attention a card needs, from none to human-required:
@@ -354,20 +355,26 @@ async function analyzeReading(
   let readingPrefix = "";
   let readingSuffix = "";
   let reading = note.fields.reading;
+  const targetAffix = splitAffixNotation(recognitionTarget);
+  const readingAffix = splitAffixNotation(reading);
   if (
-    recognitionTarget === `～${parsedKey.spelling}` &&
-    reading.startsWith("～")
+    targetAffix.notation === "leading" &&
+    targetAffix.content === parsedKey.spelling
   ) {
     lookupSpelling = parsedKey.spelling;
-    readingPrefix = "～";
-    reading = reading.slice(1);
+    if (readingAffix.notation === "leading") {
+      readingPrefix = readingAffix.decoration;
+      reading = readingAffix.content;
+    }
   } else if (
-    recognitionTarget === `${parsedKey.spelling}～` &&
-    reading.endsWith("～")
+    targetAffix.notation === "trailing" &&
+    targetAffix.content === parsedKey.spelling
   ) {
     lookupSpelling = parsedKey.spelling;
-    readingSuffix = "～";
-    reading = reading.slice(0, -1);
+    if (readingAffix.notation === "trailing") {
+      readingSuffix = readingAffix.decoration;
+      reading = readingAffix.content;
+    }
   }
   if (
     reading === "" || !/\p{Script=Han}/v.test(lookupSpelling)

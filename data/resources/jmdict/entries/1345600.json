@@ -1,0 +1,109 @@
+{
+  "id": "1345600",
+  "kanji": [
+    {
+      "common": false,
+      "text": "徐々",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "徐徐",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "じょじょ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adj-t",
+        "adv-to"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "arch"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "slow"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "gradual"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "steady"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adj-t",
+        "adv-to"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "arch"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "calm"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "composed"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "relaxed"
+        }
+      ]
+    }
+  ]
+}

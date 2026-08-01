@@ -1,0 +1,70 @@
+{
+  "id": "2229590",
+  "kanji": [
+    {
+      "common": false,
+      "text": "薬師",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "医",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "医師",
+      "tags": [
+        "iK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "くすし",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "くすりし",
+      "tags": [],
+      "appliesToKanji": [
+        "薬師"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "arch"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "doctor"
+        }
+      ]
+    }
+  ]
+}

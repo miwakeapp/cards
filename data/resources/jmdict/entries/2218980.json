@@ -1,0 +1,112 @@
+{
+  "id": "2218980",
+  "kanji": [
+    {
+      "common": false,
+      "text": "鯱張る",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "しゃちほこ張る",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "鯱鉾ばる",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "しゃちほこばる",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "しゃっちょこばる",
+      "tags": [],
+      "appliesToKanji": [
+        "鯱張る"
+      ]
+    },
+    {
+      "common": false,
+      "text": "しゃちこばる",
+      "tags": [],
+      "appliesToKanji": [
+        "鯱張る"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "v5r",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to stand on ceremony"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "v5r",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to stiffen up (the nerves)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "to be tense"
+        }
+      ]
+    }
+  ]
+}

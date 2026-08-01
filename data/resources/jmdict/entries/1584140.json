@@ -1,0 +1,61 @@
+{
+  "id": "1584140",
+  "kanji": [
+    {
+      "common": false,
+      "text": "傍目",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "はた目",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "はため",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [
+        "oft. 〜に"
+      ],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "outsider's perspective"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "as seen by an observer"
+        }
+      ]
+    }
+  ]
+}

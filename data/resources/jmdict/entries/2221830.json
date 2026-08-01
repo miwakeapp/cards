@@ -1,0 +1,99 @@
+{
+  "id": "2221830",
+  "kanji": [
+    {
+      "common": false,
+      "text": "目出度し目出度し",
+      "tags": [
+        "rK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "愛でたし愛でたし",
+      "tags": [
+        "rK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "めでたしめでたし",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "exp"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "愛でたし"
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [
+        "traditional ending to stories"
+      ],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "and they all lived happily ever after"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "exp"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "having a happy ending"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "ending without incident"
+        }
+      ]
+    }
+  ]
+}

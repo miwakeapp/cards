@@ -1,0 +1,221 @@
+{
+  "id": "1375040",
+  "kanji": [
+    {
+      "common": true,
+      "text": "勢い",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "勢",
+      "tags": [
+        "io"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "いきおい",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "いきよい",
+      "tags": [
+        "ik"
+      ],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "force"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "vigor"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "vigour"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "energy"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "spirit"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "life"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "influence"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "authority"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "power"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "might"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "impetus"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "impulse"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "momentum"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "course (of events)"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adv"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "naturally"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "necessarily"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "inevitably"
+        }
+      ]
+    }
+  ]
+}

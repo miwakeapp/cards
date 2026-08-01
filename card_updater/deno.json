@@ -11,10 +11,17 @@
         "../data/resources/jmdict/tags.json",
         "../data/test/fixtures/jmdict_furigana.json",
         "../data/test/fixtures/jmdict_readings.json"
+      ],
+      "sys": [
+        "hostname"
       ]
     }
   },
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "deno.ns"]
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "deno.ns"
+    ]
   }
 }

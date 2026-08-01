@@ -8,7 +8,7 @@ import { parseArgs } from "@std/cli/parse-args";
 import * as path from "@std/path";
 import { MODEL_IDS, type ModelId } from "card_field_generation";
 import { allJMDictEntries } from "data";
-import { buildSpellingIndex } from "../shared/jmdict_resolution/recognition_target_lookup.ts";
+import { buildSpellingIndex } from "card_resolution";
 import { EPUB_CONTEXT_PROMPT_VERSION, selectFullEPUBContext } from "./epub_context_extraction.ts";
 import { convertAnimecardsNote } from "./convert.ts";
 import { entrySelectionOverride } from "./entry_selection.ts";
@@ -66,7 +66,7 @@ function parseArguments(args: string[]): Options {
   const [manifestPath] = flags._;
   if (manifestPath === undefined) throw new Error("A conversion manifest path is required.");
   const outputPath = flags.output ?? derivedPath(manifestPath, "context");
-  const model = flags.model ?? "gemini-3.5-flash" satisfies ModelId;
+  const model = flags.model ?? "gemini-3.6-flash" satisfies ModelId;
   if (!MODEL_IDS.includes(model as ModelId)) {
     throw new Error(`Unknown model: ${model}. Available: ${MODEL_IDS.join(", ")}`);
   }

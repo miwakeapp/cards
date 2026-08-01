@@ -1,0 +1,108 @@
+{
+  "id": "1338475",
+  "kanji": [
+    {
+      "common": true,
+      "text": "お出かけ",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "お出掛け",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "御出掛け",
+      "tags": [
+        "sK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "おでかけ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "出掛け",
+          1
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "hon",
+        "pol"
+      ],
+      "info": [
+        "oft. used as a greeting in the form of お出かけですか？"
+      ],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "about to start out"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "just about to leave or go out"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "outing"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "trip"
+        }
+      ]
+    }
+  ]
+}

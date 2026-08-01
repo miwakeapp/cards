@@ -1,0 +1,123 @@
+{
+  "id": "1983530",
+  "kanji": [
+    {
+      "common": false,
+      "text": "楽チン",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "楽ちん",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "らくチン",
+      "tags": [],
+      "appliesToKanji": [
+        "楽チン"
+      ]
+    },
+    {
+      "common": false,
+      "text": "らくちん",
+      "tags": [],
+      "appliesToKanji": [
+        "楽ちん"
+      ]
+    },
+    {
+      "common": false,
+      "text": "ラクチン",
+      "tags": [],
+      "appliesToKanji": []
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adj-na",
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "chn"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "easy-peasy"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "easy"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "simple"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adj-na",
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "chn"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "pleasant"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "comfortable"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "comfy"
+        }
+      ]
+    }
+  ]
+}

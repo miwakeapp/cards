@@ -239,6 +239,26 @@ Deno.test("analyzeCard: updates furigana beneath automatic affix notation", asyn
   assertEquals(card.proposedReading, "～食[た]べる");
 });
 
+Deno.test("analyzeCard: preserves a stored half-width affix marker while updating furigana", async () => {
+  const word = makeWord({
+    id: "1358280",
+    kanji: ["食べる"],
+    kana: ["たべる"],
+    senses: [{ glosses: ["to eat"] }],
+  });
+  const note = makeNote({
+    key: "食べる | 1358280",
+    recognitionTarget: "〜食べる",
+    reading: "〜食べ[たべ]る",
+    dictionaryEntry: renderEntry(word),
+  });
+  const card = await analyzeCard(note, word);
+
+  assertEquals(card.verdict, "routine");
+  assertEquals(card.reason, "furigana-placement");
+  assertEquals(card.proposedReading, "〜食[た]べる");
+});
+
 Deno.test("analyzeCard: surfaces Reading changes alongside HTML normalization", async () => {
   const word = makeWord({
     id: "1358280",
@@ -277,7 +297,7 @@ Deno.test("analyzeCard: preserves precise readings that have no current lookup",
   assertEquals(card.proposedReading, null);
 });
 
-Deno.test("analyzeCard: repairs legacy zero-surface furigana annotations", async () => {
+Deno.test("analyzeCard: repairs malformed zero-surface furigana annotations", async () => {
   const word = makeWord({
     id: "2252350",
     kanji: ["大人買い"],

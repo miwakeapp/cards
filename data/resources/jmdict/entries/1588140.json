@@ -1,0 +1,150 @@
+{
+  "id": "1588140",
+  "kanji": [
+    {
+      "common": true,
+      "text": "打ち合わせ",
+      "tags": []
+    },
+    {
+      "common": true,
+      "text": "打合せ",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "打ち合せ",
+      "tags": [
+        "sK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "打合わせ",
+      "tags": [
+        "sK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "打ちあわせ",
+      "tags": [
+        "sK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "うち合わせ",
+      "tags": [
+        "sK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "うちあわせ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vt"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "(preparatory) meeting"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "briefing session"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "(making) advance arrangements"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "overlap (of a coat, etc.)"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n",
+        "vs"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "arch"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "making something match exactly"
+        }
+      ]
+    }
+  ]
+}

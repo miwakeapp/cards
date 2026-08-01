@@ -1,9 +1,9 @@
 import * as path from "@std/path";
 import type { FuriganaData } from "../../src/furigana_import.ts";
 import { resourcePaths } from "../../src/resource_paths.ts";
+import { FURIGANA_FIXTURE_IDS } from "./jmdict_test_fixture_ids.ts";
 
 const dataDirectory = path.resolve(import.meta.dirname!, "../..");
-const entriesDirectory = resourcePaths.preextractedJMDictEntries;
 const fixturePath = path.join(dataDirectory, "test", "fixtures", "jmdict_furigana.json");
 
 // Keep one known-good upstream record out of the fixture so `card_creator` can test how it handles
@@ -11,14 +11,6 @@ const fixturePath = path.join(dataDirectory, "test", "fixtures", "jmdict_furigan
 const OMITTED_KEYS = new Set([
   "1205330|恰好悪い|かっこわるい",
 ]);
-
-const entryIds = new Set<string>();
-for await (const entry of Deno.readDir(entriesDirectory)) {
-  if (entry.isFile && entry.name.endsWith(".json")) {
-    entryIds.add(path.basename(entry.name, ".json"));
-  }
-}
-if (entryIds.size === 0) throw new Error("No pre-extracted JMDict entries found");
 
 const furigana = JSON.parse(
   await Deno.readTextFile(resourcePaths.jmdictFurigana),
@@ -32,7 +24,7 @@ for (const key of OMITTED_KEYS) {
 }
 const fixtureFurigana = Object.fromEntries(
   Object.entries(furigana).filter(([key]) =>
-    entryIds.has(key.slice(0, key.indexOf("|"))) && !OMITTED_KEYS.has(key)
+    FURIGANA_FIXTURE_IDS.has(key.slice(0, key.indexOf("|"))) && !OMITTED_KEYS.has(key)
   ),
 );
 
