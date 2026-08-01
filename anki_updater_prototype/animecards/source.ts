@@ -872,8 +872,7 @@ export function expandEPUBContextToBalancedParagraphEnd(
   return extractEPUBHTMLFromParagraphs(paragraphs, passageText, 0);
 }
 
-export type EPUBContextAnalysis =
-  | { status: "not-found" }
+type LocatedEPUBContextAnalysis =
   | {
     status: "complete";
     match: EPUBContextMatch;
@@ -881,6 +880,11 @@ export type EPUBContextAnalysis =
     dialogueElided?: true;
   }
   | { status: "cut-off"; match: EPUBContextMatch };
+
+export type EPUBContextAnalysis =
+  | { status: "not-found" }
+  | { status: "ambiguous" }
+  | LocatedEPUBContextAnalysis;
 
 /**
  * Finds an EPUB excerpt and derives the source-faithful span that later semantic selection must
@@ -893,7 +897,7 @@ export function analyzeEPUBContext(
 ): EPUBContextAnalysis {
   const matches = findEPUBContexts(corpus, contextHTML, sourceName);
   if (matches.length === 0) return { status: "not-found" };
-  const analyses = matches.map((match): Exclude<EPUBContextAnalysis, { status: "not-found" }> => {
+  const analyses = matches.map((match): LocatedEPUBContextAnalysis => {
     const restored = requiredEPUBContextResult(match, contextHTML);
     return restored === null ? { status: "cut-off", match } : {
       status: "complete",
@@ -905,34 +909,22 @@ export function analyzeEPUBContext(
 
   if (analyses.length === 1) return analyses[0];
 
-  // Normally the historical source location is immaterial only when every occurrence has
-  // identical cleaned HTML and an identical semantic-evidence window. A complete outer quotation
-  // is independently meaningful, however, so identical rendered dialogue can be accepted even
-  // when the surrounding narration differs.
+  // Repeated source text is safe when every occurrence restores to exactly the same complete HTML.
+  // Its wider narrative surroundings remain unavailable as sense-selection evidence because
+  // `findUniqueEPUBContext()` deliberately requires one historical location.
   if (analyses.every((analysis) => analysis.status === "complete")) {
     const [first, ...rest] = analyses;
     if (
       first.status === "complete" &&
       rest.every((analysis) =>
         analysis.status === "complete" &&
-        analysis.contextHTML === first.contextHTML &&
-        (
-          JSON.stringify(analysis.match.window.map((paragraph) => paragraph.html)) ===
-            JSON.stringify(first.match.window.map((paragraph) => paragraph.html)) ||
-          isCompleteOuterDialogue(first.contextHTML)
-        )
+        analysis.contextHTML === first.contextHTML
       )
     ) {
       return first;
     }
   }
-  return { status: "not-found" };
-}
-
-function isCompleteOuterDialogue(contextHTML: string): boolean {
-  const text = searchableEPUBText(contextHTML);
-  const closing = DIALOGUE_QUOTE_PAIRS[text[0]];
-  return closing !== undefined && text.at(-1) === closing && EPUBBracketsAreBalanced(text);
+  return { status: "ambiguous" };
 }
 
 export function cleanSourceName(sourceHTML: string): string | null {

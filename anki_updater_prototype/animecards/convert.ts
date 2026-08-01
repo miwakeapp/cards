@@ -500,7 +500,9 @@ export async function convertAnimecardsNote(
       originalContextHTML,
       sourceResolution.name,
     );
-    if (analysis.status !== "not-found") epubContextMatch = analysis.match;
+    if (analysis.status === "complete" || analysis.status === "cut-off") {
+      epubContextMatch = analysis.match;
+    }
     if (options.contextOverride === undefined && analysis.status === "complete") {
       contextHTML = normalizeContextHTML(analysis.contextHTML);
       fullContextResolution = analysis.dialogueElided === true
@@ -605,40 +607,51 @@ export async function convertAnimecardsNote(
       byLookupSpelling,
     };
   }
-  let surfaceMatches = await findSurfaceForms([recognitionTarget]);
-  if (surfaceMatches.surfaces.length === 0) {
-    surfaceMatches = await findSurfaceForms(readings);
-  }
-  if (surfaceMatches.surfaces.length === 0) {
-    surfaceMatches = await findSurfaceForms(entrySpellings(entry));
-  }
-  if (surfaceMatches.surfaces.length === 0 && epubContextMatch !== null) {
-    const sourceSurfaceMatches = await findSurfaceForms(
-      [recognitionTarget, ...readings, ...entrySpellings(entry)],
-      epubContextMatch.paragraphs.map(({ html }) => `<p>${html}</p>`).join(""),
-      true,
-    );
-    if (sourceSurfaceMatches.surfaces.length === 1) {
-      const recoveredContextHTML = expandEPUBContextToIncludeTarget(
-        epubContextMatch.paragraphs,
-        originalContextHTML,
-        sourceSurfaceMatches.surfaces[0],
+  let surfaceMatches: SurfaceFormMatches;
+  try {
+    surfaceMatches = await findSurfaceForms([recognitionTarget]);
+    if (surfaceMatches.surfaces.length === 0) {
+      surfaceMatches = await findSurfaceForms(readings);
+    }
+    if (surfaceMatches.surfaces.length === 0) {
+      surfaceMatches = await findSurfaceForms(entrySpellings(entry));
+    }
+    if (surfaceMatches.surfaces.length === 0 && epubContextMatch !== null) {
+      const sourceSurfaceMatches = await findSurfaceForms(
+        [recognitionTarget, ...readings, ...entrySpellings(entry)],
+        epubContextMatch.paragraphs.map(({ html }) => `<p>${html}</p>`).join(""),
+        true,
       );
-      if (recoveredContextHTML !== null) {
-        contextHTML = normalizeContextHTML(recoveredContextHTML);
-        context = contextPlainText(contextHTML);
-        surfaceMatches = await findSurfaceForms(
-          [recognitionTarget, ...readings, ...entrySpellings(entry)],
-          contextHTML,
-          true,
+      if (sourceSurfaceMatches.surfaces.length === 1) {
+        const recoveredContextHTML = expandEPUBContextToIncludeTarget(
+          epubContextMatch.paragraphs,
+          originalContextHTML,
+          sourceSurfaceMatches.surfaces[0],
         );
-        fullContextResolution = {
-          status: "pending",
-          source: epubContextMatch.source,
-          requiredContextHTML: contextHTML,
-        };
+        if (recoveredContextHTML !== null) {
+          contextHTML = normalizeContextHTML(recoveredContextHTML);
+          context = contextPlainText(contextHTML);
+          surfaceMatches = await findSurfaceForms(
+            [recognitionTarget, ...readings, ...entrySpellings(entry)],
+            contextHTML,
+            true,
+          );
+          fullContextResolution = {
+            status: "pending",
+            source: epubContextMatch.source,
+            requiredContextHTML: contextHTML,
+          };
+        }
       }
     }
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message.includes("selects only part of a ruby annotation component")
+    ) {
+      return skip(note.noteId, word, "ruby-boundary-mismatch", error.message);
+    }
+    throw error;
   }
   recognitionTarget = recognitionTargetFromSource(surfaceMatches, recognitionTarget);
   if (!entrySpellings(entry).includes(recognitionTarget)) {

@@ -171,13 +171,6 @@ function endsInDependentFragment(paragraph: string): boolean {
   return /(?:のように|とも知らずに)$/u.test(withoutClosingPunctuation);
 }
 
-function openingUnresolvedReference(text: string): string | undefined {
-  const firstSentence = text.trimStart().replace(/^[「『（]+/u, "").split(/[。！？!?]/u, 1)[0];
-  return firstSentence.match(
-    /^(?:[^、]{1,20}(?:は|が))?(それ(?!とも)|その|そこ|両方)/u,
-  )?.[1];
-}
-
 const JAPANESE_WORD_CHARACTER = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}ー]/v;
 
 function textOutsideTargetSentinels(text: string): string[] {
@@ -333,13 +326,6 @@ function validateCandidate(
       `AI minimized context introduces source-unsupported adjacent lexical repetition(s) ${
         [...unsupportedAdjacentRepetitions].map((text) => JSON.stringify(text)).join(", ")
       }`,
-    );
-  }
-
-  const unresolvedReference = openingUnresolvedReference(candidate);
-  if (unresolvedReference !== undefined) {
-    throw new Error(
-      `AI minimized context opens with unresolved reference ${JSON.stringify(unresolvedReference)}`,
     );
   }
 

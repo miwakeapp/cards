@@ -270,16 +270,14 @@ Deno.test("renderMinimizedContextText rejects unsafe or unhelpful output", () =>
     Error,
     'source-unsupported adjacent lexical repetition(s) "猫猫"',
   );
-  assertThrows(
-    () =>
-      renderMinimizedContextText(
-        markedContextTextTemplate(
-          "前の質問を受けて、家福はそれについて考えた。答えと演技の<mark>境目</mark>を話した。",
-        ),
-        "家福はそれについて考えた。答えと演技の⟪target:0⟫境目⟪/target:0⟫を話した。",
+  assertEquals(
+    renderMinimizedContextText(
+      markedContextTextTemplate(
+        "前の質問を受けて、家福はそれについて考えた。答えと演技の<mark>境目</mark>を話した。",
       ),
-    Error,
-    'opens with unresolved reference "それ"',
+      "家福はそれについて考えた。答えと演技の⟪target:0⟫境目⟪/target:0⟫を話した。",
+    ),
+    "家福はそれについて考えた。答えと演技の<mark>境目</mark>を話した。",
   );
   assertThrows(
     () =>

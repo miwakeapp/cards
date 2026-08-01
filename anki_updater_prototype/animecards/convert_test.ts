@@ -846,6 +846,32 @@ Deno.test("convertAnimecardsNote lets marked source ruby select the JMDict readi
   }
 });
 
+Deno.test("convertAnimecardsNote defers a target inside an unsplit ruby component", async () => {
+  const entry = makeWord({ kanji: ["局所"], kana: ["きょくしょ"], partOfSpeech: ["n"] });
+  const entries = new Map([[entry.id, entry]]);
+  const result = await convertAnimecardsNote(
+    makeNote({
+      Word: "局所",
+      Reading: "きょくしょ",
+      Sentence: "<ruby><rb>薬物局所輸送</rb><rt>DDS</rt></ruby>による前頭葉局所マスキング。",
+    }),
+    {
+      sourceModel: "Animecards",
+      targetModel: "Miwake",
+      sourceFields: SOURCE_FIELDS,
+      entries,
+      spellingIndex: buildSpellingIndex(entries.values()),
+    },
+  );
+
+  assertEquals(result.skipped, {
+    noteId: 42,
+    word: "局所",
+    reason: "ruby-boundary-mismatch",
+    detail: 'Target occurrence "局所" selects only part of a ruby annotation component',
+  });
+});
+
 Deno.test("convertAnimecardsNote uses an exact existing reading among script variants", async () => {
   const entry = makeWord({ kana: ["ニヤニヤ", "にやにや"] });
   const entries = new Map([[entry.id, entry]]);
@@ -1177,6 +1203,47 @@ Deno.test("convertAnimecardsNote recovers a missing source from the EPUB corpus"
     source: "テスト小説",
     requiredContextHTML: "彼はたべている。",
   });
+});
+
+Deno.test("convertAnimecardsNote accepts identical complete EPUB excerpts in different passages", async () => {
+  const entry = makeWord({ kana: ["たべる"] });
+  const entries = new Map([[entry.id, entry]]);
+  const excerpt = "彼はたべている。";
+  const first = {
+    html: `最初の場面。${excerpt}`,
+    plainText: `最初の場面。${excerpt}`,
+    document: "first.xhtml",
+    index: 0,
+  };
+  const second = {
+    html: `別の場面。${excerpt}`,
+    plainText: `別の場面。${excerpt}`,
+    document: "second.xhtml",
+    index: 0,
+  };
+  const result = await convertAnimecardsNote(makeNote({ Sentence: excerpt }), {
+    sourceModel: "Animecards",
+    targetModel: "Miwake",
+    sourceFields: SOURCE_FIELDS,
+    entries,
+    spellingIndex: buildSpellingIndex(entries.values()),
+    epubSourceCorpus: {
+      sources: [{
+        name: "Test Book",
+        documents: [first.plainText, second.plainText],
+        paragraphs: [first, second],
+      }],
+    },
+  });
+
+  assert(result.candidate, JSON.stringify(result.skipped));
+  assertEquals(result.candidate.approved, true);
+  assertEquals(result.candidate.fullContextResolution, {
+    status: "pending",
+    source: "Test Book",
+    requiredContextHTML: excerpt,
+  });
+  assertEquals(result.candidate.senseSelectionContext, excerpt);
 });
 
 Deno.test("convertAnimecardsNote preserves semantic EPUB paragraph boundaries", async () => {

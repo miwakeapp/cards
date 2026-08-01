@@ -212,7 +212,10 @@ async function main(): Promise<void> {
       );
       const analysis = analyzeEPUBContext(corpus, originalContext, source);
       if (analysis.status === "not-found") {
-        throw new Error("The original excerpt no longer has one unambiguous EPUB match.");
+        throw new Error("The original excerpt no longer occurs in the selected EPUB source.");
+      }
+      if (analysis.status === "ambiguous") {
+        throw new Error("The original excerpt has multiple nonequivalent EPUB matches.");
       }
       const { match } = analysis;
       const inputFingerprint = await fingerprint({
