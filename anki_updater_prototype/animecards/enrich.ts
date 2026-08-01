@@ -22,7 +22,7 @@ import {
 } from "../shared/focused_card_generation.ts";
 import { applyGeneratedCardFields, needsCardFieldEnrichment } from "./enrichment.ts";
 import { checkpointMatchesInput, createCheckpointManifest } from "./checkpoint.ts";
-import { contextPlainText, normalizeContextHTML } from "./html.ts";
+import { contextPlainText } from "./html.ts";
 import { writeConversionAuditArtifacts } from "./report.ts";
 import {
   CONVERSION_MANIFEST_VERSION,
@@ -226,8 +226,10 @@ function parseManifest(json: string): ConversionManifest {
   return manifest;
 }
 
-function enrichmentContext(candidate: ConversionCandidate): string {
-  return normalizeContextHTML(candidate.target.fields["Full context"]);
+export function enrichmentContext(candidate: ConversionCandidate): string {
+  // This is already a canonical Miwake Card field produced by `card_creator`. The Animecards
+  // input normalizer would strip its semantically meaningful `<mark>` elements.
+  return candidate.target.fields["Full context"].trim();
 }
 
 function ankiFuriganaSurfaceHTML(html: string): string {

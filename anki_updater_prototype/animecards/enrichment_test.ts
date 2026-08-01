@@ -4,6 +4,7 @@ import { assertEquals, assertRejects } from "@std/assert";
 import { preextractedJMDictEntry } from "data";
 import {
   applySettledCandidateEnrichment,
+  enrichmentContext,
   isAIQuotaError,
   markedSenseSelectionContext,
 } from "./enrich.ts";
@@ -46,6 +47,16 @@ function candidate(): ConversionCandidate {
 }
 
 const entry = await preextractedJMDictEntry("1414110");
+
+Deno.test("enrichmentContext preserves canonical target markup", () => {
+  const value = candidate();
+  value.target.fields["Full context"] = "  物の<mark>大小</mark>を比べた後も、話は長く続いた。  ";
+
+  assertEquals(
+    enrichmentContext(value),
+    "物の<mark>大小</mark>を比べた後も、話は長く続いた。",
+  );
+});
 
 Deno.test("minimizedContextNeedsGeneration excludes completed results", () => {
   assertEquals(minimizedContextNeedsGeneration({ status: "not-needed" }), false);

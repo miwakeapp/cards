@@ -510,7 +510,7 @@ Deno.test("EPUB context analysis accepts identical complete dialogue with differ
   );
 });
 
-Deno.test("EPUB context analysis rejects repeated excerpts with different evidence windows", () => {
+Deno.test("EPUB context analysis accepts identical complete excerpts with different evidence windows", () => {
   const first = {
     html: "最初の前提。対象の文です。",
     plainText: "最初の前提。対象の文です。",
@@ -531,9 +531,12 @@ Deno.test("EPUB context analysis rejects repeated excerpts with different eviden
     }],
   };
 
-  assertEquals(analyzeEPUBContext(corpus, "対象の文です。", "Book"), {
-    status: "not-found",
-  });
+  const analysis = analyzeEPUBContext(corpus, "対象の文です。", "Book");
+  assertEquals(analysis.status, "complete");
+  assertEquals(
+    analysis.status === "complete" ? analysis.contextHTML : null,
+    "対象の文です。",
+  );
 });
 
 Deno.test("EPUB context analysis rejects repeated excerpts with different source ruby", () => {
@@ -557,9 +560,7 @@ Deno.test("EPUB context analysis rejects repeated excerpts with different source
     }],
   };
 
-  assertEquals(analyzeEPUBContext(corpus, "同一の文です。", "Book"), {
-    status: "not-found",
-  });
+  assertEquals(analyzeEPUBContext(corpus, "同一の文です。", "Book").status, "ambiguous");
 });
 
 Deno.test("EPUB context analysis rejects ambiguous quoted and standalone occurrences", () => {
@@ -583,9 +584,7 @@ Deno.test("EPUB context analysis rejects ambiguous quoted and standalone occurre
     }],
   };
 
-  assertEquals(analyzeEPUBContext(corpus, "対象の文です。", "Book"), {
-    status: "not-found",
-  });
+  assertEquals(analyzeEPUBContext(corpus, "対象の文です。", "Book").status, "ambiguous");
 });
 
 Deno.test("EPUB context analysis does not treat angle brackets as dialogue", () => {

@@ -3,7 +3,7 @@ import {
   resolveContextTarget,
   type ResolvedContextTarget,
 } from "card_resolution";
-import { containsKanji } from "japanese_text";
+import { containsKanji, isKanji } from "japanese_text";
 
 const HAN_CHARACTER = /\p{Script=Han}/v;
 const HIRAGANA_CHARACTER = /\p{Script=Hiragana}/v;
@@ -45,7 +45,10 @@ function validateResolvedOccurrences(
   const permitsLeftAttachment = partOfSpeech.some((tag) => tag === "suf" || tag === "n-suf");
   const permitsRightAttachment = partOfSpeech.some((tag) => tag === "pref" || tag === "n-pref");
   for (const { start, end, surface } of occurrences) {
-    if (!HAN_CHARACTER.test(surface)) continue;
+    // Multi-character JMDict spellings can legitimately participate in compounds (`原始社会`,
+    // `社会運動家`), and inflected surfaces can end immediately before another kanji
+    // (`居直って怠惰`). Only a one-kanji target is too weak to identify safely this way.
+    if (!isKanji(recognitionTarget)) continue;
     const previous = [...renderedText.slice(0, start)].at(-1) ?? "";
     const nextCodePoint = renderedText.codePointAt(end);
     const next = nextCodePoint === undefined ? "" : String.fromCodePoint(nextCodePoint);

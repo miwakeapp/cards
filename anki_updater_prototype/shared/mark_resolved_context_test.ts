@@ -38,11 +38,23 @@ Deno.test("markResolvedContextTarget allows one-kanji counters after numerals", 
   );
 });
 
-Deno.test("markResolvedContextTarget rejects multi-kanji targets embedded in compounds", async () => {
-  await assertRejects(
-    () => markResolvedContextTarget("会社員が会社にいる。", "会社", ["n"]),
-    Error,
-    `source surface "会社"`,
+Deno.test("markResolvedContextTarget allows multi-kanji words inside compounds", async () => {
+  assertEquals(
+    await markResolvedContextTarget("原始社会の社会運動家だ。", "原始", ["n", "adj-no"]),
+    "<mark>原始</mark>社会の社会運動家だ。",
+  );
+  assertEquals(
+    await markResolvedContextTarget("原始社会の社会運動家だ。", "運動家", ["n"]),
+    "原始社会の社会<mark>運動家</mark>だ。",
+  );
+});
+
+Deno.test("markResolvedContextTarget allows kana-ended surfaces before kanji", async () => {
+  assertEquals(
+    await markResolvedContextTarget("自分は無力だと居直って怠惰の言い訳をする。", "居直る", [
+      "v5r",
+    ]),
+    "自分は無力だと<mark>居直って</mark>怠惰の言い訳をする。",
   );
 });
 
