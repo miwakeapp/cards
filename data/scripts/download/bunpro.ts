@@ -14,7 +14,7 @@ const MAX_ATTEMPTS = 3;
 const CONCURRENCY = 8;
 const EXPECTED_LOGGED_OUT_SAMPLE_COUNT = 12;
 // Increment whenever parsing changes so resumable downloads cannot reuse stale derived records.
-const CACHE_VERSION = 1;
+const CACHE_VERSION = 2;
 
 interface CachedGrammarPoint {
   cacheVersion: number;
