@@ -1,5 +1,6 @@
 import { escape } from "@std/html/entities";
 import { type DefaultTreeAdapterTypes, parseFragment, type ParserError, serialize } from "parse5";
+import { ankiFuriganaToSurface } from "./anki_furigana.ts";
 import { findSourceUnsupportedHiraganaWords } from "./lexical_grounding.ts";
 
 type ChildNode = DefaultTreeAdapterTypes.ChildNode;
@@ -77,12 +78,16 @@ function appendSeparator(text: string, separator: string): string {
  * Converts sanitized marked context HTML into safe plain-text model input.
  *
  * Ruby readings and other invisible HTML content are omitted; block boundaries become blank
- * lines; and each `<mark>`'s visible surface is wrapped in opaque sentinels. Textual notation such
- * as Anki bracket furigana is preserved because context minimization may need to retain it. Exact
- * marked source markup is retained separately for restoration, so models cannot rewrite target
- * markup or inject HTML.
+ * lines; and each `<mark>`'s visible surface is wrapped in opaque sentinels. Exact marked source
+ * markup is retained separately for restoration, so models cannot rewrite target markup or inject
+ * HTML. Textual Anki bracket furigana is preserved by default for back-side context work;
+ * `stripAnkiFurigana` projects only its displayed surface for semantic operations where a reading
+ * must not leak onto the card front.
  */
-export function markedContextTextTemplate(html: string): MarkedContextTextTemplate {
+export function markedContextTextTemplate(
+  html: string,
+  { stripAnkiFurigana = false }: { stripAnkiFurigana?: boolean } = {},
+): MarkedContextTextTemplate {
   if (
     html.includes(TARGET_SENTINEL_PREFIX) ||
     html.includes(TARGET_END_SENTINEL_PREFIX)
@@ -105,7 +110,7 @@ export function markedContextTextTemplate(html: string): MarkedContextTextTempla
     let text = "";
     for (const child of parent.childNodes) {
       if (isTextNode(child)) {
-        text += child.value;
+        text += stripAnkiFurigana ? ankiFuriganaToSurface(child.value) : child.value;
         continue;
       }
       if (!isElement(child) || INVISIBLE_ELEMENTS.has(child.tagName)) continue;

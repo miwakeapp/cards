@@ -40,6 +40,13 @@ export interface SurfaceFormLookupOptions {
   partOfSpeech?: Iterable<string>;
   /** Allows a one-character target inside a larger token when stronger source evidence exists. */
   allowSingleCharacterSubstring?: boolean;
+  /**
+   * Requires kana in generated source forms to preserve the spelling's hiragana/katakana choices.
+   *
+   * Source lookup normally treats the scripts as pronunciation-equivalent. Enable this when
+   * validating an already-created card whose recognition target must retain source orthography.
+   */
+  requireExactKanaScript?: boolean;
 }
 
 const require = createRequire(import.meta.url);
@@ -84,6 +91,17 @@ function unique<T>(values: Iterable<T>): T[] {
   return [...new Set(values)];
 }
 
+function appearanceSurfaceForms(stem: string): string[] {
+  return [
+    `${stem}そう`,
+    `${stem}そうな`,
+    `${stem}そうに`,
+    `${stem}そうだ`,
+    `${stem}そうで`,
+    `${stem}そうだった`,
+  ];
+}
+
 function verbStemSurfaceForms(stem: string): string[] {
   return [
     `${stem}ます`,
@@ -97,6 +115,7 @@ function verbStemSurfaceForms(stem: string): string[] {
     `${stem}たくない`,
     `${stem}たくなかった`,
     `${stem}ながら`,
+    ...appearanceSurfaceForms(stem),
   ];
 }
 
@@ -321,13 +340,12 @@ function adjectiveSurfaceForms(dictionaryForm: string): string[] {
     `${stem}さ`,
     `${stem}み`,
     `${stem}げ`,
-    `${stem}そう`,
-    `${stem}そうな`,
-    `${stem}そうに`,
-    `${stem}そうだ`,
-    `${stem}そうで`,
-    `${stem}そうだった`,
+    ...appearanceSurfaceForms(stem),
   ];
+  // `よい` and adjectives ending in `ない` conventionally insert `さ` before appearance `そう`.
+  if (dictionaryForm === "よい" || dictionaryForm.endsWith("ない")) {
+    forms.push(...appearanceSurfaceForms(`${stem}さ`));
+  }
   // Literary and affectionate attributive constructions retain the stem of `～しい`
   // adjectives before `の`, as in `麗しの友` and `愛しの君`. This is not a general i-adjective
   // form: accepting arbitrary stems would misread strings such as `高の原` as forms of `高い`.
@@ -436,18 +454,19 @@ function literalSurfaceMatches(
   sentence: string,
   surfaceForms: Iterable<string>,
   allowSingleCharacterSubstring: boolean,
+  requireExactKanaScript: boolean,
 ): RenderedTextOccurrence[] {
-  const normalizedSentence = toHiragana(sentence);
+  const searchableSentence = requireExactKanaScript ? sentence : toHiragana(sentence);
   const matches: RenderedTextOccurrence[] = [];
   for (const form of surfaceForms) {
     if (form === "") continue;
     if ([...form].length < 2 && !allowSingleCharacterSubstring) continue;
-    const normalizedForm = toHiragana(form);
-    let start = normalizedSentence.indexOf(normalizedForm);
+    const searchableForm = requireExactKanaScript ? form : toHiragana(form);
+    let start = searchableSentence.indexOf(searchableForm);
     while (start !== -1) {
-      const end = start + normalizedForm.length;
+      const end = start + searchableForm.length;
       matches.push({ start, end, surface: sentence.slice(start, end) });
-      start = normalizedSentence.indexOf(normalizedForm, start + 1);
+      start = searchableSentence.indexOf(searchableForm, start + 1);
     }
   }
   // Prefer the longest valid conjugation at each occurrence. This keeps `たべて` instead of the
@@ -523,14 +542,28 @@ function tokenLookupForm(token: KuromojiToken): string {
   return token.basic_form === "*" ? token.surface_form : token.basic_form;
 }
 
+const INFLECTIONAL_AUXILIARY_BASIC_FORMS = new Set([
+  "ない",
+  "ぬ",
+  "ん",
+  "ます",
+  "た",
+  "う",
+  "たい",
+]);
+
 function isInflectionContinuation(token: KuromojiToken): boolean {
-  // `たい` describes the subject's desire rather than the encountered target action. Stop before
-  // it (and therefore before any following polarity, as in `されたくない`) while retaining voice
-  // already expressed by suffix verbs such as `れる`.
-  if (token.pos === "助動詞" && token.basic_form === "たい") {
-    return false;
+  if (isAuxiliaryVerbSuffix(token) || isSuruVerb(token)) {
+    return true;
   }
-  if (token.pos === "助動詞" || isAuxiliaryVerbSuffix(token) || isSuruVerb(token)) {
+
+  // Retain tightly bound auxiliaries which select an inflectional stem of the encountered
+  // predicate. The boundary is morphosyntactic, not semantic: desiderative `たい` and volitional
+  // `う` are included, while constructions following an already-complete predicate, such as
+  // `べきだ`, `だろう`, and `らしい`, remain outside. An allowlist is intentional: treating every
+  // tokenizer `助動詞` as inflection previously expanded `取り締まる` to `取り締まるべきだ` and
+  // `もたらす` to `もたらすだろう`.
+  if (token.pos === "助動詞" && INFLECTIONAL_AUXILIARY_BASIC_FORMS.has(token.basic_form)) {
     return true;
   }
 
@@ -539,33 +572,6 @@ function isInflectionContinuation(token: KuromojiToken): boolean {
   // particles, or discourse connectives into the highlighted word.
   return token.pos === "助詞" && token.pos_detail_1 === "接続助詞" &&
     ["て", "で", "ば"].includes(token.surface_form);
-}
-
-function canonicalMarkedOccurrence(
-  sentence: string,
-  occurrence: RenderedTextOccurrence,
-  tokens: readonly KuromojiToken[],
-): RenderedTextOccurrence {
-  let tokenStart = 0;
-  for (const token of tokens) {
-    // The broad surface generator deliberately recognizes desiderative forms for validation and
-    // lexical grounding. Context marking has a narrower boundary: `たい` describes the subject's
-    // desire, so retain any voice morphology before it but leave `たい` and its polarity outside.
-    if (
-      occurrence.start < tokenStart &&
-      tokenStart < occurrence.end &&
-      token.pos === "助動詞" &&
-      token.basic_form === "たい"
-    ) {
-      return {
-        start: occurrence.start,
-        end: tokenStart,
-        surface: sentence.slice(occurrence.start, tokenStart),
-      };
-    }
-    tokenStart += token.surface_form.length;
-  }
-  return occurrence;
 }
 
 function surfaceSuffixCandidates(surface: string): string[] {
@@ -952,6 +958,7 @@ export async function findSurfaceFormOccurrencesForLookupSpelling(
     sentence,
     targetDrivenForms.forms,
     options.allowSingleCharacterSubstring === true,
+    options.requireExactKanaScript === true,
   );
   let tokenizer: KuromojiTokenizer | undefined;
   let tokens: KuromojiToken[] | undefined;
@@ -988,11 +995,6 @@ export async function findSurfaceFormOccurrencesForLookupSpelling(
         !hasInflectablePartOfSpeech,
       );
     });
-    if (hasInflectablePartOfSpeech) {
-      targetDrivenMatches = targetDrivenMatches.map((occurrence) =>
-        canonicalMarkedOccurrence(sentence, occurrence, sentenceTokens)
-      );
-    }
   }
   tokenizer ??= await kuromojiTokenizer();
   tokens ??= tokenizer.tokenize(sentence);

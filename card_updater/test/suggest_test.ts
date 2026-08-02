@@ -57,6 +57,16 @@ function selected(senseNumbers: readonly number[]): SenseSelectionOutcome {
   return { outcome: "selected", senseNumbers };
 }
 
+function suggestForTest(
+  card: AnalyzedCard,
+  options: Parameters<typeof suggestForCard>[1],
+) {
+  return suggestForCard(card, {
+    verifyContext: () => Promise.resolve(),
+    ...options,
+  });
+}
+
 async function retargetingCard(): Promise<AnalyzedCard> {
   const previousEntry = makeWord({
     senses: [
@@ -84,10 +94,15 @@ Deno.test("suggestForCard supplies marked context to focused sense and hint oper
   let senseInput: SenseSelectionInput | undefined;
   let hintInput: HintGenerationInput | undefined;
   let receivedModelId: ModelId | undefined;
+  let verifiedContext: unknown;
 
-  const suggestion = await suggestForCard(card, {
+  const suggestion = await suggestForTest(card, {
     sameSpellingEntries: [card.latestWord!],
     modelId: "gpt-5.6-sol",
+    verifyContext: (context, lookupSpelling, options) => {
+      verifiedContext = { context, lookupSpelling, options };
+      return Promise.resolve();
+    },
     selectSenses: (input, options) => {
       senseInput = input;
       receivedModelId = options?.modelId;
@@ -121,6 +136,11 @@ Deno.test("suggestForCard supplies marked context to focused sense and hint oper
     contrastingUsages: [{ entry: card.latestWord!, senseNumbers: [1] }],
   });
   assertEquals(receivedModelId, "gpt-5.6-sol");
+  assertEquals(verifiedContext, {
+    context: "これは<mark>言葉</mark><br>のテストです。",
+    lookupSpelling: "言葉",
+    options: { partOfSpeech: ["n"] },
+  });
   assertEquals(suggestion.senses, [2]);
   assertEquals(suggestion.aiHint, "言葉のテスト");
   assertEquals(suggestion.defaultHint, "言葉のテスト");
@@ -131,10 +151,30 @@ Deno.test("suggestForCard supplies marked context to focused sense and hint oper
   assertEquals(suggestion.fromCache, false);
 });
 
+Deno.test("suggestForCard rejects stale target marks before invoking AI", async () => {
+  const card = await retargetingCard();
+  let senseSelectionWasRequested = false;
+
+  await assertRejects(
+    () =>
+      suggestForTest(card, {
+        sameSpellingEntries: [card.latestWord!],
+        verifyContext: () => Promise.reject(new Error("unsupported marked occurrence")),
+        selectSenses: () => {
+          senseSelectionWasRequested = true;
+          return Promise.resolve(generated(selected([1])));
+        },
+      }),
+    Error,
+    'Card 1601969325935 Full context does not mark a supported occurrence of key spelling "言葉" in latest JMDict entry "1000000"',
+  );
+  assertEquals(senseSelectionWasRequested, false);
+});
+
 Deno.test("suggestForCard reports focused operation cache hits", async () => {
   const card = await retargetingCard();
   let receivedModelId: ModelId | undefined;
-  const suggestion = await suggestForCard(card, {
+  const suggestion = await suggestForTest(card, {
     sameSpellingEntries: [card.latestWord!],
     selectSenses: (input, options) => {
       receivedModelId = options?.modelId;
@@ -154,7 +194,7 @@ Deno.test("suggestForCard skips hint generation without a competitor and preserv
   card.note.fields.hint = "同じ綴りの別項目と区別する言葉";
   let hintWasRequested = false;
 
-  const suggestion = await suggestForCard(card, {
+  const suggestion = await suggestForTest(card, {
     sameSpellingEntries: [card.latestWord!],
     selectSenses: (input) => Promise.resolve(generated(selected(input.compatibleSenseNumbers))),
     generateHint: () => {
@@ -177,7 +217,7 @@ Deno.test("suggestForCard requests a hint when another entry has the same spelli
   });
   let hintInput: HintGenerationInput | undefined;
 
-  const suggestion = await suggestForCard(card, {
+  const suggestion = await suggestForTest(card, {
     sameSpellingEntries: [card.latestWord!, competitor],
     selectSenses: (input) => Promise.resolve(generated(selected(input.compatibleSenseNumbers))),
     generateHint: (input) => {
@@ -210,7 +250,7 @@ Deno.test("suggestForCard does not assume suffix notation absent from the stored
   });
   let hintInput: HintGenerationInput | undefined;
 
-  const suggestion = await suggestForCard(card, {
+  const suggestion = await suggestForTest(card, {
     sameSpellingEntries: [card.latestWord!, noun],
     selectSenses: (input) => Promise.resolve(generated(selected(input.compatibleSenseNumbers))),
     generateHint: (input) => {
@@ -239,7 +279,7 @@ Deno.test("suggestForCard uses half-width suffix notation already present on the
   });
   let hintCalls = 0;
 
-  const suggestion = await suggestForCard(card, {
+  const suggestion = await suggestForTest(card, {
     sameSpellingEntries: [card.latestWord!, noun],
     selectSenses: (input) => Promise.resolve(generated(selected(input.compatibleSenseNumbers))),
     generateHint: () => {
@@ -261,7 +301,7 @@ Deno.test("suggestForCard requests a hint for another same-spelling suffix", asy
   });
   let hintInput: HintGenerationInput | undefined;
 
-  const suggestion = await suggestForCard(card, {
+  const suggestion = await suggestForTest(card, {
     sameSpellingEntries: [card.latestWord!, otherSuffix],
     selectSenses: (input) => Promise.resolve(generated(selected(input.compatibleSenseNumbers))),
     generateHint: (input) => {
@@ -301,7 +341,7 @@ Deno.test("suggestForCard contrasts senses excluded only by the selected reading
   );
   let hintInput: HintGenerationInput | undefined;
 
-  const suggestion = await suggestForCard(card, {
+  const suggestion = await suggestForTest(card, {
     sameSpellingEntries: [currentEntry],
     selectSenses: (input) => {
       assertEquals(input.compatibleSenseNumbers, [1]);
@@ -330,7 +370,7 @@ Deno.test("suggestForCard contrasts senses excluded only by the selected reading
 Deno.test("suggestForCard refreshes focused caches when explicitly forced", async () => {
   const card = await retargetingCard();
   let cacheMode: string | undefined;
-  await suggestForCard(card, {
+  await suggestForTest(card, {
     sameSpellingEntries: [card.latestWord!],
     force: true,
     selectSenses: (input, options) => {
@@ -348,7 +388,7 @@ Deno.test("suggestForCard rejects contextless cards before invoking AI", async (
 
   await assertRejects(
     () =>
-      suggestForCard(card, {
+      suggestForTest(card, {
         sameSpellingEntries: [card.latestWord!],
         selectSenses: (input) => {
           senseWasRequested = true;
@@ -367,7 +407,7 @@ Deno.test("suggestForCard rejects a usage matching no sense in the latest entry"
 
   await assertRejects(
     () =>
-      suggestForCard(card, {
+      suggestForTest(card, {
         sameSpellingEntries: [card.latestWord!],
         selectSenses: () => Promise.resolve(generated({ outcome: "no-match" as const })),
         generateHint: () => {
@@ -387,7 +427,7 @@ Deno.test("suggestForCard rejects an ambiguous usage without generating a hint",
 
   await assertRejects(
     () =>
-      suggestForCard(card, {
+      suggestForTest(card, {
         sameSpellingEntries: [card.latestWord!],
         selectSenses: () =>
           Promise.resolve(generated({
@@ -431,7 +471,7 @@ Deno.test("suggestForCard preserves a restricted all-compatible selection in the
   );
 
   let hintWasRequested = false;
-  const suggestion = await suggestForCard(card, {
+  const suggestion = await suggestForTest(card, {
     sameSpellingEntries: [card.latestWord!],
     selectSenses: (input) => {
       assertEquals(input.compatibleSenseNumbers, [1]);
@@ -457,7 +497,7 @@ Deno.test("contextForPrompt preserves target markup and stored line breaks", () 
 
 Deno.test("suggestForCard proposes an unhinted card when source evidence cannot support a hint", async () => {
   const card = await retargetingCard();
-  const suggestion = await suggestForCard(card, {
+  const suggestion = await suggestForTest(card, {
     sameSpellingEntries: [card.latestWord!],
     selectSenses: () => Promise.resolve(generated(selected([2]))),
     generateHint: () => Promise.resolve(generated({ outcome: "source-insufficient" as const })),
@@ -470,7 +510,7 @@ Deno.test("suggestForCard proposes an unhinted card when source evidence cannot 
 Deno.test("suggestForCard preserves an existing hint when focused generation needs no new one", async () => {
   const card = await retargetingCard();
   card.note.fields.hint = "既存の言葉";
-  const suggestion = await suggestForCard(card, {
+  const suggestion = await suggestForTest(card, {
     sameSpellingEntries: [card.latestWord!],
     selectSenses: () => Promise.resolve(generated(selected([2]))),
     generateHint: () => Promise.resolve(generated({ outcome: "not-needed" as const })),
@@ -482,7 +522,7 @@ Deno.test("suggestForCard preserves an existing hint when focused generation nee
 
 Deno.test("suggestForCard proposes an unhinted proper sense subset", async () => {
   const card = await retargetingCard();
-  const suggestion = await suggestForCard(card, {
+  const suggestion = await suggestForTest(card, {
     sameSpellingEntries: [card.latestWord!],
     selectSenses: () => Promise.resolve(generated(selected([2]))),
     generateHint: () => Promise.resolve(generated({ outcome: "not-needed" as const })),

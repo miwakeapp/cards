@@ -20,7 +20,7 @@ import {
   jmdictUsagesForSpelling,
 } from "card_creator";
 import { formatMiwakeKey } from "card_creator/keys";
-import { ankiFuriganaToSurface } from "card_resolution";
+import { ankiFuriganaToSurface, verifyMarkedContextTarget } from "card_resolution";
 import type { JMDictWord } from "data";
 import type { AnalyzedCard } from "./analyze.ts";
 import { splitAffixNotation } from "./affix_notation.ts";
@@ -71,6 +71,7 @@ export async function suggestForCard(
     force = false,
     selectSenses = selectApplicableSenses,
     generateHint = generateSourceGroundedHint,
+    verifyContext = verifyMarkedContextTarget,
   }: {
     /** Every JMDict entry containing the card's exact undecorated front-side spelling. */
     sameSpellingEntries: readonly JMDictWord[];
@@ -79,6 +80,8 @@ export async function suggestForCard(
     force?: boolean;
     selectSenses?: typeof selectApplicableSenses;
     generateHint?: typeof generateSourceGroundedHint;
+    /** Verifies that the stored marks still resolve to the card's current JMDict spelling. */
+    verifyContext?: typeof verifyMarkedContextTarget;
   },
 ): Promise<Suggestion> {
   if (card.latestWord === null || card.newParsed === null || card.parsedKey === null) {
@@ -110,6 +113,23 @@ export async function suggestForCard(
     );
   }
   const context = contextForPrompt(card.note.fields.fullContext);
+  const partOfSpeech = [
+    ...new Set(
+      compatibleSenseNumbers.flatMap((senseNumber) =>
+        card.latestWord!.sense[senseNumber - 1]?.partOfSpeech ?? []
+      ),
+    ),
+  ];
+  try {
+    await verifyContext(context, parsedKey.spelling, { partOfSpeech });
+  } catch (error) {
+    throw new Error(
+      `Card ${card.note.noteId} Full context does not mark a supported occurrence of key spelling ${
+        JSON.stringify(parsedKey.spelling)
+      } in latest JMDict entry ${JSON.stringify(card.latestWord.id)}.`,
+      { cause: error },
+    );
+  }
   const generationOptions = {
     ...(modelId === undefined ? {} : { modelId }),
     cache: generationCache,

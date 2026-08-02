@@ -98,8 +98,7 @@ Deno.test("isGeneratedSurfaceFormForLookupSpelling validates an isolated inflect
     }),
     true,
   );
-  // The broad validator accepts productive desiderative forms even though context marking uses a
-  // narrower lexical boundary and leaves the `たい` complex outside the mark.
+  // Productive desiderative morphology remains part of the encountered target form.
   assertEquals(
     isGeneratedSurfaceFormForLookupSpelling("縫いたい", "縫う", {
       partOfSpeech: ["v5u"],
@@ -367,7 +366,7 @@ Deno.test("findSurfaceFormsForLookupSpelling keeps finite target morphology", as
     await findSurfaceFormsForLookupSpelling("いつか自分で着物を縫いたいと思う。", "縫う", {
       partOfSpeech: ["v5u", "vt"],
     }),
-    ["縫い"],
+    ["縫いたい"],
   );
   assertEquals(
     await findSurfaceFormsForLookupSpelling("わたしが決着をつけなきゃいけない。", "決着をつける", {
@@ -441,6 +440,29 @@ Deno.test("findSurfaceFormsForLookupSpelling accepts kana-script-only source dif
       "あほたれ",
     ),
     ["アホタレ"],
+  );
+});
+
+Deno.test("findSurfaceFormsForLookupSpelling can require exact source kana scripts", async () => {
+  assertEquals(
+    await findSurfaceFormsForLookupSpelling("アホタレだ", "あほたれ", {
+      requireExactKanaScript: true,
+    }),
+    [],
+  );
+  assertEquals(
+    await findSurfaceFormsForLookupSpelling("ひどくどん引キした。", "ドン引き", {
+      partOfSpeech: ["n", "vs"],
+      requireExactKanaScript: true,
+    }),
+    [],
+  );
+  assertEquals(
+    await findSurfaceFormsForLookupSpelling("昨日はサボった。", "サボる", {
+      partOfSpeech: ["v5r"],
+      requireExactKanaScript: true,
+    }),
+    ["サボった"],
   );
 });
 

@@ -17,7 +17,6 @@ import {
   type FieldGenerationOperation,
   PRODUCTION_GENERATION_CONFIGURATIONS,
 } from "./model_presets.ts";
-import { validatedMarkedTargetTemplate } from "./marked_target.ts";
 import { type GenerationOptions, type GenerationResult, runGeneration } from "./runner.ts";
 
 export { HINT_PROMPT_FIXTURE_IDS, HINT_PROMPT_FIXTURE_LINKS } from "./hint_few_shots.ts";
@@ -34,13 +33,13 @@ export interface JMDictUsageReference {
 /** Evidence for deciding whether and how to distinguish one resolved usage from alternatives. */
 export interface HintGenerationInput {
   /**
-   * Sanitized source context HTML with the intended occurrence(s) wrapped in `<mark>`.
+   * Already-resolved, sanitized source context HTML with the intended occurrence(s) wrapped in
+   * `<mark>`.
    *
-   * The model receives rendered text with opaque target sentinels instead of HTML. This prevents
-   * a repeated same-spelling occurrence elsewhere in the context from silently supplying evidence
-   * for the wrong usage. Every mark's visible text must be `recognitionTarget` or an inflection
-   * permitted by the part-of-speech tags of `selectedUsage.senseNumbers`; unrelated marks are
-   * rejected before any provider call.
+   * Target location and lexical identity are caller preconditions owned by `card_resolution`. The
+   * model receives rendered text with opaque target sentinels instead of HTML, preventing an
+   * unmarked same-spelling occurrence elsewhere in the context from silently supplying evidence
+   * for the wrong usage.
    */
   context: string;
 
@@ -238,7 +237,7 @@ function validatedHintSenseNumbers(input: HintGenerationInput): {
 /** Builds the stable few-shot prefix followed by one variable hint request. */
 export async function hintMessages(input: HintGenerationInput): Promise<ModelMessage[]> {
   const senseNumbers = validatedHintSenseNumbers(input);
-  const contextTemplate = validatedHintContext(input, senseNumbers.selected);
+  const contextTemplate = markedContextTextTemplate(input.context, { stripAnkiFurigana: true });
   const messages: ModelMessage[] = [];
   for (const example of HINT_FEW_SHOTS) {
     messages.push({
@@ -266,24 +265,6 @@ export async function hintMessages(input: HintGenerationInput): Promise<ModelMes
     ),
   });
   return messages;
-}
-
-function validatedHintContext(
-  input: HintGenerationInput,
-  selectedSenseNumbers: readonly number[],
-) {
-  return validatedMarkedTargetTemplate(
-    input.context,
-    input.recognitionTarget,
-    input.selectedUsage.entry,
-    selectedSenseNumbers,
-    {
-      context: "context",
-      recognitionTarget: "recognitionTarget",
-      entry: "selectedUsage.entry",
-      senseNumbers: "selectedUsage.senseNumbers",
-    },
-  );
 }
 
 /** Number of messages in the provider-cacheable prefix returned by `hintMessages()`. */
@@ -419,8 +400,8 @@ export function validateSourceGroundedHint(
   input: HintGenerationInput,
   output: RawHintOutput,
 ): HintGenerationOutcome {
-  const senseNumbers = validatedHintSenseNumbers(input);
-  const sourceTemplate = validatedHintContext(input, senseNumbers.selected);
+  validatedHintSenseNumbers(input);
+  const sourceTemplate = markedContextTextTemplate(input.context, { stripAnkiFurigana: true });
   const {
     semanticContrastExists,
     sourceEvidenceExists,

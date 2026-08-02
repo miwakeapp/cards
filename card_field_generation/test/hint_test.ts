@@ -66,7 +66,7 @@ Deno.test("hintMessages anchors the intended repeated occurrence without sending
   );
 });
 
-Deno.test("hintMessages accepts a permitted marked inflection", async () => {
+Deno.test("hintMessages preserves an already-resolved marked inflection", async () => {
   const messages = await hintMessages({
     context: "彼は最後まで<mark>頑張って</mark>くれた。",
     recognitionTarget: "頑張る",
@@ -83,7 +83,7 @@ Deno.test("hintMessages accepts a permitted marked inflection", async () => {
   );
 });
 
-Deno.test("hintMessages rejects inconsistent JMDict usage references", async (t) => {
+Deno.test("hintMessages rejects inconsistent deterministic inputs", async (t) => {
   await t.step("selected entry does not contain recognitionTarget", async () => {
     await assertRejects(
       () =>
@@ -112,17 +112,17 @@ Deno.test("hintMessages rejects inconsistent JMDict usage references", async (t)
     );
   });
 
-  await t.step("context marks an unrelated surface", async () => {
+  await t.step("context contains no resolved target mark", async () => {
     await assertRejects(
       () =>
         hintMessages({
-          context: "会社の<mark>犬</mark>を決めた。",
+          context: "会社の方針を決めた。",
           recognitionTarget: "方針",
           selectedUsage: { entry: policyEntry, senseNumbers: [1] },
           contrastingUsages: [{ entry: policyEntry, senseNumbers: [2] }],
         }),
       Error,
-      'context <mark> occurrence 0 has visible surface "犬", which does not equal recognitionTarget "方針" and is not a permitted inflection under selectedUsage.senseNumbers [1] from selectedUsage.entry with id "1517040"',
+      "Context HTML must contain at least one <mark> element",
     );
   });
 
@@ -197,31 +197,6 @@ Deno.test("validateSourceGroundedHint returns marker-free evidence from the inte
       hintSourceSpan: "会社の方針",
       hint: "会社の方針",
     },
-  );
-});
-
-Deno.test("validateSourceGroundedHint rejects an unrelated marked surface before accepting no-hint output", () => {
-  assertThrows(
-    () =>
-      validateSourceGroundedHint(
-        {
-          context: "会社の<mark>犬</mark>を決めた。",
-          recognitionTarget: "方針",
-          selectedUsage: { entry: policyEntry, senseNumbers: [1] },
-          contrastingUsages: [{ entry: policyEntry, senseNumbers: [2] }],
-        },
-        {
-          result: {
-            semanticContrastExists: false,
-            sourceEvidenceExists: false,
-            semanticEvidenceTemplate: "",
-            hintSourceTemplate: "",
-            hintTemplate: "",
-          },
-        },
-      ),
-    Error,
-    'context <mark> occurrence 0 has visible surface "犬", which does not equal recognitionTarget "方針" and is not a permitted inflection under selectedUsage.senseNumbers [1] from selectedUsage.entry with id "1517040"',
   );
 });
 

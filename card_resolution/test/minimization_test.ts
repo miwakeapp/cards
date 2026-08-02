@@ -43,6 +43,19 @@ Deno.test("markedContextTextTemplate preserves textual Anki furigana for minimiz
   );
 });
 
+Deno.test("markedContextTextTemplate can project Anki furigana to displayed surfaces", () => {
+  assertEquals(
+    markedContextTextTemplate(
+      "音[おと]の 中[なか]を<mark>揺蕩[たゆた]いながら</mark>歩く。",
+      { stripAnkiFurigana: true },
+    ),
+    {
+      text: "音の中を⟪target:0⟫揺蕩いながら⟪/target:0⟫歩く。",
+      targets: [{ id: 0, surface: "揺蕩いながら", html: "揺蕩[たゆた]いながら" }],
+    },
+  );
+});
+
 Deno.test("markedContextTextTemplate rejects missing, nested, and empty marks", () => {
   assertThrows(
     () => markedContextTextTemplate("<p>対象がない。</p>"),

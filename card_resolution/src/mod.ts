@@ -18,7 +18,7 @@ export {
 } from "./minimization.ts";
 export type { MarkedContextTextTemplate } from "./minimization.ts";
 export { findSourceUnsupportedHiraganaWords } from "./lexical_grounding.ts";
-export { resolveContextTarget } from "./resolved_context.ts";
+export { resolveContextTarget, verifyMarkedContextTarget } from "./resolved_context.ts";
 export type { ResolvedContextTarget } from "./resolved_context.ts";
 export {
   buildSpellingIndex,
