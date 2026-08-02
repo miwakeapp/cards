@@ -533,7 +533,7 @@ Deno.test("tracked eval fixtures pass production input validation without provid
   const fixture = fixtures.find(({ id }) => id === "animecards-focused-1734611363834");
   assert(fixture?.operation === "sense-selection");
   const invalid = structuredClone(fixture);
-  invalid.input.context = "<mark>犬</mark>";
+  invalid.input.context = "犬";
   await assertRejects(
     () => assertEvalFixtureGenerationInputs([invalid]),
     Error,

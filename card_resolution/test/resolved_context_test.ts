@@ -1,5 +1,5 @@
-import { assertEquals } from "@std/assert";
-import { resolveContextTarget } from "card_resolution";
+import { assertEquals, assertRejects } from "@std/assert";
+import { resolveContextTarget, verifyMarkedContextTarget } from "card_resolution";
 
 Deno.test("resolveContextTarget preserves occurrence identity across structured HTML", async () => {
   const contextHTML =
@@ -22,6 +22,49 @@ Deno.test("resolveContextTarget returns null without a supported occurrence", as
       partOfSpeech: ["v1"],
     }),
     null,
+  );
+});
+
+Deno.test("verifyMarkedContextTarget accepts stored markup resolved from lexical morphology", async () => {
+  await verifyMarkedContextTarget(
+    "<p>最後まで<mark>頑張[がんば]らん</mark>ばかりの勢いだ。</p>",
+    "頑張る",
+    { partOfSpeech: ["v5r"] },
+  );
+  await verifyMarkedContextTarget(
+    "<mark>頼っ <span>た</span>り</mark>、また頼ったりした。",
+    "頼る",
+    { partOfSpeech: ["v5r"] },
+  );
+  await verifyMarkedContextTarget("昨日は<mark>サボった</mark>。", "サボる", {
+    partOfSpeech: ["v5r"],
+  });
+});
+
+Deno.test("verifyMarkedContextTarget rejects unsupported and exact-script mismatches", async () => {
+  await assertRejects(
+    () =>
+      verifyMarkedContextTarget("会社の<mark>犬</mark>を決めた。", "方針", {
+        partOfSpeech: ["n"],
+      }),
+    Error,
+    'surface "犬", which is not a deterministically supported exact-script occurrence of lookupSpelling "方針"',
+  );
+  await assertRejects(
+    () =>
+      verifyMarkedContextTarget("紙の端が<mark>ギザギザ</mark>だ。", "ぎざぎざ", {
+        partOfSpeech: ["adj-na"],
+      }),
+    Error,
+    'surface "ギザギザ", which is not a deterministically supported exact-script occurrence of lookupSpelling "ぎざぎざ"',
+  );
+  await assertRejects(
+    () =>
+      verifyMarkedContextTarget("ひどく<mark>どん引キ</mark>した。", "ドン引き", {
+        partOfSpeech: ["n", "vs"],
+      }),
+    Error,
+    'surface "どん引キ", which is not a deterministically supported exact-script occurrence of lookupSpelling "ドン引き"',
   );
 });
 
@@ -59,17 +102,57 @@ Deno.test("resolveContextTarget maps presentational spaces back to exact HTML ra
   );
 });
 
-Deno.test("resolveContextTarget stops before a desiderative auxiliary", async () => {
-  const result = await resolveContextTarget(
-    "あんな人に呼び捨てにされたくない。",
-    "呼び捨てにする",
-    { partOfSpeech: ["exp", "vs-i"] },
-  );
-
-  assertEquals(result?.surfaces, ["呼び捨てにされ"]);
+Deno.test("resolveContextTarget includes tightly bound desiderative morphology", async () => {
   assertEquals(
-    result?.markedHTML,
-    "あんな人に<mark>呼び捨てにされ</mark>たくない。",
+    (await resolveContextTarget("いつか着物を縫いたい。", "縫う", {
+      partOfSpeech: ["v5u"],
+    }))?.markedHTML,
+    "いつか着物を<mark>縫いたい</mark>。",
+  );
+  assertEquals(
+    (await resolveContextTarget("あんな人に呼び捨てにされたくない。", "呼び捨てにする", {
+      partOfSpeech: ["exp", "vs-i"],
+    }))?.markedHTML,
+    "あんな人に<mark>呼び捨てにされたくない</mark>。",
+  );
+  assertEquals(
+    (await resolveContextTarget("昨日は早く帰りたかった。", "帰る", {
+      partOfSpeech: ["v5r"],
+    }))?.markedHTML,
+    "昨日は早く<mark>帰りたかった</mark>。",
+  );
+  assertEquals(
+    (await resolveContextTarget("それを食べたいです。", "食べる", {
+      partOfSpeech: ["v1"],
+    }))?.markedHTML,
+    "それを<mark>食べたい</mark>です。",
+  );
+});
+
+Deno.test("resolveContextTarget distinguishes appearance そう from hearsay そうだ", async () => {
+  assertEquals(
+    (await resolveContextTarget("収入が前年を上回りそうだ。", "上回る", {
+      partOfSpeech: ["v5r"],
+    }))?.markedHTML,
+    "収入が前年を<mark>上回りそうだ</mark>。",
+  );
+  assertEquals(
+    (await resolveContextTarget("収入が前年を上回ったそうだ。", "上回る", {
+      partOfSpeech: ["v5r"],
+    }))?.markedHTML,
+    "収入が前年を<mark>上回った</mark>そうだ。",
+  );
+  assertEquals(
+    (await resolveContextTarget("眩しそうに見る。", "眩しい", {
+      partOfSpeech: ["adj-i"],
+    }))?.markedHTML,
+    "<mark>眩しそうに</mark>見る。",
+  );
+  assertEquals(
+    (await resolveContextTarget("心もとなさそうな表情だ。", "心もとない", {
+      partOfSpeech: ["adj-i"],
+    }))?.markedHTML,
+    "<mark>心もとなさそうな</mark>表情だ。",
   );
 });
 
@@ -113,5 +196,71 @@ Deno.test("resolveContextTarget includes conditional inflection but not a missin
       partOfSpeech: ["exp", "v1"],
     }),
     null,
+  );
+});
+
+Deno.test("resolveContextTarget keeps lexical morphology inside the target", async () => {
+  assertEquals(
+    (await resolveContextTarget("話しかけないで！", "話しかける", {
+      partOfSpeech: ["v1"],
+    }))?.markedHTML,
+    "<mark>話しかけないで</mark>！",
+  );
+  assertEquals(
+    (await resolveContextTarget("とぼけないでください。", "とぼける", {
+      partOfSpeech: ["v1"],
+    }))?.markedHTML,
+    "<mark>とぼけないで</mark>ください。",
+  );
+  assertEquals(
+    (await resolveContextTarget("割れんばかりの拍手", "割れる", {
+      partOfSpeech: ["v1"],
+    }))?.markedHTML,
+    "<mark>割れん</mark>ばかりの拍手",
+  );
+  assertEquals(
+    (await resolveContextTarget("症状が治まりましたら", "治まる", {
+      partOfSpeech: ["v5r"],
+    }))?.markedHTML,
+    "症状が<mark>治まりましたら</mark>",
+  );
+  assertEquals(
+    (await resolveContextTarget("たゆまざる努力", "たゆむ", {
+      partOfSpeech: ["v5m"],
+    }))?.markedHTML,
+    "<mark>たゆまざる</mark>努力",
+  );
+});
+
+Deno.test("resolveContextTarget leaves proposition-level modality outside the target", async () => {
+  assertEquals(
+    (await resolveContextTarget("取り締まるべきだ。", "取り締まる", {
+      partOfSpeech: ["v5r"],
+    }))?.markedHTML,
+    "<mark>取り締まる</mark>べきだ。",
+  );
+  assertEquals(
+    (await resolveContextTarget("接するべきである。", "接する", {
+      partOfSpeech: ["vs-s"],
+    }))?.markedHTML,
+    "<mark>接する</mark>べきである。",
+  );
+  assertEquals(
+    (await resolveContextTarget("変化をもたらすだろう。", "もたらす", {
+      partOfSpeech: ["v5s"],
+    }))?.markedHTML,
+    "変化を<mark>もたらす</mark>だろう。",
+  );
+  assertEquals(
+    (await resolveContextTarget("権利を与えられるべきだ。", "与える", {
+      partOfSpeech: ["v1"],
+    }))?.markedHTML,
+    "権利を<mark>与えられる</mark>べきだ。",
+  );
+  assertEquals(
+    (await resolveContextTarget("勝負は望むべくもない。", "望む", {
+      partOfSpeech: ["v5m"],
+    }))?.markedHTML,
+    "勝負は<mark>望む</mark>べくもない。",
   );
 });

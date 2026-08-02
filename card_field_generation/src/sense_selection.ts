@@ -1,4 +1,5 @@
 import type { ModelMessage } from "ai";
+import { markedContextTextTemplate } from "card_resolution";
 import { z } from "zod";
 import type { JMDictWord } from "data";
 import {
@@ -11,7 +12,6 @@ import {
   type FieldGenerationOperation,
   PRODUCTION_GENERATION_CONFIGURATIONS,
 } from "./model_presets.ts";
-import { validatedMarkedTargetTemplate } from "./marked_target.ts";
 import { type GenerationOptions, type GenerationResult, runGeneration } from "./runner.ts";
 import { SENSE_SELECTION_FEW_SHOTS } from "./sense_selection_few_shots.ts";
 
@@ -23,11 +23,11 @@ export {
 /** Evidence for deciding which structurally compatible JMDict senses describe one usage. */
 export interface SenseSelectionInput {
   /**
-   * Sanitized source context HTML with the intended occurrence(s) wrapped in `<mark>`.
+   * Already-resolved, sanitized source context HTML with the intended occurrence(s) wrapped in
+   * `<mark>`.
    *
-   * Every mark's visible text must be `recognitionTarget` or an inflection permitted by the
-   * part-of-speech tags of `compatibleSenseNumbers`; unrelated marks are rejected before any
-   * provider call.
+   * Target location and lexical identity are caller preconditions owned by `card_resolution`.
+   * Marks are converted to occurrence-addressed sentinels before the context is sent to the model.
    */
   context: string;
 
@@ -146,7 +146,7 @@ function rawOutputForSelection(
 /** Builds the stable few-shot prefix followed by one variable sense-selection request. */
 export async function senseSelectionMessages(input: SenseSelectionInput): Promise<ModelMessage[]> {
   const compatibleSenseNumbers = validateCompatibleSenseNumbers(input);
-  const contextTemplate = validatedSenseSelectionContext(input, compatibleSenseNumbers);
+  const contextTemplate = markedContextTextTemplate(input.context, { stripAnkiFurigana: true });
   const messages: ModelMessage[] = [];
   for (const example of SENSE_SELECTION_FEW_SHOTS) {
     messages.push({
@@ -178,24 +178,6 @@ export async function senseSelectionMessages(input: SenseSelectionInput): Promis
   return messages;
 }
 
-function validatedSenseSelectionContext(
-  input: SenseSelectionInput,
-  compatibleSenseNumbers: readonly number[],
-) {
-  return validatedMarkedTargetTemplate(
-    input.context,
-    input.recognitionTarget,
-    input.jmdictEntry,
-    compatibleSenseNumbers,
-    {
-      context: "context",
-      recognitionTarget: "recognitionTarget",
-      entry: "jmdictEntry",
-      senseNumbers: "compatibleSenseNumbers",
-    },
-  );
-}
-
 /** Number of messages in the provider-cacheable prefix returned by `senseSelectionMessages()`. */
 export const SENSE_SELECTION_STABLE_MESSAGE_COUNT = SENSE_SELECTION_FEW_SHOTS.length * 2;
 
@@ -220,7 +202,7 @@ export function validateSenseSelection(
   output: RawSenseSelectionOutput,
 ): SenseSelectionOutcome {
   const compatible = validateCompatibleSenseNumbers(input);
-  validatedSenseSelectionContext(input, compatible);
+  markedContextTextTemplate(input.context, { stripAnkiFurigana: true });
   const decisions = output.senseApplicability;
   if (
     decisions.length !== compatible.length ||

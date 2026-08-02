@@ -30,7 +30,7 @@ Deno.test("senseSelectionMessages identifies the marked source occurrence withou
   );
 });
 
-Deno.test("senseSelectionMessages accepts a permitted marked inflection", async () => {
+Deno.test("senseSelectionMessages preserves an already-resolved marked inflection", async () => {
   const messages = await senseSelectionMessages({
     context: "彼は最後まで<mark>頑張って</mark>くれた。",
     recognitionTarget: "頑張る",
@@ -47,7 +47,24 @@ Deno.test("senseSelectionMessages accepts a permitted marked inflection", async 
   );
 });
 
-Deno.test("senseSelectionMessages accepts a literary adjective form", async () => {
+Deno.test("senseSelectionMessages preserves already-resolved lexical morphology", async () => {
+  const messages = await senseSelectionMessages({
+    context: "<mark>頑張らん</mark>ばかりの勢いだ。",
+    recognitionTarget: "頑張る",
+    jmdictEntry: await preextractedJMDictEntry("1217700"),
+    compatibleSenseNumbers: [1, 2],
+  });
+  const variablePrompt = messages.at(-1);
+  if (variablePrompt?.role !== "user" || typeof variablePrompt.content !== "string") {
+    throw new TypeError("Expected final sense-selection message to contain text");
+  }
+  assertEquals(
+    variablePrompt.content.includes("⟪target:0⟫頑張らん⟪/target:0⟫ばかり"),
+    true,
+  );
+});
+
+Deno.test("senseSelectionMessages preserves an already-resolved literary adjective form", async () => {
   const messages = await senseSelectionMessages({
     context: "<mark>麗しの</mark>友よ、私にとってあなたは永遠に若いのだ。",
     recognitionTarget: "麗しい",
@@ -64,7 +81,7 @@ Deno.test("senseSelectionMessages accepts a literary adjective form", async () =
   );
 });
 
-Deno.test("senseSelectionMessages validates through Anki furigana without exposing it", async () => {
+Deno.test("senseSelectionMessages strips Anki furigana from an already-resolved context", async () => {
   const messages = await senseSelectionMessages({
     context: "音[おと]の 中[なか]を<mark>揺蕩[たゆた]いながら</mark>、私は歩いた。",
     recognitionTarget: "揺蕩う",
@@ -84,12 +101,11 @@ Deno.test("senseSelectionMessages validates through Anki furigana without exposi
   assertEquals(variablePrompt.content.includes("なか"), false);
 });
 
-Deno.test("senseSelectionMessages accepts an i-adjective stem only before unmarked そう", async () => {
-  const entry = await preextractedJMDictEntry("1922480");
+Deno.test("senseSelectionMessages preserves appearance そう inside the resolved target", async () => {
   const messages = await senseSelectionMessages({
-    context: "ちょっと<mark>とろ</mark>そうな人だ。",
+    context: "ちょっと<mark>とろそうな</mark>人だ。",
     recognitionTarget: "とろい",
-    jmdictEntry: entry,
+    jmdictEntry: await preextractedJMDictEntry("1922480"),
     compatibleSenseNumbers: [1, 2],
   });
   const variablePrompt = messages.at(-1);
@@ -97,20 +113,8 @@ Deno.test("senseSelectionMessages accepts an i-adjective stem only before unmark
     throw new TypeError("Expected final sense-selection message to contain text");
   }
   assertEquals(
-    variablePrompt.content.includes("⟪target:0⟫とろ⟪/target:0⟫そうな人"),
+    variablePrompt.content.includes("⟪target:0⟫とろそうな⟪/target:0⟫人"),
     true,
-  );
-
-  await assertRejects(
-    () =>
-      senseSelectionMessages({
-        context: "ちょっと<mark>とろ</mark>だけでは意味が通らない。",
-        recognitionTarget: "とろい",
-        jmdictEntry: entry,
-        compatibleSenseNumbers: [1, 2],
-      }),
-    Error,
-    "is not a permitted inflection",
   );
 });
 
@@ -165,20 +169,6 @@ Deno.test("senseSelectionMessages rejects inconsistent deterministic inputs", as
     );
   });
 
-  await t.step("context marks an unrelated surface", async () => {
-    await assertRejects(
-      () =>
-        senseSelectionMessages({
-          context: "木には<mark>年齢</mark>が現れる。",
-          recognitionTarget: "年輪",
-          jmdictEntry: entry,
-          compatibleSenseNumbers: [1, 2],
-        }),
-      Error,
-      'context <mark> occurrence 0 has visible surface "年齢", which does not equal recognitionTarget "年輪" and is not a permitted inflection under compatibleSenseNumbers [1,2] from jmdictEntry with id "1469260"',
-    );
-  });
-
   await t.step("compatibleSenseNumbers contains duplicates", async () => {
     await assertRejects(
       () =>
@@ -201,28 +191,6 @@ Deno.test("validateSenseSelection canonicalizes complete per-sense decisions", a
     jmdictEntry: await preextractedJMDictEntry("1469260"),
     compatibleSenseNumbers: [1, 2],
   };
-
-  await t.step("validator rejects an unrelated marked surface", () => {
-    assertThrows(
-      () =>
-        validateSenseSelection(
-          {
-            context: "木には<mark>年齢</mark>が現れる。",
-            recognitionTarget: "年輪",
-            jmdictEntry: input.jmdictEntry,
-            compatibleSenseNumbers: [1, 2],
-          },
-          {
-            senseApplicability: [
-              { senseNumber: 1, classification: "yes" },
-              { senseNumber: 2, classification: "no" },
-            ],
-          },
-        ),
-      Error,
-      'context <mark> occurrence 0 has visible surface "年齢", which does not equal recognitionTarget "年輪" and is not a permitted inflection under compatibleSenseNumbers [1,2] from jmdictEntry with id "1469260"',
-    );
-  });
 
   await t.step("no sense matches", () => {
     assertEquals(
