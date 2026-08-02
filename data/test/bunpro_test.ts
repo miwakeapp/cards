@@ -60,9 +60,12 @@ Deno.test("bunproGrammarPointFromPageProps fills cloze answers and excludes writ
             },
             {
               id: 5600,
-              content: "<span data-gp-id='5'>これ</span>を____、もう一度（いちど）____。",
+              // The payload occasionally contains decomposed kana. Corpus text is normalized to
+              // NFC so downstream consumers see one stable representation.
+              content: "<span data-gp-id='5'>これ</span>を____、もう一度（いちど）____。",
               answer: "ためしてごらん",
-              kanji_answer: null,
+              // Bunpro uses an empty `kanji_answer` when this example has no distinct kanji form.
+              kanji_answer: "",
               sentence_order: 1,
               sentenceable_type: "GrammarPoint",
               translation: "<strong>Try</strong> this again.",

@@ -74,7 +74,7 @@ function number(value: unknown, description: string): number {
 function textFromHTML(html: string): string {
   const document = new DOMParser().parseFromString(`<body>${html}</body>`, "text/html");
   if (document === null) throw new Error("Bunpro sentence HTML could not be parsed");
-  return document.body.textContent.replace(/\s+/gu, " ").trim();
+  return document.body.textContent.replace(/\s+/gu, " ").trim().normalize("NFC");
 }
 
 /**
@@ -138,7 +138,7 @@ export function bunproGrammarPointFromPageProps(
           } contains no cloze blanks`,
         );
       }
-      const answer = typeof question.kanji_answer === "string"
+      const answer = typeof question.kanji_answer === "string" && question.kanji_answer !== ""
         ? question.kanji_answer
         : string(question.answer, `Bunpro study question ${index} answer`);
       const sentenceWithFurigana = textFromHTML(content.replaceAll("____", answer));
