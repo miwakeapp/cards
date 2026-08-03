@@ -156,6 +156,27 @@ Deno.test("resolveContextTarget distinguishes appearance そう from hearsay そ
   );
 });
 
+Deno.test("resolveContextTarget handles suppletive and regular いい adjective inflections", async () => {
+  assertEquals(
+    (await resolveContextTarget("カッコよく言ったってダメ。", "カッコいい", {
+      partOfSpeech: ["adj-i"],
+    }))?.markedHTML,
+    "<mark>カッコよく</mark>言ったってダメ。",
+  );
+  assertEquals(
+    (await resolveContextTarget("かわいく飾った。", "かわいい", {
+      partOfSpeech: ["adj-i"],
+    }))?.markedHTML,
+    "<mark>かわいく</mark>飾った。",
+  );
+  assertEquals(
+    await resolveContextTarget("かわよく飾った。", "かわいい", {
+      partOfSpeech: ["adj-i"],
+    }),
+    null,
+  );
+});
+
 Deno.test("resolveContextTarget leaves a causative outside a noun target", async () => {
   const result = await resolveContextTarget("敵を全滅させた。", "全滅", {
     partOfSpeech: ["n"],
