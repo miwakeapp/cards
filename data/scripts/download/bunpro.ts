@@ -14,7 +14,7 @@ const MAX_ATTEMPTS = 3;
 const CONCURRENCY = 8;
 const EXPECTED_LOGGED_OUT_SAMPLE_COUNT = 12;
 // Increment whenever parsing changes so resumable downloads cannot reuse stale derived records.
-const CACHE_VERSION = 2;
+const CACHE_VERSION = 3;
 
 interface CachedGrammarPoint {
   cacheVersion: number;
@@ -84,12 +84,13 @@ console.log("Checking Bunpro's logged-out example payload...");
 const sampleHTML = await fetchText(BUNPRO_SAMPLE_GRAMMAR_POINT_URL);
 const buildId = bunproBuildIdFromHTML(sampleHTML);
 const sample = await grammarPoint(buildId, BUNPRO_SAMPLE_GRAMMAR_POINT_URL);
-if (sample.examples.length !== EXPECTED_LOGGED_OUT_SAMPLE_COUNT) {
+const sampleGrammarPointExamples = sample.examples.filter(({ kind }) => kind === "grammar-point");
+if (sampleGrammarPointExamples.length !== EXPECTED_LOGGED_OUT_SAMPLE_COUNT) {
   throw new Error(
-    `Expected ${EXPECTED_LOGGED_OUT_SAMPLE_COUNT} logged-out examples for ${sample.url}, but found ${sample.examples.length}. Authenticated cookies may now be required.`,
+    `Expected ${EXPECTED_LOGGED_OUT_SAMPLE_COUNT} logged-out examples for ${sample.url}, but found ${sampleGrammarPointExamples.length}. Authenticated cookies may now be required.`,
   );
 }
-console.log(`Found all ${sample.examples.length} examples without authentication.`);
+console.log(`Found all ${sampleGrammarPointExamples.length} examples without authentication.`);
 
 const sitemap = await fetchText(BUNPRO_SITEMAP_URL);
 const urls = bunproGrammarPointURLsFromSitemap(sitemap);
@@ -129,7 +130,7 @@ const grammarPoints = urls.map((url) => cache.get(url)!);
 grammarPoints.sort((left, right) => left.id - right.id);
 
 const corpus: BunproExampleCorpus = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   fetchedAt: new Date().toISOString(),
   buildId,
   sourceURL: BUNPRO_SITEMAP_URL,
