@@ -6,16 +6,26 @@ export const BUNPRO_SAMPLE_GRAMMAR_POINT_URL =
 /** Public sitemap used to discover Bunpro grammar-point pages. */
 export const BUNPRO_SITEMAP_URL = "https://bunpro.jp/sitemap.xml";
 
+/** One rendering of a Bunpro example sentence. */
+export interface BunproSentence {
+  /** Complete Japanese sentence with Bunpro's `漢字（かんじ）` reading notation retained. */
+  withFurigana: string;
+  /** Complete Japanese sentence with Bunpro's parenthesized readings removed. */
+  text: string;
+}
+
 /** One example sentence extracted from a Bunpro grammar point. */
 export interface BunproExample {
   /** Bunpro's stable study-question identifier. */
   id: number;
-  /** Display order within the grammar point. */
+  /** Whether this is a formal drill example or an example embedded in the grammar writeup. */
+  kind: "grammar-point" | "writeup";
+  /** Display order within the example's kind. */
   sentenceOrder: number;
-  /** Complete Japanese sentence with Bunpro's `漢字（かんじ）` reading notation retained. */
-  sentenceWithFurigana: string;
-  /** Complete Japanese sentence with Bunpro's parenthesized readings removed. */
-  sentence: string;
+  /** Complete sentence formed with Bunpro's ordinary `answer` value. */
+  answerSentence: BunproSentence;
+  /** Complete sentence formed with Bunpro's nonempty `kanji_answer`, when it differs. */
+  kanjiAnswerSentence?: BunproSentence;
   /** Bunpro's English translation with presentation HTML removed. */
   translation: string;
 }
@@ -32,14 +42,14 @@ export interface BunproGrammarPoint {
   jlptLevel?: string;
   /** Canonical public grammar-point URL. */
   url: string;
-  /** Grammar-point example sentences in Bunpro's display order. */
+  /** Formal drill examples followed by cloze-bearing grammar-writeup examples. */
   examples: BunproExample[];
 }
 
 /** Versioned generated artifact containing Bunpro's public grammar examples. */
 export interface BunproExampleCorpus {
   /** Artifact schema version. */
-  schemaVersion: 1;
+  schemaVersion: 2;
   /** ISO timestamp at which the complete artifact was assembled. */
   fetchedAt: string;
   /** Next.js build identifier from which every page payload was read. */
@@ -91,6 +101,11 @@ export function stripBunproFurigana(text: string): string {
   );
 }
 
+function sentenceFromAnswer(content: string, answer: string): BunproSentence {
+  const withFurigana = textFromHTML(content.replaceAll("____", answer));
+  return { withFurigana, text: stripBunproFurigana(withFurigana) };
+}
+
 /** Extracts the Next.js build identifier needed for Bunpro's compact page-data endpoints. */
 export function bunproBuildIdFromHTML(html: string): string {
   const match = html.match(
@@ -127,36 +142,56 @@ export function bunproGrammarPointFromPageProps(
   const examples = included.studyQuestions
     .map((rawQuestion, index) => {
       const question = object(rawQuestion, `Bunpro study question ${index}`);
-      if (question.sentenceable_type !== "GrammarPoint") return undefined;
+      const sentenceableType = question.sentenceable_type;
+      if (sentenceableType !== "GrammarPoint" && sentenceableType !== "Writeup") {
+        return undefined;
+      }
 
       const content = string(question.content, `Bunpro study question ${index} content`);
       const blankCount = content.match(/____/gu)?.length ?? 0;
       if (blankCount === 0) {
+        if (sentenceableType === "Writeup") return undefined;
         throw new Error(
           `Bunpro GrammarPoint study question ${
             JSON.stringify(question.id)
           } contains no cloze blanks`,
         );
       }
-      const answer = typeof question.kanji_answer === "string" && question.kanji_answer !== ""
-        ? question.kanji_answer
-        : string(question.answer, `Bunpro study question ${index} answer`);
-      const sentenceWithFurigana = textFromHTML(content.replaceAll("____", answer));
+      const answerSentence = sentenceFromAnswer(
+        content,
+        string(question.answer, `Bunpro study question ${index} answer`),
+      );
+      const kanjiAnswer = question.kanji_answer;
+      if (kanjiAnswer !== undefined && kanjiAnswer !== null && typeof kanjiAnswer !== "string") {
+        throw new TypeError(`Bunpro study question ${index} kanji_answer must be a string or null`);
+      }
+      const kanjiAnswerSentence = kanjiAnswer === undefined || kanjiAnswer === null ||
+          kanjiAnswer === ""
+        ? undefined
+        : sentenceFromAnswer(content, kanjiAnswer);
       return {
         id: number(question.id, `Bunpro study question ${index} id`),
+        kind: sentenceableType === "GrammarPoint" ? "grammar-point" : "writeup",
         sentenceOrder: number(
           question.sentence_order,
           `Bunpro study question ${index} sentence_order`,
         ),
-        sentenceWithFurigana,
-        sentence: stripBunproFurigana(sentenceWithFurigana),
+        answerSentence,
+        ...(kanjiAnswerSentence === undefined ||
+            (kanjiAnswerSentence.withFurigana === answerSentence.withFurigana &&
+              kanjiAnswerSentence.text === answerSentence.text)
+          ? {}
+          : { kanjiAnswerSentence }),
         translation: textFromHTML(
           string(question.translation, `Bunpro study question ${index} translation`),
         ),
       };
     })
     .filter((example): example is BunproExample => example !== undefined)
-    .toSorted((left, right) => left.sentenceOrder - right.sentenceOrder);
+    .toSorted((left, right) =>
+      (left.kind === right.kind ? 0 : left.kind === "grammar-point" ? -1 : 1) ||
+      left.sentenceOrder - right.sentenceOrder
+    );
 
   return {
     id: number(reviewable.id, "Bunpro grammar-point id"),

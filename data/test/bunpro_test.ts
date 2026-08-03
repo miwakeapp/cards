@@ -38,7 +38,7 @@ Deno.test("bunproGrammarPointURLsFromSitemap extracts and deduplicates canonical
   );
 });
 
-Deno.test("bunproGrammarPointFromPageProps fills cloze answers and excludes writeup examples", () => {
+Deno.test("bunproGrammarPointFromPageProps preserves formal and writeup cloze variants", () => {
   assertEquals(
     bunproGrammarPointFromPageProps(
       {
@@ -53,6 +53,7 @@ Deno.test("bunproGrammarPointFromPageProps fills cloze answers and excludes writ
             {
               id: 1151,
               content: "その景色（けしき）を____。",
+              answer: "みてごらん",
               kanji_answer: "見（み）てごらん",
               sentence_order: 0,
               sentenceable_type: "GrammarPoint",
@@ -73,10 +74,38 @@ Deno.test("bunproGrammarPointFromPageProps fills cloze answers and excludes writ
             {
               id: 180970,
               content: "この本（ほん）を読（よ）ん____。",
+              answer: "でごらん",
               kanji_answer: "でごらん",
               sentence_order: 0,
               sentenceable_type: "Writeup",
               translation: "Try reading this book.",
+            },
+            {
+              id: 180971,
+              content: "見る（みる） is the dictionary form.",
+              answer: "",
+              kanji_answer: "",
+              sentence_order: 1,
+              sentenceable_type: "Writeup",
+              translation: "An unclozed comparison.",
+            },
+            {
+              id: 5601,
+              content: "まず____。",
+              answer: "みてごらん",
+              kanji_answer: "みてごらん",
+              sentence_order: 2,
+              sentenceable_type: "GrammarPoint",
+              translation: "Try it first.",
+            },
+            {
+              id: 5602,
+              content: "次に____。",
+              answer: "みてごらん",
+              kanji_answer: null,
+              sentence_order: 3,
+              sentenceable_type: "GrammarPoint",
+              translation: "Try it next.",
             },
           ],
         },
@@ -92,17 +121,57 @@ Deno.test("bunproGrammarPointFromPageProps fills cloze answers and excludes writ
       examples: [
         {
           id: 1151,
+          kind: "grammar-point",
           sentenceOrder: 0,
-          sentenceWithFurigana: "その景色（けしき）を見（み）てごらん。",
-          sentence: "その景色を見てごらん。",
+          answerSentence: {
+            withFurigana: "その景色（けしき）をみてごらん。",
+            text: "その景色をみてごらん。",
+          },
+          kanjiAnswerSentence: {
+            withFurigana: "その景色（けしき）を見（み）てごらん。",
+            text: "その景色を見てごらん。",
+          },
           translation: "(Try to) take a look.",
         },
         {
           id: 5600,
+          kind: "grammar-point",
           sentenceOrder: 1,
-          sentenceWithFurigana: "これをためしてごらん、もう一度（いちど）ためしてごらん。",
-          sentence: "これをためしてごらん、もう一度ためしてごらん。",
+          answerSentence: {
+            withFurigana: "これをためしてごらん、もう一度（いちど）ためしてごらん。",
+            text: "これをためしてごらん、もう一度ためしてごらん。",
+          },
           translation: "Try this again.",
+        },
+        {
+          id: 5601,
+          kind: "grammar-point",
+          sentenceOrder: 2,
+          answerSentence: {
+            withFurigana: "まずみてごらん。",
+            text: "まずみてごらん。",
+          },
+          translation: "Try it first.",
+        },
+        {
+          id: 5602,
+          kind: "grammar-point",
+          sentenceOrder: 3,
+          answerSentence: {
+            withFurigana: "次にみてごらん。",
+            text: "次にみてごらん。",
+          },
+          translation: "Try it next.",
+        },
+        {
+          id: 180970,
+          kind: "writeup",
+          sentenceOrder: 0,
+          answerSentence: {
+            withFurigana: "この本（ほん）を読（よ）んでごらん。",
+            text: "この本を読んでごらん。",
+          },
+          translation: "Try reading this book.",
         },
       ],
     },
