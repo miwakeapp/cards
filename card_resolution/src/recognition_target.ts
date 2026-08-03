@@ -539,7 +539,12 @@ function occurrenceStartsAtIndependentNai(
 }
 
 function tokenLookupForm(token: KuromojiToken): string {
-  return token.basic_form === "*" ? token.surface_form : token.basic_form;
+  const basicForm = token.basic_form === "*" ? token.surface_form : token.basic_form;
+  // Independent `いい` uses the suppletive inflectional paradigm of `よい`. Kuromoji therefore
+  // tokenizes `カッコいい` as `カッコ` + `いい`, but `カッコよく` as `カッコ` + `よい`.
+  // Normalize only the standalone adjective token: lexical adjectives such as `かわいい` retain
+  // their own basic form and continue to conjugate regularly as `かわいく`.
+  return token.pos === "形容詞" && basicForm === "いい" ? "よい" : basicForm;
 }
 
 const INFLECTIONAL_AUXILIARY_BASIC_FORMS = new Set([
