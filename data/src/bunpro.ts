@@ -36,7 +36,7 @@ export interface BunproGrammarPoint {
   id: number;
   /** Bunpro's URL slug. */
   slug: string;
-  /** Japanese grammar-point label. */
+  /** Bunpro's display label, which may mix Japanese forms with English grammatical terms. */
   title: string;
   /** `N1` through `N5` when Bunpro associates the grammar point with a JLPT level. */
   jlptLevel?: string;
