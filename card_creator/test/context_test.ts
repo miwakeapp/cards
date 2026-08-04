@@ -11,7 +11,7 @@ Deno.test("processContextHTML corrects unmarked full-size kana using JMDict read
       "<ruby>容<rt>よう</rt>赦<rt>しや</rt></ruby>なく<mark>大小</mark>を見る。",
       "大小",
       "だいしょう",
-      (spelling) => Promise.resolve(readings.get(spelling) ?? []),
+      { resolveRubyReadings: (spelling) => Promise.resolve(readings.get(spelling) ?? []) },
     ),
     "容[よう] 赦[しゃ]なく<mark>大小</mark>を見る。",
   );
@@ -29,7 +29,7 @@ Deno.test("processContextHTML corrects split compound ruby using the compound's 
       "<ruby>無<rt>む</rt>慮<rt>りよ</rt></ruby>の<mark>大小</mark>を見る。",
       "大小",
       "だいしょう",
-      resolveReadings,
+      { resolveRubyReadings: resolveReadings },
     ),
     "無[む] 慮[りょ]の<mark>大小</mark>を見る。",
   );
@@ -38,7 +38,7 @@ Deno.test("processContextHTML corrects split compound ruby using the compound's 
       "<ruby>貸<rt>か</rt>家<rt>しや</rt></ruby>の<mark>大小</mark>を見る。",
       "大小",
       "だいしょう",
-      resolveReadings,
+      { resolveRubyReadings: resolveReadings },
     ),
     "貸[か] 家[しや]の<mark>大小</mark>を見る。",
   );
@@ -55,7 +55,7 @@ Deno.test("processContextHTML preserves dictionary readings with genuine full-si
       "<ruby>貸家<rt>かしや</rt></ruby>の<mark>大小</mark>を見る。",
       "大小",
       "だいしょう",
-      (spelling) => Promise.resolve(readings.get(spelling) ?? []),
+      { resolveRubyReadings: (spelling) => Promise.resolve(readings.get(spelling) ?? []) },
     ),
     "貸家[かしや]の<mark>大小</mark>を見る。",
   );
@@ -64,7 +64,7 @@ Deno.test("processContextHTML preserves dictionary readings with genuine full-si
       "<ruby>松田<rt>マツダ</rt></ruby>の<mark>大小</mark>を見る。",
       "大小",
       "だいしょう",
-      (spelling) => Promise.resolve(readings.get(spelling) ?? []),
+      { resolveRubyReadings: (spelling) => Promise.resolve(readings.get(spelling) ?? []) },
     ),
     "松田[マツダ]の<mark>大小</mark>を見る。",
   );
@@ -76,7 +76,7 @@ Deno.test("processContextHTML corrects foreign and explanatory unmarked ruby", a
       "<ruby>さや<rt>ポツド</rt></ruby>の<mark>大小</mark>を見る。",
       "大小",
       "だいしょう",
-      () => Promise.resolve([]),
+      { resolveRubyReadings: () => Promise.resolve([]) },
     ),
     "さや[ポッド]の<mark>大小</mark>を見る。",
   );
@@ -85,7 +85,7 @@ Deno.test("processContextHTML corrects foreign and explanatory unmarked ruby", a
       "<ruby>貨物輸送用鳥足<rt>チキンレツグ</rt></ruby>の<mark>大小</mark>を見る。",
       "大小",
       "だいしょう",
-      () => Promise.resolve([]),
+      { resolveRubyReadings: () => Promise.resolve([]) },
     ),
     "貨物輸送用鳥足[チキンレッグ]の<mark>大小</mark>を見る。",
   );
@@ -94,7 +94,7 @@ Deno.test("processContextHTML corrects foreign and explanatory unmarked ruby", a
       "<ruby>賢い消費者<rt>スマート・コンシユーマ</rt></ruby>の<mark>大小</mark>を見る。",
       "大小",
       "だいしょう",
-      () => Promise.resolve([]),
+      { resolveRubyReadings: () => Promise.resolve([]) },
     ),
     "賢い消費者[スマート・コンシューマ]の<mark>大小</mark>を見る。",
   );

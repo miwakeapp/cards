@@ -34,6 +34,14 @@ interface MarkedRubyAnalysis {
 
 type RubyReadingResolver = (spelling: string) => Promise<readonly string[]>;
 
+interface ProcessContextHTMLOptions {
+  /** Resolves readings for incidental, unmarked source ruby. */
+  resolveRubyReadings?: RubyReadingResolver;
+
+  /** Precisely placed Anki furigana for the selected recognition target. */
+  formattedTargetReading?: string;
+}
+
 const HTML_DOCUMENT = new DOMParser().parseFromString("<body></body>", "text/html");
 const RUBY_STRUCTURE_SELECTOR = "ruby, rb, rt, rp";
 const INVISIBLE_TEXT_ELEMENTS = new Set(["rt", "rp", "script", "style"]);
@@ -353,6 +361,42 @@ function correctFullSizeKana(source: string, canonical: string): string {
   return corrected;
 }
 
+/** Transfers a whole-target source ruby's typography onto the precise JMDict placement. */
+function preciselyPlacedSourceRuby(
+  formattedTargetReading: string,
+  jmdictSpelling: string,
+  jmdictReading: string,
+  sourceReading: string,
+): string {
+  const sourceCharacters = [...correctFullSizeKana(sourceReading, jmdictReading)];
+  let sourceOffset = 0;
+  let surface = "";
+  const result = formattedTargetReading.replace(
+    / ?([^ \[\]]+)\[([^\]]+)\]|([^ \[\]]+)/gu,
+    (match, annotatedSurface: string | undefined, annotation: string | undefined, literal) => {
+      const partSurface = annotatedSurface ?? literal;
+      const canonicalPartReading = annotation ?? literal;
+      const length = [...canonicalPartReading].length;
+      const sourcePart = sourceCharacters.slice(sourceOffset, sourceOffset + length).join("");
+      sourceOffset += length;
+      surface += partSurface;
+      return annotation === undefined
+        ? partSurface
+        : `${match.startsWith(" ") ? " " : ""}${partSurface}[${sourcePart}]`;
+    },
+  );
+  if (surface !== jmdictSpelling || sourceOffset !== sourceCharacters.length) {
+    throw new Error(
+      `Internal error: formatted target reading ${
+        JSON.stringify(formattedTargetReading)
+      } cannot transfer source ruby ${JSON.stringify(sourceReading)} for JMDict spelling ${
+        JSON.stringify(jmdictSpelling)
+      }`,
+    );
+  }
+  return result;
+}
+
 function normalizeForeignRubyReading(base: string, reading: string): string {
   const characters = [...reading];
   const isKatakanaReading = characters.every((character) =>
@@ -448,8 +492,11 @@ function replaceRuby(
   ruby: Element,
   analysis: RubyAnalysis,
   canonicalReadings: ReadonlyMap<Element, string>,
+  preciselyFormattedComponents: ReadonlyMap<Element, string>,
 ): void {
   const formattedComponents = analysis.components.map((component) => {
+    const preciselyFormatted = preciselyFormattedComponents.get(component.readingElement);
+    if (preciselyFormatted !== undefined) return preciselyFormatted;
     const canonicalReading = canonicalReadings.get(component.readingElement);
     const reading = canonicalReading === undefined
       ? component.reading
@@ -478,7 +525,9 @@ function replaceRuby(
  * @param jmdictReading The exact JMDict kana reading selected for this usage. Marked source ruby
  * must agree with it, allowing equivalent kana scripts and full-size source kana. Unmarked ruby
  * does not influence the selected reading; its own JMDict readings are used when available to
- * reverse full-size-kana typography safely.
+ * reverse full-size-kana typography safely. When `formattedTargetReading` is supplied, whole-word
+ * marked ruby is redistributed to that precise JMDict-derived placement while retaining the
+ * source's kana script.
  * @returns The supplied fragment with nonbreaking spaces normalized and source ruby converted to
  * Anki bracket notation.
  */
@@ -486,7 +535,10 @@ export async function processContextHTML(
   html: string,
   jmdictSpelling: string,
   jmdictReading: string,
-  resolveRubyReadings: RubyReadingResolver = jmdictReadingsForSpelling,
+  {
+    resolveRubyReadings = jmdictReadingsForSpelling,
+    formattedTargetReading,
+  }: ProcessContextHTMLOptions = {},
 ): Promise<string> {
   const template = parseHTMLFragment(html);
   const fragment = template.content;
@@ -508,6 +560,7 @@ export async function processContextHTML(
   }
 
   const canonicalReadings = new Map<Element, string>();
+  const formattedComponents = new Map<Element, string>();
   for (const mark of marks) {
     const markedRuby = analyzeMarkedRuby(mark, analyses);
     const { components } = markedRuby;
@@ -519,7 +572,19 @@ export async function processContextHTML(
       jmdictReading,
     );
     for (let index = 0; index < components.length; ++index) {
-      canonicalReadings.set(components[index].component.readingElement, readings[index]);
+      const component = components[index].component;
+      canonicalReadings.set(component.readingElement, readings[index]);
+      if (formattedTargetReading !== undefined && component.base === jmdictSpelling) {
+        formattedComponents.set(
+          component.readingElement,
+          preciselyPlacedSourceRuby(
+            formattedTargetReading,
+            jmdictSpelling,
+            jmdictReading,
+            component.reading,
+          ),
+        );
+      }
     }
   }
 
@@ -548,7 +613,7 @@ export async function processContextHTML(
   }
 
   for (const ruby of rubies) {
-    replaceRuby(ruby, analyses.get(ruby)!, canonicalReadings);
+    replaceRuby(ruby, analyses.get(ruby)!, canonicalReadings, formattedComponents);
   }
   return template.innerHTML.trim();
 }

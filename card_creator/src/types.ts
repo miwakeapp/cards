@@ -124,8 +124,9 @@ export interface CreateCardInput {
    * Callers are responsible for selecting complete, useful context, removing unsafe source
    * markup, and wrapping every intended target occurrence in an unadorned `<mark>`. At least one
    * mark is required. A mark may contain sanitized inline markup, including source `<ruby>`.
-   * `createCard()` normalizes nonbreaking spaces, source ruby, and the spacing required by Anki's
-   * bracket-ruby syntax.
+   * `createCard()` normalizes nonbreaking spaces and source ruby, redistributes whole-target ruby
+   * to the precise JMDict-derived placement, and adds the spacing required by Anki's bracket-ruby
+   * syntax.
    */
   fullContext: string;
 

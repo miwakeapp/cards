@@ -30,9 +30,10 @@ async function processContextField(
   html: string,
   spelling: string,
   reading: string,
+  formattedTargetReading: string | undefined,
 ): Promise<string> {
   try {
-    return await processContextHTML(html, spelling, reading);
+    return await processContextHTML(html, spelling, reading, { formattedTargetReading });
   } catch (cause) {
     if (!(cause instanceof Error)) throw cause;
     throw new Error(`${fieldName}: ${cause.message}`, { cause });
@@ -57,34 +58,34 @@ export async function createCard(input: CreateCardInput): Promise<MiwakeCard> {
     input.kanaReading,
     input.applicableSenseNumbers,
   );
+  const formattedReading = usage.usesReadingField
+    ? await formatReadingForAnki(input.jmdictEntry, usage.spelling, usage.kanaReading)
+    : null;
+  if (usage.usesReadingField && formattedReading === null) {
+    throw new Error(
+      `No furigana placement data exists for recognitionTarget ${
+        JSON.stringify(usage.spelling)
+      } with kanaReading ${JSON.stringify(usage.kanaReading)} in jmdictEntry with id ` +
+        `${JSON.stringify(input.jmdictEntry.id)}`,
+    );
+  }
   const fullContext = await processContextField(
     "fullContext",
     input.fullContext,
     usage.spelling,
     usage.kanaReading,
+    formattedReading ?? undefined,
   );
   const minimizedContext = input.minimizedContext === undefined ? null : await processContextField(
     "minimizedContext",
     input.minimizedContext,
     usage.spelling,
     usage.kanaReading,
+    formattedReading ?? undefined,
   );
 
   let reading: string | null = null;
   if (usage.usesReadingField) {
-    const formattedReading = await formatReadingForAnki(
-      input.jmdictEntry,
-      usage.spelling,
-      usage.kanaReading,
-    );
-    if (formattedReading === null) {
-      throw new Error(
-        `No furigana placement data exists for recognitionTarget ${
-          JSON.stringify(usage.spelling)
-        } with kanaReading ${JSON.stringify(usage.kanaReading)} in jmdictEntry with id ` +
-          `${JSON.stringify(input.jmdictEntry.id)}`,
-      );
-    }
     reading = `${usage.readingPrefix}${formattedReading}${usage.readingSuffix}`;
   }
 
