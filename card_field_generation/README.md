@@ -2,7 +2,7 @@
 
 Provides focused AI operations for resolving card fields that a caller cannot determine reliably from source data and JMDict alone:
 
-- `selectApplicableSenses()` determines the complete applicable subset of already structurally compatible JMDict senses.
+- `selectSensesForCard()` determines which already structurally compatible JMDict senses belong on one recognition card.
 - `generateSourceGroundedHint()` decides whether a semantic contrast needs a hint and whether the supplied source can support one, then generates the hint and its evidence when possible.
 - `minimizeContext()` shortens an already-resolved full context without changing the marked usage or its meaning.
 
@@ -22,6 +22,6 @@ Pass a completed-result cache to avoid paying twice for the same validated reque
 
 Every result records content fingerprints for its base prompt, every new corrective round, stable provider-cacheable prompt prefix, structured-output schema, and effective request configuration. GPT-5.6 models and Anthropic receive explicit cache directives, while Gemini uses its implicit prompt cache. Concurrent cold requests sharing a stable prefix wait for one structured-generation round before fanning out, so this optimization applies to production callers as well as the eval runner. One package-level round can itself include the AI SDK's bounded transient HTTP retries. The optional `card_field_generation/file-cache` subpath supplies an append-only JSON Lines result cache for Deno command-line workflows; one instance serializes its writes and recovers from an interrupted final append, but separate processes must not write the same file concurrently.
 
-`selectApplicableSenses()` returns a discriminated semantic outcome. `selected` contains the complete, explicit, nonempty applicable `senseNumbers` subset, including every structurally compatible sense number when they all apply. `no-match` means the source establishes that none of those senses describes the usage. `ambiguous` lists the senses still possible when the source cannot safely determine a complete selection, including insufficient evidence to decide match versus no-match. Both non-selected outcomes are terminal: callers defer rather than inventing a card or treating insufficient evidence as a dictionary mismatch.
+`selectSensesForCard()` returns a discriminated learner-facing outcome. `selected` contains the complete, explicit, nonempty `senseNumbers` subset: senses used directly plus transparent extensions that would be redundant as separate recognition cards. `no-match` means the source establishes that none of the compatible senses describes the usage. `ambiguous` lists the senses still possible when the source cannot safely distinguish lexical associations that would require separate cards. Both non-selected outcomes are terminal: callers defer rather than inventing a card or treating insufficient evidence as a dictionary mismatch.
 
 Callers remain responsible for adapting generated fields to their workflows and for detecting stale deterministic evidence before passing fully decided input to `card_creator`.

@@ -3,7 +3,7 @@ import { jmdictAlternativesForCardFront, jmdictUsagesForSpelling } from "card_cr
 import {
   generateSourceGroundedHint,
   type GenerationOptions,
-  selectApplicableSenses,
+  selectSensesForCard,
 } from "card_field_generation";
 import { markResolvedContextTargetWithinAnchor } from "../shared/anchored_context.ts";
 import { kanaScriptsMatch } from "./html.ts";
@@ -136,7 +136,7 @@ function uniqueForms<T>(forms: T[]): T[] {
 }
 
 export interface EntrySelectionDependencies {
-  selectSenses?: typeof selectApplicableSenses;
+  selectSenses?: typeof selectSensesForCard;
   generateHint?: typeof generateSourceGroundedHint;
 }
 
@@ -246,7 +246,7 @@ export async function selectJMDictEntry(
   request: UnresolvedJMDictEntry,
   options: EntrySelectionGenerationOptions,
   {
-    selectSenses = selectApplicableSenses,
+    selectSenses = selectSensesForCard,
     generateHint = generateSourceGroundedHint,
   }: EntrySelectionDependencies = {},
 ): Promise<GeneratedJMDictEntrySelection> {

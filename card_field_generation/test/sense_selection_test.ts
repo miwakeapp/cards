@@ -145,7 +145,8 @@ Deno.test("sense-selection few-shots classify every supplied sense independently
     throw new TypeError("Expected the 義姉 few-shot to have an assistant JSON response");
   }
   assertEquals(JSON.parse(ambiguousResponse.content), {
-    senseApplicability: [
+    senseGroups: [[1, 2]],
+    contextApplicability: [
       { senseNumber: 1, classification: "unclear" },
       { senseNumber: 2, classification: "unclear" },
     ],
@@ -184,7 +185,7 @@ Deno.test("senseSelectionMessages rejects inconsistent deterministic inputs", as
   });
 });
 
-Deno.test("validateSenseSelection canonicalizes complete per-sense decisions", async (t) => {
+Deno.test("validateSenseSelection combines context evidence with recognition groups", async (t) => {
   const input = {
     context: "木には<mark>年輪</mark>ができる。",
     recognitionTarget: "年輪",
@@ -195,7 +196,8 @@ Deno.test("validateSenseSelection canonicalizes complete per-sense decisions", a
   await t.step("no sense matches", () => {
     assertEquals(
       validateSenseSelection(input, {
-        senseApplicability: [
+        senseGroups: [[1], [2]],
+        contextApplicability: [
           { senseNumber: 1, classification: "no" },
           { senseNumber: 2, classification: "no" },
         ],
@@ -204,22 +206,24 @@ Deno.test("validateSenseSelection canonicalizes complete per-sense decisions", a
     );
   });
 
-  await t.step("every sense applies", () => {
+  await t.step("a direct sense selects its complete recognition group", () => {
     assertEquals(
       validateSenseSelection(input, {
-        senseApplicability: [
+        senseGroups: [[1, 2]],
+        contextApplicability: [
           { senseNumber: 1, classification: "yes" },
-          { senseNumber: 2, classification: "yes" },
+          { senseNumber: 2, classification: "no" },
         ],
       }),
       { outcome: "selected", senseNumbers: [1, 2] },
     );
   });
 
-  await t.step("a proper subset applies", () => {
+  await t.step("a separate recognition group remains unselected", () => {
     assertEquals(
       validateSenseSelection(input, {
-        senseApplicability: [
+        senseGroups: [[1], [2]],
+        contextApplicability: [
           { senseNumber: 1, classification: "no" },
           { senseNumber: 2, classification: "yes" },
         ],
@@ -228,10 +232,24 @@ Deno.test("validateSenseSelection canonicalizes complete per-sense decisions", a
     );
   });
 
-  await t.step("an unresolved sense makes the result ambiguous", () => {
+  await t.step("uncertainty within one recognition group still selects that group", () => {
     assertEquals(
       validateSenseSelection(input, {
-        senseApplicability: [
+        senseGroups: [[1, 2]],
+        contextApplicability: [
+          { senseNumber: 1, classification: "unclear" },
+          { senseNumber: 2, classification: "unclear" },
+        ],
+      }),
+      { outcome: "selected", senseNumbers: [1, 2] },
+    );
+  });
+
+  await t.step("uncertainty across recognition groups remains ambiguous", () => {
+    assertEquals(
+      validateSenseSelection(input, {
+        senseGroups: [[1], [2]],
+        contextApplicability: [
           { senseNumber: 1, classification: "yes" },
           { senseNumber: 2, classification: "unclear" },
         ],
@@ -241,7 +259,7 @@ Deno.test("validateSenseSelection canonicalizes complete per-sense decisions", a
   });
 
   for (
-    const [name, senseApplicability] of [
+    const [name, contextApplicability] of [
       ["missing", [{ senseNumber: 1, classification: "yes" }]],
       [
         "reordered",
@@ -268,9 +286,39 @@ Deno.test("validateSenseSelection canonicalizes complete per-sense decisions", a
   ) {
     await t.step(`rejects ${name} decisions`, () => {
       assertThrows(
-        () => validateSenseSelection(input, { senseApplicability: [...senseApplicability] }),
+        () =>
+          validateSenseSelection(input, {
+            senseGroups: [[1], [2]],
+            contextApplicability: [...contextApplicability],
+          }),
         Error,
         "expected exactly one decision for each compatibleSenseNumbers value in order [1,2]",
+      );
+    });
+  }
+
+  for (
+    const [name, senseGroups] of [
+      ["missing", [[1]]],
+      ["empty", [[], [1], [2]]],
+      ["duplicate", [[1, 2], [2]]],
+      ["out-of-range", [[1], [3]]],
+      ["reordered", [[2], [1]]],
+      ["internally reordered", [[2, 1]]],
+    ] as const
+  ) {
+    await t.step(`rejects ${name} recognition groups`, () => {
+      assertThrows(
+        () =>
+          validateSenseSelection(input, {
+            senseGroups: senseGroups.map((group) => [...group]),
+            contextApplicability: [
+              { senseNumber: 1, classification: "yes" },
+              { senseNumber: 2, classification: "no" },
+            ],
+          }),
+        Error,
+        "expected an ordered partition of compatibleSenseNumbers [1,2]",
       );
     });
   }

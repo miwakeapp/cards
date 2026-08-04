@@ -44,5 +44,5 @@ export {
   isGenerationUsage,
 } from "./usage.ts";
 export type { GenerationUsage } from "./usage.ts";
-export { selectApplicableSenses } from "./sense_selection.ts";
+export { selectSensesForCard } from "./sense_selection.ts";
 export type { SenseSelectionInput, SenseSelectionOutcome } from "./sense_selection.ts";

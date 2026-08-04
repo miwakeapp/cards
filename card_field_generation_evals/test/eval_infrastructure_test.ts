@@ -299,18 +299,18 @@ Deno.test("CLI spending guard always permits dry runs and explicit approval", ()
 
 Deno.test("tracked eval fixtures are complete and prompt overlaps are explicit", async () => {
   const fixtures = await loadEvalFixtures();
-  assertEquals(fixtures.length, 242);
+  assertEquals(fixtures.length, 272);
   assertEquals(
     fixtures.filter(({ operation }) => operation === "context-minimization").length,
     55,
   );
   assertEquals(
     fixtures.filter(({ operation }) => operation === "hint").length,
-    94,
+    103,
   );
   assertEquals(
     fixtures.filter(({ operation }) => operation === "sense-selection").length,
-    93,
+    114,
   );
   assert(
     fixtures.some((fixture) =>
@@ -490,7 +490,7 @@ Deno.test("tracked eval fixtures are complete and prompt overlaps are explicit",
   );
   assert(provisionalSenseFixtures.length > 0);
   assert(
-    provisionalSenseFixtures.some((fixture) =>
+    fixtures.some((fixture) =>
       fixture.operation === "sense-selection" &&
       fixture.expected.outcome.outcome === "ambiguous"
     ),
@@ -740,27 +740,16 @@ Deno.test("sample selection is stable and stratified without prompt overlaps", a
   }
   assert(first.every(({ evaluation }) => !evaluation.promptOverlap));
 
-  const developmentSample = selectSampleCases(fixtures, 30, "sample-v1");
-  const authority = {
-    "user-reviewed": 0,
-    "agent-reviewed": 1,
-    "corpus-replay": 2,
-    provisional: 3,
-  } as const;
-  const selectedIds = new Set(developmentSample.map(({ id }) => id));
-  for (const selected of developmentSample) {
-    const moreAuthoritativePeers = fixtures.filter((candidate) =>
-      !candidate.evaluation.promptOverlap &&
-      candidate.operation === selected.operation &&
-      expectedOutcomeStratum(candidate) === expectedOutcomeStratum(selected) &&
-      authority[candidate.evaluation.referenceBasis] <
-        authority[selected.evaluation.referenceBasis]
-    );
-    assert(
-      moreAuthoritativePeers.every(({ id }) => selectedIds.has(id)),
-      `${selected.id} must not crowd a more authoritative fixture out of its operation/outcome stratum`,
-    );
-  }
+  const senseDevelopmentSample = selectSampleCases(
+    fixtures.filter(({ operation }) => operation === "sense-selection"),
+    30,
+    "sample-v1",
+  );
+  assertEquals(
+    new Set(senseDevelopmentSample.map(({ evaluation }) => evaluation.referenceBasis)),
+    new Set(["user-reviewed", "agent-reviewed", "corpus-replay", "provisional"]),
+    "an operation-specific development sample must not be monopolized by one evidence cohort",
+  );
 });
 
 Deno.test("explicit case filters retain prompt-overlap fixtures when sampling is omitted", async () => {

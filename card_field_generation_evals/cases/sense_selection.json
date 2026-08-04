@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "description": "Tracked explicit sense-resolution outcomes. A selected outcome lists every compatible sense that applies; ambiguous means the source cannot safely distinguish the listed possible senses.",
+  "description": "Tracked explicit sense-resolution outcomes. A selected outcome lists every compatible sense that belongs on one recognition card; ambiguous means the source cannot safely distinguish possible senses that would require separate cards.",
   "cases": [
     {
       "id": "animecards-focused-1726739466292",
@@ -22,14 +22,15 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
-            1
+            1,
+            2
           ]
         }
       },
       "evaluation": {
         "promptOverlap": true,
         "referenceBasis": "agent-reviewed",
-        "reviewNote": "The context uses a numerical value or quantity; it gives no evidence for the separate figure-or-numeral sense."
+        "reviewNote": "Numerical value and measured figure are transparent formulations of the same recognition unit, even though the source directly uses the former."
       }
     },
     {
@@ -52,15 +53,16 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
-            1
+            1,
+            2
           ]
         },
-        "rationale": "身支度を終える describes completing one's personal preparations; it does not denote the clothes or outfit themselves."
+        "rationale": "身支度を終える directly describes getting ready; the outfit and the act of readying oneself are a transparent result-action pair."
       },
       "evaluation": {
         "promptOverlap": false,
         "referenceBasis": "agent-reviewed",
-        "reviewNote": "The source predicates completion of preparations, not possession or selection of an outfit."
+        "reviewNote": "The outfit and the act of getting ready do not require separate lexical associations."
       }
     },
     {
@@ -113,13 +115,15 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
-            1
+            1,
+            2
           ]
         }
       },
       "evaluation": {
         "promptOverlap": false,
-        "referenceBasis": "corpus-replay"
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Brother-in-law and older stepbrother transparently express one non-biological-older-brother recognition unit."
       }
     },
     {
@@ -202,14 +206,16 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
-            1
+            1,
+            2
           ]
         },
-        "rationale": "微分積分 names differentiation and integration; the passage does not denote a differential or derivative result."
+        "rationale": "微分積分 directly names the operation; the derivative produced by it is a transparent operation-result extension."
       },
       "evaluation": {
         "promptOverlap": false,
-        "referenceBasis": "agent-reviewed"
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Differentiation and its derivative do not require separate recognition cards."
       }
     },
     {
@@ -232,15 +238,16 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
-            1
+            1,
+            2
           ]
         },
-        "rationale": "微分積分 names differentiation and integration; the passage does not denote an integral or integration result."
+        "rationale": "微分積分 directly names the operation; the integral produced by it is a transparent operation-result extension."
       },
       "evaluation": {
         "promptOverlap": false,
         "referenceBasis": "agent-reviewed",
-        "reviewNote": "Corrected inherited all-compatible senses after independently reviewing the operation/result distinction; this is parallel to the paired 微分 fixture."
+        "reviewNote": "Integration and its integral do not require separate recognition cards."
       }
     },
     {
@@ -293,14 +300,16 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
+            1,
             2
           ]
         },
-        "rationale": "万事めでたしめでたし describes the hypothetical outcome ending without incident, rather than quoting the stock fairy-tale closing formula."
+        "rationale": "The stock closing formula and its ordinary happy-ending use express one transparent recognition unit."
       },
       "evaluation": {
         "promptOverlap": false,
-        "referenceBasis": "agent-reviewed"
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Learning either happy-ending formulation makes the other obvious in ordinary context."
       }
     },
     {
@@ -352,13 +361,15 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
-            1
+            1,
+            2
           ]
         }
       },
       "evaluation": {
         "promptOverlap": false,
-        "referenceBasis": "corpus-replay"
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The ordinary double sense and its scientific prefix form are transparently the same recognition unit."
       }
     },
     {
@@ -511,7 +522,8 @@
       },
       "evaluation": {
         "promptOverlap": false,
-        "referenceBasis": "corpus-replay"
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "A delectable flavor and a dish characterized by it are a transparent property-bearer pair."
       }
     },
     {
@@ -534,13 +546,15 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
-            1
+            1,
+            2
           ]
         }
       },
       "evaluation": {
         "promptOverlap": false,
-        "referenceBasis": "corpus-replay"
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Immediate temporal change and sudden change are transparent descriptions of the same たちまち association."
       }
     },
     {
@@ -863,18 +877,18 @@
       },
       "expected": {
         "outcome": {
-          "outcome": "ambiguous",
-          "possibleSenseNumbers": [
+          "outcome": "selected",
+          "senseNumbers": [
             1,
             2
           ]
         },
-        "rationale": "The phrase only says the reaction went beyond 号泣; it does not establish whether the crying was loud or the colloquial silent flood-of-tears usage."
+        "rationale": "Loud wailing and the non-standard silent flood-of-tears usage are contextual variants of one crying recognition unit."
       },
       "evaluation": {
         "promptOverlap": false,
-        "referenceBasis": "provisional",
-        "reviewNote": "The restored source does not distinguish the standard loud-crying sense from the non-standard colloquial sense."
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The two crying usages do not warrant separate cards; future context supplies the loud-versus-silent distinction."
       }
     },
     {
@@ -927,14 +941,16 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
+            1,
             2
           ]
         },
-        "rationale": "The passage means female university students generally; it gives no evidence for the narrower women's-college sense."
+        "rationale": "The two parses of 女子大生 are transparent from future context and belong on one recognition card."
       },
       "evaluation": {
         "promptOverlap": true,
-        "referenceBasis": "agent-reviewed"
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The source directly uses the general female-university-student sense, while the women's-college parse remains part of the same recognition unit."
       }
     },
     {
@@ -957,14 +973,16 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
-            1
+            1,
+            2
           ]
         },
-        "rationale": "The surrounding action demonstrates social cluelessness: Ito apologizes to the person who threw the bag instead of the woman who was inconvenienced. This supports dull or thickheaded, not physical sluggishness."
+        "rationale": "The source directly demonstrates dullness; sluggishness is the transparent speed-based extension of the same recognition unit."
       },
       "evaluation": {
         "promptOverlap": false,
-        "referenceBasis": "agent-reviewed"
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Dullness and sluggishness do not require separate vocabulary cards because future context supplies the mental-versus-physical distinction."
       }
     },
     {
@@ -1019,13 +1037,15 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
-            1
+            1,
+            2
           ]
         }
       },
       "evaluation": {
         "promptOverlap": false,
-        "referenceBasis": "corpus-replay"
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Magnanimous ease and placid composure are transparent facets of the same demeanor."
       }
     },
     {
@@ -1048,14 +1068,16 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
-            1
+            1,
+            2
           ]
         },
-        "rationale": "ところに婦人科があった denotes a clinic or department, not gynecology as an abstract discipline."
+        "rationale": "The source directly denotes a department; the medical field and its department are a transparent field-place extension."
       },
       "evaluation": {
         "promptOverlap": false,
-        "referenceBasis": "agent-reviewed"
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Gynecology and a gynecology department do not require separate recognition cards."
       }
     },
     {
@@ -1106,18 +1128,18 @@
       },
       "expected": {
         "outcome": {
-          "outcome": "ambiguous",
-          "possibleSenseNumbers": [
+          "outcome": "selected",
+          "senseNumbers": [
             1,
             2
           ]
         },
-        "rationale": "Calling the woman 義姉 does not reveal whether she is a sister-in-law, stepsister, adopted sister, or another non-blood-related older sister."
+        "rationale": "The source does not identify the exact relationship, but every sense transparently expresses one non-biological-older-sister recognition unit."
       },
       "evaluation": {
         "promptOverlap": true,
         "referenceBasis": "agent-reviewed",
-        "reviewNote": "The excerpt identifies the woman only as 義姉 and supplies no relationship evidence that distinguishes either compatible sense."
+        "reviewNote": "Sister-in-law, stepsister, and adopted-sister senses do not require separate recognition cards."
       }
     },
     {
@@ -1170,13 +1192,15 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
+            1,
             2
           ]
         }
       },
       "evaluation": {
         "promptOverlap": false,
-        "referenceBasis": "corpus-replay"
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The noun and adjectival descriptions of a jagged form are one recognition unit."
       }
     },
     {
@@ -1236,7 +1260,8 @@
       },
       "evaluation": {
         "promptOverlap": false,
-        "referenceBasis": "corpus-replay"
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Cowardice and underhandedness are closely related facets of the same negative person-label, distinguishable from future context."
       }
     },
     {
@@ -1259,14 +1284,15 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
-            1
+            1,
+            2
           ]
         }
       },
       "evaluation": {
         "promptOverlap": true,
         "referenceBasis": "agent-reviewed",
-        "reviewNote": "使いみちのなくなった means that the brazier no longer has a purpose or use, not a method of using it."
+        "reviewNote": "Purpose and way of using something transparently express the same use-oriented recognition unit."
       }
     },
     {
@@ -1289,13 +1315,15 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
-            1
+            1,
+            2
           ]
         }
       },
       "evaluation": {
         "promptOverlap": false,
-        "referenceBasis": "corpus-replay"
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "A skybridge is a recognizable subtype of a connecting passageway, so a second card would be redundant."
       }
     },
     {
@@ -1318,13 +1346,15 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
-            1
+            1,
+            2
           ]
         }
       },
       "evaluation": {
         "promptOverlap": false,
-        "referenceBasis": "corpus-replay"
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Tending a store and the person doing it are a transparent action-practitioner extension."
       }
     },
     {
@@ -1345,18 +1375,18 @@
       },
       "expected": {
         "outcome": {
-          "outcome": "ambiguous",
-          "possibleSenseNumbers": [
+          "outcome": "selected",
+          "senseNumbers": [
             1,
             2
           ]
         },
-        "rationale": "The passage identifies J as an unattached man but does not say whether he is widowed, divorced, or a long-term bachelor."
+        "rationale": "Widowers, divorced men, and long-term bachelors share the unattached-man recognition unit; future biographical context supplies the distinction."
       },
       "evaluation": {
         "promptOverlap": false,
-        "referenceBasis": "provisional",
-        "reviewNote": "The relationship history needed to distinguish the two senses is absent."
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The missing relationship history prevents direct sense disambiguation but does not justify separate vocabulary cards."
       }
     },
     {
@@ -1411,13 +1441,15 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
+            1,
             2
           ]
         }
       },
       "evaluation": {
         "promptOverlap": false,
-        "referenceBasis": "corpus-replay"
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually changed Key from \"いなご | 1167880 | 2\" to \"いなご | 1167880\" during live collection review."
       }
     },
     {
@@ -1470,6 +1502,7 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
+            1,
             2
           ]
         }
@@ -1477,7 +1510,7 @@
       "evaluation": {
         "promptOverlap": false,
         "referenceBasis": "agent-reviewed",
-        "reviewNote": "The context identifies a gull but supplies no species evidence for the narrower common-gull sense."
+        "reviewNote": "The source directly identifies a gull; the common-gull taxon is a technical subtype that does not warrant another recognition card."
       }
     },
     {
@@ -1561,15 +1594,16 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
+            1,
             2
           ]
         },
-        "rationale": "The adverbial 一丁前に describes the fully fledged manner in which he broods; it does not denote an adult person."
+        "rationale": "Adult and fully fledged express one maturity association; the adverbial source directly realizes the latter."
       },
       "evaluation": {
         "promptOverlap": false,
         "referenceBasis": "agent-reviewed",
-        "reviewNote": "Relabeled during model selection to distinguish semantic denotation from the related adult mockery implied by the speaker."
+        "reviewNote": "The person and maturity-property uses do not require separate recognition cards."
       }
     },
     {
@@ -1623,14 +1657,16 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
-            1
+            1,
+            2
           ]
         },
-        "rationale": "An apology advertisement can be overly formal or ceremonious but cannot itself become nervous or tense."
+        "rationale": "The source directly uses excessive formality; bodily or nervous stiffness is a transparent extension of the same recognition unit."
       },
       "evaluation": {
         "promptOverlap": false,
-        "referenceBasis": "agent-reviewed"
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Formal rigidity and nervous rigidity are distinguishable from future context without separate cards."
       }
     },
     {
@@ -1744,14 +1780,15 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
-            1
+            1,
+            2
           ]
         }
       },
       "evaluation": {
         "promptOverlap": true,
         "referenceBasis": "agent-reviewed",
-        "reviewNote": "In this editorial dispute, 文体を統一する means standardizing the contributors' writing style. The context does not contrast classical and modern forms of written language."
+        "reviewNote": "Literary style and a form of written language are transparent descriptions of one writing-style recognition unit."
       }
     },
     {
@@ -1834,14 +1871,16 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
-            1
+            1,
+            2
           ]
         },
-        "rationale": "The source explicitly says silver foil stamping, excluding the gold-tooling sense."
+        "rationale": "The source directly uses foil stamping; gold tooling is its transparent material-and-application subtype."
       },
       "evaluation": {
         "promptOverlap": false,
-        "referenceBasis": "agent-reviewed"
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Foil stamping and gold tooling do not require separate recognition cards."
       }
     },
     {
@@ -1864,15 +1903,16 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
+            1,
             2
           ]
         },
-        "rationale": "The analogy invokes ordinary swarming locust behavior. A rice field does not identify genus Oxya, so the narrower taxonomic rice-grasshopper sense must not be assumed."
+        "rationale": "The source directly invokes an ordinary locust; the narrower rice-grasshopper taxon is a technical subtype of the same recognition unit."
       },
       "evaluation": {
         "promptOverlap": true,
         "referenceBasis": "agent-reviewed",
-        "reviewNote": "The locust analogy supplies no taxonomic evidence for the narrower genus Oxya sense."
+        "reviewNote": "Direct context applicability remains broad, but the everyday and taxonomic descriptions do not require separate cards."
       }
     },
     {
@@ -1925,13 +1965,15 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
-            1
+            1,
+            2
           ]
         }
       },
       "evaluation": {
         "promptOverlap": false,
-        "referenceBasis": "corpus-replay"
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Planning and drafting a plan are transparent formulations of one recognition unit."
       }
     },
     {
@@ -1954,13 +1996,15 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
-            1
+            1,
+            2
           ]
         }
       },
       "evaluation": {
         "promptOverlap": false,
-        "referenceBasis": "corpus-replay"
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Ease and comfort are transparent facets of the same ラクチン association."
       }
     },
     {
@@ -1983,13 +2027,15 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
-            1
+            1,
+            2
           ]
         }
       },
       "evaluation": {
         "promptOverlap": false,
-        "referenceBasis": "corpus-replay"
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Radio communication and wireless transmission are transparent technology-medium formulations of one recognition unit."
       }
     },
     {
@@ -2106,13 +2152,15 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
-            1
+            1,
+            2
           ]
         }
       },
       "evaluation": {
         "promptOverlap": false,
-        "referenceBasis": "corpus-replay"
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The adjective and its aesthetics nominalization are transparent grammatical presentations of the same sublime recognition unit."
       }
     },
     {
@@ -2135,14 +2183,16 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
-            1
+            1,
+            2
           ]
         },
-        "rationale": "The source establishes lodging but gives no positive evidence for government-employee housing."
+        "rationale": "The source directly establishes lodging; government-employee housing is a transparent occupant-specific subtype."
       },
       "evaluation": {
         "promptOverlap": false,
-        "referenceBasis": "agent-reviewed"
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "General lodging and official quarters do not require separate recognition cards."
       }
     },
     {
@@ -2196,13 +2246,15 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
+            1,
             2
           ]
         }
       },
       "evaluation": {
         "promptOverlap": false,
-        "referenceBasis": "corpus-replay"
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Posing a question and the resulting question are a transparent action-result pair."
       }
     },
     {
@@ -2255,13 +2307,15 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
-            1
+            1,
+            2
           ]
         }
       },
       "evaluation": {
         "promptOverlap": false,
-        "referenceBasis": "corpus-replay"
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Being cornered and being unable to move forward or backward are transparent formulations of one idiom."
       }
     },
     {
@@ -2712,14 +2766,16 @@
         "outcome": {
           "outcome": "selected",
           "senseNumbers": [
-            1
+            1,
+            2
           ]
         },
-        "rationale": "鼻を摘む is physically pinching or holding the nose between the fingers."
+        "rationale": "鼻を摘む directly uses physical pinching; picking something up to eat is a transparent object-and-purpose subtype of the same hand action."
       },
       "evaluation": {
         "promptOverlap": false,
-        "referenceBasis": "agent-reviewed"
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The food-specific extension does not need another card because its extra action is obvious in a future eating context."
       }
     },
     {
@@ -2858,6 +2914,664 @@
         "promptOverlap": false,
         "referenceBasis": "user-reviewed",
         "reviewNote": "Domenic selected sense 5 only in the blinded 2026-07-30 preference worksheet."
+      }
+    },
+    {
+      "id": "prompt-control-義母-related-social-subtypes",
+      "provenance": {
+        "corpus": "Prompt policy control",
+        "artifact": "DESIGN.md#senses-that-belong-on-one-card"
+      },
+      "input": {
+        "context": "来週は<mark>義母</mark>が家に来る。",
+        "recognitionTarget": "義母",
+        "jmdictId": "1225880",
+        "compatibleSenseNumbers": [
+          1,
+          2,
+          3
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2,
+            3
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Mother-in-law, foster mother, and stepmother transparently express one non-biological-mother recognition unit."
+      }
+    },
+    {
+      "id": "prompt-control-寄宿-activity-place",
+      "provenance": {
+        "corpus": "Prompt policy control",
+        "artifact": "DESIGN.md#senses-that-belong-on-one-card"
+      },
+      "input": {
+        "context": "学生時代は親戚の家に<mark>寄宿</mark>していた。",
+        "recognitionTarget": "寄宿",
+        "jmdictId": "1219730",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "The lodging activity and the place providing that lodging are a transparent activity-place extension."
+      }
+    },
+    {
+      "id": "prompt-control-開店-aspect",
+      "provenance": {
+        "corpus": "Prompt policy control",
+        "artifact": "DESIGN.md#senses-that-belong-on-one-card"
+      },
+      "input": {
+        "context": "駅前に新しい店が<mark>開店</mark>した。",
+        "recognitionTarget": "開店",
+        "jmdictId": "1202870",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Opening a new shop and opening it for the day are predictable aspectual variants of one shop-opening association."
+      }
+    },
+    {
+      "id": "surfacepro11-review-1732347332915-かつて",
+      "provenance": {
+        "corpus": "SurfacePro11 manual Miwake Card review",
+        "sourceNoteId": 1732347332915,
+        "artifact": "animecards-apply-2026-07-26.jsonl compared with SurfacePro11 on 2026-07-27T13:03:14.000Z"
+      },
+      "input": {
+        "context": "こんな「ベビーエンド」が、<mark>かつて</mark>物語にあっただろうかと。",
+        "recognitionTarget": "かつて",
+        "jmdictId": "1581210",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually changed Key from \"かつて | 1581210 | 1\" to \"かつて | 1581210 | 2\" during live collection review."
+      }
+    },
+    {
+      "id": "surfacepro11-review-1742818558623-鍛冶",
+      "provenance": {
+        "corpus": "SurfacePro11 manual Miwake Card review",
+        "sourceNoteId": 1742818558623,
+        "artifact": "animecards-apply-2026-07-26.jsonl compared with SurfacePro11 on 2026-07-27T13:03:14.000Z"
+      },
+      "input": {
+        "context": "スキルは 戦[せん] 闘[とう]用以外にも、<mark>鍛[か] 冶[じ]</mark>や 革[かわ]細工、 裁[さい] 縫[ほう]といった製造系、釣りや料理、音楽などの日常系まで多岐にわたり、プレイヤーは広大なフィールドを冒険するだけでなく、文字通り《生活》することができる。",
+        "recognitionTarget": "鍛冶",
+        "jmdictId": "1419150",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually changed Key from \"鍛冶 | 1419150 | 1\" to \"鍛冶 | 1419150\" during live collection review."
+      }
+    },
+    {
+      "id": "surfacepro11-review-1776234247658-袋小路",
+      "provenance": {
+        "corpus": "SurfacePro11 manual Miwake Card review",
+        "sourceNoteId": 1776234247658,
+        "artifact": "animecards-apply-2026-07-26.jsonl compared with SurfacePro11 on 2026-07-28T05:27:06.000Z"
+      },
+      "input": {
+        "context": "我々はおだやかな、引きのばされた<mark>袋小路</mark>の中にいた。",
+        "recognitionTarget": "袋小路",
+        "jmdictId": "1411080",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually changed Key from \"袋小路 | 1411080 | 2\" to \"袋小路 | 1411080 | 1\" during live collection review."
+      }
+    },
+    {
+      "id": "surfacepro11-review-1774182837276-甲子園",
+      "provenance": {
+        "corpus": "SurfacePro11 manual Miwake Card review",
+        "sourceNoteId": 1774182837276,
+        "artifact": "animecards-apply-2026-07-28.jsonl compared with SurfacePro11 on 2026-07-28T06:53:55.000Z"
+      },
+      "input": {
+        "context": "<mark>甲子園</mark>出場を 賭[か]けた地区大会で優勝した時の写真もある。",
+        "recognitionTarget": "甲子園",
+        "jmdictId": "2092720",
+        "compatibleSenseNumbers": [
+          1,
+          2,
+          3
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2,
+            3
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually changed Key from \"甲子園 | 2092720 | 1\" to \"甲子園 | 2092720\" during live collection review."
+      }
+    },
+    {
+      "id": "surfacepro11-review-1740392870066-密葬",
+      "provenance": {
+        "corpus": "SurfacePro11 manual Miwake Card review",
+        "sourceNoteId": 1740392870066,
+        "artifact": "animecards-apply-2026-07-26.jsonl compared with SurfacePro11 on 2026-07-29T01:33:14.000Z"
+      },
+      "input": {
+        "context": "「急にこんなことを電話で申し上げるのは心苦しいのですが、渡会は先週の木曜日に亡くなり、今週の月曜日に身内だけで<mark>密葬</mark>がとりおこなわれました」",
+        "recognitionTarget": "密葬",
+        "jmdictId": "1731550",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually changed Key from \"密葬 | 1731550 | 1\" to \"密葬 | 1731550\" during live collection review."
+      }
+    },
+    {
+      "id": "surfacepro11-review-1778053863786-あぶら虫",
+      "provenance": {
+        "corpus": "SurfacePro11 manual Miwake Card review",
+        "sourceNoteId": 1778053863786,
+        "artifact": "animecards-apply-2026-07-26.jsonl compared with SurfacePro11 on 2026-07-29T01:39:25.000Z"
+      },
+      "input": {
+        "context": "北海道で<mark>あぶら虫</mark>を目にしたのははじめてだった。",
+        "recognitionTarget": "あぶら虫",
+        "jmdictId": "1538710",
+        "compatibleSenseNumbers": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually changed Key from \"あぶら虫 | 1538710 | 2\" to \"あぶら虫 | 1538710 | 1\" during live collection review."
+      }
+    },
+    {
+      "id": "surfacepro11-review-1769065844790-下宿",
+      "provenance": {
+        "corpus": "SurfacePro11 manual Miwake Card review",
+        "sourceNoteId": 1769065844790,
+        "artifact": "animecards-apply-2026-07-27.jsonl compared with SurfacePro11 on 2026-07-29T01:47:00.000Z"
+      },
+      "input": {
+        "context": "「悪いとかじゃないんですよ、全然。私が親戚に<mark>下宿</mark>させてもらってる 阪[はん] 神[しん] 国[こく] 道[どう]なんか、ＪＲ線も近くて便利だし、終点の今津まで行けば阪神にも乗り換え利くし。生活するのに便利なお店とかいっぱいあるし。だけど、西宮北口から向こう側って線路がすぐに高架になっちゃうんですよね。面白いものはやっぱり地面を走ってる線路のほうが見つけやすいんです」",
+        "recognitionTarget": "下宿",
+        "jmdictId": "1185290",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually changed Key from \"下宿 | 1185290 | 1\" to \"下宿 | 1185290\" during live collection review."
+      }
+    },
+    {
+      "id": "surfacepro11-review-1768221276725-業",
+      "provenance": {
+        "corpus": "SurfacePro11 manual Miwake Card review",
+        "sourceNoteId": 1768221276725,
+        "artifact": "animecards-apply-2026-07-28.jsonl compared with SurfacePro11 on 2026-07-29T01:50:37.000Z"
+      },
+      "input": {
+        "context": "翔子を見た瞬間のあの女の形相。鬼のような、女の<mark>業[ごう]</mark>を凝縮したような。",
+        "recognitionTarget": "業",
+        "jmdictId": "1239320",
+        "compatibleSenseNumbers": [
+          1,
+          2,
+          3
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually changed Key from \"業 | 1239320 | 2\" to \"業 | 1239320 | 1,2\" during live collection review."
+      }
+    },
+    {
+      "id": "surfacepro11-review-1728726256978-封印",
+      "provenance": {
+        "corpus": "SurfacePro11 manual Miwake Card review",
+        "sourceNoteId": 1728726256978,
+        "artifact": "animecards-apply-2026-07-26.jsonl compared with SurfacePro11 on 2026-07-29T02:12:05.000Z"
+      },
+      "input": {
+        "context": "僕もその宝物を、思い出とともに<mark>封印</mark>したのだ。",
+        "recognitionTarget": "封印",
+        "jmdictId": "1499610",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually changed Key from \"封印 | 1499610 | 2\" to \"封印 | 1499610\" during live collection review."
+      }
+    },
+    {
+      "id": "surfacepro11-review-1774950900201-本望",
+      "provenance": {
+        "corpus": "SurfacePro11 manual Miwake Card review",
+        "sourceNoteId": 1774950900201,
+        "artifact": "animecards-apply-2026-07-26.jsonl compared with SurfacePro11 on 2026-07-31T01:59:57.000Z"
+      },
+      "input": {
+        "context": "「職場で死ねたら<mark>本望</mark>。お父さんたちはそういう覚悟で仕事をしてきた。お前にもいつか、その気持ちが、わかる時が来る」",
+        "recognitionTarget": "本望",
+        "jmdictId": "1523220",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually changed Key from \"本望 | 1523220 | 2\" to \"本望 | 1523220\" during live collection review."
+      }
+    },
+    {
+      "id": "surfacepro11-review-1770463681283-バーゲン",
+      "provenance": {
+        "corpus": "SurfacePro11 manual Miwake Card review",
+        "sourceNoteId": 1770463681283,
+        "artifact": "animecards-apply-2026-07-26.jsonl compared with SurfacePro11 on 2026-07-31T02:14:20.000Z"
+      },
+      "input": {
+        "context": "<mark>バーゲン</mark>でもみくちゃになりながら奪い取った商品でも、百貨店の品は百貨店の品だ。",
+        "recognitionTarget": "バーゲン",
+        "jmdictId": "1097030",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually changed Key from \"バーゲン | 1097030 | 2\" to \"バーゲン | 1097030\" during live collection review."
+      }
+    },
+    {
+      "id": "surfacepro11-review-1745721815080-開通",
+      "provenance": {
+        "corpus": "SurfacePro11 manual Miwake Card review",
+        "sourceNoteId": 1745721815080,
+        "artifact": "animecards-apply-2026-07-26.jsonl compared with SurfacePro11 on 2026-07-31T02:50:05.000Z"
+      },
+      "input": {
+        "context": "先日新たに<mark>開通</mark>なった七十五層の主街区は古代ローマ風の造りだった。",
+        "recognitionTarget": "開通",
+        "jmdictId": "1202850",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually changed Key from \"開通 | 1202850 | 1\" to \"開通 | 1202850\" during live collection review."
+      }
+    },
+    {
+      "id": "surfacepro11-review-1778054975063-原則",
+      "provenance": {
+        "corpus": "SurfacePro11 manual Miwake Card review",
+        "sourceNoteId": 1778054975063,
+        "artifact": "animecards-apply-2026-07-26.jsonl compared with SurfacePro11 on 2026-08-02T01:13:54.000Z"
+      },
+      "input": {
+        "context": "つまり一度閉めたドアは二度と開くことはできないし、かといって何もかも開けっ放しにしておくことはできないという<mark>原則</mark>だ。",
+        "recognitionTarget": "原則",
+        "jmdictId": "1262070",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually changed Key from \"原則 | 1262070 | 1\" to \"原則 | 1262070\" during live collection review."
+      }
+    },
+    {
+      "id": "surfacepro11-review-1764075855702-義父",
+      "provenance": {
+        "corpus": "SurfacePro11 manual Miwake Card review",
+        "sourceNoteId": 1764075855702,
+        "artifact": "animecards-apply-2026-07-26.jsonl compared with SurfacePro11 on 2026-08-03T01:37:15.000Z"
+      },
+      "input": {
+        "context": "<mark>義父</mark>が 苛[いら] 立[だ]ったように舌打ちし、わたしに近寄って来る。",
+        "recognitionTarget": "義父",
+        "jmdictId": "1225860",
+        "compatibleSenseNumbers": [
+          1,
+          2,
+          3
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2,
+            3
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually changed Key from \"義父 | 1225860 | 3\" to \"義父 | 1225860\" during live collection review."
+      }
+    },
+    {
+      "id": "surfacepro11-review-1739451663450-お化け屋敷",
+      "provenance": {
+        "corpus": "SurfacePro11 manual Miwake Card review",
+        "sourceNoteId": 1739451663450,
+        "artifact": "animecards-apply-2026-07-26.jsonl compared with SurfacePro11 on 2026-08-03T01:38:04.000Z"
+      },
+      "input": {
+        "context": "「こいつな、ものすごい恐がりやねん」と木が僕に言った。「子供の頃、二人で後楽園の<mark>お化け屋敷</mark>に行ったときなんかな、手を繫いでたんやけど──」",
+        "recognitionTarget": "お化け屋敷",
+        "jmdictId": "1001680",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually changed Key from \"お化け屋敷 | 1001680 | 2\" to \"お化け屋敷 | 1001680\" during live collection review."
+      }
+    },
+    {
+      "id": "surfacepro11-review-1768798559214-地雷",
+      "provenance": {
+        "corpus": "SurfacePro11 manual Miwake Card review",
+        "sourceNoteId": 1768798559214,
+        "artifact": "animecards-apply-2026-07-26.jsonl compared with SurfacePro11 on 2026-08-03T02:03:24.000Z"
+      },
+      "input": {
+        "context": "「『綿』とか読めるんかなぁ、彼氏。まだまだ<mark>地雷</mark>がありそうやな」",
+        "recognitionTarget": "地雷",
+        "jmdictId": "1421520",
+        "compatibleSenseNumbers": [
+          1,
+          2,
+          3
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually changed Key from \"地雷 | 1421520 | 3\" to \"地雷 | 1421520 | 2\" during live collection review."
+      }
+    },
+    {
+      "id": "surfacepro11-review-1747302903635-致し方ない",
+      "provenance": {
+        "corpus": "SurfacePro11 manual Miwake Card review",
+        "sourceNoteId": 1747302903635,
+        "artifact": "animecards-apply-2026-07-26.jsonl compared with SurfacePro11 on 2026-08-03T02:06:15.000Z"
+      },
+      "input": {
+        "context": "「こうなってしまっては<mark>致し方ない</mark>。予定を早めて、私は最上層の《 紅[こう] 玉[ぎょく] 宮[きゅう]》にて君たちの訪れを待つことにするよ。……」",
+        "recognitionTarget": "致し方ない",
+        "jmdictId": "2839837",
+        "compatibleSenseNumbers": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually changed Key from \"致し方ない | 2839837 | 2\" to \"致し方ない | 2839837 | 1,2\" during live collection review."
+      }
+    },
+    {
+      "id": "surfacepro11-review-1778136829140-すかし",
+      "provenance": {
+        "corpus": "SurfacePro11 manual Miwake Card review",
+        "sourceNoteId": 1778136829140,
+        "artifact": "animecards-apply-2026-07-26.jsonl compared with SurfacePro11 on 2026-08-03T02:09:29.000Z"
+      },
+      "input": {
+        "context": "グラスも葡萄のがらの<mark>すかし</mark>が入ったなかなか粋なものだった。",
+        "recognitionTarget": "すかし",
+        "jmdictId": "1450490",
+        "compatibleSenseNumbers": [
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "outcome": {
+          "outcome": "selected",
+          "senseNumbers": [
+            1,
+            2
+          ]
+        }
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually changed Key from \"すかし | 1450490 | 2\" to \"すかし | 1450490\" during live collection review."
       }
     }
   ]

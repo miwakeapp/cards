@@ -2764,7 +2764,8 @@
       },
       "evaluation": {
         "promptOverlap": false,
-        "referenceBasis": "agent-reviewed"
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually replaced イエス・キリスト with イエスさん during live collection review on 2026-07-28."
       }
     },
     {
@@ -2874,7 +2875,8 @@
       },
       "evaluation": {
         "promptOverlap": false,
-        "referenceBasis": "agent-reviewed"
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually replaced トラックに乗った with トラックに乗る during live collection review on 2026-07-28."
       }
     },
     {
@@ -2921,7 +2923,8 @@
       },
       "evaluation": {
         "promptOverlap": false,
-        "referenceBasis": "agent-reviewed"
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually replaced ハイタッチを交わす with ハイタッチをかわす during live collection review on 2026-07-28."
       }
     },
     {
@@ -2970,7 +2973,8 @@
       },
       "evaluation": {
         "promptOverlap": false,
-        "referenceBasis": "agent-reviewed"
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually replaced 小説白鯨 with 『白鯨』 during live collection review on 2026-07-28."
       }
     },
     {
@@ -4642,6 +4646,415 @@
         "promptOverlap": false,
         "referenceBasis": "user-reviewed",
         "reviewNote": "Domenic explicitly chose an unhinted card rather than a generic hint or deferral in the 2026-07-30 preference worksheet. The source-insufficient disposition preserves the reason for omitting the hint; callers create the card unhinted."
+      }
+    },
+    {
+      "id": "surfacepro11-review-1727678913028-色あせる",
+      "provenance": {
+        "corpus": "SurfacePro11 manual Miwake Card review",
+        "sourceNoteId": 1727678913028,
+        "artifact": "animecards-apply-2026-07-26.jsonl compared with SurfacePro11 on 2026-07-28T06:28:31.000Z"
+      },
+      "input": {
+        "context": "やがてはレンタルビデオ屋の片隅で<mark>色あせて</mark>いく映画なのかもしれない。",
+        "recognitionTarget": "色あせる",
+        "selectedUsage": {
+          "jmdictId": "1627970",
+          "senseNumbers": [
+            2
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1627970",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "generated",
+        "preferredHints": [
+          "やがて色あせる"
+        ],
+        "acceptableHints": [],
+        "observedBadHints": [
+          "映画が色あせる"
+        ],
+        "rubricNotes": [
+          "Prefer the reviewed source phrasing with やがて; the generic subject in 映画が色あせる does not help identify this figurative loss-of-vividness usage."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually changed Hint from \"映画が色あせる\" to \"やがて色あせる\" during live collection review."
+      }
+    },
+    {
+      "id": "surfacepro11-review-1778054282545-糊",
+      "provenance": {
+        "corpus": "SurfacePro11 manual Miwake Card review",
+        "sourceNoteId": 1778054282545,
+        "artifact": "animecards-apply-2026-07-26.jsonl compared with SurfacePro11 on 2026-07-29T01:59:35.000Z"
+      },
+      "input": {
+        "context": "僕はカーテンを閉めてベッドに戻り、アスファルト道路みたいに固く<mark>糊</mark>づけされたシーツに寝転んで別れた妻について考え、彼女が一緒に暮している男について考えてみた。",
+        "recognitionTarget": "糊",
+        "selectedUsage": {
+          "jmdictId": "1267400",
+          "senseNumbers": [
+            2
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1267400",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "generated",
+        "preferredHints": [
+          "糊づけされたシーツ"
+        ],
+        "acceptableHints": [],
+        "observedBadHints": [
+          "洗濯糊"
+        ],
+        "rubricNotes": [
+          "糊づけされたシーツ is the exact source relationship and identifies clothing starch; do not replace it with the source-absent generic compound 洗濯糊."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually changed Hint from \"洗濯糊\" to \"糊づけされたシーツ\" during live collection review."
+      }
+    },
+    {
+      "id": "surfacepro11-review-1772959107408-手出し",
+      "provenance": {
+        "corpus": "SurfacePro11 manual Miwake Card review",
+        "sourceNoteId": 1772959107408,
+        "artifact": "animecards-apply-2026-07-26.jsonl compared with SurfacePro11 on 2026-07-30T06:29:20.000Z"
+      },
+      "input": {
+        "context": "「これは私と吾妻くんの戦いです。<mark>手出し</mark>は無用にてお願いします」",
+        "recognitionTarget": "手出し",
+        "selectedUsage": {
+          "jmdictId": "1698440",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1698440",
+            "senseNumbers": [
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "generated",
+        "preferredHints": [
+          "手出しは無用だ"
+        ],
+        "acceptableHints": [],
+        "observedBadHints": [
+          "手出し無用"
+        ],
+        "rubricNotes": [
+          "Keep the source particle and complete predicate; 手出し無用 drops the reviewed sentence structure."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually changed Hint from \"手出し無用\" to \"手出しは無用だ\" during live collection review."
+      }
+    },
+    {
+      "id": "surfacepro11-review-1742387281104-つがい",
+      "provenance": {
+        "corpus": "SurfacePro11 manual Miwake Card review",
+        "sourceNoteId": 1742387281104,
+        "artifact": "animecards-apply-2026-07-26.jsonl compared with SurfacePro11 on 2026-08-01T01:27:39.000Z"
+      },
+      "input": {
+        "context": "だって一角獣の<mark>つがい</mark>なんて僕はこれまで見たこともないから。",
+        "recognitionTarget": "つがい",
+        "selectedUsage": {
+          "jmdictId": "2199920",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "2199920",
+            "senseNumbers": [
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "generated",
+        "preferredHints": [
+          "一角獣のつがい"
+        ],
+        "acceptableHints": [],
+        "observedBadHints": [
+          "雄雌つがい"
+        ],
+        "rubricNotes": [
+          "Use the source's specific animal, 一角獣, rather than inventing the generic gender description 雄雌."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually changed Hint from \"雄雌つがい\" to \"一角獣のつがい\" during live collection review."
+      }
+    },
+    {
+      "id": "surfacepro11-review-1765857501022-ザル",
+      "provenance": {
+        "corpus": "SurfacePro11 manual Miwake Card review",
+        "sourceNoteId": 1765857501022,
+        "artifact": "animecards-apply-2026-07-26.jsonl compared with SurfacePro11 on 2026-08-01T01:33:49.000Z"
+      },
+      "input": {
+        "context": "<p>「あ、酷い。わたしそんなにお酒飲まないもん！」</p>\n\n<p>「いやいや、こんなに<mark>ザル</mark>だとは思わなかったよね。最初、ビールを半分ほど飲んで顔を真っ赤にしてたころが懐かしいよ。あのころのキナコだったら、考えてあげてもいいけど」</p>",
+        "recognitionTarget": "ザル",
+        "selectedUsage": {
+          "jmdictId": "1570240",
+          "senseNumbers": [
+            4
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1570240",
+            "senseNumbers": [
+              1,
+              2,
+              3
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "generated",
+        "preferredHints": [
+          "こんなにザルだ"
+        ],
+        "acceptableHints": [],
+        "observedBadHints": [
+          "酒豪ザル"
+        ],
+        "rubricNotes": [
+          "Preserve the exact source predicate こんなにザルだ; do not fabricate the compound 酒豪ザル."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually changed Hint from \"酒豪ザル\" to \"こんなにザルだ\" during live collection review."
+      }
+    },
+    {
+      "id": "surfacepro11-review-1772507083715-ひっぱる",
+      "provenance": {
+        "corpus": "SurfacePro11 manual Miwake Card review",
+        "sourceNoteId": 1772507083715,
+        "artifact": "animecards-apply-2026-07-26.jsonl compared with SurfacePro11 on 2026-08-02T01:37:50.000Z"
+      },
+      "input": {
+        "context": "「また来よう」と巧を<mark>ひっぱって</mark>不動産屋から出る。",
+        "recognitionTarget": "ひっぱる",
+        "selectedUsage": {
+          "jmdictId": "1601900",
+          "senseNumbers": [
+            4
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1601900",
+            "senseNumbers": [
+              1,
+              2,
+              3,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "generated",
+        "preferredHints": [
+          "Xさんをひっぱる"
+        ],
+        "acceptableHints": [],
+        "observedBadHints": [
+          "巧をひっぱる"
+        ],
+        "rubricNotes": [
+          "Replace the incidental proper name with the controlled human placeholder Xさん while preserving the source object's role."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually changed Hint from \"巧をひっぱる\" to \"Xさんをひっぱる\" during live collection review."
+      }
+    },
+    {
+      "id": "surfacepro11-review-1750333473834-ガキ",
+      "provenance": {
+        "corpus": "SurfacePro11 manual Miwake Card review",
+        "sourceNoteId": 1750333473834,
+        "artifact": "animecards-apply-2026-07-26.jsonl compared with SurfacePro11 on 2026-08-02T01:40:09.000Z"
+      },
+      "input": {
+        "context": "「……迷子かよ、 珍[めずら]しいな。……東七区の川べりの教会に、<mark>ガキ</mark>のプレイヤーがいっぱい集まって住んでるから、行ってみな」",
+        "recognitionTarget": "ガキ",
+        "selectedUsage": {
+          "jmdictId": "1197980",
+          "senseNumbers": [
+            1
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1197980",
+            "senseNumbers": [
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "generated",
+        "preferredHints": [
+          "ガキのプレイヤー"
+        ],
+        "acceptableHints": [],
+        "observedBadHints": [
+          "ガキ大将"
+        ],
+        "rubricNotes": [
+          "Use the source-grounded noun phrase ガキのプレイヤー; ガキ大将 invents a different compound and social role."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually changed Hint from \"ガキ大将\" to \"ガキのプレイヤー\" during live collection review."
+      }
+    },
+    {
+      "id": "surfacepro11-review-1745121225518-満タン",
+      "provenance": {
+        "corpus": "SurfacePro11 manual Miwake Card review",
+        "sourceNoteId": 1745121225518,
+        "artifact": "animecards-apply-2026-07-26.jsonl compared with SurfacePro11 on 2026-08-03T01:51:49.000Z"
+      },
+      "input": {
+        "context": "見かけ上のＨＰは<mark>満タン</mark>でも、ＳＡＯ内での 緊[きん] 迫[ぱく]した 戦[せん] 闘[とう]は目に見えぬ疲労を残す。",
+        "recognitionTarget": "満タン",
+        "selectedUsage": {
+          "jmdictId": "1526700",
+          "senseNumbers": [
+            2
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1526700",
+            "senseNumbers": [
+              1
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "generated",
+        "preferredHints": [
+          "ＨＰは満タンだ"
+        ],
+        "acceptableHints": [],
+        "observedBadHints": [
+          "ＨＰ満タン"
+        ],
+        "rubricNotes": [
+          "Retain the source topic particle and copula so ＨＰは満タンだ remains a complete capacity-usage cue."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually changed Hint from \"ＨＰ満タン\" to \"ＨＰは満タンだ\" during live collection review."
+      }
+    },
+    {
+      "id": "surfacepro11-review-1772505648219-すませる",
+      "provenance": {
+        "corpus": "SurfacePro11 manual Miwake Card review",
+        "sourceNoteId": 1772505648219,
+        "artifact": "animecards-apply-2026-07-26.jsonl compared with SurfacePro11 on 2026-08-03T02:08:27.000Z"
+      },
+      "input": {
+        "context": "「サイトの構造はいじらずに、更新が必要なページのみを差し替えよう。写真はありもので<mark>すませる</mark>。この条件で高品質にしあげられるデザイナーを知ってる。それで星印を説得する」",
+        "recognitionTarget": "すませる",
+        "selectedUsage": {
+          "jmdictId": "1295040",
+          "senseNumbers": [
+            2
+          ]
+        },
+        "contrastingUsages": [
+          {
+            "jmdictId": "1295040",
+            "senseNumbers": [
+              1,
+              3
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "disposition": "generated",
+        "preferredHints": [
+          "ありものですませる"
+        ],
+        "acceptableHints": [],
+        "observedBadHints": [
+          "ありもので すませる"
+        ],
+        "rubricNotes": [
+          "Preserve the exact source phrase ありものですませる without leaking Anki's control space into the Hint field."
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "Domenic manually changed Hint from \"ありもので すませる\" to \"ありものですませる\" during live collection review."
       }
     }
   ]

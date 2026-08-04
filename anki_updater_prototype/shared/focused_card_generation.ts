@@ -2,7 +2,7 @@ import {
   generateSourceGroundedHint,
   type GenerationOptions,
   type HintGenerationOutcome,
-  selectApplicableSenses,
+  selectSensesForCard,
   type SenseSelectionInput,
   type SenseSelectionOutcome,
 } from "card_field_generation";
@@ -42,13 +42,13 @@ export interface SenseAndHintResolution {
 }
 
 export interface SenseAndHintDependencies {
-  selectSenses?: typeof selectApplicableSenses;
+  selectSenses?: typeof selectSensesForCard;
   generateHint?: typeof generateSourceGroundedHint;
 }
 
 /**
- * Selects applicable senses, then asks for a source-grounded hint whenever another usage is
- * reachable from the exact spelling shown on the card front.
+ * Selects the senses that belong on one card, then asks for a source-grounded hint whenever another
+ * usage is reachable from the exact spelling shown on the card front.
  *
  * This is orchestration rather than a second prompt boundary: both steps remain independently
  * validated and content-addressably cached by `card_field_generation`.
@@ -57,7 +57,7 @@ export async function selectSensesAndMaybeGenerateHint(
   input: SenseAndHintInput,
   options: GenerationOptions,
   {
-    selectSenses = selectApplicableSenses,
+    selectSenses = selectSensesForCard,
     generateHint = generateSourceGroundedHint,
   }: SenseAndHintDependencies = {},
 ): Promise<SenseAndHintResolution> {

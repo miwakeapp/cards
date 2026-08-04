@@ -1,4 +1,11 @@
-import type { EvalFixture, EvalOperation } from "./types.ts";
+import type { EvalFixture, EvalOperation, EvalReferenceBasis } from "./types.ts";
+
+const REFERENCE_BASES: readonly EvalReferenceBasis[] = [
+  "user-reviewed",
+  "agent-reviewed",
+  "corpus-replay",
+  "provisional",
+];
 
 function stableRank(seed: string, fixture: EvalFixture): number {
   // FNV-1a is sufficient here: this is deterministic corpus ordering, not security.
@@ -8,19 +15,6 @@ function stableRank(seed: string, fixture: EvalFixture): number {
     hash = Math.imul(hash, 0x01000193);
   }
   return hash >>> 0;
-}
-
-function referenceBasisRank(fixture: EvalFixture): number {
-  switch (fixture.evaluation.referenceBasis) {
-    case "user-reviewed":
-      return 0;
-    case "agent-reviewed":
-      return 1;
-    case "corpus-replay":
-      return 2;
-    case "provisional":
-      return 3;
-  }
 }
 
 function sampleStratum(fixture: EvalFixture): string {
@@ -44,14 +38,30 @@ interface OperationSampleState {
   nextUncoveredStratumIndex: number;
   nextStratumIndex: number;
   selectedCount: number;
-  strata: Array<{
-    fixtures: EvalFixture[];
-  }>;
+  strata: SampleStratumState[];
+}
+
+interface SampleStratumState {
+  fixturesByReferenceBasis: Map<EvalReferenceBasis, EvalFixture[]>;
+  nextReferenceBasisIndex: number;
+}
+
+function nextFixtureFromStratum(state: SampleStratumState): EvalFixture | undefined {
+  for (let offset = 0; offset < REFERENCE_BASES.length; ++offset) {
+    const referenceBasisIndex = (state.nextReferenceBasisIndex + offset) % REFERENCE_BASES.length;
+    const referenceBasis = REFERENCE_BASES[referenceBasisIndex];
+    const fixture = state.fixturesByReferenceBasis.get(referenceBasis)?.shift();
+    if (fixture === undefined) continue;
+
+    state.nextReferenceBasisIndex = (referenceBasisIndex + 1) % REFERENCE_BASES.length;
+    return fixture;
+  }
+  return undefined;
 }
 
 function nextUncoveredFixture(state: OperationSampleState): EvalFixture | undefined {
   while (state.nextUncoveredStratumIndex < state.strata.length) {
-    const fixture = state.strata[state.nextUncoveredStratumIndex++].fixtures.shift();
+    const fixture = nextFixtureFromStratum(state.strata[state.nextUncoveredStratumIndex++]);
     if (fixture !== undefined) return fixture;
   }
   return undefined;
@@ -60,7 +70,7 @@ function nextUncoveredFixture(state: OperationSampleState): EvalFixture | undefi
 function nextFixture(state: OperationSampleState): EvalFixture | undefined {
   for (let offset = 0; offset < state.strata.length; ++offset) {
     const stratumIndex = (state.nextStratumIndex + offset) % state.strata.length;
-    const fixture = state.strata[stratumIndex].fixtures.shift();
+    const fixture = nextFixtureFromStratum(state.strata[stratumIndex]);
     if (fixture === undefined) continue;
 
     state.nextStratumIndex = (stratumIndex + 1) % state.strata.length;
@@ -74,8 +84,8 @@ function nextFixture(state: OperationSampleState): EvalFixture | undefined {
  *
  * Prompt few-shots are excluded to avoid direct replay. This remains a development sample, not a
  * generalization estimate. Within each operation, round-robin selection covers null and non-null
- * decisions instead of allowing the corpus's most common outcome to crowd out the rarer, often more
- * important boundary cases.
+ * decisions and rotates among reference bases instead of allowing either the most common outcome or
+ * the highest-authority cohort to crowd out the rest of the development corpus.
  */
 export function selectSampleCases(
   fixtures: readonly EvalFixture[],
@@ -107,11 +117,13 @@ export function selectSampleCases(
   for (const [operation, operationGroup] of groupedFixtures) {
     const strata = [...operationGroup].sort(([left], [right]) => left.localeCompare(right)).map(
       ([, stratumFixtures]) => ({
-        fixtures: stratumFixtures.sort((left, right) =>
-          referenceBasisRank(left) - referenceBasisRank(right) ||
-          stableRank(seed, left) - stableRank(seed, right) ||
-          left.id.localeCompare(right.id)
+        fixturesByReferenceBasis: Map.groupBy(
+          stratumFixtures.sort((left, right) =>
+            stableRank(seed, left) - stableRank(seed, right) || left.id.localeCompare(right.id)
+          ),
+          (fixture) => fixture.evaluation.referenceBasis,
         ),
+        nextReferenceBasisIndex: 0,
       }),
     );
     states.set(operation, {
@@ -146,7 +158,9 @@ export function selectSampleCases(
   while (selected.length < size) {
     const operation = operations.filter((candidate) =>
       states.get(candidate)!.strata.some((stratum) =>
-        stratum.fixtures.length > 0
+        [...stratum.fixturesByReferenceBasis.values()].some((fixtures) =>
+          fixtures.length > 0
+        )
       )
     ).sort((left, right) =>
       states.get(left)!.selectedCount - states.get(right)!.selectedCount ||

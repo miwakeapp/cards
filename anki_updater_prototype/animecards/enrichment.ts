@@ -57,7 +57,7 @@ function validateApplicableSenses(values: number[], compatibleSenses: number[]):
     new Set(values).size !== values.length
   ) {
     throw new Error(
-      `AI returned applicable senses ${JSON.stringify(values)}; expected unique integers from ` +
+      `AI returned card senses ${JSON.stringify(values)}; expected unique integers from ` +
         `the JMDict-compatible senses ${JSON.stringify(compatibleSenses)}.`,
     );
   }

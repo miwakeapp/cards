@@ -12,7 +12,7 @@ import {
   type GenerationCache,
   type GenerationResult,
   type ModelId,
-  selectApplicableSenses,
+  selectSensesForCard,
 } from "card_field_generation";
 import {
   compatibleSenseNumbersForJMDictUsage,
@@ -29,7 +29,7 @@ import { parseAnkiReading } from "./anki_reading.ts";
 export type SuggestionConfidence = "high" | "medium";
 
 export interface Suggestion {
-  /** 1-indexed applicable senses in the new entry; empty means all senses apply. */
+  /** 1-indexed senses selected for the card in the new entry; empty means all senses belong. */
   senses: number[];
   /** The canonical AI-generated hint (may differ from the card's current hint). */
   aiHint: string | null;
@@ -69,7 +69,7 @@ export async function suggestForCard(
     modelId,
     generationCache,
     force = false,
-    selectSenses = selectApplicableSenses,
+    selectSenses = selectSensesForCard,
     generateHint = generateSourceGroundedHint,
     verifyContext = verifyMarkedContextTarget,
   }: {
@@ -78,7 +78,7 @@ export async function suggestForCard(
     modelId?: ModelId;
     generationCache?: GenerationCache;
     force?: boolean;
-    selectSenses?: typeof selectApplicableSenses;
+    selectSenses?: typeof selectSensesForCard;
     generateHint?: typeof generateSourceGroundedHint;
     /** Verifies that the stored marks still resolve to the card's current JMDict spelling. */
     verifyContext?: typeof verifyMarkedContextTarget;
@@ -273,7 +273,7 @@ function buildSuggestion(
   if (sensesMatchExpectation) {
     confidence = "high";
   } else if (allApply && card.parsedKey!.senseNumbers === null) {
-    // The card targeted all senses and the AI still thinks all senses apply.
+    // The card targeted all senses and the AI still puts them on one recognition card.
     confidence = "high";
   } else {
     confidence = "medium";

@@ -1,0 +1,161 @@
+{
+  "id": "1581210",
+  "kanji": [
+    {
+      "common": false,
+      "text": "嘗て",
+      "tags": [
+        "rK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "曽て",
+      "tags": [
+        "rK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "都て",
+      "tags": [
+        "rK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "曾て",
+      "tags": [
+        "sK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "かつて",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "かって",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adv",
+        "adj-no"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "once"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "before"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "formerly"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "ever"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "former"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "ex-"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "adv",
+        "adj-no"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "uk"
+      ],
+      "info": [
+        "used with neg. verb"
+      ],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "never yet"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "never before"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "first time"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "still not happened"
+        }
+      ]
+    }
+  ]
+}

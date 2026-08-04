@@ -16,7 +16,7 @@ import {
   MODEL_IDS,
   type ModelId,
   type ReasoningEffort,
-  selectApplicableSenses,
+  selectSensesForCard,
 } from "card_field_generation";
 import { JSONLGenerationCache } from "card_field_generation/file-cache";
 import { assertEvalSpendingApproved, parseEvalCacheMode } from "../src/cli.ts";
@@ -250,7 +250,7 @@ async function generateValue(
   if (fixture.operation === "hint") {
     return await generateSourceGroundedHint(await hintGenerationInput(fixture), options);
   }
-  return await selectApplicableSenses(await senseSelectionInput(fixture), options);
+  return await selectSensesForCard(await senseSelectionInput(fixture), options);
 }
 
 function attemptProgress(

@@ -19,6 +19,8 @@ interface SenseSelectionFewShot {
   context: string;
   entry: PromptJMDictEntry;
   outcome: SenseSelectionFewShotOutcome;
+  /** Context-only classifications when pedagogical grouping resolves otherwise-unclear senses. */
+  contextClassifications?: readonly ("yes" | "no" | "unclear")[];
 }
 
 export const SENSE_SELECTION_FEW_SHOTS: readonly SenseSelectionFewShot[] = [
@@ -162,7 +164,8 @@ export const SENSE_SELECTION_FEW_SHOTS: readonly SenseSelectionFewShot[] = [
         { number: 2, glosses: ["female university student"] },
       ],
     },
-    outcome: { outcome: "selected", senseNumbers: [2] },
+    outcome: { outcome: "selected", senseNumbers: [1, 2] },
+    contextClassifications: ["no", "yes"],
   },
   {
     fixtureId: "animecards-focused-1776059447108",
@@ -176,7 +179,7 @@ export const SENSE_SELECTION_FEW_SHOTS: readonly SenseSelectionFewShot[] = [
         { number: 2, glosses: ["way to use something"] },
       ],
     },
-    outcome: { outcome: "selected", senseNumbers: [1] },
+    outcome: { outcome: "selected", senseNumbers: [1, 2] },
   },
   {
     fixtureId: "animecards-focused-1781153489336",
@@ -192,7 +195,7 @@ export const SENSE_SELECTION_FEW_SHOTS: readonly SenseSelectionFewShot[] = [
         },
       ],
     },
-    outcome: { outcome: "selected", senseNumbers: [1] },
+    outcome: { outcome: "selected", senseNumbers: [1, 2] },
   },
   {
     fixtureId: "animecards-focused-1726739466292",
@@ -205,7 +208,7 @@ export const SENSE_SELECTION_FEW_SHOTS: readonly SenseSelectionFewShot[] = [
         { number: 2, glosses: ["figure", "result", "reading (on a meter, etc.)"] },
       ],
     },
-    outcome: { outcome: "selected", senseNumbers: [1] },
+    outcome: { outcome: "selected", senseNumbers: [1, 2] },
   },
   {
     fixtureId: "animecards-focused-1781933019442",
@@ -227,7 +230,8 @@ export const SENSE_SELECTION_FEW_SHOTS: readonly SenseSelectionFewShot[] = [
         },
       ],
     },
-    outcome: { outcome: "selected", senseNumbers: [2] },
+    outcome: { outcome: "selected", senseNumbers: [1, 2] },
+    contextClassifications: ["no", "yes"],
   },
   {
     fixtureId: "animecards-focused-1782530981329",
@@ -312,7 +316,8 @@ export const SENSE_SELECTION_FEW_SHOTS: readonly SenseSelectionFewShot[] = [
         },
       ],
     },
-    outcome: { outcome: "ambiguous", possibleSenseNumbers: [1, 2] },
+    outcome: { outcome: "selected", senseNumbers: [1, 2] },
+    contextClassifications: ["unclear", "unclear"],
   },
   {
     fixtureId: "exposure-sense-1685762713860-勢い",
