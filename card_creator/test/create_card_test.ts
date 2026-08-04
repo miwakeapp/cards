@@ -660,7 +660,7 @@ Deno.test("createCard normalizes nonbreaking spaces in text nodes only", async (
   );
 });
 
-Deno.test("createCard structurally converts complex source ruby", async () => {
+Deno.test("createCard structurally converts and precisely positions source ruby", async () => {
   const card = await createCard({
     jmdictEntry: await preextractedJMDictEntry("1574430"),
     recognitionTarget: "餃子",
@@ -671,6 +671,17 @@ Deno.test("createCard structurally converts complex source ruby", async () => {
 
   assertEquals(card.fullContext, "横で<mark>餃[ぎょー] 子[ざ]</mark>を食べている。");
   assertEquals(card.reading, "餃[ギョー] 子[ザ]");
+
+  const wholeWordRuby = await createCard({
+    jmdictEntry: await preextractedJMDictEntry("1574430"),
+    recognitionTarget: "餃子",
+    kanaReading: "ギョーザ",
+    fullContext: "横で<mark><ruby>餃子<rt>ぎよーざ</rt></ruby></mark>を食べている。",
+  });
+  assertEquals(
+    wholeWordRuby.fullContext,
+    "横で<mark>餃[ぎょー] 子[ざ]</mark>を食べている。",
+  );
 });
 
 Deno.test("createCard handles multi-component and adjacent source ruby", async () => {
@@ -693,6 +704,18 @@ Deno.test("createCard handles multi-component and adjacent source ruby", async (
     dust.fullContext,
     "あの男は<mark>微[み] 塵[じん]</mark>も疑わなかった。",
   );
+});
+
+Deno.test("createCard precisely positions whole-word source ruby with okurigana", async () => {
+  const card = await createCard({
+    jmdictEntry: await preextractedJMDictEntry("1686540"),
+    recognitionTarget: "種つけ",
+    kanaReading: "たねつけ",
+    fullContext: "牛の<mark><ruby>種つけ<rt>たねつけ</rt></ruby></mark>を行う。",
+  });
+
+  assertEquals(card.fullContext, "牛の<mark>種[たね]つけ</mark>を行う。");
+  assertEquals(card.reading, "種[たね]つけ");
 });
 
 Deno.test("createCard validates partial ruby against only the selected reading", async () => {
