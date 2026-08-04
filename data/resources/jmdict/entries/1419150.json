@@ -1,0 +1,126 @@
+{
+  "id": "1419150",
+  "kanji": [
+    {
+      "common": false,
+      "text": "鍛冶",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "鍛治",
+      "tags": [
+        "iK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "かじ",
+      "tags": [
+        "gikun"
+      ],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "たんや",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "かぬち",
+      "tags": [
+        "gikun",
+        "ok"
+      ],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "blacksmithing"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "forging"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "smithery"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "smithcraft"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "blacksmith"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "smith"
+        }
+      ]
+    }
+  ]
+}

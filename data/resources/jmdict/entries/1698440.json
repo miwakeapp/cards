@@ -1,0 +1,95 @@
+{
+  "id": "1698440",
+  "kanji": [
+    {
+      "common": false,
+      "text": "手出し",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "手だし",
+      "tags": [
+        "sK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "てだし",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "meddling"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "interfering"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "ツモ切り"
+        ]
+      ],
+      "antonym": [],
+      "field": [
+        "mahj"
+      ],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "choosing to keep the drawn tile and discarding a different one"
+        }
+      ]
+    }
+  ]
+}

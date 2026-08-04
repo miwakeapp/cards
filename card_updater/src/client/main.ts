@@ -530,7 +530,7 @@ function renderFocusCard(): void {
     : `
       <div class="ai-panel">
         <div class="ai-head">No AI suggestion <a href="#" id="runAI" style="margin-left:auto">✨ run now</a></div>
-        <div class="ai-reason">Select the applicable senses manually, or run the AI for this card.</div>
+        <div class="ai-reason">Select the senses for this card manually, or run the AI for this card.</div>
       </div>`;
 
   const hintValue = work.hint;

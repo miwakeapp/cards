@@ -1,0 +1,287 @@
+{
+  "id": "2839837",
+  "kanji": [
+    {
+      "common": false,
+      "text": "致し方ない",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "致し方無い",
+      "tags": [
+        "sK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "いたし方ない",
+      "tags": [
+        "sK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "致しかたない",
+      "tags": [
+        "sK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "いたしかたない",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "exp",
+        "adj-i"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "仕方がない",
+          1
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "hum"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "there's no (other) way"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "exp",
+        "adj-i"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "hum"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "cannot be helped"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "unavoidable"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "inevitable"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "(there's) nothing one can do"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "having no choice"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "exp",
+        "adj-i"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "hum"
+      ],
+      "info": [
+        "oft. as 〜ても致し方ない"
+      ],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "it's no use (doing)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "pointless"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "useless"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "no good"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "insufficient"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "not enough"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "exp",
+        "adj-i"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "hum"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "hopeless (person)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "annoying"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "troublesome"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "awful"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "exp",
+        "adj-i"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "hum"
+      ],
+      "info": [
+        "as 〜て致し方ない or 〜で致し方ない"
+      ],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "cannot stand it"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "unbearable"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "cannot help (doing, feeling)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "dying (to do)"
+        }
+      ]
+    }
+  ]
+}

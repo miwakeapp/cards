@@ -1,0 +1,112 @@
+{
+  "id": "1219730",
+  "kanji": [
+    {
+      "common": false,
+      "text": "寄宿",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "きしゅく",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vi"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "lodging"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "boarding"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "room and board"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "board and lodging"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [
+        [
+          "寄宿舎"
+        ]
+      ],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [
+        "abbr"
+      ],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "boarding house"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "residence hall"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "dormitory"
+        }
+      ]
+    }
+  ]
+}

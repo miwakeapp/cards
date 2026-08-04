@@ -74,7 +74,7 @@ After that setup is complete, the unobtrusive indicator changes color. From now 
 
 #### Card fields
 
-- **Key**: the card's actual primary key (for disallowing duplicates); it consists of the spelling targeted for recognition + JMDict ID + ✨ sense(s) identified as applicable for this card. (The latter are omitted if all senses apply, or if there is only one sense.) This is the first field in the model so Anki gives it precedence, and the spelling is first so that it's more visible in the card browser.
+- **Key**: the card's actual primary key (for disallowing duplicates); it consists of the spelling targeted for recognition + JMDict ID + ✨ sense(s) selected for this card. (The latter are omitted if all senses belong on the card, or if there is only one sense.) This is the first field in the model so Anki gives it precedence, and the spelling is first so that it's more visible in the card browser.
 
   - Sample: `ひたと | 1430680 | 2`
   - Sample: `相性 | 1586070`
@@ -358,7 +358,13 @@ Several, but not all, senses can also fit. An example is [見込み](https://tak
 
 Here, both sense 1, "possibility; likelihood", and sense 2, "expectation; forecast", describe the usage, while sense 3, "side of a structural member", does not. The key is therefore `見込み | 1604480 | 1,2`. In general, the card should store the complete applicable subset, not only a single "best" sense.
 
-#### All senses apply
+#### Senses that belong on one card
+
+The Key records a useful recognition unit, not only the definitions directly asserted by the source sentence. Once the learner knows the word's core association, a transparently related sense does not deserve another card if ordinary future context will make the difference obvious. Predictable grammatical variants, a craft and its practitioner, an activity and its usual place, opening and reopening, closely related social subtypes, or an ordinary category and its dictionary's technical subtype can therefore share a card. This keeps JMDict's lexicographic granularity from creating redundant reviews.
+
+This is narrower than grouping anything semantically related. A second sense needs its own card when recognizing it requires another lexical association, even if the meanings share a history, metaphor, or topic.
+
+A construction-dependent meaning is also separate when the construction changes what the word contributes rather than merely changing its grammatical form. For example, the negative-polarity use of `かつて` meaning “never before” is not grouped with ordinary `かつて` meaning “formerly,” and the discourse-act use of an expression can remain separate from a descriptive use.
 
 Consider [がつがつ](https://takoboto.jp/?w=1003240) in:
 
@@ -372,15 +378,15 @@ Another example is where the different senses are just grammatical variations of
 
 Here, JMDict separates the verbal sense "to fret; to brood" from the adverbial sense "worriedly; constantly fretting". The くよくよして construction does not create a useful semantic distinction between them, so the appropriate key is `くよくよ | 1003930`, with no hint.
 
-The same principle applies when two definitions describe one encountered relationship from slightly different angles. In `スタンドアロンRPGにはつきものの勝利ファンファーレ`, [つきもの](https://takoboto.jp/?w=1495730) is both a natural accompaniment and an inevitable part of that kind of game, so senses 1 and 2 both apply. Conversely, a specialized setting can select the narrower sense even when a broader gloss sounds superficially possible: `高く上がったボールを見事にキャッチした` targets the baseball catch sense of [キャッチ](https://takoboto.jp/?w=1041530), not the entry's general catch-or-obtain-information sense.
+The same principle applies when two definitions describe one encountered relationship from slightly different angles. In `スタンドアロンRPGにはつきものの勝利ファンファーレ`, [つきもの](https://takoboto.jp/?w=1495730) is both a natural accompaniment and an inevitable part of that kind of game, so senses 1 and 2 belong on one card. In `スキルは鍛冶や革細工といった製造系まで多岐にわたり`, [鍛冶](https://takoboto.jp/?w=1419150) directly means blacksmithing, but its blacksmith sense is a transparent practitioner extension rather than a new association worth another recognition card. Conversely, a specialized setting can select the narrower sense even when a broader gloss sounds superficially possible: `高く上がったボールを見事にキャッチした` targets the baseball catch sense of [キャッチ](https://takoboto.jp/?w=1041530), not the entry's general catch-or-obtain-information sense.
 
 Conventional proper names can also unite tightly linked facets that would be artificial to split for recognition. In `甲子園出場を賭けた地区大会`, [甲子園](https://takoboto.jp/?w=2092720) invokes the stadium together with the spring and summer national high-school tournaments identified by it. The card therefore keeps all three senses rather than forcing a venue-versus-event distinction.
 
-#### The source does not distinguish genuinely different senses
+#### The source does not distinguish senses that need separate cards
 
-Selecting all senses is correct only when they express the same learned fact or the usage genuinely invokes their overlap. It is not a fallback for inadequate evidence. For example, merely calling a woman 義姉 does not reveal whether she is a sister-in-law, an older stepsister, or an older adopted sister. Those senses describe different relationships and cannot all be asserted just because the excerpt leaves each possible.
+Grouping senses is correct when their differences will be obvious from ordinary context once the shared lexical association is learned. For example, merely calling someone [義父](https://takoboto.jp/?w=1225860) does not reveal whether he is a father-in-law, foster father, or stepfather, but all three transparently express the same non-biological-father association. They belong on one recognition card; the learner does not benefit from three otherwise identical cards.
 
-Sense resolution therefore distinguishes three outcomes: a complete selected subset, a positive judgment that no compatible sense matches, and unresolved ambiguity among non-equivalent senses. The last outcome defers card creation and records the senses still possible. It must not be collapsed into “all senses apply” or “no sense applies”: the former would teach unsupported meanings, while the latter would incorrectly suggest a JMDict gap or wrong entry.
+Insufficient context still matters when the possible senses would teach genuinely different associations. Sense resolution therefore distinguishes three outcomes: a complete selected subset, a positive judgment that no compatible sense matches, and unresolved ambiguity among senses that need separate cards. The last outcome defers card creation and records the senses still possible. It must not be collapsed into a shared card or “no sense applies”: the former would merge distinct things to learn, while the latter would incorrectly suggest a JMDict gap or wrong entry.
 
 #### One sense combines distinct usages
 

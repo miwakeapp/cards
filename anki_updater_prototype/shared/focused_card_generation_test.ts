@@ -181,7 +181,7 @@ Deno.test("selectSensesAndMaybeGenerateHint validates card-front usages before g
   });
 });
 
-Deno.test("selectSensesAndMaybeGenerateHint skips hint generation when all senses apply", async () => {
+Deno.test("selectSensesAndMaybeGenerateHint skips hint generation when all senses belong", async () => {
   let hintCalls = 0;
   let receivedModelId: string | undefined;
   const result = await selectSensesAndMaybeGenerateHint(focusedInput(), {}, {

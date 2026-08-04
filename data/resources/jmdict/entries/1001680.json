@@ -1,0 +1,100 @@
+{
+  "id": "1001680",
+  "kanji": [
+    {
+      "common": false,
+      "text": "お化け屋敷",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "おばけ屋敷",
+      "tags": [
+        "sK"
+      ]
+    },
+    {
+      "common": false,
+      "text": "御化け屋敷",
+      "tags": [
+        "sK"
+      ]
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "おばけやしき",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "haunted house"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "spook house"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "haunted house (attraction)"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "haunted attraction"
+        }
+      ]
+    }
+  ]
+}

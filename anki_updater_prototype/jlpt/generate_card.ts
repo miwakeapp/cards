@@ -10,7 +10,7 @@ import {
   generateSourceGroundedHint,
   type GenerationOptions,
   minimizeContext,
-  selectApplicableSenses,
+  selectSensesForCard,
 } from "card_field_generation";
 import { inferLegacySourceLanguage } from "../animecards/source.ts";
 import {
@@ -138,7 +138,7 @@ export async function generateJLPTCard(
   input: JLPTCardGenerationInput,
   options: GenerationOptions,
   {
-    selectSenses = selectApplicableSenses,
+    selectSenses = selectSensesForCard,
     generateHint = generateSourceGroundedHint,
     minimize = minimizeContext,
   }: JLPTCardGenerationDependencies = {},

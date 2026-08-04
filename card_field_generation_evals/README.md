@@ -12,7 +12,7 @@ See [MODEL_SELECTION.md](MODEL_SELECTION.md) for the comparison methodology, dev
 deno task run
 ```
 
-For inexpensive prompt iteration, use the deterministic 30-case development sample. It balances all three operations, stratifies each operation by expected outcome, prioritizes user- and agent-reviewed references within each stratum, and excludes prompt few-shots. Lower-authority corpus-replay or provisional cases remain eligible when needed for outcome coverage or sample breadth. This is an iteration aid, not a statistically independent held-out test set.
+For inexpensive prompt iteration, use the deterministic 30-case development sample. It balances all three operations, stratifies each operation by expected outcome, rotates among user-reviewed, agent-reviewed, corpus-replay, and provisional evidence within each stratum, and excludes prompt few-shots. This is an iteration aid, not a statistically independent held-out test set.
 
 ```sh
 deno task run --sample 30
@@ -68,8 +68,8 @@ A separate preference worksheet was adjudicated outside the repository on 2026-0
 
 ## Fixture files
 
-- `cases/sense_selection.json` contains 93 tracked decisions: the focused Animecards batch, focused known-failure and no-applicable-sense controls, agent-adjudicated cases retained from the predecessor evaluator, the normative three-compatible-sense 見込み example from `DESIGN.md`, and three user-reviewed worksheet cases.
-- `cases/hint.json` contains 94 decisions: 60 failures carried forward from the predecessor card-generation review log, 26 agent-adjudicated cases from a read-only sample of accepted SurfacePro11 cards, four earlier controls where no semantic hint is needed, two deliberately underspecified controls where a hint is needed but the source cannot support one, and two exposed user-preference cases.
+- `cases/sense_selection.json` contains 114 tracked decisions: the focused Animecards batch, focused known-failure and no-applicable-sense controls, agent-adjudicated cases retained from the predecessor evaluator, the normative three-compatible-sense 見込み example from `DESIGN.md`, three additional controls for pedagogical sense grouping, three user-reviewed worksheet cases, and 19 final-Key decisions recovered from manual SurfacePro11 edits.
+- `cases/hint.json` contains 103 decisions: 60 failures carried forward from the predecessor card-generation review log, 26 agent-adjudicated cases from a read-only sample of accepted SurfacePro11 cards, four earlier controls where no semantic hint is needed, two deliberately underspecified controls where a hint is needed but the source cannot support one, two exposed user-preference cases, and nine new preferences recovered from manual SurfacePro11 hint edits.
 - `cases/minimization.json` contains 55 decisions: 40 contexts that benefit from shortening and 15 contexts where the correct output is `null`.
 
 `../data/resources/jmdict/card_field_generation_eval_entry_ids.json` is a generated boundary artifact listing the entries these fixtures require from `data`. Regenerate it with `deno task build:jmdict-entry-manifest` after changing fixture entry IDs. Tests reject a stale manifest. Keeping the flat ID list with the data resources lets `data` rebuild independently without reaching back into this consumer package or learning its fixture schema.
@@ -95,6 +95,8 @@ Two exposed preference cases add direct user evidence: 飾り物 accepts either 
 
 A separate agent audit of 40 accepted SurfacePro11 cards contributes 26 cases absent from the historical corpus: 10 positive hint references, eight corrections for source-unsupported accepted hints, and eight `not-needed` cases that isolate a genuinely equivalent competing usage. The audited 圧巻 card is intentionally excluded because it has no contrasting usage; deciding not to request a hint there belongs to upstream acquisition policy, not hint generation.
 
+A later read-only comparison of 40 manually reviewed SurfacePro11 notes against their applied conversion records recovered another set of direct user decisions. Nineteen same-entry Key edits provide sense-selection references: 18 new cases and a correction to the earlier corpus-replay expectation for いなご. These decisions reflect the Key's pedagogical grouping policy: senses belong together when learning one makes the others transparently understandable in ordinary context, even if the source sentence directly realizes only one. Fourteen nonempty Hint edits provide nine new hint cases and confirm five existing cases. Two corrections instead select a different spelling or JMDict entry, and five removed hints are consequences of deterministic affix notation; those seven remain outside these focused AI operations rather than being mislabeled as prompt evidence.
+
 The other 17 cases are deliberately excluded from `hint.json`:
 
 - 7 require JMDict changes or an explicit defer decision;
@@ -107,7 +109,7 @@ Those exclusions should be covered by the appropriate future operation-specific 
 
 ## Provenance
 
-The sense fixtures were extracted from `anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json`. The hint fixtures combine historical review notes with ignored conversion manifests that preserve the selected JMDict entry, reading, and sense evidence, plus the 26 retained cases from the agent's read-only SurfacePro11 accepted-card audit. The minimization fixtures combine 18 agent-reviewed predecessor evals, 31 accepted Miwake notes sampled read-only from SurfacePro11, two organic HTML-ruby inputs from the Exposure migration, and four direct preference-worksheet decisions. All evidence needed by an eval is copied into the tracked fixture; the ignored artifacts and live collection are not runtime dependencies.
+The sense fixtures were extracted from `anki_updater_prototype/generated/animecards-surfacepro11-2026-07-26-focused-review-approved.json` and the later read-only comparison of live reviewed keys with their apply records. The hint fixtures combine historical review notes with ignored conversion manifests that preserve the selected JMDict entry, reading, and sense evidence, the 26 retained cases from the agent's read-only SurfacePro11 accepted-card audit, and the later reviewed Hint edits. The minimization fixtures combine 18 agent-reviewed predecessor evals, 31 accepted Miwake notes sampled read-only from SurfacePro11, two organic HTML-ruby inputs from the Exposure migration, and four direct preference-worksheet decisions. All evidence needed by an eval is copied into the tracked fixture; the ignored artifacts and live collection are not runtime dependencies.
 
 The predecessor's review log is preserved verbatim at `archive/card_creator_evals/KNOWN_FAILURES.md`. It is historical evidence, distinct from the active unresolved-issue log at `KNOWN_FAILURES.md`. Fixtures that cite it retain their original conversion manifest separately in `provenance.artifact`, while `provenance.knownFailure` points to a validated archive section and row. Model-promoted outputs from the predecessor were not carried forward as authoritative expectations; agents re-adjudicated the active references, and exact minimization strings inherited from the predecessor remain silver evidence.
 
