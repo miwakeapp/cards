@@ -177,9 +177,13 @@ export async function analyzeCard(
   const spellingInLatest = latestWord.kanji.some((form) => form.text === parsedKey.spelling) ||
     latestWord.kana.some((form) => form.text === parsedKey.spelling);
   if (!spellingInLatest) {
+    const spellingInStored = oldParsed.kanjiForms.includes(parsedKey.spelling) ||
+      oldParsed.kanaForms.includes(parsedKey.spelling);
     return exceptional(note, parsedKey, {
-      reason: "spelling-removed",
-      detail: `The spelling "${parsedKey.spelling}" is no longer a form of this entry.`,
+      reason: spellingInStored ? "spelling-removed" : "spelling-not-in-entry",
+      detail: spellingInStored
+        ? `The spelling "${parsedKey.spelling}" is no longer a form of this entry.`
+        : `The Key spelling "${parsedKey.spelling}" is not a form of its stored or latest JMDict entry.`,
       latestWord,
       latestEntryHTML,
     });

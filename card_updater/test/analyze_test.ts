@@ -63,6 +63,17 @@ Deno.test("analyzeCard: exception when the spelling left the entry", async () =>
   assertEquals(card.reason, "spelling-removed");
 });
 
+Deno.test("analyzeCard: distinguishes a Key spelling absent from the stored entry", async () => {
+  const note = makeNote({ key: "抄う | 1226200:1", dictionary: renderDictionary(TWO_SENSES) });
+  const card = await analyzeCard(note, entriesById(TWO_SENSES));
+  assertEquals(card.verdict, "exception");
+  assertEquals(card.reason, "spelling-not-in-entry");
+  assertEquals(
+    card.detail,
+    'The Key spelling "抄う" is not a form of its stored or latest JMDict entry.',
+  );
+});
+
 Deno.test("analyzeCard: exception when the key targets a sense the stored entry lacks", async () => {
   const note = makeNote({ key: "掬う | 1226200:5", dictionary: renderDictionary(TWO_SENSES) });
   assertEquals((await analyzeCard(note, entriesById(TWO_SENSES))).reason, "target-out-of-range");

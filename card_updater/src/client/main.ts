@@ -73,6 +73,7 @@ const REASON_LABELS: Record<string, { title: string; explain?: string }> = {
   "entry-deleted": { title: "JMDict entry no longer exists" },
   "invalid-key": { title: "Key is not a valid Miwake Card key" },
   "spelling-removed": { title: "Spelling removed from the entry" },
+  "spelling-not-in-entry": { title: "Key spelling is not in its JMDict entry" },
   "stored-entry-missing": { title: "Card has no stored dictionary entry" },
   "stored-entry-unparseable": { title: "Stored dictionary entry is unparseable" },
   "target-out-of-range": { title: "Key targets a sense the stored entry lacks" },
