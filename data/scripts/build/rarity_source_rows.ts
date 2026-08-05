@@ -40,17 +40,21 @@ export function validateBCCWJHeader(line: string): void {
 
 /** Parses and validates one BCCWJ LUW2 row. */
 export function parseBCCWJRow(line: string, lineNumber: number): {
+  reading: string;
   lemma: string;
   totalPMW: number;
 } {
   const parts = line.split("\t");
   if (parts.length !== expectedBCCWJFieldCount || !parts[2]) {
-    throw new Error(`Invalid BCCWJ row at line ${lineNumber}: unexpected field count or lemma`);
+    throw new Error(
+      `Invalid BCCWJ row at line ${lineNumber}: unexpected field count or lemma`,
+    );
   }
 
   parsePositiveSafeInteger(parts[0], `BCCWJ rank at line ${lineNumber}`);
   parsePositiveSafeInteger(parts[6], `BCCWJ frequency at line ${lineNumber}`);
   return {
+    reading: parts[1],
     lemma: parts[2],
     totalPMW: parsePositiveNumber(parts[7], `BCCWJ pmw at line ${lineNumber}`),
   };

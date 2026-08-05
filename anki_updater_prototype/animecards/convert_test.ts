@@ -870,15 +870,16 @@ Deno.test("convertAnimecardsNote accepts structurally equivalent multiple readin
 
   assert(result.candidate);
   assertEquals(result.candidate.readingKana, "せい");
-  assertEquals(result.candidate.additionalAcceptedReadings, [{
-    jmdictId: entry.id,
-    kanaReading: "しょう",
-    applicableSenseNumbers: [1],
-  }]);
-  assertEquals(
-    result.candidate.target.fields.Reading,
-    "<ul><li>生[せい]</li><li>生[しょう]</li></ul>",
-  );
+  assertEquals(result.candidate.additionalAcceptedReadings, undefined);
+  assertEquals(result.candidate.readingResolution, {
+    status: "pending",
+    alternatives: [{
+      jmdictId: entry.id,
+      kanaReading: "しょう",
+      applicableSenseNumbers: [1],
+    }],
+  });
+  assertEquals(result.candidate.target.fields.Reading, "生[せい]");
 });
 
 Deno.test("convertAnimecardsNote rejects obsolete, rare, and search-only alternatives", async () => {
@@ -906,15 +907,16 @@ Deno.test("convertAnimecardsNote rejects obsolete, rare, and search-only alterna
 
   assert(result.candidate);
   assertEquals(result.candidate.readingKana, "せい");
-  assertEquals(result.candidate.additionalAcceptedReadings, [{
-    jmdictId: entry.id,
-    kanaReading: "しょう",
-    applicableSenseNumbers: [1],
-  }]);
-  assertEquals(
-    result.candidate.target.fields.Reading,
-    "<ul><li>生[せい]</li><li>生[しょう]</li></ul>",
-  );
+  assertEquals(result.candidate.additionalAcceptedReadings, undefined);
+  assertEquals(result.candidate.readingResolution, {
+    status: "pending",
+    alternatives: [{
+      jmdictId: entry.id,
+      kanaReading: "しょう",
+      applicableSenseNumbers: [1],
+    }],
+  });
+  assertEquals(result.candidate.target.fields.Reading, "生[せい]");
 });
 
 Deno.test("convertAnimecardsNote retains a marked non-common reading selected by source ruby", async () => {
@@ -943,15 +945,16 @@ Deno.test("convertAnimecardsNote retains a marked non-common reading selected by
 
   assert(result.candidate);
   assertEquals(result.candidate.readingKana, "しょう");
-  assertEquals(result.candidate.additionalAcceptedReadings, [{
-    jmdictId: entry.id,
-    kanaReading: "せい",
-    applicableSenseNumbers: [1],
-  }]);
-  assertEquals(
-    result.candidate.target.fields.Reading,
-    "<ul><li>生[せい]</li><li>生[しょう]</li></ul>",
-  );
+  assertEquals(result.candidate.additionalAcceptedReadings, undefined);
+  assertEquals(result.candidate.readingResolution, {
+    status: "pending",
+    alternatives: [{
+      jmdictId: entry.id,
+      kanaReading: "せい",
+      applicableSenseNumbers: [1],
+    }],
+  });
+  assertEquals(result.candidate.target.fields.Reading, "生[しょう]");
 });
 
 Deno.test("convertAnimecardsNote lets marked source ruby select the JMDict reading", async () => {
@@ -977,10 +980,7 @@ Deno.test("convertAnimecardsNote lets marked source ruby select the JMDict readi
 
     assert(result.candidate);
     assertEquals(result.candidate.readingKana, "しょう");
-    assertEquals(
-      result.candidate.target.fields.Reading,
-      "<ul><li>生[せい]</li><li>生[しょう]</li></ul>",
-    );
+    assertEquals(result.candidate.target.fields.Reading, "生[しょう]");
     assertEquals(
       result.candidate.target.fields["Full context"],
       "<mark>生[しょう]</mark>の情報",

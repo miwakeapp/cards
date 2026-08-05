@@ -1,0 +1,68 @@
+{
+  "id": "1285830",
+  "kanji": [
+    {
+      "common": true,
+      "text": "刻々",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "刻刻",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "こっこく",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "こくこく",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "adv",
+        "adv-to"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "moment by moment"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "hour by hour"
+        }
+      ]
+    }
+  ]
+}

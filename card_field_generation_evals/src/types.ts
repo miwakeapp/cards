@@ -7,6 +7,7 @@ import type {
   GenerationUsage,
   HintGenerationOutcome,
   ModelId,
+  ReadingSelectionOutcome,
   SenseSelectionOutcome,
 } from "card_field_generation";
 import type { EstimatedUSDCost, PricingSourceURLs } from "./pricing.ts";
@@ -72,6 +73,35 @@ export interface SenseSelectionFixture {
   evaluation: EvalFixtureEvaluation;
 }
 
+/** Additional-reading evidence and a reviewed include/omit reference. */
+export interface ReadingSelectionFixture {
+  operation: "reading-selection";
+  id: string;
+  provenance: EvalProvenance;
+  input: {
+    context: string;
+    recognitionTarget: string;
+    jmdictId: string;
+    senseNumbers: number[];
+    encountered: {
+      kanaReading: string;
+      bccwjFrequencyPerMillion: number | null;
+    };
+    alternatives: Array<{
+      kanaReading: string;
+      bccwjFrequencyPerMillion: number | null;
+    }>;
+  };
+  expected: {
+    decisions: Array<{
+      kanaReading: string;
+      decision: "include" | "omit";
+      rationale: string;
+    }>;
+  };
+  evaluation: EvalFixtureEvaluation;
+}
+
 /** An explicit selected or contrasting JMDict usage in a hint fixture. */
 export interface FixtureJMDictUsage {
   jmdictId: string;
@@ -133,6 +163,7 @@ export interface ContextMinimizationFixture {
 export type EvalFixture =
   | ContextMinimizationFixture
   | HintFixture
+  | ReadingSelectionFixture
   | SenseSelectionFixture;
 
 /** One concrete provider preset under evaluation. */
@@ -145,6 +176,12 @@ export interface EvalModelConfiguration {
 /** Reference matches for the objectively enumerable sense-selection operation. */
 export interface SenseSelectionScore {
   kind: "sense-selection";
+  exactMatch: boolean;
+}
+
+/** Exact include/omit agreement for every alternative reading. */
+export interface ReadingSelectionScore {
+  kind: "reading-selection";
   exactMatch: boolean;
 }
 
@@ -195,10 +232,19 @@ export interface ContextMinimizationScore {
 }
 
 /** Operation-specific value after package validation. */
-export type EvalValue = HintGenerationOutcome | SenseSelectionOutcome | string | null;
+export type EvalValue =
+  | HintGenerationOutcome
+  | ReadingSelectionOutcome
+  | SenseSelectionOutcome
+  | string
+  | null;
 
 /** Operation-specific reference score. */
-export type EvalScore = ContextMinimizationScore | HintScore | SenseSelectionScore;
+export type EvalScore =
+  | ContextMinimizationScore
+  | HintScore
+  | ReadingSelectionScore
+  | SenseSelectionScore;
 
 interface EvalCaseResultBase {
   operation: EvalOperation;
@@ -210,10 +256,12 @@ interface EvalCaseResultBase {
   input:
     | ContextMinimizationFixture["input"]
     | HintFixture["input"]
+    | ReadingSelectionFixture["input"]
     | SenseSelectionFixture["input"];
   expected:
     | ContextMinimizationFixture["expected"]
     | HintFixture["expected"]
+    | ReadingSelectionFixture["expected"]
     | SenseSelectionFixture["expected"];
   modelId: ModelId;
   reasoningEffort: EffectiveReasoningEffort;
@@ -246,8 +294,8 @@ export interface FailedEvalCaseResult extends EvalCaseResultBase {
 /** One case/model/effort result. */
 export type EvalCaseResult = FailedEvalCaseResult | SuccessfulEvalCaseResult;
 
-/** Sense-selection reference scores for one non-prompt-overlap evidence cohort. */
-export interface SenseSelectionCohortSummary {
+/** Exact selection scores for one non-prompt-overlap evidence cohort. */
+export interface SelectionCohortSummary {
   caseCount: number;
   exactMatchCount: number;
 }
@@ -307,7 +355,10 @@ export interface EvalSummary {
   /** Approximate standard list-price cost for this summary's provider attempts. */
   estimatedCostUSD: EstimatedUSDCost;
   senseSelection?: {
-    cohorts: EvalReferenceBasisCohorts<SenseSelectionCohortSummary>;
+    cohorts: EvalReferenceBasisCohorts<SelectionCohortSummary>;
+  };
+  readingSelection?: {
+    cohorts: EvalReferenceBasisCohorts<SelectionCohortSummary>;
   };
   hint?: {
     cohorts: EvalReferenceBasisCohorts<HintCohortSummary>;

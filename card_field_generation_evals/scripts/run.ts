@@ -16,6 +16,7 @@ import {
   MODEL_IDS,
   type ModelId,
   type ReasoningEffort,
+  selectAdditionalReadingsForCard,
   selectSensesForCard,
 } from "card_field_generation";
 import { JSONLGenerationCache } from "card_field_generation/file-cache";
@@ -31,6 +32,7 @@ import {
   evalFixtureHashContent,
   evalFixtureSetHashContent,
   hintGenerationInput,
+  readingSelectionInput,
   senseSelectionInput,
 } from "../src/generation_inputs.ts";
 import { writeRunArtifacts } from "../src/report.ts";
@@ -90,7 +92,7 @@ Usage:
 Options:
   --model <id>          Override every selected operation's model; repeatable. Use "all" for every preset.
   --effort <level>      Override every selected operation's effort; repeatable. Use "all" for every level.
-  --operation <name>    context-minimization, hint, or sense-selection; repeatable. Defaults to all.
+  --operation <name>    context-minimization, hint, reading-selection, or sense-selection; repeatable. Defaults to all.
   --case <substring>    Run fixture IDs containing this text; repeatable.
   --sample <count>      Deterministic development sample, stratified by operation and outcome.
   --seed <text>         Sample ordering seed. Defaults to sample-v1.
@@ -250,6 +252,9 @@ async function generateValue(
   if (fixture.operation === "hint") {
     return await generateSourceGroundedHint(await hintGenerationInput(fixture), options);
   }
+  if (fixture.operation === "reading-selection") {
+    return await selectAdditionalReadingsForCard(await readingSelectionInput(fixture), options);
+  }
   return await selectSensesForCard(await senseSelectionInput(fixture), options);
 }
 
@@ -393,6 +398,8 @@ function printPlan(
     } context-minimization, ${
       fixtures.filter(({ operation }) => operation === "hint").length
     } hint, ${
+      fixtures.filter(({ operation }) => operation === "reading-selection").length
+    } reading-selection, ${
       fixtures.filter(({ operation }) => operation === "sense-selection").length
     } sense-selection.`,
   );

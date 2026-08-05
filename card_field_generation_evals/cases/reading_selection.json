@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 1,
+  "description": "Tracked judgments about whether otherwise valid same-entry readings are useful enough to accept on one recognition card. The encountered reading is always retained and is therefore absent from expected decisions.",
+  "cases": [
+    {
+      "id": "animecards-reading-1285830-刻々",
+      "provenance": {
+        "corpus": "Animecards live-collection review",
+        "sourceNoteId": 1785910097295,
+        "artifact": "SurfacePro11 review on 2026-08-05"
+      },
+      "input": {
+        "context": "第二次世界大戦が<mark>刻々</mark>と近づいてくる足音を聞きながら、カーは、普通のイギリス人の多くが信じていた考え方にいらだっていました。",
+        "recognitionTarget": "刻々",
+        "jmdictId": "1285830",
+        "senseNumbers": [1],
+        "encountered": {
+          "kanaReading": "こっこく",
+          "bccwjFrequencyPerMillion": 3.1809523
+        },
+        "alternatives": [
+          {
+            "kanaReading": "こくこく",
+            "bccwjFrequencyPerMillion": 0.060018
+          }
+        ]
+      },
+      "expected": {
+        "decisions": [
+          {
+            "kanaReading": "こくこく",
+            "decision": "omit",
+            "rationale": "The uncommon unassimilated variant is not useful enough to teach alongside the ordinary reading こっこく."
+          }
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed"
+      }
+    },
+    {
+      "id": "animecards-reading-1408950-打破",
+      "provenance": {
+        "corpus": "Animecards live-collection review",
+        "sourceNoteId": 1785911180697,
+        "artifact": "SurfacePro11 review on 2026-08-05"
+      },
+      "input": {
+        "context": "まちがったことをドイツなどに強制したから、強制された国家がそれを<mark>打破</mark>しようとするのは当然だと、こう述べた。",
+        "recognitionTarget": "打破",
+        "jmdictId": "1408950",
+        "senseNumbers": [1],
+        "encountered": {
+          "kanaReading": "だは",
+          "bccwjFrequencyPerMillion": 0.5761725
+        },
+        "alternatives": [
+          {
+            "kanaReading": "たは",
+            "bccwjFrequencyPerMillion": null
+          }
+        ]
+      },
+      "expected": {
+        "decisions": [
+          {
+            "kanaReading": "たは",
+            "decision": "omit",
+            "rationale": "JMDict marks たは as obsolete kana usage, so the deterministic converter should omit it before this operation normally runs."
+          }
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed",
+        "reviewNote": "A defense-in-depth prompt case; normal converter scaffolding rejects this tagged alternative without AI."
+      }
+    },
+    {
+      "id": "animecards-reading-1449790-統治",
+      "provenance": {
+        "corpus": "Animecards live-collection review",
+        "sourceNoteId": 1785813821891,
+        "artifact": "SurfacePro11 review on 2026-08-05"
+      },
+      "input": {
+        "context": "太平洋戦争の後、アメリカが日本に対して間接<mark>統治</mark>というかたちで占領する。",
+        "recognitionTarget": "統治",
+        "jmdictId": "1449790",
+        "senseNumbers": [1],
+        "encountered": {
+          "kanaReading": "とうち",
+          "bccwjFrequencyPerMillion": 3.1329379
+        },
+        "alternatives": [
+          {
+            "kanaReading": "とうじ",
+            "bccwjFrequencyPerMillion": null
+          }
+        ]
+      },
+      "expected": {
+        "decisions": [
+          {
+            "kanaReading": "とうじ",
+            "decision": "omit",
+            "rationale": "The valid but non-common reading とうじ is not useful enough to teach alongside the ordinary とうち in this usage."
+          }
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed"
+      }
+    },
+    {
+      "id": "design-reading-1582710-日本",
+      "provenance": {
+        "corpus": "Miwake card design policy",
+        "artifact": "DESIGN.md"
+      },
+      "input": {
+        "context": "来年は<mark>日本</mark>へ行く。",
+        "recognitionTarget": "日本",
+        "jmdictId": "1582710",
+        "senseNumbers": [1],
+        "encountered": {
+          "kanaReading": "にほん",
+          "bccwjFrequencyPerMillion": null
+        },
+        "alternatives": [
+          {
+            "kanaReading": "にっぽん",
+            "bccwjFrequencyPerMillion": 682.6803727
+          }
+        ]
+      },
+      "expected": {
+        "decisions": [
+          {
+            "kanaReading": "にっぽん",
+            "decision": "include",
+            "rationale": "Both readings are common, standard pronunciations of the same ordinary place name and belong on one card."
+          }
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed"
+      }
+    },
+    {
+      "id": "design-reading-1584660-明日",
+      "provenance": {
+        "corpus": "Miwake card design policy",
+        "artifact": "DESIGN.md"
+      },
+      "input": {
+        "context": "じゃあ、また<mark>明日</mark>ね。",
+        "recognitionTarget": "明日",
+        "jmdictId": "1584660",
+        "senseNumbers": [1],
+        "encountered": {
+          "kanaReading": "あした",
+          "bccwjFrequencyPerMillion": 6.794034
+        },
+        "alternatives": [
+          {
+            "kanaReading": "あす",
+            "bccwjFrequencyPerMillion": 122.7007326
+          },
+          {
+            "kanaReading": "みょうにち",
+            "bccwjFrequencyPerMillion": 2.2806828
+          }
+        ]
+      },
+      "expected": {
+        "decisions": [
+          {
+            "kanaReading": "あす",
+            "decision": "include",
+            "rationale": "あす is a common standard alternative for the same ordinary meaning."
+          },
+          {
+            "kanaReading": "みょうにち",
+            "decision": "omit",
+            "rationale": "The strongly formal reading does not belong on this casual conversational card."
+          }
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "user-reviewed"
+      }
+    }
+  ]
+}

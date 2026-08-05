@@ -1,4 +1,4 @@
-export const CONVERSION_MANIFEST_VERSION = 15;
+export const CONVERSION_MANIFEST_VERSION = 16;
 
 export interface AnkiFieldValue {
   value: string;
@@ -86,6 +86,40 @@ export function senseResolutionNeedsGeneration(
   return resolution.status === "pending" || resolution.status === "failed";
 }
 
+export type ReadingResolution =
+  | { status: "not-needed" }
+  | { status: "pending"; alternatives: AdditionalAcceptedReadingResolution[] }
+  | {
+    status: "generated";
+    model: string;
+    generatedAt: string;
+    alternatives: AdditionalAcceptedReadingResolution[];
+    decisions: Array<{
+      kanaReading: string;
+      decision: "include" | "omit";
+      rationale: string;
+    }>;
+  }
+  | {
+    status: "failed";
+    model: string;
+    attemptedAt: string;
+    error: string;
+    alternatives: AdditionalAcceptedReadingResolution[];
+  };
+
+/** Whether additional-reading selection is final and safe to render or apply. */
+export function readingResolutionIsComplete(resolution: ReadingResolution): boolean {
+  return resolution.status === "not-needed" || resolution.status === "generated";
+}
+
+/** Whether additional-reading selection still needs generation, including a retry after failure. */
+export function readingResolutionNeedsGeneration(
+  resolution: ReadingResolution,
+): resolution is Extract<ReadingResolution, { status: "pending" | "failed" }> {
+  return resolution.status === "pending" || resolution.status === "failed";
+}
+
 interface FullContextSelectionInput {
   /** EPUB source containing the required context. */
   source: string;
@@ -155,8 +189,10 @@ export interface ConversionCandidate {
   recognitionTargetOverride?: string;
   /** Pronunciation identified by the acquisition evidence; final Reading order is independent. */
   readingKana: string;
-  /** Other reviewed pronunciations and their direct JMDict grounding. */
+  /** Other final accepted pronunciations and their direct JMDict grounding. */
   additionalAcceptedReadings?: AdditionalAcceptedReadingResolution[];
+  /** Disposition of otherwise valid same-entry pronunciations considered for this card. */
+  readingResolution: ReadingResolution;
   /**
    * Plain-text evidence supplied to sense-selection AI.
    *
@@ -231,7 +267,8 @@ export function deferredReason(candidate: ConversionCandidate): DeferredReason |
   }
   if (
     candidate.minimizedContextResolution.status === "failed" ||
-    candidate.senseResolution.status === "failed"
+    candidate.senseResolution.status === "failed" ||
+    candidate.readingResolution.status === "failed"
   ) {
     return "ai-enrichment-failed";
   }

@@ -1,13 +1,23 @@
-import type { HintGenerationInput, SenseSelectionInput } from "card_field_generation";
+import type {
+  HintGenerationInput,
+  ReadingSelectionInput,
+  SenseSelectionInput,
+} from "card_field_generation";
 import {
   assertContextMinimizationInput,
   assertHintGenerationInput,
+  assertReadingSelectionInput,
   assertSenseSelectionInput,
   promptJMDictEntry,
   promptJMDictProjectionSignature,
 } from "card_field_generation/eval-metadata";
 import { type JMDictWord, preextractedJMDictEntry } from "data";
-import type { EvalFixture, HintFixture, SenseSelectionFixture } from "./types.ts";
+import type {
+  EvalFixture,
+  HintFixture,
+  ReadingSelectionFixture,
+  SenseSelectionFixture,
+} from "./types.ts";
 
 type JMDictEntryLoader = (id: string) => Promise<JMDictWord>;
 
@@ -43,6 +53,17 @@ export async function senseSelectionInput(
   };
 }
 
+/** Resolves the JMDict reference in one tracked additional-reading fixture. */
+export async function readingSelectionInput(
+  fixture: ReadingSelectionFixture,
+): Promise<ReadingSelectionInput> {
+  const { jmdictId, ...input } = fixture.input;
+  return {
+    ...input,
+    jmdictEntry: await preextractedJMDictEntry(jmdictId),
+  };
+}
+
 /**
  * Builds the canonical audit identity for one tracked fixture.
  *
@@ -69,6 +90,27 @@ export async function evalFixtureHashContent(
           await promptJMDictEntry(entry, fixture.input.compatibleSenseNumbers),
         ),
       },
+    };
+  }
+
+  if (fixture.operation === "reading-selection") {
+    const entry = await loadJMDictEntry(fixture.input.jmdictId);
+    const promptReadings = [fixture.input.encountered, ...fixture.input.alternatives].map(
+      ({ kanaReading }) => {
+        const form = entry.kana.find(({ text }) => text === kanaReading);
+        return form === undefined
+          ? { kanaReading, missing: true }
+          : { kanaReading, common: form.common, tags: form.tags };
+      },
+    );
+    return {
+      fixture,
+      promptJMDictProjectionSignatures: {
+        selected: promptJMDictProjectionSignature(
+          await promptJMDictEntry(entry, fixture.input.senseNumbers),
+        ),
+      },
+      promptReadings,
     };
   }
 
@@ -119,6 +161,8 @@ export async function assertEvalFixtureGenerationInputs(
         assertContextMinimizationInput(fixture.input);
       } else if (fixture.operation === "hint") {
         await assertHintGenerationInput(await hintGenerationInput(fixture));
+      } else if (fixture.operation === "reading-selection") {
+        await assertReadingSelectionInput(await readingSelectionInput(fixture));
       } else {
         await assertSenseSelectionInput(await senseSelectionInput(fixture));
       }

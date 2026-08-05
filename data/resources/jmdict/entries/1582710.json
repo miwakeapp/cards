@@ -1,0 +1,56 @@
+{
+  "id": "1582710",
+  "kanji": [
+    {
+      "common": true,
+      "text": "日本",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "にほん",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": true,
+      "text": "にっぽん",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "Japan"
+        }
+      ]
+    }
+  ]
+}

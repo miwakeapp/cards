@@ -58,6 +58,7 @@ export function effectiveReasoningEffort(
 export const FIELD_GENERATION_OPERATIONS = [
   "context-minimization",
   "hint",
+  "reading-selection",
   "sense-selection",
 ] as const;
 
@@ -85,6 +86,10 @@ export const PRODUCTION_GENERATION_CONFIGURATIONS = {
     reasoningEffort: "low",
   },
   hint: {
+    modelId: "gpt-5.6-sol",
+    reasoningEffort: "medium",
+  },
+  "reading-selection": {
     modelId: "gpt-5.6-sol",
     reasoningEffort: "medium",
   },

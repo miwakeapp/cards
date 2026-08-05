@@ -1,10 +1,11 @@
 import { assertEquals, assertRejects, assertThrows } from "@std/assert";
 import * as path from "@std/path";
 import { DatabaseSync } from "node:sqlite";
-import { normalizeRarityTerm } from "../src/rarity_normalization.ts";
+import { normalizeRarityReading, normalizeRarityTerm } from "../src/rarity_normalization.ts";
 import {
   createRarityResourceLookup,
   initializeRarityDatabase,
+  UPSERT_BCCWJ_READING_SQL,
   UPSERT_BCCWJ_SQL,
   UPSERT_NWJC_SQL,
 } from "../src/rarity_resources.ts";
@@ -28,6 +29,10 @@ Deno.test("normalizeRarityTerm canonicalizes plain resource keys", () => {
   assertEquals(normalizeRarityTerm(normalized), normalized);
 });
 
+Deno.test("normalizeRarityReading canonicalizes spacing, width, and kana script", () => {
+  assertEquals(normalizeRarityReading("トウ　チ"), "とうち");
+});
+
 Deno.test("rarity resource lookup normalizes and returns minimal hits", async () => {
   await withFixtureDatabase(async (lookup) => {
     assertEquals(await lookup.nwjcSurface1GramHit("ｶｯｺ　ｲｲ"), {
@@ -35,8 +40,12 @@ Deno.test("rarity resource lookup normalizes and returns minimal hits", async ()
       tokenTotal: TEST_NWJC_TOKEN_TOTAL,
     });
     assertEquals(await lookup.bccwjLUW2LemmaHit("玄　妙"), { totalPMW: 0.024 });
+    assertEquals(await lookup.bccwjLUW2LemmaReadingHit("玄　妙", "ゲンミョウ"), {
+      totalPMW: 0.024,
+    });
     assertEquals(await lookup.nwjcSurface1GramHit("absent"), null);
     assertEquals(await lookup.bccwjLUW2LemmaHit("absent"), null);
+    assertEquals(await lookup.bccwjLUW2LemmaReadingHit("玄妙", "げんびょう"), null);
   });
 });
 
@@ -86,10 +95,19 @@ Deno.test("rarity source parsers accept the current schemas", () => {
 
   const row = bccwjFields();
   row[0] = "536095";
+  row[1] = "ゲンミョウ";
   row[2] = "玄妙";
   row[6] = "2";
   row[7] = "0.0240072";
   assertEquals(parseBCCWJRow(row.join("\t"), 42), {
+    reading: "ゲンミョウ",
+    lemma: "玄妙",
+    totalPMW: 0.0240072,
+  });
+
+  row[1] = "";
+  assertEquals(parseBCCWJRow(row.join("\t"), 43), {
+    reading: "",
     lemma: "玄妙",
     totalPMW: 0.0240072,
   });
@@ -104,6 +122,7 @@ Deno.test("rarity source parsers reject malformed rows", () => {
 
   const row = bccwjFields();
   row[0] = "1";
+  row[1] = "ゲンミョウ";
   row[2] = "玄妙";
   row[6] = "2";
   row[7] = "0.024junk";
@@ -124,6 +143,9 @@ async function withFixtureDatabase(
   const insertBCCWJ = database.prepare(UPSERT_BCCWJ_SQL);
   insertBCCWJ.run("玄妙", 0.01);
   insertBCCWJ.run("玄妙", 0.014);
+  const insertBCCWJReading = database.prepare(UPSERT_BCCWJ_READING_SQL);
+  insertBCCWJReading.run("玄妙", "げんみょう", 0.01);
+  insertBCCWJReading.run("玄妙", "げんみょう", 0.014);
   database.close();
 
   const lookup = createRarityResourceLookup(databasePath);

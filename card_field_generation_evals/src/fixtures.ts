@@ -6,6 +6,7 @@ import type {
   EvalFixture,
   EvalKnownFailureReference,
   HintFixture,
+  ReadingSelectionFixture,
   SenseSelectionFixture,
 } from "./types.ts";
 
@@ -63,6 +64,36 @@ const senseSelectionFileSchema = z.strictObject({
     expected: z.strictObject({
       outcome: senseSelectionOutcomeSchema,
       rationale: z.string().min(1).optional(),
+    }),
+    evaluation: evaluationSchema,
+  })),
+});
+
+const readingEvidenceSchema = z.strictObject({
+  kanaReading: z.string().min(1),
+  bccwjFrequencyPerMillion: z.number().positive().finite().nullable(),
+});
+
+const readingSelectionFileSchema = z.strictObject({
+  schemaVersion: z.literal(1),
+  description: z.string().min(1).optional(),
+  cases: z.array(z.strictObject({
+    id: z.string().min(1),
+    provenance: provenanceSchema,
+    input: z.strictObject({
+      context: z.string().min(1),
+      recognitionTarget: z.string().min(1),
+      jmdictId: z.string().regex(/^\d+$/u),
+      senseNumbers: positiveSenseNumbersSchema.min(1),
+      encountered: readingEvidenceSchema,
+      alternatives: z.array(readingEvidenceSchema).min(1),
+    }),
+    expected: z.strictObject({
+      decisions: z.array(z.strictObject({
+        kanaReading: z.string().min(1),
+        decision: z.enum(["include", "omit"]),
+        rationale: z.string().min(1),
+      })).min(1),
     }),
     evaluation: evaluationSchema,
   })),
@@ -144,6 +175,17 @@ function validateSenseFixture(fixture: SenseSelectionFixture): void {
   if (incompatible.length > 0) {
     throw new Error(
       `${label} contains values outside compatibleSenseNumbers: ${incompatible.join(", ")}`,
+    );
+  }
+}
+
+function validateReadingFixture(fixture: ReadingSelectionFixture): void {
+  assertUniqueSenseNumbers(fixture.input.senseNumbers, `${fixture.id}.input.senseNumbers`);
+  const alternatives = fixture.input.alternatives.map(({ kanaReading }) => kanaReading);
+  const decisions = fixture.expected.decisions.map(({ kanaReading }) => kanaReading);
+  if (JSON.stringify(decisions) !== JSON.stringify(alternatives)) {
+    throw new Error(
+      `${fixture.id}.expected.decisions must correspond to every input alternative in order`,
     );
   }
 }
@@ -399,6 +441,9 @@ export async function loadEvalFixtures(
   const hintFile = hintFileSchema.parse(
     await readJSON(path.join(casesDirectory, "hint.json")),
   );
+  const readingFile = readingSelectionFileSchema.parse(
+    await readJSON(path.join(casesDirectory, "reading_selection.json")),
+  );
   const contextMinimizationFile = contextMinimizationFileSchema.parse(
     await readJSON(path.join(casesDirectory, "minimization.json")),
   );
@@ -412,6 +457,10 @@ export async function loadEvalFixtures(
     ...senseFile.cases.map((fixture): SenseSelectionFixture => ({
       ...fixture,
       operation: "sense-selection",
+    })),
+    ...readingFile.cases.map((fixture): ReadingSelectionFixture => ({
+      ...fixture,
+      operation: "reading-selection",
     })),
     ...hintFile.cases.map((fixture): HintFixture => ({
       ...fixture,
@@ -433,6 +482,8 @@ export async function loadEvalFixtures(
       validateContextMinimizationFixture(fixture);
     } else if (fixture.operation === "hint") {
       validateHintFixture(fixture);
+    } else if (fixture.operation === "reading-selection") {
+      validateReadingFixture(fixture);
     } else {
       validateSenseFixture(fixture);
     }
@@ -449,6 +500,8 @@ export function jmdictEntryIdsForEvalFixtures(fixtures: readonly EvalFixture[]):
   const ids = new Set<string>();
   for (const fixture of fixtures) {
     if (fixture.operation === "sense-selection") {
+      ids.add(fixture.input.jmdictId);
+    } else if (fixture.operation === "reading-selection") {
       ids.add(fixture.input.jmdictId);
     } else if (fixture.operation === "hint") {
       ids.add(fixture.input.selectedUsage.jmdictId);

@@ -29,6 +29,7 @@ import {
   SENSE_SELECTION_PROMPT_FIXTURE_LINKS,
 } from "./sense_selection_few_shots.ts";
 import type { FieldGenerationOperation } from "./model_presets.ts";
+import { type ReadingSelectionInput, readingSelectionMessages } from "./reading_selection.ts";
 
 export type { FieldGenerationOperation } from "./model_presets.ts";
 
@@ -44,6 +45,7 @@ export const PROMPT_FEW_SHOT_FIXTURE_LINKS: Readonly<
 > = Object.freeze({
   "context-minimization": CONTEXT_MINIMIZATION_PROMPT_FIXTURE_LINKS,
   hint: HINT_PROMPT_FIXTURE_LINKS,
+  "reading-selection": [],
   "sense-selection": SENSE_SELECTION_PROMPT_FIXTURE_LINKS,
 });
 
@@ -53,6 +55,7 @@ export const PROMPT_FEW_SHOT_FIXTURE_IDS: Readonly<
 > = Object.freeze({
   "context-minimization": CONTEXT_MINIMIZATION_PROMPT_FIXTURE_IDS,
   hint: HINT_PROMPT_FIXTURE_IDS,
+  "reading-selection": [],
   "sense-selection": SENSE_SELECTION_PROMPT_FIXTURE_IDS,
 });
 
@@ -82,6 +85,11 @@ export function assertContextMinimizationInput(input: ContextMinimizationInput):
 /** Exercises the production pre-provider validation path for a hint eval input. */
 export async function assertHintGenerationInput(input: HintGenerationInput): Promise<void> {
   await hintMessages(input);
+}
+
+/** Exercises the production pre-provider validation path for an additional-reading eval input. */
+export async function assertReadingSelectionInput(input: ReadingSelectionInput): Promise<void> {
+  await readingSelectionMessages(input);
 }
 
 /** Exercises the production pre-provider validation path for a sense-selection eval input. */

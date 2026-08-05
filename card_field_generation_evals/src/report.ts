@@ -19,6 +19,11 @@ function formatActual(result: Extract<EvalCaseResult, { status: "success" }>): s
   const value = result.value;
   if (value === null) return "`null`";
   if (typeof value === "string") return JSON.stringify(value);
+  if ("decisions" in value) {
+    return value.decisions.map(({ kanaReading, decision }) => `${kanaReading}: ${decision}`).join(
+      ", ",
+    );
+  }
   if ("outcome" in value) {
     if (value.outcome === "generated") {
       return `generated hint ${JSON.stringify(value.hint)}`;
@@ -81,6 +86,17 @@ function summaryMarkdown(summary: EvalSummary): string {
       if (cohort.caseCount === 0) continue;
       lines.push(
         `- ${label} exact outcome agreement: ${cohort.exactMatchCount}/${cohort.caseCount} (${
+          percentage(cohort.exactMatchCount, cohort.caseCount)
+        }). ${qualification}`,
+      );
+    }
+  }
+  if (summary.readingSelection !== undefined) {
+    for (const { key, label, qualification } of REFERENCE_COHORTS) {
+      const cohort = summary.readingSelection.cohorts[key];
+      if (cohort.caseCount === 0) continue;
+      lines.push(
+        `- ${label} exact reading-decision agreement: ${cohort.exactMatchCount}/${cohort.caseCount} (${
           percentage(cohort.exactMatchCount, cohort.caseCount)
         }). ${qualification}`,
       );
@@ -153,7 +169,7 @@ function resultNeedsDetail(result: EvalCaseResult): boolean {
   if (result.fixtureEvaluation.referenceBasis === "provisional") return true;
   if (result.status === "error") return true;
   if (needsAttemptAudit(result)) return true;
-  if (result.score.kind === "sense-selection") {
+  if (result.score.kind === "sense-selection" || result.score.kind === "reading-selection") {
     return !result.score.exactMatch;
   }
   if (result.score.kind === "context-minimization") {
@@ -202,6 +218,15 @@ function expectedDescription(result: EvalCaseResult): string {
     return expected.outcome.senseNumbers.length === compatibleSenseNumbers.length
       ? "select all compatible senses"
       : `select senses ${expected.outcome.senseNumbers.join(", ")}`;
+  }
+  if (result.operation === "reading-selection") {
+    const expected = result.expected as {
+      decisions: Array<{ kanaReading: string; decision: "include" | "omit" }>;
+    };
+    return expected.decisions.map(({ kanaReading, decision }) => `${kanaReading}: ${decision}`)
+      .join(
+        ", ",
+      );
   }
   const expected = result.expected as {
     disposition: "generated" | "not-needed" | "source-insufficient";
@@ -346,7 +371,9 @@ function resultConfigurationMarkdown(result: EvalCaseResult): string {
           `- Length diagnostic: ${result.score.hintCharacterCount} Unicode code points, ${result.score.hintLengthDelta} longer than recognitionTarget; the 6- and 12-character thresholds are review signals, not validator limits.`,
         );
       }
-    } else if (result.score.kind === "sense-selection") {
+    } else if (
+      result.score.kind === "sense-selection" || result.score.kind === "reading-selection"
+    ) {
       lines.push(
         `- Reference judgment: exact outcome ${result.score.exactMatch ? "yes" : "no"}.`,
       );
@@ -401,6 +428,13 @@ function caseDetailMarkdown(results: readonly EvalCaseResult[]): string {
     const expected = result.expected as { rationale?: string };
     if (expected.rationale !== undefined) {
       lines.push(`- Reference rationale: ${expected.rationale}`);
+    }
+  } else if (result.operation === "reading-selection") {
+    const expected = result.expected as {
+      decisions: Array<{ kanaReading: string; rationale: string }>;
+    };
+    for (const decision of expected.decisions) {
+      lines.push(`- Reference rationale for ${decision.kanaReading}: ${decision.rationale}`);
     }
   } else {
     const expected = result.expected as { rubricNotes: string[] };

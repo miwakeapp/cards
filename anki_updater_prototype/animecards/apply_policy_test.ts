@@ -35,6 +35,7 @@ async function candidate(): Promise<ConversionCandidate> {
     fullContextResolution: { status: "source-unavailable" },
     minimizedContextResolution: { status: "not-needed" },
     senseResolution: { status: "not-needed" },
+    readingResolution: { status: "not-needed" },
     original: await snapshotNote(sourceNote()),
     target: {
       modelName: "Miwake",
