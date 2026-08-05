@@ -1,5 +1,5 @@
 import { assertEquals } from "@std/assert";
-import { formatReading, parseReading } from "card_model/reading";
+import { decorateReadingAlternative, formatReading, parseReading } from "card_model/reading";
 
 Deno.test("formatReading keeps one reading plain and lists multiple readings", () => {
   assertEquals(formatReading(["裏[うら] 面[めん]"]), "裏[うら] 面[めん]");
@@ -15,6 +15,18 @@ Deno.test("formatReading keeps one reading plain and lists multiple readings", (
     formatReading(["<字>[じ]&", "<字>[し]&"]),
     "<ul><li>&lt;字&gt;[じ]&amp;</li><li>&lt;字&gt;[し]&amp;</li></ul>",
   );
+});
+
+Deno.test("decorateReadingAlternative separates only an initial ruby base", () => {
+  assertEquals(
+    decorateReadingAlternative("三[ざん] 昧[まい]", "～", ""),
+    "～ 三[ざん] 昧[まい]",
+  );
+  assertEquals(
+    decorateReadingAlternative("を 食[た]べる", "～", ""),
+    "～を 食[た]べる",
+  );
+  assertEquals(decorateReadingAlternative("曽[そう]", "", "～"), "曽[そう]～");
 });
 
 Deno.test("parseReading handles plain and list representations", () => {

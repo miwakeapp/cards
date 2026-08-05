@@ -494,7 +494,26 @@ Deno.test("analyzeCard: updates furigana beneath automatic affix notation", asyn
 
   assertEquals(card.verdict, "routine");
   assertEquals(card.reason, "furigana-placement");
-  assertEquals(card.proposedReading, "～食[た]べる");
+  assertEquals(card.proposedReading, "～ 食[た]べる");
+});
+
+Deno.test("analyzeCard: keeps a leading affix marker outside the first ruby base", async () => {
+  const word = makeWord({
+    id: "1358280",
+    kanji: ["食べる"],
+    kana: ["たべる"],
+    senses: [{ glosses: ["to eat"] }],
+  });
+  const note = makeNote({
+    key: "食べる | 1358280",
+    recognitionTarget: "～食べる",
+    reading: "～ 食[た]べる",
+    dictionary: renderDictionary(word),
+  });
+  const card = await analyzeCard(note, entriesById(word));
+
+  assertEquals(card.verdict, "unchanged");
+  assertEquals(card.proposedReading, null);
 });
 
 Deno.test("analyzeCard: preserves a stored half-width affix marker while updating furigana", async () => {
@@ -514,7 +533,7 @@ Deno.test("analyzeCard: preserves a stored half-width affix marker while updatin
 
   assertEquals(card.verdict, "routine");
   assertEquals(card.reason, "furigana-placement");
-  assertEquals(card.proposedReading, "〜食[た]べる");
+  assertEquals(card.proposedReading, "〜 食[た]べる");
 });
 
 Deno.test("analyzeCard: surfaces Reading changes alongside HTML normalization", async () => {

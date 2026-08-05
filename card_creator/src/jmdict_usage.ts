@@ -248,9 +248,7 @@ export function resolveJMDictUsage(
     SUFFIX_PARTS_OF_SPEECH,
   );
   const recognitionTargetPrefix = isSuffix ? NOTATION_MARKER : "";
-  // Anki uses spaces to separate adjacent furigana chunks. Without one here, the notation marker
-  // becomes part of the first annotated kanji's ruby base.
-  const readingPrefix = isSuffix ? `${NOTATION_MARKER} ` : "";
+  const readingPrefix = isSuffix ? NOTATION_MARKER : "";
   const readingSuffix = isPrefix ? NOTATION_MARKER : "";
 
   return {
