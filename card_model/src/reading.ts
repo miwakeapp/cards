@@ -44,6 +44,18 @@ export function formatReading(alternatives: readonly string[]): string {
   return `<ul>${escaped.map((alternative) => `<li>${alternative}</li>`).join("")}</ul>`;
 }
 
+/** Adds display affixes without letting a leading affix become part of the first ruby base. */
+export function decorateReadingAlternative(
+  alternative: string,
+  prefix: string,
+  suffix: string,
+): string {
+  const parsed = parseAnkiFurigana(alternative);
+  if (parsed === null) throw new Error("Reading alternative must use valid Anki furigana syntax");
+  const prefixDelimiter = prefix !== "" && parsed.parts[0].type === "ruby" ? " " : "";
+  return `${prefix}${prefixDelimiter}${alternative}${suffix}`;
+}
+
 function parseAlternative(
   formatted: string,
   expectedSurface: string,

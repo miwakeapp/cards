@@ -2,7 +2,12 @@ import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
 import type { AcceptedJMDictUsage } from "card_creator";
 import { formatAcceptedReadingsForAnki } from "card_creator/accepted-reading";
 import type { Key } from "card_model/keys";
-import { formatReading, type ParsedReadingAlternative, parseReading } from "card_model/reading";
+import {
+  decorateReadingAlternative,
+  formatReading,
+  type ParsedReadingAlternative,
+  parseReading,
+} from "card_model/reading";
 import { parseAnkiFurigana } from "japanese_text";
 import { splitAffixNotation } from "./affix_notation.ts";
 
@@ -154,12 +159,10 @@ export async function validateCardReading(
   const targetAffix = splitAffixNotation(recognitionTarget);
   let canonicalAlternatives: readonly string[];
   if (targetAffix.content === key.spelling) {
+    const prefix = targetAffix.notation === "leading" ? targetAffix.decoration.trim() : "";
+    const suffix = targetAffix.notation === "trailing" ? targetAffix.decoration.trim() : "";
     canonicalAlternatives = formattedVariants.map((formatted) =>
-      targetAffix.notation === "leading"
-        ? `${targetAffix.decoration}${formatted}`
-        : targetAffix.notation === "trailing"
-        ? `${formatted}${targetAffix.decoration}`
-        : formatted
+      decorateReadingAlternative(formatted, prefix, suffix)
     );
   } else {
     const canonicalReadings = parseReading(formatReading(formattedVariants), key.spelling)!;

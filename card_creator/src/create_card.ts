@@ -5,7 +5,7 @@
 import { escape } from "@std/html/entities";
 import { renderDictionaryField } from "card_model/dictionary";
 import { formatKey } from "card_model/keys";
-import { formatReading } from "card_model/reading";
+import { decorateReadingAlternative, formatReading } from "card_model/reading";
 import type { CardFields } from "card_model";
 import { formatResolvedReadingsForAnki, resolveAcceptedContent } from "./accepted_content.ts";
 import { processContextHTML } from "./context.ts";
@@ -88,7 +88,11 @@ export async function createCard(
     const referenceUsage = resolved.usages[0].usage;
     reading = formatReading(
       formatting.formattedReadings.map((formatted) =>
-        `${referenceUsage.readingPrefix}${formatted}${referenceUsage.readingSuffix}`
+        decorateReadingAlternative(
+          formatted,
+          referenceUsage.readingPrefix,
+          referenceUsage.readingSuffix,
+        )
       ),
     );
   }
