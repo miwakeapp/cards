@@ -32,6 +32,7 @@
     "@std/testing": "jsr:@std/testing@^1.0.16",
     "iso-639-2": "npm:iso-639-2",
     "parse5": "npm:parse5@^8.0.1",
+    "translate-american-british-english": "npm:translate-american-british-english@^1.0.1",
     "@ai-sdk/anthropic": "npm:@ai-sdk/anthropic@^4.0.23",
     "@ai-sdk/google": "npm:@ai-sdk/google@^4.0.26",
     "@ai-sdk/openai": "npm:@ai-sdk/openai@^4.0.22",
