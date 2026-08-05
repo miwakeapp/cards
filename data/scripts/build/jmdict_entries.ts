@@ -29,6 +29,14 @@ const JMDICT_TO_HTML_TEST_IDS = new Set([
   "2228700", // 彼岸桜, shared related tags + mixed misc
   "2861582", // トスアップ, shared field + language source
   "1604990", // 目にあう, lots of forms
+  "1080510", // テレビ, program/programme glosses
+  "1375040", // 勢い, vigor/vigour glosses
+  "1424660", // 中心, center/centre glosses
+  "1485470", // 飛行機, airplane/aeroplane glosses
+  "1495000", // 下手, several British/American gloss pairs
+  "1496680", // 婦人科, gynecology/gynaecology glosses
+  "1533460", // 面子, honor/honour glosses
+  "1584090", // 抱く, harbor/harbour glosses
 ]);
 
 // IDs used by the shared Miwake Cards preview fixtures.
