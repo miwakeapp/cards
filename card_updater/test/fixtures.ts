@@ -34,16 +34,26 @@ export function makeWord(options: {
   } as JMdictWord;
 }
 
+export function entriesById(...entries: readonly JMdictWord[]): Map<string, JMdictWord> {
+  return new Map(entries.map((entry) => [entry.id, entry]));
+}
+
 export function makeNote(
-  fields: Partial<MiwakeNoteFields> & Pick<MiwakeNoteFields, "key" | "dictionaryEntry">,
+  fields: Partial<MiwakeNoteFields> & Pick<MiwakeNoteFields, "key" | "dictionary">,
 ): MiwakeNoteSnapshot {
+  const recognitionTarget = fields.key.split("|")[0].trim();
+  const defaultReadings: Readonly<Record<string, string>> = {
+    "言葉": "言[こと] 葉[ば]",
+    "掬う": "掬[すく]う",
+    "息抜き": "息[いき] 抜[ぬ]き",
+  };
   return {
     noteId: 1601969325935,
     tags: [],
     cards: [1601969325940],
     fields: {
-      recognitionTarget: fields.key.split("|")[0].trim(),
-      reading: "",
+      recognitionTarget,
+      reading: defaultReadings[recognitionTarget] ?? "",
       hint: "",
       fullContext: "これは<mark>言葉</mark>のテストです。",
       minimizedContext: "",

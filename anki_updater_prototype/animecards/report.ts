@@ -6,6 +6,7 @@
 
 import { parseArgs } from "@std/cli/parse-args";
 import * as path from "@std/path";
+import { parseKey } from "card_model/keys";
 import { normalizePlainText } from "./html.ts";
 import { type ConversionCandidate, type ConversionManifest, deferredReason } from "./types.ts";
 
@@ -141,6 +142,9 @@ export function buildConversionReport(manifest: ConversionManifest): string {
   const entrySelections = manifest.candidates.filter((candidate) =>
     candidate.jmdictEntryResolution !== undefined
   );
+  const multiReadingCandidates = manifest.candidates.filter((candidate) =>
+    (candidate.additionalAcceptedReadings?.length ?? 0) > 0
+  );
   const entrySelectionDeferrals = manifest.skipped.filter((skipped) =>
     skipped.entrySelection !== undefined
   );
@@ -228,8 +232,51 @@ export function buildConversionReport(manifest: ConversionManifest): string {
       [...senseModelCounts].map(([model, count]) => `${model}=${count}`).join(", ") || "none"
     }`,
     `- JMDict-entry selections: ${entrySelections.length}`,
+    `- Multi-reading selections: ${multiReadingCandidates.length}`,
     `- Failed AI enrichments: ${failedEnrichments.length}`,
     "",
+    "## Multi-reading selections",
+    "",
+  ];
+
+  if (multiReadingCandidates.length === 0) {
+    lines.push("None.", "");
+  } else {
+    lines.push(
+      "| Note ID | Recognition target | Lead usage | Accepted alternatives | Final Reading |",
+      "| ---: | --- | --- | --- | --- |",
+    );
+    for (const candidate of multiReadingCandidates) {
+      const parsedKey = parseKey(candidate.target.fields.Key);
+      const lead = parsedKey?.usages.find(({ jmdictId }) => jmdictId === candidate.jmdictId);
+      const describeUsage = (
+        kana: string,
+        jmdictId: string,
+        senseNumbers: readonly number[] | null,
+      ) =>
+        `${kana} · ${jmdictId} ${
+          senseNumbers === null ? "all senses" : `S${senseNumbers.join(",")}`
+        }`;
+      lines.push(
+        `| ${candidate.noteId} | ${inlineCode(candidate.keyRecognitionTarget)} | ${
+          lead === undefined ? "invalid Key" : inlineCode(
+            describeUsage(candidate.readingKana, lead.jmdictId, lead.senseNumbers),
+          )
+        } | ${
+          candidate.additionalAcceptedReadings === undefined
+            ? "none"
+            : candidate.additionalAcceptedReadings.map((item) =>
+              inlineCode(
+                describeUsage(item.kanaReading, item.jmdictId, item.applicableSenseNumbers),
+              )
+            ).join("; ")
+        } | ${inlineCode(candidate.target.fields.Reading)} |`,
+      );
+    }
+    lines.push("");
+  }
+
+  lines.push(
     "## Distinct final Source HTML",
     "",
     `${sortedSourceGroups.length} distinct strings; ${
@@ -242,7 +289,7 @@ export function buildConversionReport(manifest: ConversionManifest): string {
     "",
     "| Count | Resolution | Final HTML string | Source URL handling | Example note IDs |",
     "| ---: | --- | --- | --- | --- |",
-  ];
+  );
 
   for (const group of sortedSourceGroups) {
     const methods = [

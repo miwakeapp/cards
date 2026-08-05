@@ -2,17 +2,16 @@ import "../../data/test/use_jmdict_fixtures.ts";
 
 import { assertEquals, assertRejects } from "@std/assert";
 import { createCard } from "card_creator";
+import { renderDictionaryField } from "card_model/dictionary";
 import { preextractedJMDictEntry } from "data";
-import { renderEntry } from "jmdict_to_html";
 
 Deno.test("createCard renders complete deterministic fields", async () => {
   const sizes = await preextractedJMDictEntry("1414110");
   const card = await createCard({
-    jmdictEntry: sizes,
+    jmdictUsages: [{ entry: sizes, applicableSenseNumbers: [1] }],
+    kanaReadings: ["だいしょう"],
     recognitionTarget: "大小",
-    kanaReading: "だいしょう",
     fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
-    applicableSenseNumbers: [1],
     hint: "サイズの大小",
     minimizedContext: "箱の<mark>大小</mark>で値段が変わる。",
     source: {
@@ -22,45 +21,148 @@ Deno.test("createCard renders complete deterministic fields", async () => {
   });
 
   assertEquals(card, {
-    key: "大小 | 1414110 | 1",
+    key: "大小 | 1414110:1",
     recognitionTarget: "大小",
     reading: "大[だい] 小[しょう]",
     hint: "サイズの大小",
     fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
     minimizedContext: "箱の<mark>大小</mark>で値段が変わる。",
-    dictionaryEntry: renderEntry(sizes),
+    dictionary: renderDictionaryField([sizes]),
     source: '<span lang="en">Test Book</span>',
   });
+});
+
+Deno.test("createCard renders accepted readings as a list", async () => {
+  const alternateNames = await preextractedJMDictEntry("1158110");
+  const card = await createCard({
+    jmdictUsages: [{
+      entry: alternateNames,
+      applicableSenseNumbers: [1],
+    }],
+    kanaReadings: ["いみょう", "いめい"],
+    recognitionTarget: "異名",
+    fullContext: "その<mark>異名</mark>を知っている。",
+  });
+
+  assertEquals(
+    card.reading,
+    "<ul><li>異[い] 名[みょう]</li><li>異[い] 名[めい]</li></ul>",
+  );
+  assertEquals(card.key, "異名 | 1158110:1");
+});
+
+Deno.test("createCard canonically orders entries and readings independently of input", async () => {
+  const lowerId = await preextractedJMDictEntry("1645430");
+  const equivalent = await preextractedJMDictEntry("2863046");
+  const card = await createCard({
+    jmdictUsages: [{
+      entry: equivalent,
+      applicableSenseNumbers: [1],
+    }, {
+      entry: lowerId,
+    }],
+    kanaReadings: ["すぎわい", "なりわい"],
+    recognitionTarget: "生業",
+    fullContext: "演技をまっとうするのが彼の<mark><ruby>生業<rt>すぎわい</rt></ruby></mark>だ。",
+  });
+
+  assertEquals(card.key, "生業 | 1645430;2863046");
+  assertEquals(
+    card.reading,
+    "<ul><li>生業[なりわい]</li><li>生業[すぎわい]</li></ul>",
+  );
+  assertEquals(card.fullContext, "演技をまっとうするのが彼の<mark>生業[すぎわい]</mark>だ。");
+  assertEquals(card.dictionary, renderDictionaryField([lowerId, equivalent]));
+});
+
+Deno.test("createCard rejects readings which do not support the combined Key usage", async () => {
+  const alternateNames = await preextractedJMDictEntry("1158110");
+  await assertRejects(
+    () =>
+      createCard({
+        jmdictUsages: [{
+          entry: alternateNames,
+          applicableSenseNumbers: [1, 2],
+        }],
+        kanaReadings: ["いみょう", "いめい"],
+        recognitionTarget: "異名",
+        fullContext: "その<mark>異名</mark>を知っている。",
+      }),
+    Error,
+    'kanaReading "いみょう" does not support any complete JMDict usage',
+  );
+});
+
+Deno.test("createCard rejects duplicate JMDict usages and readings", async () => {
+  const alternateNames = await preextractedJMDictEntry("1158110");
+  await assertRejects(
+    () =>
+      createCard({
+        jmdictUsages: [{ entry: alternateNames }, { entry: alternateNames }],
+        kanaReadings: ["いみょう"],
+        recognitionTarget: "異名",
+        fullContext: "その<mark>異名</mark>を知っている。",
+      }),
+    Error,
+    "jmdictUsages must not repeat a JMDict entry",
+  );
+  await assertRejects(
+    () =>
+      createCard({
+        jmdictUsages: [{ entry: alternateNames, applicableSenseNumbers: [1] }],
+        kanaReadings: ["いみょう", "いみょう"],
+        recognitionTarget: "異名",
+        fullContext: "その<mark>異名</mark>を知っている。",
+      }),
+    Error,
+    "kanaReadings must not repeat a reading",
+  );
+});
+
+Deno.test("createCard validates omitted senses across every accepted reading", async () => {
+  const alternateNames = await preextractedJMDictEntry("1158110");
+  await assertRejects(
+    () =>
+      createCard({
+        jmdictUsages: [{ entry: alternateNames }],
+        kanaReadings: ["いみょう", "いめい"],
+        recognitionTarget: "異名",
+        fullContext: "その<mark>異名</mark>を知っている。",
+      }),
+    Error,
+    'kanaReading "いみょう" does not support any complete JMDict usage',
+  );
 });
 
 Deno.test("createCard canonicalizes valid sense selections", async () => {
   const sizes = await preextractedJMDictEntry("1414110");
   assertEquals(
     (await createCard({
-      jmdictEntry: sizes,
+      jmdictUsages: [{ entry: sizes, applicableSenseNumbers: [3, 1] }],
+      kanaReadings: ["だいしょう"],
       recognitionTarget: "大小",
-      kanaReading: "だいしょう",
       fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
-      applicableSenseNumbers: [3, 1],
     })).key,
-    "大小 | 1414110 | 1,3",
+    "大小 | 1414110:1,3",
   );
   assertEquals(
     (await createCard({
-      jmdictEntry: sizes,
+      jmdictUsages: [{ entry: sizes }],
+      kanaReadings: ["だいしょう"],
       recognitionTarget: "大小",
-      kanaReading: "だいしょう",
       fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
     })).key,
     "大小 | 1414110",
   );
   assertEquals(
     (await createCard({
-      jmdictEntry: sizes,
+      jmdictUsages: [{
+        entry: sizes,
+        applicableSenseNumbers: [6, 5, 4, 3, 2, 1],
+      }],
+      kanaReadings: ["だいしょう"],
       recognitionTarget: "大小",
-      kanaReading: "だいしょう",
       fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
-      applicableSenseNumbers: [6, 5, 4, 3, 2, 1],
     })).key,
     "大小 | 1414110",
   );
@@ -71,9 +173,9 @@ Deno.test("createCard identifies invalid plain-text input fields", async () => {
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{ entry: sizes }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "",
-        kanaReading: "だいしょう",
         fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
       }),
     Error,
@@ -82,9 +184,9 @@ Deno.test("createCard identifies invalid plain-text input fields", async () => {
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{ entry: sizes }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: " 大小",
-        kanaReading: "だいしょう",
         fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
       }),
     Error,
@@ -93,9 +195,9 @@ Deno.test("createCard identifies invalid plain-text input fields", async () => {
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{ entry: sizes }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "大\u00a0小",
-        kanaReading: "だいしょう",
         fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
       }),
     Error,
@@ -104,9 +206,9 @@ Deno.test("createCard identifies invalid plain-text input fields", async () => {
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{ entry: sizes }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "大小",
-        kanaReading: "だいしょう",
         fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
         hint: "",
       }),
@@ -116,9 +218,9 @@ Deno.test("createCard identifies invalid plain-text input fields", async () => {
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{ entry: sizes }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "大小",
-        kanaReading: "だいしょう",
         fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
         hint: " 大小",
       }),
@@ -128,9 +230,9 @@ Deno.test("createCard identifies invalid plain-text input fields", async () => {
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{ entry: sizes }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "大小",
-        kanaReading: "だいしょう",
         fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
         hint: "大\u202f小",
       }),
@@ -144,11 +246,10 @@ Deno.test("createCard rejects invalid sense selections", async () => {
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{ entry: sizes, applicableSenseNumbers: [] }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "大小",
-        kanaReading: "だいしょう",
         fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
-        applicableSenseNumbers: [],
       }),
     Error,
     'applicableSenseNumbers [] must contain one or more unique integers between 1 and 6, inclusive, for jmdictEntry with id "1414110"',
@@ -156,11 +257,10 @@ Deno.test("createCard rejects invalid sense selections", async () => {
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{ entry: sizes, applicableSenseNumbers: [0] }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "大小",
-        kanaReading: "だいしょう",
         fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
-        applicableSenseNumbers: [0],
       }),
     Error,
     'applicableSenseNumbers [0] must contain one or more unique integers between 1 and 6, inclusive, for jmdictEntry with id "1414110"',
@@ -168,11 +268,10 @@ Deno.test("createCard rejects invalid sense selections", async () => {
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{ entry: sizes, applicableSenseNumbers: [7] }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "大小",
-        kanaReading: "だいしょう",
         fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
-        applicableSenseNumbers: [7],
       }),
     Error,
     'applicableSenseNumbers [7] must contain one or more unique integers between 1 and 6, inclusive, for jmdictEntry with id "1414110"',
@@ -180,11 +279,13 @@ Deno.test("createCard rejects invalid sense selections", async () => {
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{
+          entry: sizes,
+          applicableSenseNumbers: [1, 1],
+        }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "大小",
-        kanaReading: "だいしょう",
         fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
-        applicableSenseNumbers: [1, 1],
       }),
     Error,
     'applicableSenseNumbers [1, 1] must contain one or more unique integers between 1 and 6, inclusive, for jmdictEntry with id "1414110"',
@@ -192,11 +293,13 @@ Deno.test("createCard rejects invalid sense selections", async () => {
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{
+          entry: sizes,
+          applicableSenseNumbers: [1.5],
+        }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "大小",
-        kanaReading: "だいしょう",
         fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
-        applicableSenseNumbers: [1.5],
       }),
     Error,
     'applicableSenseNumbers [1.5] must contain one or more unique integers between 1 and 6, inclusive, for jmdictEntry with id "1414110"',
@@ -204,11 +307,13 @@ Deno.test("createCard rejects invalid sense selections", async () => {
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{
+          entry: sizes,
+          applicableSenseNumbers: [NaN],
+        }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "大小",
-        kanaReading: "だいしょう",
         fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
-        applicableSenseNumbers: [NaN],
       }),
     Error,
     'applicableSenseNumbers [NaN] must contain one or more unique integers between 1 and 6, inclusive, for jmdictEntry with id "1414110"',
@@ -216,11 +321,13 @@ Deno.test("createCard rejects invalid sense selections", async () => {
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{
+          entry: sizes,
+          applicableSenseNumbers: [Infinity],
+        }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "大小",
-        kanaReading: "だいしょう",
         fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
-        applicableSenseNumbers: [Infinity],
       }),
     Error,
     'applicableSenseNumbers [Infinity] must contain one or more unique integers between 1 and 6, inclusive, for jmdictEntry with id "1414110"',
@@ -232,9 +339,9 @@ Deno.test("createCard requires JMDict spellings and applicable readings", async 
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{ entry: sizes }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "猫",
-        kanaReading: "だいしょう",
         fullContext: "この箱の<mark>猫</mark>によって値段が変わる。",
       }),
     Error,
@@ -243,9 +350,9 @@ Deno.test("createCard requires JMDict spellings and applicable readings", async 
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{ entry: sizes }],
+        kanaReadings: ["ダイショウ"],
         recognitionTarget: "大小",
-        kanaReading: "ダイショウ",
         fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
       }),
     Error,
@@ -254,9 +361,9 @@ Deno.test("createCard requires JMDict spellings and applicable readings", async 
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{ entry: sizes }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "～大小",
-        kanaReading: "だいしょう",
         fullContext: "この箱の<mark>～大小</mark>によって値段が変わる。",
       }),
     Error,
@@ -267,9 +374,9 @@ Deno.test("createCard requires JMDict spellings and applicable readings", async 
 Deno.test("createCard requires a reading for non-kana spellings", async () => {
   const player = await preextractedJMDictEntry("1000110");
   const card = await createCard({
-    jmdictEntry: player,
+    jmdictUsages: [{ entry: player }],
+    kanaReadings: ["シーディープレイヤー"],
     recognitionTarget: "ＣＤプレイヤー",
-    kanaReading: "シーディープレイヤー",
     fullContext: "<mark>ＣＤプレイヤー</mark>を買った。",
   });
 
@@ -277,7 +384,7 @@ Deno.test("createCard requires a reading for non-kana spellings", async () => {
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: player,
+        jmdictUsages: [{ entry: player }],
         recognitionTarget: "ＣＤプレイヤー",
         fullContext: "<mark>ＣＤプレイヤー</mark>を買った。",
       }),
@@ -289,14 +396,14 @@ Deno.test("createCard requires a reading for non-kana spellings", async () => {
 Deno.test("createCard omits the Reading field for kana spellings", async () => {
   const kanaEntry = await preextractedJMDictEntry("1207650");
   const plainCard = await createCard({
-    jmdictEntry: kanaEntry,
+    jmdictUsages: [{ entry: kanaEntry }],
     recognitionTarget: "かけがえのない",
     fullContext: "<mark>かけがえのない</mark>ものを知った。",
   });
   assertEquals(plainCard.reading, null);
 
   const rubyCard = await createCard({
-    jmdictEntry: kanaEntry,
+    jmdictUsages: [{ entry: kanaEntry }],
     recognitionTarget: "かけがえのない",
     fullContext: "<mark><ruby>かけがえのない<rt>カケガエノナイ</rt></ruby></mark>ものを知った。",
   });
@@ -308,9 +415,9 @@ Deno.test("createCard omits the Reading field for kana spellings", async () => {
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: kanaEntry,
+        jmdictUsages: [{ entry: kanaEntry }],
+        kanaReadings: ["かけがえのない"],
         recognitionTarget: "かけがえのない",
-        kanaReading: "かけがえのない",
         fullContext: "<mark>かけがえのない</mark>ものを知った。",
       }),
     Error,
@@ -321,20 +428,19 @@ Deno.test("createCard omits the Reading field for kana spellings", async () => {
 Deno.test("createCard applies JMDict spelling and reading restrictions to senses", async () => {
   const die = await preextractedJMDictEntry("2013080");
   const dieCard = await createCard({
-    jmdictEntry: die,
+    jmdictUsages: [{ entry: die }],
+    kanaReadings: ["ぼっする"],
     recognitionTarget: "歿する",
-    kanaReading: "ぼっする",
     fullContext: "その地で<mark>歿した</mark>。",
   });
-  assertEquals(dieCard.key, "歿する | 2013080 | 2");
+  assertEquals(dieCard.key, "歿する | 2013080:2");
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: die,
+        jmdictUsages: [{ entry: die, applicableSenseNumbers: [1] }],
+        kanaReadings: ["ぼっする"],
         recognitionTarget: "歿する",
-        kanaReading: "ぼっする",
         fullContext: "その地で<mark>歿した</mark>。",
-        applicableSenseNumbers: [1],
       }),
     Error,
     'applicableSenseNumbers [1] includes sense 1, which does not apply to recognitionTarget "歿する" with kanaReading "ぼっする" in jmdictEntry with id "2013080"; applicableSenseNumbers may select only [2]',
@@ -342,47 +448,44 @@ Deno.test("createCard applies JMDict spelling and reading restrictions to senses
 
   const alias = await preextractedJMDictEntry("1158110");
   const firstAliasCard = await createCard({
-    jmdictEntry: alias,
+    jmdictUsages: [{ entry: alias }],
+    kanaReadings: ["いみょう"],
     recognitionTarget: "異名",
-    kanaReading: "いみょう",
     fullContext: "<mark>異名</mark>を持つ。",
   });
-  assertEquals(firstAliasCard.key, "異名 | 1158110 | 1");
+  assertEquals(firstAliasCard.key, "異名 | 1158110:1");
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: alias,
+        jmdictUsages: [{ entry: alias, applicableSenseNumbers: [2] }],
+        kanaReadings: ["いみょう"],
         recognitionTarget: "異名",
-        kanaReading: "いみょう",
         fullContext: "<mark>異名</mark>を持つ。",
-        applicableSenseNumbers: [2],
       }),
     Error,
     'applicableSenseNumbers [2] includes sense 2, which does not apply to recognitionTarget "異名" with kanaReading "いみょう" in jmdictEntry with id "1158110"; applicableSenseNumbers may select only [1]',
   );
 
   const secondAliasCard = await createCard({
-    jmdictEntry: alias,
+    jmdictUsages: [{ entry: alias, applicableSenseNumbers: [2] }],
+    kanaReadings: ["いめい"],
     recognitionTarget: "異名",
-    kanaReading: "いめい",
     fullContext: "<mark>異名</mark>を持つ。",
-    applicableSenseNumbers: [2],
   });
-  assertEquals(secondAliasCard.key, "異名 | 1158110 | 2");
+  assertEquals(secondAliasCard.key, "異名 | 1158110:2");
 
   const kanaAliasCard = await createCard({
-    jmdictEntry: alias,
+    jmdictUsages: [{ entry: alias }],
     recognitionTarget: "いみょう",
     fullContext: "<mark>いみょう</mark>を持つ。",
   });
-  assertEquals(kanaAliasCard.key, "いみょう | 1158110 | 1");
+  assertEquals(kanaAliasCard.key, "いみょう | 1158110:1");
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: alias,
+        jmdictUsages: [{ entry: alias, applicableSenseNumbers: [2] }],
         recognitionTarget: "いみょう",
         fullContext: "<mark>いみょう</mark>を持つ。",
-        applicableSenseNumbers: [2],
       }),
     Error,
     'applicableSenseNumbers [2] includes sense 2, which does not apply to recognitionTarget "いみょう" with kanaReading "いみょう" in jmdictEntry with id "1158110"; applicableSenseNumbers may select only [1]',
@@ -392,9 +495,9 @@ Deno.test("createCard applies JMDict spelling and reading restrictions to senses
 Deno.test("createCard validates reading-to-spelling restrictions", async () => {
   const torch = await preextractedJMDictEntry("1632080");
   const card = await createCard({
-    jmdictEntry: torch,
+    jmdictUsages: [{ entry: torch }],
+    kanaReadings: ["たいまつ"],
     recognitionTarget: "炬",
-    kanaReading: "たいまつ",
     fullContext: "<mark>炬</mark>を掲げた。",
   });
 
@@ -402,9 +505,9 @@ Deno.test("createCard validates reading-to-spelling restrictions", async () => {
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: torch,
+        jmdictUsages: [{ entry: torch }],
+        kanaReadings: ["しょうめい"],
         recognitionTarget: "炬",
-        kanaReading: "しょうめい",
         fullContext: "<mark>炬</mark>を掲げた。",
       }),
     Error,
@@ -414,9 +517,9 @@ Deno.test("createCard validates reading-to-spelling restrictions", async () => {
 
 Deno.test("createCard accepts exact search-only readings", async () => {
   const card = await createCard({
-    jmdictEntry: await preextractedJMDictEntry("1311110"),
+    jmdictUsages: [{ entry: await preextractedJMDictEntry("1311110") }],
+    kanaReadings: ["ワタシ"],
     recognitionTarget: "私",
-    kanaReading: "ワタシ",
     fullContext: "<mark>私</mark>が行く。",
   });
 
@@ -425,9 +528,9 @@ Deno.test("createCard accepts exact search-only readings", async () => {
 
 Deno.test("createCard derives safe prefix and suffix notation from selected senses", async () => {
   const prefix = await createCard({
-    jmdictEntry: await preextractedJMDictEntry("1581200"),
+    jmdictUsages: [{ entry: await preextractedJMDictEntry("1581200") }],
+    kanaReadings: ["そう"],
     recognitionTarget: "曽",
-    kanaReading: "そう",
     fullContext: "<mark>曽祖父</mark>に会う。",
   });
   assertEquals(prefix.key, "曽 | 1581200");
@@ -435,9 +538,9 @@ Deno.test("createCard derives safe prefix and suffix notation from selected sens
   assertEquals(prefix.reading, "曽[そう]～");
 
   const counter = await createCard({
-    jmdictEntry: await preextractedJMDictEntry("2077160"),
+    jmdictUsages: [{ entry: await preextractedJMDictEntry("2077160") }],
+    kanaReadings: ["そう"],
     recognitionTarget: "艘",
-    kanaReading: "そう",
     fullContext: "全部で二<mark>艘</mark>あった。",
   });
   assertEquals(counter.key, "艘 | 2077160");
@@ -446,24 +549,23 @@ Deno.test("createCard derives safe prefix and suffix notation from selected sens
 
   const degree = await preextractedJMDictEntry("1006690");
   const generalDegreeCard = await createCard({
-    jmdictEntry: degree,
+    jmdictUsages: [{ entry: degree }],
     recognitionTarget: "そこそこ",
     fullContext: "<mark>そこそこ</mark>の出来だ。",
   });
   assertEquals(generalDegreeCard.recognitionTarget, "そこそこ");
 
   const suffixDegreeCard = await createCard({
-    jmdictEntry: degree,
+    jmdictUsages: [{ entry: degree, applicableSenseNumbers: [3] }],
     recognitionTarget: "そこそこ",
     fullContext: "<mark>そこそこ</mark>の出来だ。",
-    applicableSenseNumbers: [3],
   });
   assertEquals(suffixDegreeCard.recognitionTarget, "～そこそこ");
 
   const imitation = await preextractedJMDictEntry("1225260");
   assertEquals(
     (await createCard({
-      jmdictEntry: imitation,
+      jmdictUsages: [{ entry: imitation }],
       recognitionTarget: "まがい",
       fullContext: "<mark>まがい</mark>物だ。",
     })).recognitionTarget,
@@ -473,9 +575,9 @@ Deno.test("createCard derives safe prefix and suffix notation from selected sens
 
 Deno.test("createCard separates suffix notation from multi-kanji furigana", async () => {
   const card = await createCard({
-    jmdictEntry: await preextractedJMDictEntry("1855690"),
+    jmdictUsages: [{ entry: await preextractedJMDictEntry("1855690") }],
+    kanaReadings: ["とうとう"],
     recognitionTarget: "等々",
-    kanaReading: "とうとう",
     fullContext: "契約条件<mark>等々</mark>を確認する。",
   });
 
@@ -485,9 +587,9 @@ Deno.test("createCard separates suffix notation from multi-kanji furigana", asyn
 
 Deno.test("createCard applies a missing gikun placement to the complete spelling", async () => {
   const card = await createCard({
-    jmdictEntry: await preextractedJMDictEntry("1576750"),
+    jmdictUsages: [{ entry: await preextractedJMDictEntry("1576750") }],
+    kanaReadings: ["たそがれ"],
     recognitionTarget: "黄昏",
-    kanaReading: "たそがれ",
     fullContext: "永遠の<mark>黄昏</mark>の中で停止していた。",
   });
 
@@ -500,9 +602,9 @@ Deno.test("createCard requires precise furigana for multi-kanji spellings", asyn
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: unattractive,
+        jmdictUsages: [{ entry: unattractive }],
+        kanaReadings: ["かっこわるい"],
         recognitionTarget: "恰好悪い",
-        kanaReading: "かっこわるい",
         fullContext: "<mark>恰好悪い</mark>。",
       }),
     Error,
@@ -514,9 +616,9 @@ Deno.test("createCard directly annotates one kanji without furigana data", async
   const shrine = await preextractedJMDictEntry("1322660");
   assertEquals(
     (await createCard({
-      jmdictEntry: shrine,
+      jmdictUsages: [{ entry: shrine }],
+      kanaReadings: ["やしろ"],
       recognitionTarget: "社",
-      kanaReading: "やしろ",
       fullContext: "屋上に<mark>社</mark>を移した。",
     })).reading,
     "社[やしろ]",
@@ -525,9 +627,9 @@ Deno.test("createCard directly annotates one kanji without furigana data", async
 
 Deno.test("createCard preserves explicit multiple target marks", async () => {
   const card = await createCard({
-    jmdictEntry: await preextractedJMDictEntry("1217700"),
+    jmdictUsages: [{ entry: await preextractedJMDictEntry("1217700") }],
+    kanaReadings: ["がんばる"],
     recognitionTarget: "頑張る",
-    kanaReading: "がんばる",
     fullContext: "<mark>頑張った</mark>し、また<mark>頑張れる</mark>。",
   });
 
@@ -542,9 +644,9 @@ Deno.test("createCard validates resolved context structure", async () => {
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{ entry: sizes }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "大小",
-        kanaReading: "だいしょう",
         fullContext: "文脈だけ。",
       }),
     Error,
@@ -553,9 +655,9 @@ Deno.test("createCard validates resolved context structure", async () => {
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{ entry: sizes }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "大小",
-        kanaReading: "だいしょう",
         fullContext: "文<mark></mark>",
       }),
     Error,
@@ -564,9 +666,9 @@ Deno.test("createCard validates resolved context structure", async () => {
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{ entry: sizes }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "大小",
-        kanaReading: "だいしょう",
         fullContext: '<mark class="target">大小</mark>',
       }),
     Error,
@@ -575,9 +677,9 @@ Deno.test("createCard validates resolved context structure", async () => {
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{ entry: sizes }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "大小",
-        kanaReading: "だいしょう",
         fullContext: "<mark><mark>大小</mark></mark>",
       }),
     Error,
@@ -586,9 +688,9 @@ Deno.test("createCard validates resolved context structure", async () => {
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{ entry: sizes }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "大小",
-        kanaReading: "だいしょう",
         fullContext: "<ruby><mark>大</mark><rt>だい</rt></ruby>小",
       }),
     Error,
@@ -597,9 +699,9 @@ Deno.test("createCard validates resolved context structure", async () => {
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{ entry: sizes }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "大小",
-        kanaReading: "だいしょう",
         fullContext: "<rt>だい</rt><mark>大小</mark>",
       }),
     Error,
@@ -608,9 +710,9 @@ Deno.test("createCard validates resolved context structure", async () => {
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{ entry: sizes }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "大小",
-        kanaReading: "だいしょう",
         fullContext: "<rb>大</rb><mark>大小</mark>",
       }),
     Error,
@@ -619,9 +721,9 @@ Deno.test("createCard validates resolved context structure", async () => {
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{ entry: sizes }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "大小",
-        kanaReading: "だいしょう",
         fullContext: "<rp>（</rp><mark>大小</mark>",
       }),
     Error,
@@ -634,9 +736,9 @@ Deno.test("createCard identifies the invalid context field", async () => {
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{ entry: sizes }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "大小",
-        kanaReading: "だいしょう",
         fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
         minimizedContext: "大小だけ。",
       }),
@@ -647,9 +749,11 @@ Deno.test("createCard identifies the invalid context field", async () => {
 
 Deno.test("createCard normalizes nonbreaking spaces in text nodes only", async () => {
   const card = await createCard({
-    jmdictEntry: await preextractedJMDictEntry("1414110"),
+    jmdictUsages: [{
+      entry: await preextractedJMDictEntry("1414110"),
+    }],
+    kanaReadings: ["だいしょう"],
     recognitionTarget: "大小",
-    kanaReading: "だいしょう",
     fullContext:
       '<span title="keep&nbsp;this">この箱の&nbsp;<mark>大小</mark>&#0160;によって\u202f値段が変わる。</span>',
   });
@@ -662,9 +766,9 @@ Deno.test("createCard normalizes nonbreaking spaces in text nodes only", async (
 
 Deno.test("createCard structurally converts and precisely positions source ruby", async () => {
   const card = await createCard({
-    jmdictEntry: await preextractedJMDictEntry("1574430"),
+    jmdictUsages: [{ entry: await preextractedJMDictEntry("1574430") }],
+    kanaReadings: ["ギョーザ"],
     recognitionTarget: "餃子",
-    kanaReading: "ギョーザ",
     fullContext:
       '横で<mark><ruby class="word"><rb><span>餃</span></rb><rp>（</rp><rt data-reading="1"><span>ぎよー</span></rt><rp>）</rp><rb>子</rb><rt>ざ</rt></ruby></mark>を食べている。',
   });
@@ -673,9 +777,9 @@ Deno.test("createCard structurally converts and precisely positions source ruby"
   assertEquals(card.reading, "餃[ギョー] 子[ザ]");
 
   const wholeWordRuby = await createCard({
-    jmdictEntry: await preextractedJMDictEntry("1574430"),
+    jmdictUsages: [{ entry: await preextractedJMDictEntry("1574430") }],
+    kanaReadings: ["ギョーザ"],
     recognitionTarget: "餃子",
-    kanaReading: "ギョーザ",
     fullContext: "横で<mark><ruby>餃子<rt>ぎよーざ</rt></ruby></mark>を食べている。",
   });
   assertEquals(
@@ -686,17 +790,17 @@ Deno.test("createCard structurally converts and precisely positions source ruby"
 
 Deno.test("createCard handles multi-component and adjacent source ruby", async () => {
   const collapse = await createCard({
-    jmdictEntry: await preextractedJMDictEntry("1209590"),
+    jmdictUsages: [{ entry: await preextractedJMDictEntry("1209590") }],
+    kanaReadings: ["がかい"],
     recognitionTarget: "瓦解",
-    kanaReading: "がかい",
     fullContext: "ルールが<mark><ruby>瓦<rt>が</rt>解<rt>かい</rt></ruby></mark>していく。",
   });
   assertEquals(collapse.fullContext, "ルールが<mark>瓦[が] 解[かい]</mark>していく。");
 
   const dust = await createCard({
-    jmdictEntry: await preextractedJMDictEntry("1486050"),
+    jmdictUsages: [{ entry: await preextractedJMDictEntry("1486050") }],
+    kanaReadings: ["みじん"],
     recognitionTarget: "微塵",
-    kanaReading: "みじん",
     fullContext:
       "あの男は<mark><ruby>微<rt>み</rt></ruby><ruby>塵<rt>じん</rt></ruby></mark>も疑わなかった。",
   });
@@ -708,9 +812,9 @@ Deno.test("createCard handles multi-component and adjacent source ruby", async (
 
 Deno.test("createCard precisely positions whole-word source ruby with okurigana", async () => {
   const card = await createCard({
-    jmdictEntry: await preextractedJMDictEntry("1686540"),
+    jmdictUsages: [{ entry: await preextractedJMDictEntry("1686540") }],
+    kanaReadings: ["たねつけ"],
     recognitionTarget: "種つけ",
-    kanaReading: "たねつけ",
     fullContext: "牛の<mark><ruby>種つけ<rt>たねつけ</rt></ruby></mark>を行う。",
   });
 
@@ -721,9 +825,9 @@ Deno.test("createCard precisely positions whole-word source ruby with okurigana"
 Deno.test("createCard validates partial ruby against only the selected reading", async () => {
   const tokyo = await preextractedJMDictEntry("1447690");
   const card = await createCard({
-    jmdictEntry: tokyo,
+    jmdictUsages: [{ entry: tokyo }],
+    kanaReadings: ["とうきょう"],
     recognitionTarget: "東京",
-    kanaReading: "とうきょう",
     fullContext: "<mark><ruby>東<rt>とう</rt></ruby>京</mark>に行く。",
   });
   assertEquals(card.fullContext, "<mark>東[とう]京</mark>に行く。");
@@ -732,9 +836,9 @@ Deno.test("createCard validates partial ruby against only the selected reading",
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: tokyo,
+        jmdictUsages: [{ entry: tokyo }],
+        kanaReadings: ["とうけい"],
         recognitionTarget: "東京",
-        kanaReading: "とうけい",
         fullContext: "<mark><ruby>東<rt>とう</rt>京<rt>きょう</rt></ruby></mark>に行く。",
       }),
     Error,
@@ -744,9 +848,11 @@ Deno.test("createCard validates partial ruby against only the selected reading",
 
 Deno.test("createCard handles organic inflected and partial source ruby", async () => {
   const strike = await createCard({
-    jmdictEntry: await preextractedJMDictEntry("1416140"),
+    jmdictUsages: [{
+      entry: await preextractedJMDictEntry("1416140"),
+    }],
+    kanaReadings: ["たたきつける"],
     recognitionTarget: "叩きつける",
-    kanaReading: "たたきつける",
     fullContext:
       "地面に<mark><ruby><rb>叩</rb><rt>たた</rt></ruby>きつけられた</mark>ピナは、青い<ruby><rb>瞳</rb><rt>ひとみ</rt></ruby>で見つめた。",
   });
@@ -756,17 +862,19 @@ Deno.test("createCard handles organic inflected and partial source ruby", async 
   );
 
   const bonfire = await createCard({
-    jmdictEntry: await preextractedJMDictEntry("1504680"),
+    jmdictUsages: [{ entry: await preextractedJMDictEntry("1504680") }],
+    kanaReadings: ["たきび"],
     recognitionTarget: "焚き火",
-    kanaReading: "たきび",
     fullContext: "<mark><ruby>焚<rt>た</rt></ruby>き火</mark>を囲む。",
   });
   assertEquals(bonfire.fullContext, "<mark>焚[た]き火</mark>を囲む。");
 
   const fastidious = await createCard({
-    jmdictEntry: await preextractedJMDictEntry("2434300"),
+    jmdictUsages: [{
+      entry: await preextractedJMDictEntry("2434300"),
+    }],
+    kanaReadings: ["けっぺきしょう"],
     recognitionTarget: "潔癖症",
-    kanaReading: "けっぺきしょう",
     fullContext:
       "<mark><ruby>潔<rt>けつ</rt></ruby><ruby>癖<rt>ぺき</rt></ruby>症</mark>ではない。",
   });
@@ -778,9 +886,9 @@ Deno.test("createCard handles organic inflected and partial source ruby", async 
 
 Deno.test("createCard aligns partial ruby using its marked source position", async () => {
   const card = await createCard({
-    jmdictEntry: await preextractedJMDictEntry("1580650"),
+    jmdictUsages: [{ entry: await preextractedJMDictEntry("1580650") }],
+    kanaReadings: ["ひとびと"],
     recognitionTarget: "人人",
-    kanaReading: "ひとびと",
     fullContext: "<mark>人<ruby>人<rt>びと</rt></ruby></mark>が集まった。",
   });
 
@@ -790,18 +898,20 @@ Deno.test("createCard aligns partial ruby using its marked source position", asy
 
 Deno.test("createCard preserves ruby script and corrects full-size source kana", async () => {
   const faces = await createCard({
-    jmdictEntry: await preextractedJMDictEntry("1533460"),
+    jmdictUsages: [{ entry: await preextractedJMDictEntry("1533460") }],
+    kanaReadings: ["メンツ"],
     recognitionTarget: "面子",
-    kanaReading: "メンツ",
     fullContext: "<mark><ruby>面<rt>めん</rt>子<rt>つ</rt></ruby></mark>を保つ。",
   });
   assertEquals(faces.fullContext, "<mark>面[めん] 子[つ]</mark>を保つ。");
   assertEquals(faces.reading, "面[メン] 子[ツ]");
 
   const center = await createCard({
-    jmdictEntry: await preextractedJMDictEntry("1424660"),
+    jmdictUsages: [{
+      entry: await preextractedJMDictEntry("1424660"),
+    }],
+    kanaReadings: ["ちゅうすう"],
     recognitionTarget: "中枢",
-    kanaReading: "ちゅうすう",
     fullContext: "<mark><ruby>中<rt>ちゆう</rt>枢<rt>すう</rt></ruby></mark>から追放された。",
   });
   assertEquals(center.fullContext, "<mark>中[ちゅう] 枢[すう]</mark>から追放された。");
@@ -809,9 +919,11 @@ Deno.test("createCard preserves ruby script and corrects full-size source kana",
 
 Deno.test("createCard ignores unmarked ruby when validating the selected reading", async () => {
   const card = await createCard({
-    jmdictEntry: await preextractedJMDictEntry("1447690"),
+    jmdictUsages: [{
+      entry: await preextractedJMDictEntry("1447690"),
+    }],
+    kanaReadings: ["とうきょう"],
     recognitionTarget: "東京",
-    kanaReading: "とうきょう",
     fullContext:
       "旧称は<ruby>東京<rt>とうけい</rt></ruby>だが、<ruby>赦<rt>しや</rt></ruby>なく<mark>東京</mark>へ行く。",
   });
@@ -825,9 +937,11 @@ Deno.test("createCard ignores unmarked ruby when validating the selected reading
 
 Deno.test("createCard adds Anki separators without adding a space before mark", async () => {
   const card = await createCard({
-    jmdictEntry: await preextractedJMDictEntry("1414110"),
+    jmdictUsages: [{
+      entry: await preextractedJMDictEntry("1414110"),
+    }],
+    kanaReadings: ["だいしょう"],
     recognitionTarget: "大小",
-    kanaReading: "だいしょう",
     fullContext:
       "<ruby>藁<rt>わら</rt></ruby>と、地面に<ruby>叩<rt>たた</rt></ruby>きつけ、青い <ruby>瞳<rt>ひとみ</rt></ruby>で<mark>大小</mark>を見る。",
   });
@@ -840,9 +954,11 @@ Deno.test("createCard adds Anki separators without adding a space before mark", 
 
 Deno.test("createCard preserves paragraphs and harmless inline target markup", async () => {
   const card = await createCard({
-    jmdictEntry: await preextractedJMDictEntry("1414110"),
+    jmdictUsages: [{
+      entry: await preextractedJMDictEntry("1414110"),
+    }],
+    kanaReadings: ["だいしょう"],
     recognitionTarget: "大小",
-    kanaReading: "だいしょう",
     fullContext: "<p>前の段落。</p>\n\n<p><mark><em>大小</em></mark>を見る。</p>",
   });
 
@@ -855,9 +971,9 @@ Deno.test("createCard preserves paragraphs and harmless inline target markup", a
 Deno.test("createCard unwraps ruby without readings and rejects malformed ruby", async () => {
   const sizes = await preextractedJMDictEntry("1414110");
   const card = await createCard({
-    jmdictEntry: sizes,
+    jmdictUsages: [{ entry: sizes }],
+    kanaReadings: ["だいしょう"],
     recognitionTarget: "大小",
-    kanaReading: "だいしょう",
     fullContext: "<ruby>俺</ruby>は<ruby></ruby><mark>大小</mark>を見た。",
   });
   assertEquals(card.fullContext, "俺は<mark>大小</mark>を見た。");
@@ -865,9 +981,9 @@ Deno.test("createCard unwraps ruby without readings and rejects malformed ruby",
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{ entry: sizes }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "大小",
-        kanaReading: "だいしょう",
         fullContext: "<mark><ruby><rt>だい</rt></ruby>小</mark>",
       }),
     Error,
@@ -876,9 +992,9 @@ Deno.test("createCard unwraps ruby without readings and rejects malformed ruby",
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{ entry: sizes }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "大小",
-        kanaReading: "だいしょう",
         fullContext: "<mark><ruby>大<rt></rt></ruby>小</mark>",
       }),
     Error,
@@ -887,9 +1003,9 @@ Deno.test("createCard unwraps ruby without readings and rejects malformed ruby",
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{ entry: sizes }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "大小",
-        kanaReading: "だいしょう",
         fullContext:
           "<mark><ruby>大<span><ruby>小<rt>しょう</rt></ruby></span><rt>だい</rt></ruby></mark>",
       }),
@@ -899,9 +1015,9 @@ Deno.test("createCard unwraps ruby without readings and rejects malformed ruby",
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{ entry: sizes }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "大小",
-        kanaReading: "だいしょう",
         fullContext: "<mark><ruby>猫<rt>ねこ</rt></ruby></mark>",
       }),
     Error,
@@ -913,9 +1029,11 @@ Deno.test("createCard rejects marked ruby that conflicts with the selected readi
   await assertRejects(
     async () =>
       createCard({
-        jmdictEntry: await preextractedJMDictEntry("1209590"),
+        jmdictUsages: [{
+          entry: await preextractedJMDictEntry("1209590"),
+        }],
+        kanaReadings: ["がかい"],
         recognitionTarget: "瓦解",
-        kanaReading: "がかい",
         fullContext: "<mark><ruby>瓦<rt>かわら</rt>解<rt>とけ</rt></ruby></mark>する。",
       }),
     Error,
@@ -927,9 +1045,9 @@ Deno.test("createCard renders and validates explicit source metadata", async () 
   const sizes = await preextractedJMDictEntry("1414110");
   assertEquals(
     (await createCard({
-      jmdictEntry: sizes,
+      jmdictUsages: [{ entry: sizes }],
+      kanaReadings: ["だいしょう"],
       recognitionTarget: "大小",
-      kanaReading: "だいしょう",
       fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
       source: { text: "『テスト本』", lang: "ja" },
     })).source,
@@ -937,9 +1055,9 @@ Deno.test("createCard renders and validates explicit source metadata", async () 
   );
   assertEquals(
     (await createCard({
-      jmdictEntry: sizes,
+      jmdictUsages: [{ entry: sizes }],
+      kanaReadings: ["だいしょう"],
       recognitionTarget: "大小",
-      kanaReading: "だいしょう",
       fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
       source: {
         text: "「NHKニュース」",
@@ -951,9 +1069,9 @@ Deno.test("createCard renders and validates explicit source metadata", async () 
   );
   assertEquals(
     (await createCard({
-      jmdictEntry: sizes,
+      jmdictUsages: [{ entry: sizes }],
+      kanaReadings: ["だいしょう"],
       recognitionTarget: "大小",
-      kanaReading: "だいしょう",
       fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
       source: { text: "News & Notes", lang: "en-us", url: "https://example.com" },
     })).source,
@@ -963,9 +1081,9 @@ Deno.test("createCard renders and validates explicit source metadata", async () 
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{ entry: sizes }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "大小",
-        kanaReading: "だいしょう",
         fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
         source: { text: "Test", lang: "x-private" },
       }),
@@ -974,9 +1092,9 @@ Deno.test("createCard renders and validates explicit source metadata", async () 
   );
   assertEquals(
     (await createCard({
-      jmdictEntry: sizes,
+      jmdictUsages: [{ entry: sizes }],
+      kanaReadings: ["だいしょう"],
       recognitionTarget: "大小",
-      kanaReading: "だいしょう",
       fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
       source: { text: "Deep link", lang: "en", url: " miwake://cards/大小 " },
     })).source,
@@ -984,9 +1102,9 @@ Deno.test("createCard renders and validates explicit source metadata", async () 
   );
   assertEquals(
     (await createCard({
-      jmdictEntry: sizes,
+      jmdictUsages: [{ entry: sizes }],
+      kanaReadings: ["だいしょう"],
       recognitionTarget: "大小",
-      kanaReading: "だいしょう",
       fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
       source: { text: "File", lang: "en", url: "ftp://example.com/file" },
     })).source,
@@ -995,9 +1113,9 @@ Deno.test("createCard renders and validates explicit source metadata", async () 
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{ entry: sizes }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "大小",
-        kanaReading: "だいしょう",
         fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
         source: { text: "Test", lang: "en", url: "/relative" },
       }),
@@ -1007,9 +1125,9 @@ Deno.test("createCard renders and validates explicit source metadata", async () 
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{ entry: sizes }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "大小",
-        kanaReading: "だいしょう",
         fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
         source: { text: "", lang: "en" },
       }),
@@ -1019,9 +1137,9 @@ Deno.test("createCard renders and validates explicit source metadata", async () 
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{ entry: sizes }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "大小",
-        kanaReading: "だいしょう",
         fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
         source: { text: " Test", lang: "en" },
       }),
@@ -1031,9 +1149,9 @@ Deno.test("createCard renders and validates explicit source metadata", async () 
   await assertRejects(
     () =>
       createCard({
-        jmdictEntry: sizes,
+        jmdictUsages: [{ entry: sizes }],
+        kanaReadings: ["だいしょう"],
         recognitionTarget: "大小",
-        kanaReading: "だいしょう",
         fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
         source: { text: "Test ", lang: "en" },
       }),
@@ -1044,9 +1162,11 @@ Deno.test("createCard renders and validates explicit source metadata", async () 
 
 Deno.test("createCard renders trusted source HTML verbatim", async () => {
   const card = await createCard({
-    jmdictEntry: await preextractedJMDictEntry("1414110"),
+    jmdictUsages: [{
+      entry: await preextractedJMDictEntry("1414110"),
+    }],
+    kanaReadings: ["だいしょう"],
     recognitionTarget: "大小",
-    kanaReading: "だいしょう",
     fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
     source: {
       html:
@@ -1063,9 +1183,11 @@ Deno.test("createCard renders trusted source HTML verbatim", async () => {
 
 Deno.test("createCard escapes caller-owned plain-text fields", async () => {
   const card = await createCard({
-    jmdictEntry: await preextractedJMDictEntry("1414110"),
+    jmdictUsages: [{
+      entry: await preextractedJMDictEntry("1414110"),
+    }],
+    kanaReadings: ["だいしょう"],
     recognitionTarget: "大小",
-    kanaReading: "だいしょう",
     fullContext: "この箱の<mark>大小</mark>によって値段が変わる。",
     hint: "<b>large & small</b>",
   });

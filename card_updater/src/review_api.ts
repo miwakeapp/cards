@@ -30,28 +30,21 @@ export interface ReviewItem {
   detail: string;
   word: string;
   key: string;
-  recognitionTarget: string | null;
-  jmdictId: string | null;
   hint: string;
   fullContext: string;
   currentEntryHTML: string;
   latestEntryHTML: string | null;
   oldSenseCount: number | null;
-  newSenseCount: number | null;
-  totalNewSenses: number;
-  targetSenseNumbers: number[];
   mappedTargetSenses: number[];
   removedSenses: Array<{ number: number; text: string; wasTargeted: boolean }>;
   proposedKey: string | null;
   currentReading: string;
   proposedReading: string | null;
-  needsAI: boolean;
   senseViews: SenseView[];
   changeChips: ChangeChip[];
   suggestion: Suggestion | null;
   decision: DecisionDraft | null;
   applied: Pick<AppliedRecord, "wroteFields"> | null;
-  fingerprint: string | undefined;
 }
 
 export interface ReviewPayload {

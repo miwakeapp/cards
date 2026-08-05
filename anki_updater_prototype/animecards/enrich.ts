@@ -6,7 +6,7 @@
 
 import { parseArgs } from "@std/cli/parse-args";
 import * as path from "@std/path";
-import { jmdictUsagesForSpelling } from "card_creator";
+import { jmdictUsagesForSpelling } from "card_creator/jmdict";
 import { buildSpellingIndex, findAllEntriesBySpelling } from "card_resolution";
 import { allJMDictEntries, type JMDictWord } from "data";
 import { isAIQuotaError, minimizeContext, MODEL_IDS, type ModelId } from "card_field_generation";

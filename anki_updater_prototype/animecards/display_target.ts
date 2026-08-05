@@ -1,10 +1,8 @@
 import { escape } from "@std/html/entities";
 import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
-import {
-  jmdictAlternativesForCardFront,
-  jmdictUsagesForSpelling,
-  type MiwakeCard,
-} from "card_creator";
+import { jmdictAlternativesForCardFront, jmdictUsagesForSpelling } from "card_creator/jmdict";
+import type { CardFields } from "card_model";
+import { formatReading, parseReading } from "card_model/reading";
 
 const NOTATION_MARKER_PATTERN = /[~〜～]/u;
 
@@ -73,7 +71,7 @@ export function disambiguationHintForJMDictUsage(
  * notation.
  */
 export function applyDisplayTargetOverride(
-  card: Pick<MiwakeCard, "recognitionTarget" | "reading">,
+  card: Pick<CardFields, "recognitionTarget" | "reading">,
   spelling: string,
   override: string | undefined,
 ): { recognitionTarget: string; reading: string | null } {
@@ -96,11 +94,20 @@ export function applyDisplayTargetOverride(
     return { recognitionTarget: escape(override), reading: null };
   }
 
-  const baseReading = card.reading.replace(/^～|～$/gu, "");
+  const readingAlternatives = parseReading(card.reading, card.recognitionTarget);
+  if (readingAlternatives === null) {
+    throw new Error(
+      `Card Creator returned an invalid Reading field ${JSON.stringify(card.reading)}`,
+    );
+  }
+
   const before = override.slice(0, firstIndex);
   const after = override.slice(firstIndex + spelling.length);
   return {
     recognitionTarget: escape(override),
-    reading: `${escape(before)}${baseReading}${escape(after)}`,
+    reading: formatReading(readingAlternatives.map(({ formatted: reading }) => {
+      const baseReading = reading.replace(/^～|～$/gu, "");
+      return `${before}${baseReading}${after}`;
+    })),
   };
 }

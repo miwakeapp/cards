@@ -1,23 +1,13 @@
-<p id="reading" lang="ja">{{furigana:Reading}}{{^Reading}}{{furigana:Recognition target}}{{/Reading}}</p>
+<div id="reading" lang="ja">{{furigana:Reading}}{{^Reading}}{{furigana:Recognition target}}{{/Reading}}</div>
 
-<div id="dictionary-entry" class="miwake-dictionary-entry">
-{{Dictionary entry}}
-<button id="toggle-hidden-readings" class="expando" aria-expanded="false" aria-label="Show hidden readings">
-  <svg viewBox="0 0 16 16" aria-hidden="true">
-    <path d="M6 4l4 4-4 4" />
-  </svg>
-</button>
+<div id="dictionary" lang="en">
+{{Dictionary}}
 </div>
 
 <div id="context" lang="ja">
   {{#Minimized context}}
   <div id="minimized-context">{{furigana:Minimized context}}</div>
-  <div id="full-context" hidden>{{furigana:Full context}}</div>
-  <button id="toggle-context" class="expando" aria-expanded="false" aria-label="Show full context">
-    <svg viewBox="0 0 16 16" aria-hidden="true">
-      <path d="M4 6l4 4 4-4" />
-    </svg>
-  </button>
+  <div id="full-context">{{furigana:Full context}}</div>
   {{/Minimized context}}
   {{^Minimized context}}
   <div>{{furigana:Full context}}</div>
@@ -30,39 +20,40 @@
 
 <script type="module">
 // NOTE: Any JS here needs to be idempotent to handle Anki re-running it, e.g. after the card is edited.
-const key = "{{Key}}";
-const sensesForThisCard = key.split("|")[2]?.trim().split(",").map(Number);
+for (const button of document.querySelectorAll("button.expando")) button.remove();
 
-const senseEls = document.querySelectorAll(".senses > li");
-for (const [i, senseEl] of senseEls.entries()) {
-  senseEl.classList.toggle("relevant", !sensesForThisCard || sensesForThisCard.includes(i + 1));
+function addExpando(parent, name, label, iconPath) {
+  const expandedClass = `show-${name}`;
+  parent.classList.remove(expandedClass);
+
+  const button = document.createElement("button");
+  button.className = `expando toggle-${name}`;
+  button.setAttribute("aria-expanded", "false");
+  button.setAttribute("aria-label", label);
+  button.setAttribute("title", label);
+  button.innerHTML = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="${iconPath}" /></svg>`;
+  button.onclick = () => {
+    const expanded = button.getAttribute("aria-expanded") === "false";
+    button.setAttribute("aria-expanded", String(expanded));
+    parent.classList.toggle(expandedClass, expanded);
+  };
+  parent.append(button);
 }
 
-const dictEntryEl = document.querySelector("#dictionary-entry");
-const toggleHiddenReadingsEl = document.querySelector("#toggle-hidden-readings");
-dictEntryEl.classList.remove("show-hidden-readings");
-toggleHiddenReadingsEl.setAttribute("aria-expanded", "false");
-toggleHiddenReadingsEl.onclick = () => {
-  const expanded = toggleHiddenReadingsEl.getAttribute("aria-expanded") === "false";
+const usages = "{{Key}}".split("|")[1]?.trim().split(";") ?? [];
+const dictionaryEntries = document.querySelectorAll("#dictionary > .miwake-dictionary-entry");
+for (const [entryIndex, entry] of dictionaryEntries.entries()) {
+  const senseNumbers = usages[entryIndex]?.split(":")[1]?.split(",").map(Number);
+  for (const [senseIndex, sense] of entry.querySelectorAll(":scope > .senses > li").entries()) {
+    sense.classList.toggle("relevant", !senseNumbers || senseNumbers.includes(senseIndex + 1));
+  }
 
-  toggleHiddenReadingsEl.setAttribute("aria-expanded", expanded);
-  dictEntryEl.classList.toggle("show-hidden-readings", expanded);
-};
+  addExpando(entry, "hidden-readings", "Show hidden readings", "M6 4l4 4-4 4");
+}
 
-const toggleContextEl = document.querySelector("#toggle-context");
 const minimizedContextEl = document.querySelector("#minimized-context");
-if (toggleContextEl) {
-  const fullContextEl = document.querySelector("#full-context");
-  toggleContextEl.setAttribute("aria-expanded", "false");
-  minimizedContextEl.hidden = false;
-  fullContextEl.hidden = true;
-
-  toggleContextEl.onclick = () => {
-    const expanded = toggleContextEl.getAttribute("aria-expanded") === "false";
-
-    toggleContextEl.setAttribute("aria-expanded", expanded);
-    minimizedContextEl.hidden = expanded;
-    fullContextEl.hidden = !expanded;
-  };
+if (minimizedContextEl) {
+  const contextEl = document.querySelector("#context");
+  addExpando(contextEl, "full-context", "Show full context", "M4 6l4 4 4-4");
 }
 </script>

@@ -2,8 +2,8 @@
  * Creates the Miwake note type via AnkiConnect.
  *
  * - Fields (in order, with Key first for sorting/browsing):
- *   Key, Recognition target, Reading, Hint, Full context, Minimized context,
- *   Dictionary entry, Source
+ *   Key, Recognition target, Reading, Hint, Full context, Minimized context, Dictionary,
+ *   Source
  * - Templates match the current Anki model (furigana:Reading fallback).
  * - CSS = card chrome + current minimal.css (night-mode aware).
  *
@@ -11,19 +11,10 @@
  */
 
 import * as path from "@std/path";
+import { fieldOrder } from "card_model";
 import { YankiConnect } from "yanki-connect";
 
 const MODEL_NAME = "Miwake";
-const FIELDS = [
-  "Key",
-  "Recognition target",
-  "Reading",
-  "Hint",
-  "Full context",
-  "Minimized context",
-  "Dictionary entry",
-  "Source",
-];
 const FIELD_FONT_FAMILY = "Noto Serif JP";
 const client = new YankiConnect();
 
@@ -54,7 +45,7 @@ if (exists) {
 console.log(`Creating model ${MODEL_NAME}...`);
 await client.model.createModel({
   modelName: MODEL_NAME,
-  inOrderFields: FIELDS,
+  inOrderFields: [...fieldOrder],
   css: combinedCSS,
   cardTemplates: [
     {
@@ -66,7 +57,7 @@ await client.model.createModel({
 });
 
 // Ensure browser/editor font is set for core fields.
-for (const field of FIELDS) {
+for (const field of fieldOrder) {
   await client.model.modelFieldSetFont({
     modelName: MODEL_NAME,
     fieldName: field,

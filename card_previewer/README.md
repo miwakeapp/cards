@@ -11,7 +11,7 @@ It is a development tool for Miwake Cards HTML and CSS, not a deployed applicati
 deno task --cwd card_previewer dev
 ```
 
-Both views use the fixture definitions in `src/fixtures.ts` and display why each entry is useful. The generated dictionary HTML is also the value of the card fixture's `Dictionary entry` field, so both views exercise the same source data.
+Both views use the fixture definitions in `src/fixtures.ts` and display why each entry is useful. The generated dictionary HTML is also the value of the card fixture's `Dictionary` field, so both views exercise the same source data.
 
 The card preview can switch between front and back, edit every user-visible card field, exercise conditional template branches, and report the rendered line breaks and heights of the front recognition target and back reading. Field editors contain the values Anki stores, including bracket-based furigana such as `食[た]べる`; the preview applies the same bracket-to-ruby transformation when a template uses the `furigana:` field filter.
 

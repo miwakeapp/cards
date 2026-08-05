@@ -6,7 +6,7 @@ const SUFFIX_PARTS_OF_SPEECH = new Set(["suf", "n-suf", "ctr"]);
 const NOTATION_MARKER = "～";
 
 /** A JMDict spelling, reading, and sense selection resolved into card-facing notation. */
-interface ResolvedJMDictUsage {
+export interface ResolvedJMDictUsage {
   /** The exact spelling from the JMDict entry, without affix notation. */
   spelling: string;
 
@@ -36,15 +36,6 @@ export interface JMDictSpellingUsage {
 
   /** Nonempty 1-indexed senses available for the spelling across its applicable readings. */
   readonly senseNumbers: readonly number[];
-}
-
-/** How the actual card front communicates an affix boundary when filtering alternative usages. */
-export interface CardFrontAlternativeOptions {
-  /**
-   * Describes the notation on an already-rendered, possibly user-edited front. When omitted, the
-   * notation is derived from the selected senses exactly as `createCard()` would derive it.
-   */
-  readonly displayedAffixNotation?: "leading" | "none" | "trailing";
 }
 
 function allows(values: readonly string[], value: string): boolean {
@@ -362,7 +353,13 @@ export function jmdictUsagesForSpelling(
 export function jmdictAlternativesForCardFront(
   selectedUsage: JMDictSpellingUsage,
   frontSideUsages: readonly JMDictSpellingUsage[],
-  options: CardFrontAlternativeOptions = {},
+  options: {
+    /**
+     * The notation on an already-rendered, possibly user-edited front. When omitted, notation is
+     * derived from the selected senses exactly as `createCard()` would derive it.
+     */
+    readonly displayedAffixNotation?: "leading" | "none" | "trailing";
+  } = {},
 ): JMDictSpellingUsage[] {
   const selectedSenseNumbers = validateSenseNumbers(
     selectedUsage.senseNumbers,

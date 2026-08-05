@@ -1449,7 +1449,7 @@
       "evaluation": {
         "promptOverlap": false,
         "referenceBasis": "user-reviewed",
-        "reviewNote": "Domenic manually changed Key from \"いなご | 1167880 | 2\" to \"いなご | 1167880\" during live collection review."
+        "reviewNote": "Domenic manually changed Key from \"いなご | 1167880:2\" to \"いなご | 1167880\" during live collection review."
       }
     },
     {
@@ -3035,7 +3035,7 @@
       "evaluation": {
         "promptOverlap": false,
         "referenceBasis": "user-reviewed",
-        "reviewNote": "Domenic manually changed Key from \"かつて | 1581210 | 1\" to \"かつて | 1581210 | 2\" during live collection review."
+        "reviewNote": "Domenic manually changed Key from \"かつて | 1581210:1\" to \"かつて | 1581210:2\" during live collection review."
       }
     },
     {
@@ -3066,7 +3066,7 @@
       "evaluation": {
         "promptOverlap": false,
         "referenceBasis": "user-reviewed",
-        "reviewNote": "Domenic manually changed Key from \"鍛冶 | 1419150 | 1\" to \"鍛冶 | 1419150\" during live collection review."
+        "reviewNote": "Domenic manually changed Key from \"鍛冶 | 1419150:1\" to \"鍛冶 | 1419150\" during live collection review."
       }
     },
     {
@@ -3096,7 +3096,7 @@
       "evaluation": {
         "promptOverlap": false,
         "referenceBasis": "user-reviewed",
-        "reviewNote": "Domenic manually changed Key from \"袋小路 | 1411080 | 2\" to \"袋小路 | 1411080 | 1\" during live collection review."
+        "reviewNote": "Domenic manually changed Key from \"袋小路 | 1411080:2\" to \"袋小路 | 1411080:1\" during live collection review."
       }
     },
     {
@@ -3129,7 +3129,7 @@
       "evaluation": {
         "promptOverlap": false,
         "referenceBasis": "user-reviewed",
-        "reviewNote": "Domenic manually changed Key from \"甲子園 | 2092720 | 1\" to \"甲子園 | 2092720\" during live collection review."
+        "reviewNote": "Domenic manually changed Key from \"甲子園 | 2092720:1\" to \"甲子園 | 2092720\" during live collection review."
       }
     },
     {
@@ -3160,7 +3160,7 @@
       "evaluation": {
         "promptOverlap": false,
         "referenceBasis": "user-reviewed",
-        "reviewNote": "Domenic manually changed Key from \"密葬 | 1731550 | 1\" to \"密葬 | 1731550\" during live collection review."
+        "reviewNote": "Domenic manually changed Key from \"密葬 | 1731550:1\" to \"密葬 | 1731550\" during live collection review."
       }
     },
     {
@@ -3193,7 +3193,7 @@
       "evaluation": {
         "promptOverlap": false,
         "referenceBasis": "user-reviewed",
-        "reviewNote": "Domenic manually changed Key from \"あぶら虫 | 1538710 | 2\" to \"あぶら虫 | 1538710 | 1\" during live collection review."
+        "reviewNote": "Domenic manually changed Key from \"あぶら虫 | 1538710:2\" to \"あぶら虫 | 1538710:1\" during live collection review."
       }
     },
     {
@@ -3224,7 +3224,7 @@
       "evaluation": {
         "promptOverlap": false,
         "referenceBasis": "user-reviewed",
-        "reviewNote": "Domenic manually changed Key from \"下宿 | 1185290 | 1\" to \"下宿 | 1185290\" during live collection review."
+        "reviewNote": "Domenic manually changed Key from \"下宿 | 1185290:1\" to \"下宿 | 1185290\" during live collection review."
       }
     },
     {
@@ -3256,7 +3256,7 @@
       "evaluation": {
         "promptOverlap": false,
         "referenceBasis": "user-reviewed",
-        "reviewNote": "Domenic manually changed Key from \"業 | 1239320 | 2\" to \"業 | 1239320 | 1,2\" during live collection review."
+        "reviewNote": "Domenic manually changed Key from \"業 | 1239320:2\" to \"業 | 1239320:1,2\" during live collection review."
       }
     },
     {
@@ -3287,7 +3287,7 @@
       "evaluation": {
         "promptOverlap": false,
         "referenceBasis": "user-reviewed",
-        "reviewNote": "Domenic manually changed Key from \"封印 | 1499610 | 2\" to \"封印 | 1499610\" during live collection review."
+        "reviewNote": "Domenic manually changed Key from \"封印 | 1499610:2\" to \"封印 | 1499610\" during live collection review."
       }
     },
     {
@@ -3318,7 +3318,7 @@
       "evaluation": {
         "promptOverlap": false,
         "referenceBasis": "user-reviewed",
-        "reviewNote": "Domenic manually changed Key from \"本望 | 1523220 | 2\" to \"本望 | 1523220\" during live collection review."
+        "reviewNote": "Domenic manually changed Key from \"本望 | 1523220:2\" to \"本望 | 1523220\" during live collection review."
       }
     },
     {
@@ -3349,7 +3349,7 @@
       "evaluation": {
         "promptOverlap": false,
         "referenceBasis": "user-reviewed",
-        "reviewNote": "Domenic manually changed Key from \"バーゲン | 1097030 | 2\" to \"バーゲン | 1097030\" during live collection review."
+        "reviewNote": "Domenic manually changed Key from \"バーゲン | 1097030:2\" to \"バーゲン | 1097030\" during live collection review."
       }
     },
     {
@@ -3380,7 +3380,7 @@
       "evaluation": {
         "promptOverlap": false,
         "referenceBasis": "user-reviewed",
-        "reviewNote": "Domenic manually changed Key from \"開通 | 1202850 | 1\" to \"開通 | 1202850\" during live collection review."
+        "reviewNote": "Domenic manually changed Key from \"開通 | 1202850:1\" to \"開通 | 1202850\" during live collection review."
       }
     },
     {
@@ -3411,7 +3411,7 @@
       "evaluation": {
         "promptOverlap": false,
         "referenceBasis": "user-reviewed",
-        "reviewNote": "Domenic manually changed Key from \"原則 | 1262070 | 1\" to \"原則 | 1262070\" during live collection review."
+        "reviewNote": "Domenic manually changed Key from \"原則 | 1262070:1\" to \"原則 | 1262070\" during live collection review."
       }
     },
     {
@@ -3444,7 +3444,7 @@
       "evaluation": {
         "promptOverlap": false,
         "referenceBasis": "user-reviewed",
-        "reviewNote": "Domenic manually changed Key from \"義父 | 1225860 | 3\" to \"義父 | 1225860\" during live collection review."
+        "reviewNote": "Domenic manually changed Key from \"義父 | 1225860:3\" to \"義父 | 1225860\" during live collection review."
       }
     },
     {
@@ -3475,7 +3475,7 @@
       "evaluation": {
         "promptOverlap": false,
         "referenceBasis": "user-reviewed",
-        "reviewNote": "Domenic manually changed Key from \"お化け屋敷 | 1001680 | 2\" to \"お化け屋敷 | 1001680\" during live collection review."
+        "reviewNote": "Domenic manually changed Key from \"お化け屋敷 | 1001680:2\" to \"お化け屋敷 | 1001680\" during live collection review."
       }
     },
     {
@@ -3506,7 +3506,7 @@
       "evaluation": {
         "promptOverlap": false,
         "referenceBasis": "user-reviewed",
-        "reviewNote": "Domenic manually changed Key from \"地雷 | 1421520 | 3\" to \"地雷 | 1421520 | 2\" during live collection review."
+        "reviewNote": "Domenic manually changed Key from \"地雷 | 1421520:3\" to \"地雷 | 1421520:2\" during live collection review."
       }
     },
     {
@@ -3540,7 +3540,7 @@
       "evaluation": {
         "promptOverlap": false,
         "referenceBasis": "user-reviewed",
-        "reviewNote": "Domenic manually changed Key from \"致し方ない | 2839837 | 2\" to \"致し方ない | 2839837 | 1,2\" during live collection review."
+        "reviewNote": "Domenic manually changed Key from \"致し方ない | 2839837:2\" to \"致し方ない | 2839837:1,2\" during live collection review."
       }
     },
     {
@@ -3571,7 +3571,7 @@
       "evaluation": {
         "promptOverlap": false,
         "referenceBasis": "user-reviewed",
-        "reviewNote": "Domenic manually changed Key from \"すかし | 1450490 | 2\" to \"すかし | 1450490\" during live collection review."
+        "reviewNote": "Domenic manually changed Key from \"すかし | 1450490:2\" to \"すかし | 1450490\" during live collection review."
       }
     }
   ]

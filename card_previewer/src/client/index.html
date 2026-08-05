@@ -2,19 +2,19 @@
 <html lang="en">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Miwake Cards Previewer — Dictionary Entry</title>
+  <title>Miwake Cards Previewer — Dictionary Field</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="/styles/site.css">
   <link rel="stylesheet" href="/styles/dictionary_preview.css">
 
   <header class="site-header">
     <nav class="preview-navigation" aria-label="Preview views">
-      <strong aria-current="page">Dictionary entry</strong>
+      <strong aria-current="page">Dictionary field</strong>
       <a href="/card_preview.html">Card template</a>
     </nav>
 
     <div class="page-heading">
-      <h1>Dictionary Entry Preview</h1>
+      <h1>Dictionary Field Preview</h1>
       <p>Inspect the rendered dictionary field using the shared card fixture catalog.</p>
     </div>
 
@@ -41,13 +41,13 @@
   <main class="preview-main">
     <section class="preview-panel" aria-labelledby="entry-heading">
       <header class="panel-heading">
-        <h2 id="entry-heading">Rendered dictionary entry</h2>
-        <p id="entry-id"></p>
+        <h2 id="entry-heading">Rendered Dictionary field</h2>
+        <p id="dictionary-ids"></p>
       </header>
       <div id="dictionary-stage" class="dictionary-stage">
-        <article id="dictionary-entry" class="miwake-dictionary-entry" lang="en"></article>
+        <div id="dictionary" lang="en"></div>
       </div>
-      <footer id="dictionary-entry-links" class="dictionary-entry-links"></footer>
+      <footer id="dictionary-links" class="dictionary-links"></footer>
     </section>
   </main>
 

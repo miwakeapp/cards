@@ -45,7 +45,7 @@ export function cardFingerprint(card: AnalyzedCard): Promise<string> {
     card.note.fields.recognitionTarget,
     card.note.fields.reading,
     card.note.fields.hint,
-    card.note.fields.dictionaryEntry,
+    card.note.fields.dictionary,
     card.latestEntryHTML,
     card.proposedReading,
     card.note.fields.fullContext,

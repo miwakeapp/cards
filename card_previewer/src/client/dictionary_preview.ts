@@ -12,16 +12,16 @@ const fixtureReason = document.querySelector<HTMLElement>("#fixture-reason")!;
 const styleSelect = document.querySelector<HTMLSelectElement>("#style")!;
 const nightModeInput = document.querySelector<HTMLInputElement>("#night-mode")!;
 const stage = document.querySelector<HTMLElement>("#dictionary-stage")!;
-const entry = document.querySelector<HTMLElement>("#dictionary-entry")!;
-const entryId = document.querySelector<HTMLElement>("#entry-id")!;
-const links = document.querySelector<HTMLElement>("#dictionary-entry-links")!;
+const dictionary = document.querySelector<HTMLElement>("#dictionary")!;
+const dictionaryIds = document.querySelector<HTMLElement>("#dictionary-ids")!;
+const links = document.querySelector<HTMLElement>("#dictionary-links")!;
 const STYLE_LINK_ID = "dictionary-style";
 
 let fixtures: PreviewFixture[] = [];
 
 initialize().catch((error) => {
   console.error(error);
-  entry.textContent = "Unable to load preview data.";
+  dictionary.textContent = "Unable to load preview data.";
 });
 
 async function initialize(): Promise<void> {
@@ -38,13 +38,17 @@ async function initialize(): Promise<void> {
 function render(): void {
   const fixture = selectedFixture(fixtureSelect, fixtures);
   renderFixtureReason(fixtureReason, fixture);
-  entry.dataset.entryId = fixture.id;
-  entry.innerHTML = fixture.fields["Dictionary entry"];
-  entryId.textContent = `JMDict ${fixture.id}`;
+  dictionary.innerHTML = fixture.fields["Dictionary"];
+  const jmdictIds = [fixture.id, ...(fixture.additionalEntryIds ?? [])].toSorted(
+    (left, right) => Number(left) - Number(right),
+  );
+  dictionaryIds.textContent = `JMDict ${jmdictIds.join(" · ")}`;
   links.replaceChildren(
-    buildExternalLink(
-      "View on Takoboto",
-      `https://takoboto.jp/?w=${encodeURIComponent(fixture.id)}`,
+    ...jmdictIds.map((id) =>
+      buildExternalLink(
+        jmdictIds.length === 1 ? "View on Takoboto" : `View ${id} on Takoboto`,
+        `https://takoboto.jp/?w=${encodeURIComponent(id)}`,
+      )
     ),
     buildExternalLink(
       "View on Jisho",

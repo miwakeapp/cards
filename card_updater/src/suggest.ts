@@ -18,13 +18,13 @@ import {
   compatibleSenseNumbersForJMDictUsage,
   jmdictAlternativesForCardFront,
   jmdictUsagesForSpelling,
-} from "card_creator";
-import { formatMiwakeKey } from "card_creator/keys";
+} from "card_creator/jmdict";
+import { formatKey } from "card_model/keys";
 import { ankiFuriganaToSurface, verifyMarkedContextTarget } from "card_resolution";
 import type { JMDictWord } from "data";
 import type { AnalyzedCard } from "./analyze.ts";
 import { splitAffixNotation } from "./affix_notation.ts";
-import { parseAnkiReading } from "./anki_reading.ts";
+import { parseCardReadingAlternatives } from "./reading_validation.ts";
 
 export type SuggestionConfidence = "high" | "medium";
 
@@ -96,12 +96,27 @@ export async function suggestForCard(
 
   let aiHint: string | null;
   const focusedResults: GenerationResult<unknown>[] = [];
-  const kanaReading = selectedKanaReading(card);
-  const compatibleSenseNumbers = compatibleSenseNumbersForJMDictUsage(
-    card.latestWord,
-    parsedKey.spelling,
-    card.latestWord.kanji.some(({ text }) => text === parsedKey.spelling) ? kanaReading : undefined,
-  );
+  const kanaReadings = acceptedKanaReadings(card);
+  const compatibleSenseNumbers = [
+    ...new Set(kanaReadings.flatMap((kanaReading) => {
+      try {
+        return compatibleSenseNumbersForJMDictUsage(
+          card.latestWord!,
+          parsedKey.spelling,
+          card.latestWord!.kanji.some(({ text }) => text === parsedKey.spelling)
+            ? kanaReading
+            : undefined,
+        );
+      } catch {
+        return [];
+      }
+    })),
+  ].toSorted((left, right) => left - right);
+  if (compatibleSenseNumbers.length === 0) {
+    throw new Error(
+      `No accepted Reading alternative supports anchor JMDict entry ${card.latestWord.id}.`,
+    );
+  }
   const spellingUsages = jmdictUsagesForSpelling(sameSpellingEntries, parsedKey.spelling);
   const selectedEntryUsage = spellingUsages.find(({ entry }) => entry.id === card.latestWord!.id);
   if (selectedEntryUsage === undefined) {
@@ -168,9 +183,23 @@ export async function suggestForCard(
     card.newParsed.senses.length,
   );
   aiHint = null;
+  const supplementalUsageByEntryId = new Map(
+    parsedKey.usages.slice(1).map((usage) => [usage.jmdictId, usage]),
+  );
+  const unselectedSpellingUsages = spellingUsages.flatMap((usage) => {
+    const selected = supplementalUsageByEntryId.get(usage.entry.id);
+    if (selected === undefined) return [usage];
+    const selectedSenses = new Set(
+      selected.senseNumbers ?? usage.entry.sense.map((_, index) => index + 1),
+    );
+    const senseNumbers = usage.senseNumbers.filter((senseNumber) =>
+      !selectedSenses.has(senseNumber)
+    );
+    return senseNumbers.length === 0 ? [] : [{ ...usage, senseNumbers }];
+  });
   const contrastingUsages = jmdictAlternativesForCardFront(
     { entry: card.latestWord, senseNumbers: selectedSenseNumbers },
-    spellingUsages,
+    unselectedSpellingUsages,
     {
       // Recognition target is user-editable and the updater never rewrites it. Hint generation
       // must therefore use the notation actually displayed, not what a newly created card would
@@ -213,31 +242,25 @@ function displayedAffixNotation(
   return splitAffixNotation(recognitionTarget).notation;
 }
 
-function selectedKanaReading(card: AnalyzedCard): string {
+function acceptedKanaReadings(card: AnalyzedCard): string[] {
   const spelling = card.parsedKey!.spelling;
-  if (card.latestWord!.kana.some(({ text }) => text === spelling)) return spelling;
+  if (card.latestWord!.kana.some(({ text }) => text === spelling)) return [spelling];
 
   const recognitionTarget = card.note.fields.recognitionTarget || spelling;
-  let reading = card.note.fields.reading;
-  const targetAffix = splitAffixNotation(recognitionTarget);
-  const readingAffix = splitAffixNotation(reading);
-  if (
-    targetAffix.content === spelling &&
-    targetAffix.notation !== "none" &&
-    targetAffix.notation === readingAffix.notation
-  ) {
-    reading = readingAffix.content;
-  }
-  const readings = parseAnkiReading(reading, spelling);
-  if (readings === null || readings.length !== 1) {
+  const readings = parseCardReadingAlternatives(
+    card.note.fields.reading,
+    recognitionTarget,
+    spelling,
+  );
+  if (readings === null) {
     throw new Error(
-      `Card ${card.note.noteId} must have exactly one parseable kana reading for recognition ` +
-        `target ${JSON.stringify(spelling)} before sense selection; found ${
+      `Card ${card.note.noteId} must have parseable kana readings for recognition target ` +
+        `${JSON.stringify(spelling)} before sense selection; found ${
           JSON.stringify(card.note.fields.reading)
         }`,
     );
   }
-  return readings[0];
+  return readings.map(({ kanaReading }) => kanaReading);
 }
 
 /**
@@ -272,7 +295,7 @@ function buildSuggestion(
   let confidence: SuggestionConfidence;
   if (sensesMatchExpectation) {
     confidence = "high";
-  } else if (allApply && card.parsedKey!.senseNumbers === null) {
+  } else if (allApply && card.parsedKey!.usages[0].senseNumbers === null) {
     // The card targeted all senses and the AI still puts them on one recognition card.
     confidence = "high";
   } else {
@@ -329,10 +352,13 @@ function buildExplanation(
 }
 
 export function suggestedKey(card: AnalyzedCard, senses: number[]): string {
-  return formatMiwakeKey(
-    card.parsedKey!.spelling,
-    card.parsedKey!.jmdictId,
-    senses,
-    card.newParsed!.senses.length,
-  );
+  const parsedKey = card.parsedKey!;
+  if (parsedKey.usages.length !== 1) {
+    throw new Error("Multi-entry recognition cards require manual semantic review.");
+  }
+  return formatKey(parsedKey.spelling, [{
+    jmdictId: parsedKey.usages[0].jmdictId,
+    senseNumbers: senses,
+    totalSenses: card.newParsed!.senses.length,
+  }]);
 }

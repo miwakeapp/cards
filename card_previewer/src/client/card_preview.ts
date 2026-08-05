@@ -47,7 +47,7 @@ const fieldDescriptions: Record<CardFieldName, { description: string; rows: numb
     description: "Optional shortened context; enables the context expando.",
     rows: 3,
   },
-  "Dictionary entry": {
+  "Dictionary": {
     description: "Generated dictionary-entry HTML stored on the card.",
     rows: 10,
   },

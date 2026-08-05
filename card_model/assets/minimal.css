@@ -110,7 +110,9 @@
       &.tag-iK,
       &.tag-ok,
       &.tag-oK,
-      &.tag-io {
+      &.tag-io,
+      &.tag-sK,
+      &.tag-sk {
         color: var(--rarely-used-color);
       }
 

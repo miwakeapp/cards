@@ -1,6 +1,6 @@
 import "../../data/test/use_jmdict_fixtures.ts";
 
-import { assertEquals, assertRejects } from "@std/assert";
+import { assertEquals, assertRejects, assertThrows } from "@std/assert";
 import type {
   GenerationResult,
   HintGenerationInput,
@@ -8,10 +8,16 @@ import type {
   SenseSelectionInput,
   SenseSelectionOutcome,
 } from "card_field_generation";
-import { renderEntry } from "jmdict_to_html";
+import { renderDictionaryField } from "card_model/dictionary";
+import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
+import { preextractedJMDictEntry } from "data";
 import { analyzeCard, type AnalyzedCard } from "../src/analyze.ts";
 import { contextForPrompt, suggestedKey, suggestForCard } from "../src/suggest.ts";
-import { makeNote, makeWord } from "./fixtures.ts";
+import { entriesById, makeNote, makeWord } from "./fixtures.ts";
+
+function renderDictionary(word: JMdictWord): string {
+  return renderDictionaryField([word]);
+}
 
 function generated<T>(
   value: T,
@@ -81,13 +87,68 @@ async function retargetingCard(): Promise<AnalyzedCard> {
     ],
   });
   const note = makeNote({
-    key: "言葉 | 1000000 | 1",
-    dictionaryEntry: renderEntry(previousEntry),
+    key: "言葉 | 1000000:1",
+    dictionary: renderDictionary(previousEntry),
     reading: "言[こと] 葉[ば]",
     fullContext: "これは<mark>言[こと] 葉[ば]</mark><br>のテストです。",
   });
-  return await analyzeCard(note, currentEntry);
+  return await analyzeCard(note, entriesById(currentEntry));
 }
+
+Deno.test("suggestForCard considers every accepted reading for the anchor entry", async () => {
+  const previousAnchor = await preextractedJMDictEntry("1158110");
+  const currentAnchor = structuredClone(previousAnchor);
+  currentAnchor.sense[0].gloss[0].text = "an alternative name";
+  const card = await analyzeCard(
+    makeNote({
+      key: "異名 | 1158110:1",
+      dictionary: renderDictionary(previousAnchor),
+      reading: "<ul><li>異[い] 名[みょう]</li><li>異[い] 名[めい]</li></ul>",
+      fullContext: "《閃光》の<mark>異名</mark>で知られている。",
+    }),
+    entriesById(currentAnchor),
+  );
+  assertEquals(card.verdict, "retarget");
+
+  const suggestion = await suggestForTest(card, {
+    sameSpellingEntries: [currentAnchor],
+    selectSenses: (input) => {
+      assertEquals(input.compatibleSenseNumbers, [1, 2]);
+      return Promise.resolve(generated(selected([1])));
+    },
+    generateHint: () => Promise.resolve(generated({ outcome: "not-needed" as const })),
+  });
+
+  assertEquals(suggestion.senses, [1]);
+});
+
+Deno.test("suggestForCard projects a custom Recognition target onto the Key spelling", async () => {
+  const previousAnchor = await preextractedJMDictEntry("1158110");
+  const currentAnchor = structuredClone(previousAnchor);
+  currentAnchor.sense[0].gloss[0].text = "an alternative name";
+  const card = await analyzeCard(
+    makeNote({
+      key: "異名 | 1158110:1",
+      recognitionTarget: "その異名",
+      reading: "その 異[い] 名[みょう]",
+      dictionary: renderDictionary(previousAnchor),
+      fullContext: "その<mark>異名</mark>で知られている。",
+    }),
+    entriesById(currentAnchor),
+  );
+  assertEquals(card.verdict, "retarget");
+
+  const suggestion = await suggestForTest(card, {
+    sameSpellingEntries: [currentAnchor],
+    selectSenses: (input) => {
+      assertEquals(input.compatibleSenseNumbers, [1]);
+      return Promise.resolve(generated(selected([1])));
+    },
+    generateHint: () => Promise.resolve(generated({ outcome: "not-needed" as const })),
+  });
+
+  assertEquals(suggestion.senses, [1]);
+});
 
 Deno.test("suggestForCard supplies marked context to focused sense and hint operations", async () => {
   const card = await retargetingCard();
@@ -333,11 +394,11 @@ Deno.test("suggestForCard contrasts senses excluded only by the selected reading
   previousEntry.sense[0].gloss[0].text = "word";
   const card = await analyzeCard(
     makeNote({
-      key: "言葉 | 1000000 | 1",
-      dictionaryEntry: renderEntry(previousEntry),
+      key: "言葉 | 1000000:1",
+      dictionary: renderDictionary(previousEntry),
       reading: "言[こと] 葉[ば]",
     }),
-    currentEntry,
+    entriesById(currentEntry),
   );
   let hintInput: HintGenerationInput | undefined;
 
@@ -463,11 +524,11 @@ Deno.test("suggestForCard preserves a restricted all-compatible selection in the
   currentEntry.sense[1].appliesToKanji = ["詞"];
   const card = await analyzeCard(
     makeNote({
-      key: "言葉 | 1000000 | 1",
-      dictionaryEntry: renderEntry(previousEntry),
+      key: "言葉 | 1000000:1",
+      dictionary: renderDictionary(previousEntry),
       reading: "言[こと] 葉[ば]",
     }),
-    currentEntry,
+    entriesById(currentEntry),
   );
 
   let hintWasRequested = false;
@@ -485,7 +546,25 @@ Deno.test("suggestForCard preserves a restricted all-compatible selection in the
 
   assertEquals(hintWasRequested, false);
   assertEquals(suggestion.senses, [1]);
-  assertEquals(suggestedKey(card, suggestion.senses), "言葉 | 1000000 | 1");
+  assertEquals(suggestedKey(card, suggestion.senses), "言葉 | 1000000:1");
+});
+
+Deno.test("suggestedKey rejects AI retargeting for multi-entry cards", async () => {
+  const card = await retargetingCard();
+  card.note.fields.key = "言葉 | 1000000:1;2000000:2";
+  card.parsedKey = {
+    spelling: "言葉",
+    usages: [
+      { jmdictId: "1000000", senseNumbers: [1] },
+      { jmdictId: "2000000", senseNumbers: [2] },
+    ],
+  };
+
+  assertThrows(
+    () => suggestedKey(card, [2]),
+    Error,
+    "Multi-entry recognition cards require manual semantic review.",
+  );
 });
 
 Deno.test("contextForPrompt preserves target markup and stored line breaks", () => {

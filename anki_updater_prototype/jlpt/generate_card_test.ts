@@ -117,7 +117,7 @@ Deno.test("generateJLPTCard marks every occurrence and uses focused sense and hi
   assertEquals(hintModelId, undefined);
   assertEquals(hintInput?.selectedUsage, { entry: word, senseNumbers: [2] });
   assertEquals(hintInput?.contrastingUsages, [{ entry: word, senseNumbers: [1] }]);
-  assertEquals(card.key, "かな | 1000000 | 2");
+  assertEquals(card.key, "かな | 1000000:2");
   assertEquals(card.hint, "かなを比べる");
   assertEquals(card.source, '<span lang="ja">テスト</span>');
 });
@@ -395,7 +395,7 @@ Deno.test("generateJLPTCard creates an unhinted proper sense subset", async () =
       generateHint: () => Promise.resolve(generated({ outcome: "not-needed" as const })),
     },
   );
-  assertEquals(card.key, "かな | 1000000 | 1");
+  assertEquals(card.key, "かな | 1000000:1");
   assertEquals(card.hint, null);
 });
 

@@ -334,6 +334,35 @@ Deno.test("selectJMDictEntry defers senses spanning several entries", async () =
   });
 });
 
+Deno.test("selectJMDictEntry accepts equivalent senses with a unique reading anchor", async () => {
+  const result = await selectJMDictEntry(
+    request(),
+    MODEL_OPTIONS,
+    dependencies((input) => ({
+      outcome: "selected",
+      senseNumbers: [...input.compatibleSenseNumbers],
+    })),
+  );
+
+  assertEquals(result, {
+    status: "selected",
+    jmdictId: "1111111",
+    recognitionTarget: "業",
+    applicableSenseNumbers: [1],
+    hint: null,
+    model: "test",
+    generatedAt: result.status === "selected" ? result.generatedAt : "",
+    candidateJMDictIds: ["1111111", "2222222"],
+    allowedJMDictIds: ["1111111", "2222222"],
+    additionalAcceptedReadings: [{
+      jmdictId: "2222222",
+      kanaReading: "わざ",
+      applicableSenseNumbers: [1, 2],
+    }],
+    modelConfigurationIds: ["test"],
+  });
+});
+
 Deno.test("selectJMDictEntry does not override a same-reading unlinked choice", async () => {
   let calls = 0;
   const unlinked = entry("1111111", ["karma"]);

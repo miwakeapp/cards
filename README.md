@@ -24,7 +24,7 @@ Some workflows call AI providers. Copy `.env.sample` to `.env` and add only the 
 | [`card_resolution`](./card_resolution/)                         | Resolves exact target occurrences and safely adapts structured contexts for generation.    |
 | [`card_field_generation`](./card_field_generation/)             | Owns focused AI operations for unresolved card fields.                                     |
 | [`card_field_generation_evals`](./card_field_generation_evals/) | Back-tests those operations against basis-labeled conversion references.                   |
-| [`card_model`](./card_model/)                                   | Owns the production Anki card templates, styles, font, and setup workflow.                 |
+| [`card_model`](./card_model/)                                   | Owns the persisted field contract, codecs, templates, styles, font, and setup workflow.    |
 | [`card_previewer`](./card_previewer/)                           | Previews dictionary-entry styles and card templates with shared representative fixtures.   |
 | [`card_updater`](./card_updater/)                               | Reviews and applies changes caused by new JMDict revisions.                                |
 | [`data`](./data/)                                               | Owns JMDict and rarity resource access, provenance, downloads, and checked-in samples.     |

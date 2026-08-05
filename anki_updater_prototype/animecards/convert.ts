@@ -1,5 +1,7 @@
 import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
-import { compatibleSenseNumbersForJMDictUsage, createCard, type MiwakeCard } from "card_creator";
+import { createCard } from "card_creator";
+import { compatibleSenseNumbersForJMDictUsage } from "card_creator/jmdict";
+import type { CardFields } from "card_model";
 import { toHiragana } from "japanese_text";
 import {
   deriveLookupSpellings,
@@ -54,17 +56,7 @@ import {
   type SourceResolution,
   type TargetInContextResolution,
 } from "./types.ts";
-
-export const MIWAKE_FIELD_NAMES = [
-  "Key",
-  "Recognition target",
-  "Reading",
-  "Hint",
-  "Full context",
-  "Minimized context",
-  "Dictionary entry",
-  "Source",
-] as const;
+import { cardCreatorInputForAcceptedReadings } from "./card_creator_input.ts";
 
 export interface UnresolvedTargetInContext {
   context: string;
@@ -290,6 +282,40 @@ function isSearchOnlyReading(entry: JMdictWord, reading: string): boolean {
   return entry.kana.find(({ text }) => text === reading)?.tags.includes("sk") === true;
 }
 
+function canonicalApplicableReadings(entry: JMdictWord, recognitionTarget: string): string[] {
+  const readings = applicableReadings(entry, recognitionTarget);
+  return readings.filter((reading) =>
+    !isSearchOnlyReading(entry, reading) ||
+    !readings.some((candidate) =>
+      !isSearchOnlyReading(entry, candidate) && kanaScriptsMatch(candidate, reading)
+    )
+  );
+}
+
+function arraysEqual<T>(left: readonly T[], right: readonly T[]): boolean {
+  return left.length === right.length && left.every((value, index) => value === right[index]);
+}
+
+function automaticallyAcceptedReadings(
+  entry: JMdictWord,
+  recognitionTarget: string,
+  leadReading: string,
+): string[] {
+  const leadSenses = compatibleSenseNumbersForJMDictUsage(
+    entry,
+    recognitionTarget,
+    leadReading,
+  );
+  return canonicalApplicableReadings(entry, recognitionTarget).filter((reading) =>
+    reading !== leadReading &&
+    !kanaScriptsMatch(reading, leadReading) &&
+    arraysEqual(
+      compatibleSenseNumbersForJMDictUsage(entry, recognitionTarget, reading),
+      leadSenses,
+    )
+  );
+}
+
 function chooseReading(
   entry: JMdictWord,
   recognitionTarget: string,
@@ -345,6 +371,23 @@ function chooseReading(
   }
   if (readings.length === 1) {
     return { reading: readings[0] };
+  }
+
+  const canonicalReadings = canonicalApplicableReadings(entry, recognitionTarget);
+  if (
+    canonicalReadings.length > 0 &&
+    canonicalReadings.every((reading) =>
+      arraysEqual(
+        compatibleSenseNumbersForJMDictUsage(entry, recognitionTarget, reading),
+        compatibleSenseNumbersForJMDictUsage(
+          entry,
+          recognitionTarget,
+          canonicalReadings[0],
+        ),
+      )
+    )
+  ) {
+    return { reading: canonicalReadings[0] };
   }
 
   return {
@@ -787,13 +830,71 @@ export async function convertAnimecardsNote(
         ? undefined
         : selected;
     };
-    const renderCard = (reading: string | undefined) => {
+    const renderCard = (reading: string | undefined, includeAlternatives = true) => {
+      if (usesReadingField && reading === undefined) {
+        throw new Error("A kanji recognition target requires a lead reading.");
+      }
       const applicableSenseNumbers = selectedSensesForReading(reading);
+      const leadCompatibleSenses = usesReadingField
+        ? compatibleSenseNumbersForJMDictUsage(entry, recognitionTarget, reading)
+        : [];
+      const leadSelectedSenses = applicableSenseNumbers ?? leadCompatibleSenses;
+      const reviewedAdditionalReadings = includeAlternatives
+        ? entrySelectionOverride?.additionalAcceptedReadings ?? []
+        : [];
+      const additionalAcceptedReadings = usesReadingField
+        ? [
+          ...(includeAlternatives
+            ? automaticallyAcceptedReadings(entry, recognitionTarget, reading!).map((
+              kanaReading,
+            ) => ({
+              jmdictId: entry.id,
+              kanaReading,
+              applicableSenseNumbers: leadSelectedSenses,
+            }))
+            : []),
+          ...reviewedAdditionalReadings,
+        ].filter((candidate) =>
+          candidate.jmdictId !== entry.id || !kanaScriptsMatch(candidate.kanaReading, reading!)
+        ).filter((candidate, index, candidates) =>
+          candidates.findIndex((other) =>
+            other.jmdictId === candidate.jmdictId &&
+            JSON.stringify(other.applicableSenseNumbers) ===
+              JSON.stringify(candidate.applicableSenseNumbers) &&
+            kanaScriptsMatch(other.kanaReading, candidate.kanaReading)
+          ) === index
+        )
+        : [];
+      const additionalJMDictUsages = additionalAcceptedReadings.map((additional) => {
+        const additionalEntry = options.entries.get(additional.jmdictId);
+        if (additionalEntry === undefined) {
+          throw new Error(
+            `Additional accepted reading refers to missing JMDict entry ${
+              JSON.stringify(additional.jmdictId)
+            }`,
+          );
+        }
+        return {
+          entry: additionalEntry,
+          kanaReading: additional.kanaReading,
+          applicableSenseNumbers: additional.applicableSenseNumbers,
+        };
+      });
+      const cardCreatorJMDictInput = usesReadingField
+        ? cardCreatorInputForAcceptedReadings([{
+          entry,
+          kanaReading: reading!,
+          applicableSenseNumbers: leadSelectedSenses,
+        }, ...additionalJMDictUsages])
+        : {
+          jmdictUsages: [{
+            entry,
+            ...(applicableSenseNumbers === undefined ? {} : { applicableSenseNumbers }),
+          }] as const,
+        };
       return createCard({
-        jmdictEntry: entry,
+        ...cardCreatorJMDictInput,
         recognitionTarget,
-        ...(usesReadingField ? { kanaReading: reading } : {}),
-        ...(applicableSenseNumbers === undefined ? {} : { applicableSenseNumbers }),
         ...(entrySelectionOverride?.hint === undefined || entrySelectionOverride.hint === null
           ? {}
           : { hint: entrySelectionOverride.hint }),
@@ -803,14 +904,14 @@ export async function convertAnimecardsNote(
     };
 
     let selectedReading: string;
-    let card: MiwakeCard;
+    let card: CardFields;
     if (!usesReadingField) {
       selectedReading = recognitionTarget;
       card = await renderCard(undefined);
     } else if (markedContextHasRuby(markedContext)) {
       const attempts = await Promise.all(readings.map(async (reading) => {
         try {
-          return { reading, card: await renderCard(reading), error: undefined };
+          return { reading, card: await renderCard(reading, false), error: undefined };
         } catch (error) {
           return { reading, card: undefined, error };
         }
@@ -836,7 +937,7 @@ export async function convertAnimecardsNote(
         throw attempts[0]?.error ?? new Error("No reading agrees with the marked source ruby");
       }
       selectedReading = selected.reading;
-      card = selected.card ?? await renderCard(selected.reading);
+      card = await renderCard(selected.reading);
     } else {
       if (!("reading" in readingResult)) {
         return skip(note.noteId, word, readingResult.reason, readingResult.detail);
@@ -930,7 +1031,7 @@ export async function convertAnimecardsNote(
       "Hint": displayHint ?? "",
       "Full context": card.fullContext,
       "Minimized context": card.minimizedContext ?? "",
-      "Dictionary entry": card.dictionaryEntry,
+      "Dictionary": card.dictionary,
       "Source": card.source ?? "",
     };
 
@@ -943,6 +1044,40 @@ export async function convertAnimecardsNote(
         keyRecognitionTarget,
         ...(recognitionTargetOverride === undefined ? {} : { recognitionTargetOverride }),
         readingKana: selectedReading,
+        ...(usesReadingField &&
+            (entrySelectionOverride?.additionalAcceptedReadings !== undefined ||
+              automaticallyAcceptedReadings(entry, keyRecognitionTarget, selectedReading).length >
+                0)
+          ? {
+            additionalAcceptedReadings: [
+              ...automaticallyAcceptedReadings(
+                entry,
+                keyRecognitionTarget,
+                selectedReading,
+              ).map((kanaReading) => ({
+                jmdictId: entry.id,
+                kanaReading,
+                applicableSenseNumbers: selectedSensesForReading(selectedReading) ??
+                  compatibleSenseNumbersForJMDictUsage(
+                    entry,
+                    keyRecognitionTarget,
+                    selectedReading,
+                  ),
+              })),
+              ...(entrySelectionOverride?.additionalAcceptedReadings ?? []),
+            ].filter((candidate) =>
+              candidate.jmdictId !== entry.id ||
+              !kanaScriptsMatch(candidate.kanaReading, selectedReading)
+            ).filter((candidate, index, candidates) =>
+              candidates.findIndex((other) =>
+                other.jmdictId === candidate.jmdictId &&
+                JSON.stringify(other.applicableSenseNumbers) ===
+                  JSON.stringify(candidate.applicableSenseNumbers) &&
+                kanaScriptsMatch(other.kanaReading, candidate.kanaReading)
+              ) === index
+            ),
+          }
+          : {}),
         senseSelectionContext: senseSelectionContext(),
         sourceResolution,
         targetInContextResolution,

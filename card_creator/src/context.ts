@@ -38,8 +38,8 @@ interface ProcessContextHTMLOptions {
   /** Resolves readings for incidental, unmarked source ruby. */
   resolveRubyReadings?: RubyReadingResolver;
 
-  /** Precisely placed Anki furigana for the selected recognition target. */
-  formattedTargetReading?: string;
+  /** Precisely placed Anki furigana keyed by accepted JMDict reading. */
+  formattedTargetReadings?: ReadonlyMap<string, string>;
 }
 
 const HTML_DOCUMENT = new DOMParser().parseFromString("<body></body>", "text/html");
@@ -522,24 +522,27 @@ function replaceRuby(
  * around each intended target occurrence. Source `<ruby>` is allowed.
  * @param jmdictSpelling The exact undecorated JMDict spelling selected for the card. It provides
  * the alignment template for partial ruby inside marked, possibly inflected source text.
- * @param jmdictReading The exact JMDict kana reading selected for this usage. Marked source ruby
- * must agree with it, allowing equivalent kana scripts and full-size source kana. Unmarked ruby
- * does not influence the selected reading; its own JMDict readings are used when available to
- * reverse full-size-kana typography safely. When `formattedTargetReading` is supplied, whole-word
- * marked ruby is redistributed to that precise JMDict-derived placement while retaining the
- * source's kana script.
+ * @param acceptedJMDictReadings The accepted exact JMDict kana readings. Marked source ruby must
+ * agree with at least one, allowing equivalent kana scripts and full-size source kana. Unmarked
+ * ruby does not influence the accepted set; its own JMDict readings are used when available to
+ * reverse full-size-kana typography safely. When a matching precisely formatted target reading
+ * is supplied, whole-word marked ruby is redistributed to that JMDict-derived placement while
+ * retaining the source's kana script.
  * @returns The supplied fragment with nonbreaking spaces normalized and source ruby converted to
  * Anki bracket notation.
  */
 export async function processContextHTML(
   html: string,
   jmdictSpelling: string,
-  jmdictReading: string,
+  acceptedJMDictReadings: readonly string[],
   {
     resolveRubyReadings = jmdictReadingsForSpelling,
-    formattedTargetReading,
+    formattedTargetReadings,
   }: ProcessContextHTMLOptions = {},
 ): Promise<string> {
+  if (acceptedJMDictReadings.length === 0) {
+    throw new Error("At least one accepted JMDict reading is required");
+  }
   const template = parseHTMLFragment(html);
   const fragment = template.content;
   normalizeTextNodes(fragment);
@@ -565,12 +568,35 @@ export async function processContextHTML(
     const markedRuby = analyzeMarkedRuby(mark, analyses);
     const { components } = markedRuby;
     if (components.length === 0) continue;
-    const readings = canonicalComponentReadings(
-      components,
-      markedRuby.visibleText,
-      jmdictSpelling,
-      jmdictReading,
-    );
+    let readings: string[] | undefined;
+    let matchedJMDictReading: string | undefined;
+    let firstError: unknown;
+    for (const jmdictReading of acceptedJMDictReadings) {
+      try {
+        readings = canonicalComponentReadings(
+          components,
+          markedRuby.visibleText,
+          jmdictSpelling,
+          jmdictReading,
+        );
+        matchedJMDictReading = jmdictReading;
+        break;
+      } catch (error) {
+        firstError ??= error;
+      }
+    }
+    if (readings === undefined) {
+      if (acceptedJMDictReadings.length === 1) throw firstError;
+      throw new Error(
+        `Supplied HTML ruby does not agree with any accepted kanaReading ${
+          JSON.stringify(acceptedJMDictReadings)
+        } for recognitionTarget ${JSON.stringify(jmdictSpelling)}`,
+        { cause: firstError },
+      );
+    }
+    const formattedTargetReading = matchedJMDictReading === undefined
+      ? undefined
+      : formattedTargetReadings?.get(matchedJMDictReading);
     for (let index = 0; index < components.length; ++index) {
       const component = components[index].component;
       canonicalReadings.set(component.readingElement, readings[index]);
@@ -580,7 +606,7 @@ export async function processContextHTML(
           preciselyPlacedSourceRuby(
             formattedTargetReading,
             jmdictSpelling,
-            jmdictReading,
+            matchedJMDictReading!,
             component.reading,
           ),
         );

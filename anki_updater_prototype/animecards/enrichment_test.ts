@@ -39,7 +39,7 @@ function candidate(): ConversionCandidate {
         Hint: "",
         "Full context": "物の<mark>大小</mark>を比べた後も、話は長く続いた。",
         "Minimized context": "",
-        "Dictionary entry": "entry",
+        "Dictionary": "entry",
         Source: '<span lang="en">Test</span>',
       },
     },
@@ -175,7 +175,7 @@ Deno.test("enrichment preserves successful sense generation when minimization fa
     compatibleSenses: [1, 2, 3, 4, 5, 6],
     applicableSenses: [2],
   });
-  assertEquals(value.target.fields.Key, "大小 | 1414110 | 2");
+  assertEquals(value.target.fields.Key, "大小 | 1414110:2");
   assertEquals(value.target.fields.Hint, "規模大小");
   assertEquals(value.minimizedContextResolution, {
     status: "failed",
@@ -205,7 +205,7 @@ Deno.test("applyGeneratedCardFields applies selected senses, hint, and minimized
     "2026-07-18T00:00:00.000Z",
   );
 
-  assertEquals(value.target.fields.Key, "大小 | 1414110 | 2");
+  assertEquals(value.target.fields.Key, "大小 | 1414110:2");
   assertEquals(value.target.fields.Hint, "規模大小");
   assertEquals(value.target.fields["Minimized context"], "物の<mark>大小</mark>を比べた。");
   assertEquals<ConversionCandidate["senseResolution"]>(value.senseResolution, {
@@ -314,7 +314,7 @@ Deno.test("settled enrichment accepts a validated not-needed hint outcome", asyn
   );
 
   assertEquals(failures, []);
-  assertEquals(value.target.fields.Key, "大小 | 1414110 | 2");
+  assertEquals(value.target.fields.Key, "大小 | 1414110:2");
   assertEquals(value.target.fields.Hint, "");
   assertEquals(value.senseResolution, {
     status: "generated",
@@ -349,7 +349,7 @@ Deno.test("settled enrichment accepts a validated source-insufficient hint outco
   );
 
   assertEquals(failures, []);
-  assertEquals(value.target.fields.Key, "大小 | 1414110 | 2");
+  assertEquals(value.target.fields.Key, "大小 | 1414110:2");
   assertEquals(value.target.fields.Hint, "");
   assertEquals(value.senseResolution, {
     status: "generated",
@@ -450,7 +450,7 @@ Deno.test("applyGeneratedCardFields retries a failed sense selection", async () 
     "2026-07-18T00:00:00.000Z",
   );
 
-  assertEquals(value.target.fields.Key, "大小 | 1414110 | 2");
+  assertEquals(value.target.fields.Key, "大小 | 1414110:2");
   assertEquals<ConversionCandidate["senseResolution"]>(value.senseResolution, {
     status: "generated",
     model: "claude-opus-5",
@@ -475,7 +475,7 @@ Deno.test("applyGeneratedCardFields preserves an existing sense while minimizing
     compatibleSenses: [1, 2, 3, 4, 5, 6],
     applicableSenses: [2],
   };
-  value.target.fields.Key = "大小 | 1414110 | 2";
+  value.target.fields.Key = "大小 | 1414110:2";
   value.target.fields.Hint = "規模大小";
 
   await applyGeneratedCardFields(
@@ -489,7 +489,7 @@ Deno.test("applyGeneratedCardFields preserves an existing sense while minimizing
     "2026-07-18T00:00:00.000Z",
   );
 
-  assertEquals(value.target.fields.Key, "大小 | 1414110 | 2");
+  assertEquals(value.target.fields.Key, "大小 | 1414110:2");
   assertEquals(value.target.fields.Hint, "規模大小");
   assertEquals(value.target.fields["Minimized context"], "物の<mark>大小</mark>を比べた。");
 });
@@ -572,7 +572,7 @@ Deno.test("applyGeneratedCardFields rerenders affix notation after sense selecti
     "2026-07-18T00:00:00.000Z",
   );
 
-  assertEquals(value.target.fields.Key, `そこそこ | ${degree.id} | 3`);
+  assertEquals(value.target.fields.Key, `そこそこ | ${degree.id}:3`);
   assertEquals(value.target.fields["Recognition target"], "～そこそこ");
   assertEquals(value.target.fields.Hint, "");
   assertEquals(value.recognitionTarget, "～そこそこ");

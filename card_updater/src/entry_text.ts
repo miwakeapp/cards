@@ -1,5 +1,5 @@
 /**
- * Text-level understanding of rendered dictionary-entry HTML (the `Dictionary entry` card
+ * Text-level understanding of rendered dictionary-entry HTML (the `Dictionary` card
  * field): parsing into forms/senses, encoding-insensitive normalization, semantic diffing, and
  * alignment of old senses to new ones.
  *

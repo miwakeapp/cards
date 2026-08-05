@@ -1,13 +1,5 @@
-/** Deterministic Miwake Card rendering and the JMDict/card-front rules needed to prepare it. */
+/** Deterministic Miwake Card rendering. */
 export { createCard } from "./create_card.ts";
-export { formatReadingForAnki } from "./format_reading_for_anki.ts";
-export {
-  compatibleSenseNumbersForJMDictUsage,
-  jmdictAlternativesForCardFront,
-  jmdictUsagesForSpelling,
-} from "./jmdict_usage.ts";
-export type { CardFrontAlternativeOptions, JMDictSpellingUsage } from "./jmdict_usage.ts";
-export type { CardSource, CreateCardInput, MiwakeCard } from "./types.ts";
-
-export { formatMiwakeKey, parseMiwakeKey } from "./keys.ts";
-export type { MiwakeKey } from "./keys.ts";
+export type { AcceptedJMDictUsage, CardSource, CreateCardInput } from "./types.ts";
+/** The persisted result type returned by `createCard()`; canonically owned by `card_model`. */
+export type { CardFields } from "card_model";

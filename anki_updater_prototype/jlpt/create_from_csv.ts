@@ -18,7 +18,7 @@
 import { parseArgs } from "@std/cli/parse-args";
 import { parse as parseCSV } from "@std/csv";
 import * as path from "@std/path";
-import type { MiwakeCard } from "card_creator";
+import type { CardFields } from "card_model";
 import { buildSpellingIndex, findAllEntriesBySpelling } from "card_resolution";
 import { allJMDictEntries } from "data";
 import { MODEL_IDS, type ModelId } from "card_field_generation";
@@ -92,7 +92,7 @@ if (resolved.length === 0) Deno.exit(0);
 
 // --- Generate cards ---
 
-const cards: Array<{ row: CSVRow; card: MiwakeCard }> = [];
+const cards: Array<{ row: CSVRow; card: CardFields }> = [];
 const generationCache = new JSONLGenerationCache(
   args.cache ??
     path.join(import.meta.dirname!, "..", "generated", "card-field-generation-cache.jsonl"),
@@ -155,7 +155,7 @@ for (const { card } of cards) {
     "Hint": card.hint ?? "",
     "Full context": card.fullContext,
     "Minimized context": card.minimizedContext ?? "",
-    "Dictionary entry": card.dictionaryEntry,
+    "Dictionary": card.dictionary,
     "Source": card.source ?? "",
   };
 

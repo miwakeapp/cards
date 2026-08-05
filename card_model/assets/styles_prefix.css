@@ -49,6 +49,15 @@ rt {
   margin: 0;
 }
 
+#reading {
+  > ul {
+    width: fit-content;
+    margin: 0 auto;
+    padding-inline-start: 1em;
+    text-align: start;
+  }
+}
+
 #hint {
   margin-top: 0.5rem;
   text-align: center;
@@ -56,8 +65,12 @@ rt {
   font-size: 1.3rem;
 }
 
-#dictionary-entry {
+#dictionary {
   margin-top: 0.5rem;
+}
+
+.miwake-dictionary-entry {
+  margin: 0;
 
   &:has(.tag-sK, .tag-sk) > .forms {
     flex-basis: calc(100% - 2rem);
@@ -74,11 +87,29 @@ rt {
   }
 }
 
+.miwake-dictionary-entry + .miwake-dictionary-entry {
+  border-top: 1px solid color-mix(in srgb, currentColor, transparent 80%);
+}
+
 #context {
   margin: 1rem 2rem 0 2rem;
   line-height: 1.6;
   text-align: center;
   font-size: 1.4rem;
+
+  #full-context {
+    display: none;
+  }
+
+  &.show-full-context {
+    #minimized-context {
+      display: none;
+    }
+
+    #full-context {
+      display: block;
+    }
+  }
 
   mark {
     background: none;
@@ -140,7 +171,7 @@ button.expando {
   }
 }
 
-#toggle-hidden-readings {
+button.toggle-hidden-readings {
   display: none;
   align-self: flex-start;
   order: 2;
@@ -154,13 +185,13 @@ button.expando {
     height: 0.75rem;
   }
 
-  #dictionary-entry:has(.tag-sK, .tag-sk) > & {
+  .miwake-dictionary-entry:has(.tag-sK, .tag-sk) > & {
     display: inline-flex;
   }
 }
 
 /* Override minimal.css's `display: none` on search-only forms */
-#dictionary-entry.show-hidden-readings {
+.miwake-dictionary-entry.show-hidden-readings {
   :is(.tag-sK, .tag-sk) {
     display: inline;
   }
