@@ -10,6 +10,7 @@ import type {
 import { equal } from "@std/assert";
 
 import { resolveJMDictLanguage } from "./jmdict_language.ts";
+import { filterRedundantBritishEnglishGlosses } from "./english_glosses.ts";
 import {
   field as expandField,
   misc as expandMisc,
@@ -164,7 +165,7 @@ function renderSense(
     blocks.push(renderList("ul", "part-of-speech", items));
   }
 
-  const glosses = sense.gloss;
+  const glosses = filterRedundantBritishEnglishGlosses(sense.gloss);
   if (glosses.length > 0) {
     const items = glosses.map((gloss) => `<li>${escapeText(gloss.text)}</li>`);
     blocks.push(renderList("ul", "glosses", items));
