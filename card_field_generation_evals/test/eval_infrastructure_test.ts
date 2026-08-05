@@ -44,6 +44,7 @@ import {
 import {
   scoreContextMinimization,
   scoreHint,
+  scoreReadingSelection,
   scoreSenseSelection,
   summarizeResults,
 } from "../src/scoring.ts";
@@ -55,6 +56,7 @@ import type {
   EvalReferenceBasis,
   EvalRun,
   HintFixture,
+  ReadingSelectionFixture,
   SenseSelectionFixture,
 } from "../src/types.ts";
 
@@ -67,6 +69,9 @@ const PROVENANCE = {
 function expectedOutcomeStratum(fixture: EvalFixture): string {
   if (fixture.operation === "context-minimization" || fixture.operation === "hint") {
     return fixture.expected.disposition;
+  }
+  if (fixture.operation === "reading-selection") {
+    return fixture.expected.decisions.map(({ decision }) => decision).join("+");
   }
   if (fixture.expected.outcome.outcome !== "selected") {
     return fixture.expected.outcome.outcome;
@@ -299,7 +304,7 @@ Deno.test("CLI spending guard always permits dry runs and explicit approval", ()
 
 Deno.test("tracked eval fixtures are complete and prompt overlaps are explicit", async () => {
   const fixtures = await loadEvalFixtures();
-  assertEquals(fixtures.length, 272);
+  assertEquals(fixtures.length, 277);
   assertEquals(
     fixtures.filter(({ operation }) => operation === "context-minimization").length,
     55,
@@ -307,6 +312,10 @@ Deno.test("tracked eval fixtures are complete and prompt overlaps are explicit",
   assertEquals(
     fixtures.filter(({ operation }) => operation === "hint").length,
     103,
+  );
+  assertEquals(
+    fixtures.filter(({ operation }) => operation === "reading-selection").length,
+    5,
   );
   assertEquals(
     fixtures.filter(({ operation }) => operation === "sense-selection").length,
@@ -323,7 +332,12 @@ Deno.test("tracked eval fixtures are complete and prompt overlaps are explicit",
   );
   // Derive overlap accounting from the production prompts. Prompt examples may simplify their
   // source fixtures, but changing which fixtures they derive from must update the annotations.
-  const operations = ["context-minimization", "hint", "sense-selection"] as const;
+  const operations = [
+    "context-minimization",
+    "hint",
+    "reading-selection",
+    "sense-selection",
+  ] as const;
   const expectedOverlaps = Object.fromEntries(
     operations.map((operation) => {
       const fixtureIds = PROMPT_FEW_SHOT_FIXTURE_LINKS[operation].map(({ fixtureId }) => fixtureId)
@@ -447,7 +461,7 @@ Deno.test("tracked eval fixtures are complete and prompt overlaps are explicit",
             } must be an ordered semantic subset of a fixture contrast`,
           );
         }
-      } else {
+      } else if (fixture.operation === "sense-selection") {
         const fixtureContext = markedContextTextTemplate(fixture.input.context).text;
         assertIncludesSignature(
           contextSubstrings(fixtureContext, link.contextLength).map((context) =>
@@ -481,6 +495,8 @@ Deno.test("tracked eval fixtures are complete and prompt overlaps are explicit",
           await promptJMDictEntry(entry, fixture.input.compatibleSenseNumbers),
           `${label} compatible JMDict projection`,
         );
+      } else {
+        throw new Error("Reading selection has no prompt few-shots.");
       }
     }
   }
@@ -779,6 +795,38 @@ Deno.test("operation scores preserve exact decisions without overfitting text re
     kind: "sense-selection",
     exactMatch: false,
   });
+  const readingFixture: ReadingSelectionFixture = {
+    operation: "reading-selection",
+    id: "reading-case",
+    provenance: PROVENANCE,
+    evaluation: { promptOverlap: false, referenceBasis: "user-reviewed" },
+    input: {
+      context: "<mark>明日</mark>ね。",
+      recognitionTarget: "明日",
+      jmdictId: "1584660",
+      senseNumbers: [1],
+      encountered: { kanaReading: "あした", bccwjFrequencyPerMillion: 6.7 },
+      alternatives: [
+        { kanaReading: "あす", bccwjFrequencyPerMillion: 122.7 },
+        { kanaReading: "みょうにち", bccwjFrequencyPerMillion: 2.2 },
+      ],
+    },
+    expected: {
+      decisions: [
+        { kanaReading: "あす", decision: "include", rationale: "Common." },
+        { kanaReading: "みょうにち", decision: "omit", rationale: "Formal." },
+      ],
+    },
+  };
+  assertEquals(
+    scoreReadingSelection(readingFixture, {
+      decisions: [
+        { kanaReading: "あす", decision: "include", rationale: "Different rationale." },
+        { kanaReading: "みょうにち", decision: "omit", rationale: "Still different." },
+      ],
+    }),
+    { kind: "reading-selection", exactMatch: true },
+  );
   assertEquals(
     scoreHint(hintFixture(), {
       outcome: "generated",

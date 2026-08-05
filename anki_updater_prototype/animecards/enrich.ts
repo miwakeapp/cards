@@ -6,10 +6,17 @@
 
 import { parseArgs } from "@std/cli/parse-args";
 import * as path from "@std/path";
-import { jmdictUsagesForSpelling } from "card_creator/jmdict";
+import { compatibleSenseNumbersForJMDictUsage, jmdictUsagesForSpelling } from "card_creator/jmdict";
 import { buildSpellingIndex, findAllEntriesBySpelling } from "card_resolution";
 import { allJMDictEntries, type JMDictWord } from "data";
-import { isAIQuotaError, minimizeContext, MODEL_IDS, type ModelId } from "card_field_generation";
+import { bccwjLUW2LemmaReadingHit } from "data/rarity";
+import {
+  isAIQuotaError,
+  minimizeContext,
+  MODEL_IDS,
+  type ModelId,
+  selectAdditionalReadingsForCard,
+} from "card_field_generation";
 export { isAIQuotaError } from "card_field_generation";
 import { JSONLGenerationCache } from "card_field_generation/file-cache";
 import {
@@ -30,6 +37,8 @@ import {
   type ConversionManifest,
   deferUnavailableSourceContexts,
   minimizedContextNeedsGeneration,
+  readingResolutionNeedsGeneration,
+  senseResolutionIsComplete,
   senseResolutionNeedsGeneration,
 } from "./types.ts";
 
@@ -42,7 +51,10 @@ interface Options {
   concurrency: number;
 }
 
-type EnrichmentOperationName = "context minimization" | "sense/hint generation";
+type EnrichmentOperationName =
+  | "context minimization"
+  | "reading selection"
+  | "sense/hint generation";
 
 interface PendingEnrichmentOperation<Result> {
   promise: Promise<Result>;
@@ -73,6 +85,37 @@ function modelSummary(
   completed: readonly string[] = [],
 ): string {
   return [...new Set([...attempted, ...completed])].join(", ") || "(unknown)";
+}
+
+function concreteSelectedSenseNumbers(
+  candidate: ConversionCandidate,
+  entry: JMDictWord,
+): number[] {
+  const compatible = compatibleSenseNumbersForJMDictUsage(
+    entry,
+    candidate.keyRecognitionTarget,
+    candidate.readingKana,
+  );
+  if (candidate.senseResolution.status === "determined") {
+    return [...candidate.senseResolution.applicableSenses];
+  }
+  if (candidate.senseResolution.status === "generated") {
+    return candidate.senseResolution.applicableSenses.length === 0
+      ? compatible
+      : [...candidate.senseResolution.applicableSenses];
+  }
+  if (candidate.senseResolution.status === "not-needed") return compatible;
+  throw new Error(
+    `Cannot select additional readings before sense resolution for note ${candidate.noteId}.`,
+  );
+}
+
+async function readingEvidence(recognitionTarget: string, kanaReading: string) {
+  return {
+    kanaReading,
+    bccwjFrequencyPerMillion:
+      (await bccwjLUW2LemmaReadingHit(recognitionTarget, kanaReading))?.totalPMW ?? null,
+  };
 }
 
 /**
@@ -335,6 +378,7 @@ async function main(): Promise<void> {
     const attemptedAt = new Date().toISOString();
     const attemptedSenseModelConfigurationIds = new Set<string>();
     const attemptedMinimizationModelConfigurationIds = new Set<string>();
+    const attemptedReadingModelConfigurationIds = new Set<string>();
     const generationOptions = {
       ...(options.model === undefined ? {} : { modelId: options.model }),
       cache: generationCache,
@@ -414,6 +458,58 @@ async function main(): Promise<void> {
       },
       attemptedAt,
     );
+    if (
+      senseResolutionIsComplete(candidate.senseResolution) &&
+      readingResolutionNeedsGeneration(candidate.readingResolution)
+    ) {
+      try {
+        const alternatives = candidate.readingResolution.alternatives;
+        const readingResult = await selectAdditionalReadingsForCard({
+          context: await markedSenseSelectionContext(
+            candidate,
+            entry.sense.flatMap((sense) => sense.partOfSpeech),
+          ),
+          recognitionTarget: candidate.keyRecognitionTarget,
+          jmdictEntry: entry,
+          senseNumbers: concreteSelectedSenseNumbers(candidate, entry),
+          encountered: await readingEvidence(
+            candidate.keyRecognitionTarget,
+            candidate.readingKana,
+          ),
+          alternatives: await Promise.all(
+            alternatives.map(({ kanaReading }) =>
+              readingEvidence(candidate.keyRecognitionTarget, kanaReading)
+            ),
+          ),
+        }, {
+          ...generationOptions,
+          onAttempt: attemptReporter(
+            "reading selection",
+            attemptedReadingModelConfigurationIds,
+          ),
+        });
+        await applyGeneratedCardFields(
+          candidate,
+          entry,
+          sameSpellingEntries,
+          { readingSelection: readingResult.value },
+          { readingSelection: readingResult.metadata.modelConfigurationId },
+          attemptedAt,
+        );
+      } catch (error) {
+        const message = errorMessage(error);
+        failures.push({ operation: "reading selection", error: message });
+        if (readingResolutionNeedsGeneration(candidate.readingResolution)) {
+          candidate.readingResolution = {
+            status: "failed",
+            model: modelSummary(attemptedReadingModelConfigurationIds),
+            attemptedAt,
+            error: message,
+            alternatives: candidate.readingResolution.alternatives,
+          };
+        }
+      }
+    }
     if (failures.length === 0) {
       ++generated;
       console.error(`  Generated ${candidate.noteId}: ${candidate.recognitionTarget}`);

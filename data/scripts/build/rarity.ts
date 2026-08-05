@@ -1,9 +1,10 @@
 import * as path from "@std/path";
 import { TextLineStream } from "@std/streams";
 import { DatabaseSync } from "node:sqlite";
-import { normalizeRarityTerm } from "../../src/rarity_normalization.ts";
+import { normalizeRarityReading, normalizeRarityTerm } from "../../src/rarity_normalization.ts";
 import {
   initializeRarityDatabase,
+  UPSERT_BCCWJ_READING_SQL,
   UPSERT_BCCWJ_SQL,
   UPSERT_NWJC_SQL,
 } from "../../src/rarity_resources.ts";
@@ -90,6 +91,7 @@ async function buildNWJCIndex(database: DatabaseSync): Promise<{
 
 async function buildBCCWJIndex(database: DatabaseSync): Promise<number> {
   const insert = database.prepare(UPSERT_BCCWJ_SQL);
+  const insertReading = database.prepare(UPSERT_BCCWJ_READING_SQL);
   let lineNumber = 0;
 
   for await (const line of await readLines(bccwjSourcePath)) {
@@ -99,9 +101,13 @@ async function buildBCCWJIndex(database: DatabaseSync): Promise<number> {
       continue;
     }
 
-    const { lemma, totalPMW } = parseBCCWJRow(line, lineNumber);
+    const { lemma, reading, totalPMW } = parseBCCWJRow(line, lineNumber);
     const term = normalizeRarityTerm(lemma);
-    if (term) insert.run(term, totalPMW);
+    const normalizedReading = normalizeRarityReading(reading);
+    if (term) {
+      insert.run(term, totalPMW);
+      if (normalizedReading) insertReading.run(term, normalizedReading, totalPMW);
+    }
   }
 
   if (lineNumber === 0) throw new Error("BCCWJ source is empty");

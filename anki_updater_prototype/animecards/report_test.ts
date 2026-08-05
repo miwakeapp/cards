@@ -45,6 +45,7 @@ Deno.test("buildConversionReport groups exact final source HTML strings", () => 
         fullContextResolution: { status: "restored", method: "exact" },
         minimizedContextResolution: { status: "not-needed" },
         senseResolution: { status: "not-needed" },
+        readingResolution: { status: "not-needed" },
         target: { fields: { Source: '<span lang="ja">『舟を編む』</span>', Key: "舟 | 1" } },
       },
       {
@@ -59,6 +60,7 @@ Deno.test("buildConversionReport groups exact final source HTML strings", () => 
         fullContextResolution: { status: "source-unavailable" },
         minimizedContextResolution: { status: "pending" },
         senseResolution: { status: "pending", compatibleSenses: [1, 2] },
+        readingResolution: { status: "not-needed" },
         original: { fields: {} },
         target: { fields: { Source: "", Key: "本 | 2" } },
       },
@@ -86,6 +88,7 @@ Deno.test("buildConversionReport groups exact final source HTML strings", () => 
         },
         minimizedContextResolution: { status: "pending" },
         senseResolution: { status: "pending", compatibleSenses: [1, 2] },
+        readingResolution: { status: "not-needed" },
         original: { fields: {} },
         target: {
           fields: {
@@ -115,6 +118,7 @@ Deno.test("buildConversionReport groups exact final source HTML strings", () => 
           error: "Invalid JSON response",
         },
         senseResolution: { status: "not-needed" },
+        readingResolution: { status: "not-needed" },
         original: { fields: {} },
         target: {
           fields: {
@@ -181,6 +185,7 @@ Deno.test("buildConversionReport shows selected and compatible senses", () => {
         compatibleSenses: [1, 2, 3],
         applicableSenses: [2],
       },
+      readingResolution: { status: "not-needed" },
       jmdictEntryResolution: {
         model: "gemini-3.6-flash",
         generatedAt: "2026-07-27T00:00:00.000Z",
@@ -246,6 +251,7 @@ Deno.test("buildConversionReport audits no-match sense selections", () => {
         generatedAt: "2026-07-26T00:00:00.000Z",
         compatibleSenses: [1, 2],
       },
+      readingResolution: { status: "not-needed" },
       original: { fields: {} },
       target: {
         fields: {
@@ -299,6 +305,7 @@ Deno.test("buildConversionReport audits ambiguous sense selections distinctly", 
         compatibleSenses: [1, 2, 3],
         possibleSenses: [1, 3],
       },
+      readingResolution: { status: "not-needed" },
       original: { fields: {} },
       target: {
         fields: {

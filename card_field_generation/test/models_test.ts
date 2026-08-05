@@ -15,6 +15,10 @@ Deno.test("focused operations expose their configured production settings", () =
       modelId: "gpt-5.6-sol",
       reasoningEffort: "medium",
     },
+    "reading-selection": {
+      modelId: "gpt-5.6-sol",
+      reasoningEffort: "medium",
+    },
     "sense-selection": {
       modelId: "gpt-5.6-sol",
       reasoningEffort: "medium",

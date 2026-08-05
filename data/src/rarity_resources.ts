@@ -1,11 +1,11 @@
 import { DatabaseSync } from "node:sqlite";
-import { normalizeRarityTerm } from "./rarity_normalization.ts";
+import { normalizeRarityReading, normalizeRarityTerm } from "./rarity_normalization.ts";
 import { resourcePaths } from "./resource_paths.ts";
 
 /** Filename of the generated SQLite rarity database. */
 export const RARITY_DATABASE_FILENAME = "rarity.sqlite3";
 /** Schema version stored in the rarity database's `user_version`. */
-export const RARITY_DATABASE_VERSION = 1;
+export const RARITY_DATABASE_VERSION = 2;
 /** Inserts or accumulates an NWJC surface count. */
 export const UPSERT_NWJC_SQL = `
   INSERT INTO nwjc_surface_1gram (term, count) VALUES (?, ?)
@@ -16,6 +16,11 @@ export const UPSERT_BCCWJ_SQL = `
   INSERT INTO bccwj_luw2_lemma (term, total_pmw) VALUES (?, ?)
   ON CONFLICT (term) DO UPDATE SET total_pmw = total_pmw + excluded.total_pmw
 `;
+/** Inserts or accumulates a BCCWJ morphological lemma-reading frequency. */
+export const UPSERT_BCCWJ_READING_SQL = `
+  INSERT INTO bccwj_luw2_lemma_reading (term, reading, total_pmw) VALUES (?, ?, ?)
+  ON CONFLICT (term, reading) DO UPDATE SET total_pmw = total_pmw + excluded.total_pmw
+`;
 
 const resourcesNotFoundMessage =
   "Rarity resources not found. Run `deno task --cwd data update:rarity`.";
@@ -25,6 +30,7 @@ interface DatabaseState {
   nwjcTokenTotal: number;
   nwjcStatement: ReturnType<DatabaseSync["prepare"]>;
   bccwjStatement: ReturnType<DatabaseSync["prepare"]>;
+  bccwjReadingStatement: ReturnType<DatabaseSync["prepare"]>;
 }
 
 /** Lazily opened lookups over the generated rarity database. */
@@ -33,6 +39,11 @@ export interface RarityResourceLookup {
   nwjcSurface1GramHit(target: string): Promise<{ count: number; tokenTotal: number } | null>;
   /** Looks up a BCCWJ LUW2 lemma frequency per million words. */
   bccwjLUW2LemmaHit(target: string): Promise<{ totalPMW: number } | null>;
+  /** Looks up a BCCWJ LUW2 morphological lemma-reading frequency per million words. */
+  bccwjLUW2LemmaReadingHit(
+    target: string,
+    reading: string,
+  ): Promise<{ totalPMW: number } | null>;
   /** Closes the database if it was opened. */
   close(): Promise<void>;
 }
@@ -51,6 +62,12 @@ export function initializeRarityDatabase(database: DatabaseSync): void {
     CREATE TABLE bccwj_luw2_lemma (
       term TEXT PRIMARY KEY,
       total_pmw REAL NOT NULL CHECK (total_pmw > 0)
+    ) WITHOUT ROWID;
+    CREATE TABLE bccwj_luw2_lemma_reading (
+      term TEXT NOT NULL,
+      reading TEXT NOT NULL,
+      total_pmw REAL NOT NULL CHECK (total_pmw > 0),
+      PRIMARY KEY (term, reading)
     ) WITHOUT ROWID;
   `);
 }
@@ -88,6 +105,18 @@ export function createRarityResourceLookup(databasePath: string): RarityResource
       return row ?? null;
     },
 
+    async bccwjLUW2LemmaReadingHit(target, reading) {
+      const term = normalizeRarityTerm(target);
+      const normalizedReading = normalizeRarityReading(reading);
+      if (!term || !normalizedReading) return null;
+
+      const { bccwjReadingStatement } = await state();
+      const row = bccwjReadingStatement.get(term, normalizedReading) as
+        | { totalPMW: number }
+        | undefined;
+      return row ?? null;
+    },
+
     async close() {
       if (statePromise) {
         const promise = statePromise;
@@ -115,6 +144,14 @@ export function nwjcSurface1GramHit(
 /** Looks up a target in the BCCWJ LUW2 lemma resource. */
 export function bccwjLUW2LemmaHit(target: string): Promise<{ totalPMW: number } | null> {
   return defaultLookup.bccwjLUW2LemmaHit(target);
+}
+
+/** Looks up a BCCWJ morphological reading assigned to a target lemma. */
+export function bccwjLUW2LemmaReadingHit(
+  target: string,
+  reading: string,
+): Promise<{ totalPMW: number } | null> {
+  return defaultLookup.bccwjLUW2LemmaReadingHit(target, reading);
 }
 
 async function openDatabase(databasePath: string): Promise<DatabaseState> {
@@ -159,6 +196,10 @@ async function openDatabase(databasePath: string): Promise<DatabaseState> {
       nwjcStatement: database.prepare("SELECT count FROM nwjc_surface_1gram WHERE term = ?"),
       bccwjStatement: database.prepare(
         "SELECT total_pmw AS totalPMW FROM bccwj_luw2_lemma WHERE term = ?",
+      ),
+      bccwjReadingStatement: database.prepare(
+        "SELECT total_pmw AS totalPMW FROM bccwj_luw2_lemma_reading " +
+          "WHERE term = ? AND reading = ?",
       ),
     };
   } catch (error) {

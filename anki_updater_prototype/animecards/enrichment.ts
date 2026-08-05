@@ -4,7 +4,11 @@ import {
   jmdictAlternativesForCardFront,
   jmdictUsagesForSpelling,
 } from "card_creator/jmdict";
-import type { HintGenerationOutcome, SenseSelectionOutcome } from "card_field_generation";
+import type {
+  HintGenerationOutcome,
+  ReadingSelectionOutcome,
+  SenseSelectionOutcome,
+} from "card_field_generation";
 import type { JMDictWord } from "data";
 import { cardCreatorInputForAcceptedReadings } from "./card_creator_input.ts";
 import { applyDisplayTargetOverride, disambiguationHintForJMDictUsage } from "./display_target.ts";
@@ -12,6 +16,7 @@ import { cardSourceFromResolution } from "./source.ts";
 import {
   type ConversionCandidate,
   minimizedContextNeedsGeneration,
+  readingResolutionNeedsGeneration,
   senseResolutionIsComplete,
   senseResolutionNeedsGeneration,
 } from "./types.ts";
@@ -30,6 +35,8 @@ export interface CandidateGeneratedFields {
   hintOutcome?: HintGenerationOutcome | null;
   /** Present only when this enrichment run was also responsible for context minimization. */
   minimizedContext?: string | null;
+  /** Present only when this enrichment run judged eligible additional pronunciations. */
+  readingSelection?: ReadingSelectionOutcome;
 }
 
 export interface CandidateGeneratedFieldProvenance {
@@ -37,6 +44,8 @@ export interface CandidateGeneratedFieldProvenance {
   senseSelection?: string;
   /** Model-and-effort identity used by context minimization. */
   minimizedContext?: string;
+  /** Model-and-effort identity used by additional-reading selection. */
+  readingSelection?: string;
 }
 
 /** Whether a candidate still needs one or more focused card-field operations. */
@@ -49,6 +58,7 @@ export function needsCardFieldEnrichment(candidate: ConversionCandidate): boolea
   }
   return candidate.fullContextResolution.status === "restored" &&
     (!senseResolutionIsComplete(candidate.senseResolution) ||
+      readingResolutionNeedsGeneration(candidate.readingResolution) ||
       minimizedContextNeedsGeneration(candidate.minimizedContextResolution));
 }
 
@@ -90,7 +100,11 @@ export async function applyGeneratedCardFields(
   let hint = candidate.target.fields.Hint;
   let minimizedContext = candidate.target.fields["Minimized context"];
   let senseResolution = candidate.senseResolution;
+  let readingResolution = candidate.readingResolution;
   let minimizedContextResolution = candidate.minimizedContextResolution;
+  let finalAdditionalAcceptedReadings = (candidate.additionalAcceptedReadings ?? []).map(
+    (reading) => ({ ...reading, applicableSenseNumbers: [...reading.applicableSenseNumbers] }),
+  );
 
   const hasSenseResult = fields.senseSelection !== undefined ||
     provenance.senseSelection !== undefined;
@@ -213,8 +227,46 @@ export async function applyGeneratedCardFields(
     return;
   }
 
+  const hasReadingResult = fields.readingSelection !== undefined ||
+    provenance.readingSelection !== undefined;
+  if (readingResolutionNeedsGeneration(candidate.readingResolution) && hasReadingResult) {
+    if (provenance.readingSelection === undefined) {
+      throw new Error(
+        "Generated additional-reading fields are missing their model configuration provenance.",
+      );
+    }
+    if (fields.readingSelection === undefined) {
+      throw new Error(
+        "AI result is missing readingSelection for a candidate that requires it.",
+      );
+    }
+    const expected = candidate.readingResolution.alternatives.map(({ kanaReading }) => kanaReading);
+    const decisions = fields.readingSelection.decisions;
+    if (
+      decisions.length !== expected.length ||
+      decisions.some(({ kanaReading }, index) => kanaReading !== expected[index])
+    ) {
+      throw new Error(
+        `AI returned additional-reading decisions ${
+          JSON.stringify(decisions.map(({ kanaReading }) => kanaReading))
+        }; expected ${JSON.stringify(expected)}.`,
+      );
+    }
+    const accepted = candidate.readingResolution.alternatives.filter((_, index) =>
+      decisions[index].decision === "include"
+    );
+    finalAdditionalAcceptedReadings = [...finalAdditionalAcceptedReadings, ...accepted];
+    readingResolution = {
+      status: "generated",
+      model: provenance.readingSelection,
+      generatedAt,
+      alternatives: candidate.readingResolution.alternatives,
+      decisions: decisions.map((decision) => ({ ...decision })),
+    };
+  }
+
   const selectedSenses = applicableSenses.length === 0 ? undefined : applicableSenses;
-  const additionalAcceptedReadings = (candidate.additionalAcceptedReadings ?? []).map(
+  const additionalAcceptedReadings = finalAdditionalAcceptedReadings.map(
     (additional) => {
       const additionalEntry = sameSpellingEntries.find(({ id }) => id === additional.jmdictId);
       if (additionalEntry === undefined) {
@@ -292,13 +344,16 @@ export async function applyGeneratedCardFields(
   candidate.target.fields["Dictionary"] = card.dictionary;
   candidate.target.fields.Source = card.source ?? "";
   candidate.recognitionTarget = displayTarget.recognitionTarget;
-  if (candidate.additionalAcceptedReadings !== undefined) {
+  if (additionalAcceptedReadings.length > 0) {
     candidate.additionalAcceptedReadings = additionalAcceptedReadings.map((additional) => ({
       jmdictId: additional.entry.id,
       kanaReading: additional.kanaReading,
       applicableSenseNumbers: [...additional.applicableSenseNumbers],
     }));
+  } else {
+    delete candidate.additionalAcceptedReadings;
   }
   candidate.senseResolution = senseResolution;
+  candidate.readingResolution = readingResolution;
   candidate.minimizedContextResolution = minimizedContextResolution;
 }

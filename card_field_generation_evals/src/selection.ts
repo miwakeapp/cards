@@ -23,6 +23,8 @@ function sampleStratum(fixture: EvalFixture): string {
       return fixture.expected.disposition;
     case "hint":
       return fixture.expected.disposition;
+    case "reading-selection":
+      return fixture.expected.decisions.map(({ decision }) => decision).join("+");
     case "sense-selection":
       if (fixture.expected.outcome.outcome !== "selected") {
         return fixture.expected.outcome.outcome;

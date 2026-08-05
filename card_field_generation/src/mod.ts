@@ -27,6 +27,13 @@ export type {
   ReasoningEffort,
 } from "./model_presets.ts";
 export { isAIQuotaError } from "./provider_error.ts";
+export { selectAdditionalReadingsForCard } from "./reading_selection.ts";
+export type {
+  AlternativeReadingDecision,
+  ReadingCandidateEvidence,
+  ReadingSelectionInput,
+  ReadingSelectionOutcome,
+} from "./reading_selection.ts";
 export { GenerationAttemptsExhaustedError } from "./runner.ts";
 export type {
   CachedGenerationMetadata,

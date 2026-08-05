@@ -46,6 +46,7 @@ import {
   resolveSource,
 } from "./source.ts";
 import {
+  type AdditionalAcceptedReadingResolution,
   type AnkiNoteInfo,
   type ConversionCandidate,
   type FullContextResolution,
@@ -294,6 +295,25 @@ function canonicalApplicableReadings(entry: JMdictWord, recognitionTarget: strin
 
 function arraysEqual<T>(left: readonly T[], right: readonly T[]): boolean {
   return left.length === right.length && left.every((value, index) => value === right[index]);
+}
+
+function distinctAdditionalReadings(
+  candidates: readonly AdditionalAcceptedReadingResolution[],
+  leadJMDictId: string,
+  leadReading: string,
+): AdditionalAcceptedReadingResolution[] {
+  return candidates.filter((candidate) =>
+    candidate.jmdictId !== leadJMDictId || !kanaScriptsMatch(candidate.kanaReading, leadReading)
+  ).filter((candidate, index, all) =>
+    all.findIndex((other) =>
+      other.jmdictId === candidate.jmdictId &&
+      arraysEqual(other.applicableSenseNumbers, candidate.applicableSenseNumbers) &&
+      kanaScriptsMatch(other.kanaReading, candidate.kanaReading)
+    ) === index
+  ).map((candidate) => ({
+    ...candidate,
+    applicableSenseNumbers: [...candidate.applicableSenseNumbers],
+  }));
 }
 
 const AUTOMATICALLY_REJECTED_READING_TAGS = new Set(["ok", "rk", "sk"]);
@@ -855,27 +875,7 @@ export async function convertAnimecardsNote(
         ? entrySelectionOverride?.additionalAcceptedReadings ?? []
         : [];
       const additionalAcceptedReadings = usesReadingField
-        ? [
-          ...(includeAlternatives
-            ? automaticallyAcceptedReadings(entry, recognitionTarget, reading!).map((
-              kanaReading,
-            ) => ({
-              jmdictId: entry.id,
-              kanaReading,
-              applicableSenseNumbers: leadSelectedSenses,
-            }))
-            : []),
-          ...reviewedAdditionalReadings,
-        ].filter((candidate) =>
-          candidate.jmdictId !== entry.id || !kanaScriptsMatch(candidate.kanaReading, reading!)
-        ).filter((candidate, index, candidates) =>
-          candidates.findIndex((other) =>
-            other.jmdictId === candidate.jmdictId &&
-            JSON.stringify(other.applicableSenseNumbers) ===
-              JSON.stringify(candidate.applicableSenseNumbers) &&
-            kanaScriptsMatch(other.kanaReading, candidate.kanaReading)
-          ) === index
-        )
+        ? distinctAdditionalReadings(reviewedAdditionalReadings, entry.id, reading!)
         : [];
       const additionalJMDictUsages = additionalAcceptedReadings.map((additional) => {
         const additionalEntry = options.entries.get(additional.jmdictId);
@@ -1036,6 +1036,38 @@ export async function convertAnimecardsNote(
         : { status: "pending", compatibleSenses };
     }
 
+    const leadSelectedSenses = selectedSensesForReading(selectedReading) ??
+      compatibleSenseNumbersForJMDictUsage(
+        entry,
+        keyRecognitionTarget,
+        usesReadingField ? selectedReading : undefined,
+      );
+    const reviewedAdditionalReadings = usesReadingField
+      ? distinctAdditionalReadings(
+        entrySelectionOverride?.additionalAcceptedReadings ?? [],
+        entry.id,
+        selectedReading,
+      )
+      : [];
+    const possibleAdditionalReadings = usesReadingField
+      ? distinctAdditionalReadings(
+        automaticallyAcceptedReadings(entry, keyRecognitionTarget, selectedReading).map((
+          kanaReading,
+        ) => ({
+          jmdictId: entry.id,
+          kanaReading,
+          applicableSenseNumbers: leadSelectedSenses,
+        })),
+        entry.id,
+        selectedReading,
+      ).filter((candidate) =>
+        !reviewedAdditionalReadings.some((reviewed) =>
+          reviewed.jmdictId === candidate.jmdictId &&
+          kanaScriptsMatch(reviewed.kanaReading, candidate.kanaReading)
+        )
+      )
+      : [];
+
     const targetFields = {
       "Key": card.key,
       "Recognition target": displayTarget.recognitionTarget,
@@ -1056,40 +1088,12 @@ export async function convertAnimecardsNote(
         keyRecognitionTarget,
         ...(recognitionTargetOverride === undefined ? {} : { recognitionTargetOverride }),
         readingKana: selectedReading,
-        ...(usesReadingField &&
-            (entrySelectionOverride?.additionalAcceptedReadings !== undefined ||
-              automaticallyAcceptedReadings(entry, keyRecognitionTarget, selectedReading).length >
-                0)
-          ? {
-            additionalAcceptedReadings: [
-              ...automaticallyAcceptedReadings(
-                entry,
-                keyRecognitionTarget,
-                selectedReading,
-              ).map((kanaReading) => ({
-                jmdictId: entry.id,
-                kanaReading,
-                applicableSenseNumbers: selectedSensesForReading(selectedReading) ??
-                  compatibleSenseNumbersForJMDictUsage(
-                    entry,
-                    keyRecognitionTarget,
-                    selectedReading,
-                  ),
-              })),
-              ...(entrySelectionOverride?.additionalAcceptedReadings ?? []),
-            ].filter((candidate) =>
-              candidate.jmdictId !== entry.id ||
-              !kanaScriptsMatch(candidate.kanaReading, selectedReading)
-            ).filter((candidate, index, candidates) =>
-              candidates.findIndex((other) =>
-                other.jmdictId === candidate.jmdictId &&
-                JSON.stringify(other.applicableSenseNumbers) ===
-                  JSON.stringify(candidate.applicableSenseNumbers) &&
-                kanaScriptsMatch(other.kanaReading, candidate.kanaReading)
-              ) === index
-            ),
-          }
-          : {}),
+        ...(reviewedAdditionalReadings.length === 0 ? {} : {
+          additionalAcceptedReadings: reviewedAdditionalReadings,
+        }),
+        readingResolution: possibleAdditionalReadings.length === 0
+          ? { status: "not-needed" }
+          : { status: "pending", alternatives: possibleAdditionalReadings },
         senseSelectionContext: senseSelectionContext(),
         sourceResolution,
         targetInContextResolution,

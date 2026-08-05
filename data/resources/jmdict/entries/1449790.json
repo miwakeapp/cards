@@ -1,0 +1,76 @@
+{
+  "id": "1449790",
+  "kanji": [
+    {
+      "common": true,
+      "text": "統治",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "とうち",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "とうじ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vt"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "rule"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "reign"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "government"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "governing"
+        }
+      ]
+    }
+  ]
+}

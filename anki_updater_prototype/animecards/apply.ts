@@ -18,6 +18,7 @@ import {
   type ConversionCandidate,
   type ConversionManifest,
   deferredReason,
+  readingResolutionIsComplete,
   senseResolutionIsComplete,
 } from "./types.ts";
 
@@ -151,6 +152,14 @@ async function main(): Promise<void> {
   if (incompleteSenseSelections.length > 0) {
     throw new Error(
       `${incompleteSenseSelections.length} approved candidates still need AI sense selection. Run animecards:enrich before apply.`,
+    );
+  }
+  const incompleteReadingSelections = candidates.filter((candidate) =>
+    !readingResolutionIsComplete(candidate.readingResolution)
+  );
+  if (incompleteReadingSelections.length > 0) {
+    throw new Error(
+      `${incompleteReadingSelections.length} approved candidates still need AI additional-reading selection. Run animecards:enrich before apply.`,
     );
   }
 

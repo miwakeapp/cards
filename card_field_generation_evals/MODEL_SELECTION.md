@@ -5,6 +5,7 @@ The current defaults were selected on 2026-07-29 after agents iterated on the tr
 ## Selected configurations
 
 - **Sense selection:** GPT-5.6 Sol at medium reasoning. It was the most reliable at retaining every genuinely applicable sense without collapsing related-but-distinct senses or over-selecting a sense merely evoked by the context.
+- **Additional-reading selection:** GPT-5.6 Sol at medium reasoning. It reproduced all five initial user-reviewed decisions, including retaining both common readings of `日本`, omitting the uncommon alternatives on the three corrected live cards, and retaining `あす` but not formal `みょうにち` for casual `明日`. Gemini 3.6 Flash at medium reasoning matched four of five but retained `みょうにち`.
 - **Hint generation:** GPT-5.6 Sol at medium reasoning. It was the most consistent at preserving source participants, voice, relationships, spelling, and modality while producing a short phrase. Lower-cost models more often invented generic collocations or copied an unhelpfully long or inflected fragment.
 - **Context minimization:** Claude Opus 5 at low effort. In the agent-adjudicated comparison it was the most dependable at retaining antecedents, comparison frames, and necessary adjacent sentences while removing narrative framing. Higher effort did not justify its extra cost on those development cases.
 
@@ -29,12 +30,13 @@ The final hint and minimization prompts received complete production-model runs 
 - Context minimization completed 55/55 cases with eight corrective retries at an estimated $0.222724. Among non-prompt-overlap references, its minimize/keep decision agreed with 37/39 agent-reviewed cases and 7/7 corpus-replay cases; no output exactly reproduced a recorded bad context.
 - Hint generation completed 94/94 cases with three corrective retries and seven local result-cache hits at an estimated $1.371866. Among non-prompt-overlap references, operation disposition agreed with 3/3 user-reviewed and 76/78 agent-reviewed cases. Agent-reviewed generated wording produced 57 preferred exact matches, two acceptable exact matches, four novel validated outputs requiring review, and zero recorded-bad exact matches.
 - Sense selection completed the then-current 92-case corpus without retries at an estimated $0.834176. Non-prompt-overlap exact agreement was 3/3 user-reviewed, 24/26 agent-reviewed, 32/43 corpus-replay, and 2/3 provisional. After the final discourse-act clarification, the stratified 30-case run completed without retries at an estimated $0.259478 and agreed with 4/4 user-reviewed, 19/22 agent-reviewed, 2/2 corpus-replay, and 1/2 provisional references. Two of its agent-reference disagreements were already present before the clarification; the third was a stochastic reversal on an unaffected case.
+- Additional-reading selection completed its initial five-case corpus without retries. GPT-5.6 Sol at medium reasoning agreed with 5/5 user-reviewed decisions at an estimated $0.031115; Gemini 3.6 Flash at medium reasoning agreed with 4/5 at an estimated lower bound of $0.017763. The corpus is deliberately small and motivating, so this establishes behavior on the known cases rather than a generalization estimate.
 
 The eight-answer blind worksheet matched exactly on both hints, one of two sense choices, one of two context minimizations, and neither of two contextual mark boundaries. The sense miss led to the general discourse-act rule and now passes without an exact few-shot. The two marking misses led to deterministic boundaries for attached `たり` and following desiderative `たい`; both now pass focused tests. The remaining minimization miss was a reasonable difference in how much supporting context to retain and did not justify prompt specialization. Four exact matches out of eight is not a benchmark, but the exercise usefully found defects that development-reference scoring had missed.
 
 ## Cost and caching
 
-The saved development and comparison runs total approximately **$33.19 USD** at the checked-in standard list prices. This includes model exploration, prompt iteration, corrective reruns, the blinded-worksheet follow-up, and several full-corpus validations; it is not the cost of one production batch.
+The saved development and comparison runs total approximately **$33.24 USD** at the checked-in standard list prices. This includes model exploration, prompt iteration, corrective reruns, the blinded-worksheet follow-up, and several full-corpus validations; it is not the cost of one production batch.
 
 Two cache layers prevent paying for unchanged work:
 

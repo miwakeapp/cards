@@ -129,9 +129,12 @@ export function buildConversionReport(manifest: ConversionManifest): string {
   const minimizationModelCounts = new Map<string, number>();
   const senseCounts = new Map<string, number>();
   const senseModelCounts = new Map<string, number>();
+  const readingCounts = new Map<string, number>();
+  const readingModelCounts = new Map<string, number>();
   const failedEnrichments = manifest.candidates.filter((candidate) =>
     candidate.minimizedContextResolution.status === "failed" ||
-    candidate.senseResolution.status === "failed"
+    candidate.senseResolution.status === "failed" ||
+    candidate.readingResolution.status === "failed"
   );
   const aiResolvedTargets = candidates.filter((candidate) =>
     candidate.targetInContextResolution.method === "ai"
@@ -144,6 +147,9 @@ export function buildConversionReport(manifest: ConversionManifest): string {
   );
   const multiReadingCandidates = manifest.candidates.filter((candidate) =>
     (candidate.additionalAcceptedReadings?.length ?? 0) > 0
+  );
+  const readingSelections = manifest.candidates.filter((candidate) =>
+    candidate.readingResolution.status !== "not-needed"
   );
   const entrySelectionDeferrals = manifest.skipped.filter((skipped) =>
     skipped.entrySelection !== undefined
@@ -189,6 +195,14 @@ export function buildConversionReport(manifest: ConversionManifest): string {
         (senseModelCounts.get(candidate.senseResolution.model) ?? 0) + 1,
       );
     }
+    const readingStatus = candidate.readingResolution.status;
+    readingCounts.set(readingStatus, (readingCounts.get(readingStatus) ?? 0) + 1);
+    if (candidate.readingResolution.status === "generated") {
+      readingModelCounts.set(
+        candidate.readingResolution.model,
+        (readingModelCounts.get(candidate.readingResolution.model) ?? 0) + 1,
+      );
+    }
   }
 
   const lines = [
@@ -231,6 +245,12 @@ export function buildConversionReport(manifest: ConversionManifest): string {
     `- Sense-selection AI models: ${
       [...senseModelCounts].map(([model, count]) => `${model}=${count}`).join(", ") || "none"
     }`,
+    `- Additional-reading selection: ${
+      [...readingCounts].map(([status, count]) => `${status}=${count}`).join(", ")
+    }`,
+    `- Additional-reading AI models: ${
+      [...readingModelCounts].map(([model, count]) => `${model}=${count}`).join(", ") || "none"
+    }`,
     `- JMDict-entry selections: ${entrySelections.length}`,
     `- Multi-reading selections: ${multiReadingCandidates.length}`,
     `- Failed AI enrichments: ${failedEnrichments.length}`,
@@ -272,6 +292,32 @@ export function buildConversionReport(manifest: ConversionManifest): string {
             ).join("; ")
         } | ${inlineCode(candidate.target.fields.Reading)} |`,
       );
+    }
+    lines.push("");
+  }
+
+  lines.push("## Additional-reading judgments", "");
+  if (readingSelections.length === 0) {
+    lines.push("None.", "");
+  } else {
+    for (const candidate of readingSelections) {
+      const resolution = candidate.readingResolution;
+      lines.push(
+        `- Note ${candidate.noteId} · ${
+          inlineCode(candidate.keyRecognitionTarget)
+        } · ${resolution.status}`,
+      );
+      if (resolution.status === "generated") {
+        for (const decision of resolution.decisions) {
+          lines.push(
+            `  - ${inlineCode(decision.kanaReading)}: ${decision.decision} — ${decision.rationale}`,
+          );
+        }
+      } else if (resolution.status !== "not-needed") {
+        for (const alternative of resolution.alternatives) {
+          lines.push(`  - ${inlineCode(alternative.kanaReading)}`);
+        }
+      }
     }
     lines.push("");
   }

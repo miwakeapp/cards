@@ -29,6 +29,7 @@ function candidate(): ConversionCandidate {
     fullContextResolution: { status: "restored", method: "exact" },
     minimizedContextResolution: { status: "pending" },
     senseResolution: { status: "pending", compatibleSenses: [1, 2, 3, 4, 5, 6] },
+    readingResolution: { status: "not-needed" },
     original: { modelName: "Animecards", tags: [], cards: [99], fields: {}, fingerprint: "abc" },
     target: {
       modelName: "Miwake",
@@ -47,6 +48,33 @@ function candidate(): ConversionCandidate {
 }
 
 const entry = await preextractedJMDictEntry("1414110");
+const alternateNamesEntry = await preextractedJMDictEntry("1158110");
+
+function additionalReadingCandidate(): ConversionCandidate {
+  const value = candidate();
+  value.jmdictId = alternateNamesEntry.id;
+  value.recognitionTarget = "異名";
+  value.keyRecognitionTarget = "異名";
+  value.readingKana = "いみょう";
+  value.senseSelectionContext = "その異名を知っている。";
+  value.targetInContextResolution = { method: "deterministic", surface: "異名" };
+  value.minimizedContextResolution = { status: "not-needed" };
+  value.senseResolution = { status: "determined", applicableSenses: [1] };
+  value.readingResolution = {
+    status: "pending",
+    alternatives: [{
+      jmdictId: alternateNamesEntry.id,
+      kanaReading: "いめい",
+      applicableSenseNumbers: [1],
+    }],
+  };
+  value.target.fields.Key = "異名 | 1158110:1";
+  value.target.fields["Recognition target"] = "異名";
+  value.target.fields.Reading = "異[い] 名[みょう]";
+  value.target.fields["Full context"] = "その<mark>異名</mark>を知っている。";
+  value.target.fields["Minimized context"] = "";
+  return value;
+}
 
 Deno.test("enrichmentContext preserves canonical target markup", () => {
   const value = candidate();
@@ -93,6 +121,75 @@ Deno.test("isAIQuotaError recognizes provider quota failures", () => {
   assertEquals(isAIQuotaError("RESOURCE_EXHAUSTED: quota exceeded"), false);
   assertEquals(isAIQuotaError("Quota has been exceeded for this project"), false);
   assertEquals(isAIQuotaError("Invalid JSON response"), false);
+});
+
+Deno.test("applyGeneratedCardFields includes an AI-selected additional reading", async () => {
+  const value = additionalReadingCandidate();
+  await applyGeneratedCardFields(
+    value,
+    alternateNamesEntry,
+    [alternateNamesEntry],
+    {
+      readingSelection: {
+        decisions: [{
+          kanaReading: "いめい",
+          decision: "include",
+          rationale: "A useful modern alternative.",
+        }],
+      },
+    },
+    { readingSelection: "gpt-5.6-sol@medium" },
+    "2026-08-05T00:00:00.000Z",
+  );
+
+  assertEquals(
+    value.target.fields.Reading,
+    "<ul><li>異[い] 名[みょう]</li><li>異[い] 名[めい]</li></ul>",
+  );
+  assertEquals(value.additionalAcceptedReadings, [{
+    jmdictId: "1158110",
+    kanaReading: "いめい",
+    applicableSenseNumbers: [1],
+  }]);
+  assertEquals(value.readingResolution, {
+    status: "generated",
+    model: "gpt-5.6-sol@medium",
+    generatedAt: "2026-08-05T00:00:00.000Z",
+    alternatives: [{
+      jmdictId: "1158110",
+      kanaReading: "いめい",
+      applicableSenseNumbers: [1],
+    }],
+    decisions: [{
+      kanaReading: "いめい",
+      decision: "include",
+      rationale: "A useful modern alternative.",
+    }],
+  });
+});
+
+Deno.test("applyGeneratedCardFields omits a rejected additional reading", async () => {
+  const value = additionalReadingCandidate();
+  await applyGeneratedCardFields(
+    value,
+    alternateNamesEntry,
+    [alternateNamesEntry],
+    {
+      readingSelection: {
+        decisions: [{
+          kanaReading: "いめい",
+          decision: "omit",
+          rationale: "Too uncommon for this card.",
+        }],
+      },
+    },
+    { readingSelection: "gpt-5.6-sol@medium" },
+    "2026-08-05T00:00:00.000Z",
+  );
+
+  assertEquals(value.target.fields.Reading, "異[い] 名[みょう]");
+  assertEquals(value.additionalAcceptedReadings, undefined);
+  assertEquals(value.readingResolution.status, "generated");
 });
 
 Deno.test("enrichment preserves successful minimization when sense generation fails", async () => {

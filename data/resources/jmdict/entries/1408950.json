@@ -1,0 +1,72 @@
+{
+  "id": "1408950",
+  "kanji": [
+    {
+      "common": true,
+      "text": "打破",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "だは",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    },
+    {
+      "common": false,
+      "text": "たは",
+      "tags": [
+        "ok"
+      ],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "vs",
+        "vt"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "breaking down"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "defeating"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "abolishing"
+        }
+      ]
+    }
+  ]
+}

@@ -1,10 +1,10 @@
 # Card-field generation evals
 
-This package evaluates the focused AI operations in `card_field_generation` against tracked card-conversion references. Every fixture records whether its expectation was user-reviewed, agent-reviewed, replayed from an observed corpus artifact, or remains provisional. It deliberately keeps sense selection, hint generation, and context minimization separate: sense selections have enumerable answers, null minimization decisions can be compared exactly, and novel source-grounded text needs review instead of being marked wrong merely because it differs from one preferred example.
+This package evaluates the focused AI operations in `card_field_generation` against tracked card-conversion references. Every fixture records whether its expectation was user-reviewed, agent-reviewed, replayed from an observed corpus artifact, or remains provisional. It deliberately keeps sense selection, additional-reading selection, hint generation, and context minimization separate: sense and reading selections have enumerable answers, null minimization decisions can be compared exactly, and novel source-grounded text needs review instead of being marked wrong merely because it differs from one preferred example.
 
 ## Running evals
 
-The default run uses each operation's current production configuration: GPT-5.6 Sol at medium reasoning effort for sense selection and hints, and Claude Opus 5 at low effort for context minimization. These settings are an agent-adjudicated engineering baseline selected on the development corpus, not a user-validated optimum. Provider results are content-addressed and persisted in `generated/cache.jsonl`, so rerunning an unchanged prompt/model/input does not pay for another request. This is the default `--cache-mode use` policy.
+The default run uses each operation's current production configuration: GPT-5.6 Sol at medium reasoning effort for sense selection, additional-reading selection, and hints, and Claude Opus 5 at low effort for context minimization. These settings are an agent-adjudicated engineering baseline selected on the development corpus, not a user-validated optimum. Provider results are content-addressed and persisted in `generated/cache.jsonl`, so rerunning an unchanged prompt/model/input does not pay for another request. This is the default `--cache-mode use` policy.
 
 See [MODEL_SELECTION.md](MODEL_SELECTION.md) for the comparison methodology, development back-test, cost record, and rationale for those defaults.
 
@@ -12,7 +12,7 @@ See [MODEL_SELECTION.md](MODEL_SELECTION.md) for the comparison methodology, dev
 deno task run
 ```
 
-For inexpensive prompt iteration, use the deterministic 30-case development sample. It balances all three operations, stratifies each operation by expected outcome, rotates among user-reviewed, agent-reviewed, corpus-replay, and provisional evidence within each stratum, and excludes prompt few-shots. This is an iteration aid, not a statistically independent held-out test set.
+For inexpensive prompt iteration, use the deterministic 30-case development sample. It balances all four operations, stratifies each operation by expected outcome, rotates among user-reviewed, agent-reviewed, corpus-replay, and provisional evidence within each stratum, and excludes prompt few-shots. This is an iteration aid, not a statistically independent held-out test set.
 
 ```sh
 deno task run --sample 30
@@ -69,6 +69,7 @@ A separate preference worksheet was adjudicated outside the repository on 2026-0
 ## Fixture files
 
 - `cases/sense_selection.json` contains 114 tracked decisions: the focused Animecards batch, focused known-failure and no-applicable-sense controls, agent-adjudicated cases retained from the predecessor evaluator, the normative three-compatible-sense 見込み example from `DESIGN.md`, three additional controls for pedagogical sense grouping, three user-reviewed worksheet cases, and 19 final-Key decisions recovered from manual SurfacePro11 edits.
+- `cases/reading_selection.json` contains five user-reviewed decisions: the three live-collection corrections that motivated the operation plus positive `日本` and mixed casual-`明日` controls from the card design policy.
 - `cases/hint.json` contains 103 decisions: 60 failures carried forward from the predecessor card-generation review log, 26 agent-adjudicated cases from a read-only sample of accepted SurfacePro11 cards, four earlier controls where no semantic hint is needed, two deliberately underspecified controls where a hint is needed but the source cannot support one, two exposed user-preference cases, and nine new preferences recovered from manual SurfacePro11 hint edits.
 - `cases/minimization.json` contains 55 decisions: 40 contexts that benefit from shortening and 15 contexts where the correct output is `null`.
 
