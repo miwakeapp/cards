@@ -1,13 +1,13 @@
 import { assertEquals, assertStringIncludes } from "@std/assert";
+import type { JMdictGloss } from "@scriptin/jmdict-simplified-types";
 import { preextractedJMDictEntry } from "data";
 
 import { filterRedundantBritishEnglishGlosses } from "../src/english_glosses.ts";
 import { renderEntry } from "../src/mod.ts";
 
-type Gloss = Parameters<typeof filterRedundantBritishEnglishGlosses>[0][number];
-
 const SPELLING_PAIRS = [
   ["favourite colour", "favorite color"],
+  ["accessorised", "accessorized"],
   ["behaviour", "behavior"],
   ["TV programme", "TV program"],
   ["centre", "center"],
@@ -92,7 +92,7 @@ Deno.test("renderEntry keeps corpus glosses that differ beyond British spelling"
   assertStringIncludes(html, "<li>to harbor</li>");
 });
 
-function gloss(text: string, lang = "eng"): Gloss {
+function gloss(text: string, lang = "eng"): JMdictGloss {
   return { lang, gender: null, type: null, text };
 }
 
