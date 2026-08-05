@@ -296,6 +296,15 @@ function arraysEqual<T>(left: readonly T[], right: readonly T[]): boolean {
   return left.length === right.length && left.every((value, index) => value === right[index]);
 }
 
+const AUTOMATICALLY_REJECTED_READING_TAGS = new Set(["ok", "rk", "sk"]);
+
+/**
+ * Rejects readings that JMDict explicitly marks as unsuitable automatic alternatives.
+ *
+ * The lead reading has already been selected from source ruby or the Animecard and is deliberately
+ * exempt: encounter evidence outranks these form tags. A future focused operation can judge the
+ * remaining alternatives using frequency, dictionary commonness, register, and collocation.
+ */
 function automaticallyAcceptedReadings(
   entry: JMdictWord,
   recognitionTarget: string,
@@ -309,6 +318,9 @@ function automaticallyAcceptedReadings(
   return canonicalApplicableReadings(entry, recognitionTarget).filter((reading) =>
     reading !== leadReading &&
     !kanaScriptsMatch(reading, leadReading) &&
+    entry.kana.some(({ tags, text }) =>
+      text === reading && !tags.some((tag) => AUTOMATICALLY_REJECTED_READING_TAGS.has(tag))
+    ) &&
     arraysEqual(
       compatibleSenseNumbersForJMDictUsage(entry, recognitionTarget, reading),
       leadSenses,

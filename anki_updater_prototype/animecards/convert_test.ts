@@ -1,7 +1,7 @@
 import "../../data/test/use_jmdict_fixtures.ts";
 
 import { assert, assertEquals } from "@std/assert";
-import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
+import type { JMdictKana, JMdictWord } from "@scriptin/jmdict-simplified-types";
 import { preextractedJMDictEntry } from "data";
 import { buildSpellingIndex } from "card_resolution";
 import { convertAnimecardsNote } from "./convert.ts";
@@ -19,7 +19,7 @@ const SOURCE_FIELDS: SourceFieldMapping = {
 function makeWord(options: {
   id?: string;
   kanji?: string[];
-  kana: string[];
+  kana: string[] | JMdictKana[];
   senses?: number;
   partOfSpeech?: string[];
 }): JMdictWord {
@@ -39,12 +39,9 @@ function makeWord(options: {
   return {
     id: options.id ?? "1234567",
     kanji: (options.kanji ?? []).map((text) => ({ text, common: true, tags: [] })),
-    kana: options.kana.map((text) => ({
-      text,
-      common: true,
-      tags: [],
-      appliesToKanji: ["*"],
-    })),
+    kana: typeof options.kana[0] === "string"
+      ? options.kana.map((text) => ({ text, common: true, tags: [], appliesToKanji: ["*"] }))
+      : options.kana,
     sense: Array.from({ length: options.senses ?? 1 }, () => ({ ...sense })),
   } as JMdictWord;
 }
@@ -876,6 +873,79 @@ Deno.test("convertAnimecardsNote accepts structurally equivalent multiple readin
   assertEquals(result.candidate.additionalAcceptedReadings, [{
     jmdictId: entry.id,
     kanaReading: "しょう",
+    applicableSenseNumbers: [1],
+  }]);
+  assertEquals(
+    result.candidate.target.fields.Reading,
+    "<ul><li>生[せい]</li><li>生[しょう]</li></ul>",
+  );
+});
+
+Deno.test("convertAnimecardsNote rejects obsolete, rare, and search-only alternatives", async () => {
+  const entry = makeWord({
+    kanji: ["生"],
+    kana: [
+      { text: "せい", common: true, tags: [], appliesToKanji: ["*"] },
+      { text: "しょう", common: false, tags: [], appliesToKanji: ["*"] },
+      { text: "なま", common: true, tags: ["ok"], appliesToKanji: ["*"] },
+      { text: "き", common: true, tags: ["rk"], appliesToKanji: ["*"] },
+      { text: "うぶ", common: true, tags: ["sk"], appliesToKanji: ["*"] },
+    ],
+  });
+  const entries = new Map([[entry.id, entry]]);
+  const result = await convertAnimecardsNote(
+    makeNote({ Word: "生", Sentence: "生の情報", Reading: "せい" }),
+    {
+      sourceModel: "Animecards",
+      targetModel: "Miwake",
+      sourceFields: SOURCE_FIELDS,
+      entries,
+      spellingIndex: buildSpellingIndex(entries.values()),
+    },
+  );
+
+  assert(result.candidate);
+  assertEquals(result.candidate.readingKana, "せい");
+  assertEquals(result.candidate.additionalAcceptedReadings, [{
+    jmdictId: entry.id,
+    kanaReading: "しょう",
+    applicableSenseNumbers: [1],
+  }]);
+  assertEquals(
+    result.candidate.target.fields.Reading,
+    "<ul><li>生[せい]</li><li>生[しょう]</li></ul>",
+  );
+});
+
+Deno.test("convertAnimecardsNote retains a marked non-common reading selected by source ruby", async () => {
+  const entry = makeWord({
+    kanji: ["生"],
+    kana: [
+      { text: "せい", common: true, tags: [], appliesToKanji: ["*"] },
+      { text: "しょう", common: false, tags: ["rk"], appliesToKanji: ["*"] },
+    ],
+  });
+  const entries = new Map([[entry.id, entry]]);
+  const result = await convertAnimecardsNote(
+    makeNote({
+      Word: "生",
+      Sentence: "<ruby>生<rt>しょう</rt></ruby>の情報",
+      Reading: "せい",
+    }),
+    {
+      sourceModel: "Animecards",
+      targetModel: "Miwake",
+      sourceFields: SOURCE_FIELDS,
+      entries,
+      spellingIndex: buildSpellingIndex(entries.values()),
+    },
+  );
+
+  assert(result.candidate);
+  assertEquals(result.candidate.readingKana, "しょう");
+  assertEquals(result.candidate.additionalAcceptedReadings, [{
+    jmdictId: entry.id,
+    kanaReading: "せい",
     applicableSenseNumbers: [1],
   }]);
   assertEquals(
