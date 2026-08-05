@@ -51,10 +51,17 @@ rt {
 
 #reading {
   > ul {
-    width: fit-content;
-    margin: 0 auto;
-    padding-inline-start: 1em;
-    text-align: start;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    > li {
+      display: inline;
+
+      &:not(:last-of-type)::after {
+        content: "・";
+      }
+    }
   }
 }
 
