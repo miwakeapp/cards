@@ -443,7 +443,7 @@ section[id] {
 
 .reading-transition {
   display: flex;
-  align-items: center;
+  align-items: start;
   gap: 8px;
   padding: 0 20px 12px;
   color: var(--muted);
@@ -462,6 +462,11 @@ section[id] {
     color: var(--ink);
   }
 
+  & .reading-value > ul {
+    margin: 0;
+    padding-inline-start: 1em;
+  }
+
   & ruby {
     font-family: var(--serif-ja);
     font-size: 15px;
@@ -470,6 +475,10 @@ section[id] {
   & rt {
     font-size: 9px;
   }
+}
+
+.reading-separator {
+  margin-inline: 0.25em;
 }
 
 .detail-changes .reading-transition {
@@ -1047,6 +1056,11 @@ section[id] {
 }
 
 /* ---------- normalize & exceptions ---------- */
+
+#normalizeBody {
+  display: grid;
+  gap: 8px;
+}
 
 .normalize-strip {
   border: 1px solid var(--line);

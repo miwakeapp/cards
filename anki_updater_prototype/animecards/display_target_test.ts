@@ -117,6 +117,20 @@ Deno.test("applyDisplayTargetOverride transfers precise furigana into a user edi
       reading: "～然[ぜん]とする&lt;script&gt;",
     },
   );
+  assertEquals(
+    applyDisplayTargetOverride(
+      {
+        recognitionTarget: "然",
+        reading: "<ul><li>然[ぜん]</li><li>然[ねん]</li></ul>",
+      },
+      "然",
+      "～然とする",
+    ),
+    {
+      recognitionTarget: "～然とする",
+      reading: "<ul><li>～然[ぜん]とする</li><li>～然[ねん]とする</li></ul>",
+    },
+  );
 });
 
 Deno.test("applyDisplayTargetOverride leaves automatic notation alone without an override", () => {

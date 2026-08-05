@@ -25,6 +25,7 @@ import { buildSpellingIndex, findAllEntriesBySpelling, type SpellingIndex } from
 import { createACInvoke, DEFAULT_ANKI_CONNECT_URL, fetchMiwakeNotes } from "./anki.ts";
 import { analyzeCard, type AnalyzedCard } from "./analyze.ts";
 import { ensureLatestFurigana, ensureLatestJMDict } from "data/download";
+import { flagDuplicateRecognitionUnits } from "./duplicate_keys.ts";
 import { startServer } from "./server.ts";
 import { createGenerationCache, ReviewState } from "./state.ts";
 import { suggestForCard, type Suggestion } from "./suggest.ts";
@@ -240,13 +241,8 @@ const notes = await fetchMiwakeNotes(options.query, {
 console.error(`Fetched ${notes.length} Miwake notes.`);
 
 console.error("Analyzing cards...");
-const cards = await Promise.all(notes.map((note) => {
-  const jmdictId = note.fields.key.split("|")[1]?.trim();
-  return analyzeCard(
-    note,
-    jmdictId === undefined ? undefined : entries.get(jmdictId),
-  );
-}));
+let cards = await Promise.all(notes.map((note) => analyzeCard(note, entries)));
+cards = flagDuplicateRecognitionUnits(cards, entries);
 
 const counts = { unchanged: 0, normalize: 0, routine: 0, retarget: 0, exception: 0 };
 for (const card of cards) {
@@ -268,6 +264,7 @@ const state = await ReviewState.load(cards);
 
 startServer({
   cards,
+  entries,
   suggestions,
   spellingIndex,
   generationCache,

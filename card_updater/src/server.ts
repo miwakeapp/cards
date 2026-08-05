@@ -5,11 +5,15 @@
 
 import { serveDir } from "@std/http/file-server";
 import * as path from "@std/path";
+import { parseKey } from "card_model/keys";
 import type { GenerationCache } from "card_field_generation";
 import { findAllEntriesBySpelling, type SpellingIndex } from "card_resolution";
+import type { JMDictWord } from "data";
 import { ac, type ACInvoke, applyNoteUpdate, openNoteInAnki } from "./anki.ts";
 import { applyRestrictionReason } from "./client/apply_policy.ts";
+import { RecognitionUnitIndex } from "./duplicate_keys.ts";
 import type { AnalyzedCard } from "./analyze.ts";
+import { validateCardReading } from "./reading_validation.ts";
 import type { ReviewItem, ReviewMeta, ReviewPayload } from "./review_api.ts";
 import { suggestedKey, suggestForCard, type Suggestion } from "./suggest.ts";
 import { type DecisionRecord, type ReviewState } from "./state.ts";
@@ -19,6 +23,7 @@ const BUILD_DIRECTORY = path.resolve(import.meta.dirname!, "../build");
 
 export interface ServerOptions {
   cards: AnalyzedCard[];
+  entries: ReadonlyMap<string, JMDictWord>;
   suggestions: Map<number, Suggestion>;
   spellingIndex: SpellingIndex;
   generationCache: GenerationCache;
@@ -33,11 +38,36 @@ export function impliedDecision(card: AnalyzedCard): "accept" | "none" {
   return card.verdict === "routine" || card.verdict === "normalize" ? "accept" : "none";
 }
 
+/** Validates and canonically formats the Reading retained beside a proposed latest-JMDict Key. */
+export async function validateResultingReading(
+  card: AnalyzedCard,
+  key: string,
+  reading: string,
+  entries: ReadonlyMap<string, JMDictWord>,
+): Promise<{ reading: string } | { error: string }> {
+  const parsedKey = parseKey(key);
+  if (parsedKey === null) return { error: "The resulting Key is not canonical." };
+
+  const readingValidation = await validateCardReading({
+    key: parsedKey,
+    recognitionTarget: card.note.fields.recognitionTarget,
+    reading,
+    entries,
+  });
+  if (readingValidation.error !== null) {
+    return { error: `The resulting Key and Reading are incompatible: ${readingValidation.error}` };
+  }
+  return { reading: readingValidation.proposedReading ?? reading };
+}
+
 export function startServer(options: ServerOptions): Deno.HttpServer {
-  const { cards, suggestions, spellingIndex, generationCache, state, meta } = options;
+  const { cards, entries, suggestions, spellingIndex, generationCache, state, meta } = options;
   const invoke = options.invoke ?? ac;
   const cardsByNoteId = new Map(cards.map((card) => [card.note.noteId, card]));
-  const allKeys = new Set(cards.map((card) => card.note.fields.key));
+  const recognitionUnits = new RecognitionUnitIndex(
+    cards.map((card) => ({ noteId: card.note.noteId, key: card.note.fields.key })),
+    entries,
+  );
 
   function cardPayload(card: AnalyzedCard): ReviewItem {
     const suggestion = suggestions.get(card.note.noteId) ?? null;
@@ -51,16 +81,11 @@ export function startServer(options: ServerOptions): Deno.HttpServer {
       word: card.note.fields.recognitionTarget ||
         card.parsedKey?.spelling || card.note.fields.key,
       key: card.note.fields.key,
-      recognitionTarget: card.parsedKey?.spelling ?? null,
-      jmdictId: card.parsedKey?.jmdictId ?? null,
       hint: card.note.fields.hint,
       fullContext: card.note.fields.fullContext,
-      currentEntryHTML: card.note.fields.dictionaryEntry,
+      currentEntryHTML: card.note.fields.dictionary,
       latestEntryHTML: card.latestEntryHTML,
       oldSenseCount: card.oldParsed?.senses.length ?? null,
-      newSenseCount: card.newParsed?.senses.length ?? null,
-      totalNewSenses: card.newParsed?.senses.length ?? 0,
-      targetSenseNumbers: card.targetSenseNumbers,
       mappedTargetSenses: card.mappedTargetSenses,
       removedSenses: card.alignment?.removedSenses.map((sense) => ({
         number: sense.number,
@@ -70,7 +95,6 @@ export function startServer(options: ServerOptions): Deno.HttpServer {
       proposedKey: card.proposedKey,
       currentReading: card.note.fields.reading,
       proposedReading: card.proposedReading,
-      needsAI: card.needsAI,
       senseViews: card.senseViews,
       changeChips: card.changeChips,
       suggestion,
@@ -82,7 +106,6 @@ export function startServer(options: ServerOptions): Deno.HttpServer {
         decidedAt: savedDecision.decidedAt,
       },
       applied: applied === null ? null : { wroteFields: applied.wroteFields },
-      fingerprint: state.fingerprint(card.note.noteId),
     };
   }
 
@@ -183,11 +206,24 @@ export function startServer(options: ServerOptions): Deno.HttpServer {
     }
 
     const { set } = resolution;
-    if (set.key !== undefined && set.key !== card.note.fields.key && allKeys.has(set.key)) {
+    const resultingKey = set.key ?? card.note.fields.key;
+    const resultingReading = set.reading ?? card.note.fields.reading;
+    const readingValidation = await validateResultingReading(
+      card,
+      resultingKey,
+      resultingReading,
+      entries,
+    );
+    if ("error" in readingValidation) return { noteId, ok: false, error: readingValidation.error };
+    if (readingValidation.reading !== resultingReading) set.reading = readingValidation.reading;
+    const conflicts = recognitionUnits.conflicts(noteId, resultingKey);
+    if (conflicts.length > 0) {
       return {
         noteId,
         ok: false,
-        error: `Another scanned card already has the key "${set.key}".`,
+        error: `Another scanned card represents the same JMDict entry/sense usage (note IDs: ${
+          conflicts.join(", ")
+        }).`,
       };
     }
 
@@ -197,16 +233,14 @@ export function startServer(options: ServerOptions): Deno.HttpServer {
         key: card.note.fields.key,
         recognitionTarget: card.note.fields.recognitionTarget,
         reading: card.note.fields.reading,
-        dictionaryEntry: card.note.fields.dictionaryEntry,
+        dictionary: card.note.fields.dictionary,
         hint: card.note.fields.hint,
       },
       set,
     }, invoke);
 
     if (result.ok) {
-      if (set.key !== undefined) {
-        allKeys.add(set.key);
-      }
+      recognitionUnits.update(noteId, resultingKey);
       await state.markApplied(noteId, {
         appliedAt: new Date().toISOString(),
         fromKey: card.note.fields.key,
@@ -223,7 +257,14 @@ export function startServer(options: ServerOptions): Deno.HttpServer {
     card: AnalyzedCard,
     record: DecisionRecord | null,
   ):
-    | { set: { key?: string; reading?: string; dictionaryEntry?: string; hint?: string } }
+    | {
+      set: {
+        key?: string;
+        reading?: string;
+        dictionary?: string;
+        hint?: string;
+      };
+    }
     | { error: string } {
     const effective = record?.decision ?? impliedDecision(card);
     if (effective !== "accept") {
@@ -239,7 +280,7 @@ export function startServer(options: ServerOptions): Deno.HttpServer {
       }
       return {
         set: {
-          dictionaryEntry: card.latestEntryHTML,
+          dictionary: card.latestEntryHTML,
           key: suggestedKey(card, record.senses),
           hint: record.hint ?? "",
           ...(card.proposedReading === null ? {} : { reading: card.proposedReading }),
@@ -250,7 +291,7 @@ export function startServer(options: ServerOptions): Deno.HttpServer {
     if (card.verdict === "routine" || card.verdict === "normalize") {
       return {
         set: {
-          dictionaryEntry: card.latestEntryHTML,
+          dictionary: card.latestEntryHTML,
           ...(card.proposedKey === null ? {} : { key: card.proposedKey }),
           ...(card.proposedReading === null ? {} : { reading: card.proposedReading }),
         },

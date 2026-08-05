@@ -6,7 +6,7 @@ import {
   compatibleSenseNumbersForJMDictUsage,
   jmdictAlternativesForCardFront,
   jmdictUsagesForSpelling,
-} from "../src/mod.ts";
+} from "card_creator/jmdict";
 
 function oneSenseEntry(id: string, partOfSpeech: string[]): JMDictWord {
   return {

@@ -1,6 +1,6 @@
 import * as path from "@std/path";
+import { renderDictionaryField } from "card_model/dictionary";
 import type { JMDictWord } from "data";
-import { renderEntry } from "jmdict_to_html";
 import { fixtureDefinitions, type PreviewFixture } from "../src/fixtures.ts";
 
 const entriesDirectory = path.resolve(
@@ -12,16 +12,21 @@ const outputFile = path.resolve(dataDirectory, "fixtures.json");
 
 const fixtures: PreviewFixture[] = await Promise.all(
   fixtureDefinitions.map(async (fixture) => {
-    const entryFilename = path.join(entriesDirectory, `${fixture.id}.json`);
-    const json = await Deno.readTextFile(entryFilename);
-    const word = JSON.parse(json) as JMDictWord;
+    const words = await Promise.all(
+      [fixture.id, ...(fixture.additionalEntryIds ?? [])].map(async (id) => {
+        const entryFilename = path.join(entriesDirectory, `${id}.json`);
+        const json = await Deno.readTextFile(entryFilename);
+        return JSON.parse(json) as JMDictWord;
+      }),
+    );
+    const word = words[0];
 
     return {
       ...fixture,
       primaryTerm: getPrimaryTerm(word),
       fields: {
         ...fixture.fields,
-        "Dictionary entry": renderEntry(word),
+        "Dictionary": renderDictionaryField(words),
       },
     };
   }),

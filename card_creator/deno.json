@@ -2,10 +2,11 @@
   "name": "card_creator",
   "exports": {
     ".": "./src/mod.ts",
-    "./keys": "./src/keys.ts"
+    "./accepted-reading": "./src/accepted_reading.ts",
+    "./jmdict": "./src/jmdict.ts"
   },
   "tasks": {
-    "doc:check": "deno doc --lint src/mod.ts src/keys.ts"
+    "doc:check": "deno doc --lint src/mod.ts src/accepted_reading.ts src/jmdict.ts"
   },
   "test": {
     "permissions": {

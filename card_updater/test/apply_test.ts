@@ -1,5 +1,9 @@
 import { assertEquals } from "@std/assert";
-import { type ACInvoke, applyNoteUpdate } from "../src/anki.ts";
+import { type ACInvoke, ankiKeyText, applyNoteUpdate } from "../src/anki.ts";
+
+Deno.test("ankiKeyText preserves noncanonical whitespace and markup", () => {
+  assertEquals(ankiKeyText(" 後々&nbsp;| <b>1578610</b> "), " 後々 | <b>1578610</b> ");
+});
 
 function fakeAnki(noteFields: Record<string, string> | null) {
   const calls: Array<{ action: string; params: Record<string, unknown> }> = [];
@@ -25,10 +29,10 @@ function fakeAnki(noteFields: Record<string, string> | null) {
 }
 
 const CURRENT_FIELDS = {
-  "Key": "掬う | 1226200 | 1",
+  "Key": "掬う | 1226200:1",
   "Recognition target": "掬う",
   "Hint": "",
-  "Dictionary entry": '<ol class="senses"><li>old</li></ol>',
+  "Dictionary": '<ol class="senses"><li>old</li></ol>',
   "Full context": "",
   "Minimized context": "",
   "Reading": "掬[すく]う",
@@ -47,58 +51,58 @@ Deno.test("applyNoteUpdate: writes only changed fields when the snapshot still m
   const result = await applyNoteUpdate({
     noteId: 42,
     expect: {
-      key: "掬う | 1226200 | 1",
+      key: "掬う | 1226200:1",
       recognitionTarget: "掬う",
       reading: "掬[すく]う",
-      dictionaryEntry: '<ol class="senses"><li>old</li></ol>',
+      dictionary: '<ol class="senses"><li>old</li></ol>',
       hint: "",
     },
     set: {
-      key: "掬う | 1226200 | 1", // unchanged → not written
-      dictionaryEntry: '<ol class="senses"><li>new</li></ol>',
+      key: "掬う | 1226200:1", // unchanged → not written
+      dictionary: '<ol class="senses"><li>new</li></ol>',
       hint: "", // unchanged → not written
     },
   }, invoke);
 
   assertEquals(result.ok, true);
-  assertEquals(result.wroteFields, ["Dictionary entry"]);
+  assertEquals(result.wroteFields, ["Dictionary"]);
   assertEquals(result.before, {
-    key: "掬う | 1226200 | 1",
+    key: "掬う | 1226200:1",
     reading: "掬[すく]う",
-    dictionaryEntry: '<ol class="senses"><li>old</li></ol>',
+    dictionary: '<ol class="senses"><li>old</li></ol>',
     hint: "",
   });
   assertEquals(result.after, {
-    key: "掬う | 1226200 | 1",
+    key: "掬う | 1226200:1",
     reading: "掬[すく]う",
-    dictionaryEntry: '<ol class="senses"><li>new</li></ol>',
+    dictionary: '<ol class="senses"><li>new</li></ol>',
     hint: "",
   });
   const update = calls.find((call) => call.action === "updateNoteFields")!;
   assertEquals(update.params, {
-    note: { id: 42, fields: { "Dictionary entry": '<ol class="senses"><li>new</li></ol>' } },
+    note: { id: 42, fields: { "Dictionary": '<ol class="senses"><li>new</li></ol>' } },
   });
 });
 
 Deno.test("applyNoteUpdate: refuses when the note changed since analysis", async () => {
   const { invoke, calls } = fakeAnki({
     ...CURRENT_FIELDS,
-    "Dictionary entry": '<ol class="senses"><li>edited in Anki meanwhile</li></ol>',
+    "Dictionary": '<ol class="senses"><li>edited in Anki meanwhile</li></ol>',
   });
   const result = await applyNoteUpdate({
     noteId: 42,
     expect: {
-      key: "掬う | 1226200 | 1",
+      key: "掬う | 1226200:1",
       recognitionTarget: "掬う",
       reading: "掬[すく]う",
-      dictionaryEntry: '<ol class="senses"><li>old</li></ol>',
+      dictionary: '<ol class="senses"><li>old</li></ol>',
       hint: "",
     },
-    set: { dictionaryEntry: '<ol class="senses"><li>new</li></ol>' },
+    set: { dictionary: '<ol class="senses"><li>new</li></ol>' },
   }, invoke);
 
   assertEquals(result.ok, false);
-  assertEquals(result.error?.includes("Dictionary entry"), true);
+  assertEquals(result.error?.includes("Dictionary"), true);
   assertEquals(calls.some((call) => call.action === "updateNoteFields"), false);
 });
 
@@ -107,13 +111,13 @@ Deno.test("applyNoteUpdate: refuses when the note no longer exists", async () =>
   const result = await applyNoteUpdate({
     noteId: 42,
     expect: {
-      key: "掬う | 1226200 | 1",
+      key: "掬う | 1226200:1",
       recognitionTarget: "掬う",
       reading: "掬[すく]う",
-      dictionaryEntry: "",
+      dictionary: "",
       hint: "",
     },
-    set: { dictionaryEntry: "y" },
+    set: { dictionary: "y" },
   }, invoke);
 
   assertEquals(result.ok, false);
@@ -125,24 +129,24 @@ Deno.test("applyNoteUpdate: key and hint changes are written together", async ()
   const result = await applyNoteUpdate({
     noteId: 42,
     expect: {
-      key: "掬う | 1226200 | 1",
+      key: "掬う | 1226200:1",
       recognitionTarget: "掬う",
       reading: "掬[すく]う",
-      dictionaryEntry: '<ol class="senses"><li>old</li></ol>',
+      dictionary: '<ol class="senses"><li>old</li></ol>',
       hint: "",
     },
     set: {
-      key: "掬う | 1226200 | 2",
-      dictionaryEntry: '<ol class="senses"><li>new</li></ol>',
+      key: "掬う | 1226200:2",
+      dictionary: '<ol class="senses"><li>new</li></ol>',
       hint: "網で掬う",
     },
   }, invoke);
 
   assertEquals(result.ok, true);
-  assertEquals(result.wroteFields.sort(), ["Dictionary entry", "Hint", "Key"]);
+  assertEquals(result.wroteFields.sort(), ["Dictionary", "Hint", "Key"]);
   const update = calls.find((call) => call.action === "updateNoteFields")!;
   const fields = (update.params.note as { fields: Record<string, string> }).fields;
-  assertEquals(fields["Key"], "掬う | 1226200 | 2");
+  assertEquals(fields["Key"], "掬う | 1226200:2");
   assertEquals(fields["Hint"], "網で掬う");
 });
 
@@ -154,7 +158,7 @@ Deno.test("applyNoteUpdate: guards and records Reading changes", async () => {
       key: "食べる | 1358280",
       recognitionTarget: "食べる",
       reading: "食[た]べる",
-      dictionaryEntry: '<ol class="senses"><li>old</li></ol>',
+      dictionary: '<ol class="senses"><li>old</li></ol>',
       hint: "",
     },
     set: { reading: "食べ[たべ]る" },
@@ -179,7 +183,7 @@ Deno.test("applyNoteUpdate: refuses a Reading edited after analysis", async () =
       key: "食べる | 1358280",
       recognitionTarget: "食べる",
       reading: "食[た]べる",
-      dictionaryEntry: '<ol class="senses"><li>old</li></ol>',
+      dictionary: '<ol class="senses"><li>old</li></ol>',
       hint: "",
     },
     set: { reading: "食べ[たべ]る" },
@@ -198,13 +202,13 @@ Deno.test("applyNoteUpdate: refuses a Recognition target edited after analysis",
   const result = await applyNoteUpdate({
     noteId: 42,
     expect: {
-      key: "掬う | 1226200 | 1",
+      key: "掬う | 1226200:1",
       recognitionTarget: "掬う",
       reading: "掬[すく]う",
-      dictionaryEntry: '<ol class="senses"><li>old</li></ol>',
+      dictionary: '<ol class="senses"><li>old</li></ol>',
       hint: "",
     },
-    set: { dictionaryEntry: '<ol class="senses"><li>new</li></ol>' },
+    set: { dictionary: '<ol class="senses"><li>new</li></ol>' },
   }, invoke);
 
   assertEquals(result.ok, false);

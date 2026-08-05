@@ -439,7 +439,7 @@ Deno.test("convertAnimecardsNote resolves a multi-sense entry from JMDict restri
   );
 
   assert(result.candidate);
-  assertEquals(result.candidate.target.fields.Key, "異名 | 1158110 | 1");
+  assertEquals(result.candidate.target.fields.Key, "異名 | 1158110:1");
   assertEquals(result.candidate.senseResolution, {
     status: "determined",
     applicableSenses: [1],
@@ -526,11 +526,25 @@ Deno.test("convertAnimecardsNote declines a spelling shared by multiple JMDict e
         generatedAt: "2026-07-27T00:00:00.000Z",
         candidateJMDictIds: ["1111111", "2222222"],
         allowedJMDictIds: ["1111111"],
+        additionalAcceptedReadings: [{
+          jmdictId: "2222222",
+          kanaReading: "わざ",
+          applicableSenseNumbers: [1],
+        }],
       },
     },
   );
   assert(resolved.candidate);
-  assertEquals(resolved.candidate.target.fields.Key, "業 | 1111111 | 1");
+  assertEquals(resolved.candidate.target.fields.Key, "業 | 1111111:1;2222222");
+  assertEquals(
+    resolved.candidate.target.fields.Reading,
+    "<ul><li>業[ごう]</li><li>業[わざ]</li></ul>",
+  );
+  assertEquals(resolved.candidate.additionalAcceptedReadings, [{
+    jmdictId: "2222222",
+    kanaReading: "わざ",
+    applicableSenseNumbers: [1],
+  }]);
   assertEquals(resolved.candidate.target.fields.Hint, "前世の業");
   assertEquals(resolved.candidate.senseResolution, {
     status: "generated",
@@ -547,6 +561,51 @@ Deno.test("convertAnimecardsNote declines a spelling shared by multiple JMDict e
     candidateJMDictIds: ["1111111", "2222222"],
     allowedJMDictIds: ["1111111"],
   });
+});
+
+Deno.test("convertAnimecardsNote retains an equivalent entry with the lead reading", async () => {
+  const selected = makeWord({ id: "2222222", kanji: ["業"], kana: ["ごう"], senses: 2 });
+  const equivalent = makeWord({ id: "1111111", kanji: ["業"], kana: ["ごう"] });
+  const entries = new Map([[selected.id, selected], [equivalent.id, equivalent]]);
+  const result = await convertAnimecardsNote(
+    makeNote({
+      Word: "業[ごう]",
+      Sentence: "前世の業だ。",
+      Glossary: '<a href="https://jitendex.org/?q=2222222">definition</a>',
+      Reading: "ごう",
+    }),
+    {
+      sourceModel: "Animecards",
+      targetModel: "Miwake",
+      sourceFields: SOURCE_FIELDS,
+      entries,
+      spellingIndex: buildSpellingIndex(entries.values()),
+      jmdictEntrySelectionOverride: {
+        jmdictId: selected.id,
+        recognitionTarget: "業",
+        applicableSenseNumbers: [1],
+        hint: null,
+        model: "gemini-3.6-flash",
+        generatedAt: "2026-07-27T00:00:00.000Z",
+        candidateJMDictIds: [selected.id, equivalent.id],
+        allowedJMDictIds: [selected.id],
+        additionalAcceptedReadings: [{
+          jmdictId: equivalent.id,
+          kanaReading: "ごう",
+          applicableSenseNumbers: [1],
+        }],
+      },
+    },
+  );
+
+  assert(result.candidate);
+  assertEquals(result.candidate.target.fields.Key, "業 | 1111111;2222222:1");
+  assertEquals(result.candidate.target.fields.Reading, "業[ごう]");
+  assertEquals(result.candidate.additionalAcceptedReadings, [{
+    jmdictId: "1111111",
+    kanaReading: "ごう",
+    applicableSenseNumbers: [1],
+  }]);
 });
 
 Deno.test("convertAnimecardsNote finds same-spelling entries across JMDict form categories", async () => {
@@ -625,7 +684,7 @@ Deno.test("convertAnimecardsNote lets a reviewed entry override replace a wrong 
 
   assert(result.candidate);
   assertEquals(result.candidate.jmdictId, selected.id);
-  assertEquals(result.candidate.target.fields.Key, "業 | 1111111 | 1");
+  assertEquals(result.candidate.target.fields.Key, "業 | 1111111:1");
   assertEquals(result.candidate.target.fields.Hint, "前世の業");
 });
 
@@ -798,7 +857,7 @@ Deno.test("convertAnimecardsNote declines a bracketed recognition-target hint", 
   });
 });
 
-Deno.test("convertAnimecardsNote declines unresolved multiple readings", async () => {
+Deno.test("convertAnimecardsNote accepts structurally equivalent multiple readings", async () => {
   const entry = makeWord({ kanji: ["生"], kana: ["せい", "しょう"] });
   const entries = new Map([[entry.id, entry]]);
   const result = await convertAnimecardsNote(
@@ -812,7 +871,17 @@ Deno.test("convertAnimecardsNote declines unresolved multiple readings", async (
     },
   );
 
-  assertEquals(result.skipped?.reason, "ambiguous-reading");
+  assert(result.candidate);
+  assertEquals(result.candidate.readingKana, "せい");
+  assertEquals(result.candidate.additionalAcceptedReadings, [{
+    jmdictId: entry.id,
+    kanaReading: "しょう",
+    applicableSenseNumbers: [1],
+  }]);
+  assertEquals(
+    result.candidate.target.fields.Reading,
+    "<ul><li>生[せい]</li><li>生[しょう]</li></ul>",
+  );
 });
 
 Deno.test("convertAnimecardsNote lets marked source ruby select the JMDict reading", async () => {
@@ -838,7 +907,10 @@ Deno.test("convertAnimecardsNote lets marked source ruby select the JMDict readi
 
     assert(result.candidate);
     assertEquals(result.candidate.readingKana, "しょう");
-    assertEquals(result.candidate.target.fields.Reading, "生[しょう]");
+    assertEquals(
+      result.candidate.target.fields.Reading,
+      "<ul><li>生[せい]</li><li>生[しょう]</li></ul>",
+    );
     assertEquals(
       result.candidate.target.fields["Full context"],
       "<mark>生[しょう]</mark>の情報",

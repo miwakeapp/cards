@@ -52,6 +52,26 @@ export type CardSource =
     }
   );
 
+/** One distinct JMDict entry and sense usage accepted by the recognition card. */
+export interface AcceptedJMDictUsage {
+  /**
+   * The JMDict entry represented in the card's Key and Dictionary.
+   *
+   * Every entry may appear only once. Very rarely, same-spelling entries whose selected senses
+   * form one recognition unit appear as separate items and separate `Dictionary` blocks.
+   */
+  entry: JMDictWord;
+
+  /**
+   * The senses in `entry` represented by this card.
+   *
+   * Omit this to use the union of senses structurally compatible with the selected spelling and
+   * accepted readings. When present, values must be unique 1-indexed senses supported together by
+   * at least one accepted reading in this entry.
+   */
+  applicableSenseNumbers?: readonly number[];
+}
+
 /**
  * Fully decided semantic content from which `createCard()` deterministically renders a Miwake
  * Card.
@@ -63,17 +83,29 @@ export type CardSource =
  */
 export interface CreateCardInput {
   /**
-   * The complete JMDict entry selected for this usage.
+   * The nonempty JMDict entry/sense usages accepted by this recognition card.
    *
-   * Its `id` is used in the card key, its senses validate `applicableSenseNumbers`, and its forms
-   * and readings validate source ruby and the requested `kanaReading`.
+   * Every entry must be distinct. Input order is immaterial: Key usages and `Dictionary` blocks
+   * are sorted numerically by JMDict ID.
    */
-  jmdictEntry: JMDictWord;
+  jmdictUsages: readonly [AcceptedJMDictUsage, ...AcceptedJMDictUsage[]];
+
+  /**
+   * The nonempty set of kana readings accepted for a non-kana recognition target.
+   *
+   * Input order is immaterial; `createCard()` gives the Reading field a stable order based on the
+   * numerically first JMDict entry which directly supports each reading. Every reading is the
+   * caller's assertion that it is an acceptable answer for every selected usage on the card.
+   * JMDict must directly support each reading for at least one complete `jmdictUsages` item, and
+   * every usage must be directly supported by at least one reading. Omit this for a recognition
+   * target selected from a JMDict kana form.
+   */
+  kanaReadings?: readonly [string, ...string[]];
 
   /**
    * The nonempty, undecorated JMDict spelling selected for this card.
    *
-   * It must exactly equal one of `jmdictEntry`'s kanji or kana spellings. It preserves the spelling
+   * It must exactly equal a form in every accepted usage's entry. It preserves the spelling
    * encountered in the source while remaining a dictionary form: source `匂いをかぎ` produces
    * `かぐ`, whereas source `匂いを嗅ぎ` produces `嗅ぐ`.
    *
@@ -82,32 +114,6 @@ export interface CreateCardInput {
    * Reading fields. The key always uses this undecorated spelling.
    */
   recognitionTarget: string;
-
-  /**
-   * The single JMDict-style kana reading selected for this usage.
-   *
-   * This is the unannotated pronunciation, such as `だいしょう`, not the Anki furigana stored in
-   * the card's `Reading` field. `createCard()` validates it against `jmdictEntry` and source ruby,
-   * then renders `MiwakeCard.reading` as precisely placed Anki furigana such as
-   * `大[だい] 小[しょう]`.
-   *
-   * It is required when `recognitionTarget` selects one of `jmdictEntry.kanji`'s spellings,
-   * including spellings that happen not to contain Han characters. It must exactly equal an
-   * applicable `jmdictEntry.kana` spelling; search-only readings are valid. Omit it when
-   * `recognitionTarget` itself selects a kana spelling. Source ruby may use the
-   * hiragana/katakana-equivalent pronunciation and is validated separately.
-   */
-  kanaReading?: string;
-
-  /**
-   * The 1-indexed JMDict senses applicable to this usage.
-   *
-   * Omit this when every sense compatible with the selected spelling and reading applies. When
-   * present, values must be unique compatible senses within the selected entry; ordering does not
-   * affect the generated key. JMDict spelling and reading restrictions are always reflected in the
-   * generated key, even when this is omitted.
-   */
-  applicableSenseNumbers?: readonly number[];
 
   /**
    * A minimal Japanese disambiguation hint.
@@ -140,51 +146,4 @@ export interface CreateCardInput {
 
   /** Final source metadata, or omitted when no reliable source is available. */
   source?: CardSource;
-}
-
-/**
- * A complete set of final, HTML-ready Anki field values for a Miwake Card.
- *
- * Plain-text input fields are HTML-escaped, while contexts and dictionary entries contain the
- * documented semantic markup. Callers should write these values directly to Anki without escaping
- * them again.
- */
-export interface MiwakeCard {
-  /**
-   * The card's primary key: spelling, JMDict ID, and—when not all apply—sense numbers.
-   *
-   * Examples: `ひたと | 1430680 | 2,3` and `相性 | 1586070`.
-   */
-  key: string;
-
-  /**
-   * The dictionary-form spelling shown on the front of the card.
-   *
-   * This can contain automatically derived leading or trailing `～` notation. Users may edit the
-   * field afterward to add more specific notation without changing the card key.
-   */
-  recognitionTarget: string;
-
-  /**
-   * The recognition target with precisely placed Anki-style bracket ruby.
-   *
-   * Example: `大人[おとな] 買[が]い`. This is `null` when the recognition target selects a JMDict
-   * kana form; JMDict `kanji` forms receive a Reading even when they contain no Han characters.
-   */
-  reading: string | null;
-
-  /** The supplied disambiguation hint, or `null` when none was supplied. */
-  hint: string | null;
-
-  /** The full context with its supplied marks preserved and source ruby normalized. */
-  fullContext: string;
-
-  /** The processed minimized context, or `null` when none was supplied. */
-  minimizedContext: string | null;
-
-  /** Semantic HTML rendered from the complete selected JMDict entry. */
-  dictionaryEntry: string;
-
-  /** Rendered source HTML, or `null` when no source was supplied. */
-  source: string | null;
 }

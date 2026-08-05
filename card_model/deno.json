@@ -1,10 +1,25 @@
 {
+  "name": "card_model",
+  "exports": {
+    ".": "./src/mod.ts",
+    "./dictionary": "./src/dictionary.ts",
+    "./keys": "./src/keys.ts",
+    "./reading": "./src/reading.ts"
+  },
   "imports": {
     "yanki-connect": "npm:yanki-connect@^4.0.6"
   },
   "tasks": {
-    "doc:check": "deno doc --lint scripts/setup.ts",
+    "doc:check": "deno doc --lint src/mod.ts src/dictionary.ts src/keys.ts src/reading.ts scripts/setup.ts",
     "setup": "deno run --allow-net --allow-read=. scripts/setup.ts"
+  },
+  "test": {
+    "permissions": {
+      "read": [
+        "../data/resources/jmdict/tags.json",
+        "../data/resources/jmdict/entries"
+      ]
+    }
   },
   "fmt": {
     "exclude": ["assets/*.html"]

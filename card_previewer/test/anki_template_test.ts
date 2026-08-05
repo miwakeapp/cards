@@ -10,6 +10,18 @@ Deno.test("applyAnkiFuriganaFilter converts bracket notation to ruby", () => {
   );
 });
 
+Deno.test("applyAnkiFuriganaFilter works inside a multi-reading list", () => {
+  assertEquals(
+    applyAnkiFuriganaFilter(
+      "<ul><li>裏[うら] 面[めん]</li><li>裏[り] 面[めん]</li></ul>",
+    ),
+    "<ul><li><ruby><rb>裏</rb><rt>うら</rt></ruby>" +
+      "<ruby><rb>面</rb><rt>めん</rt></ruby></li><li>" +
+      "<ruby><rb>裏</rb><rt>り</rt></ruby><ruby><rb>面</rb><rt>めん</rt></ruby>" +
+      "</li></ul>",
+  );
+});
+
 Deno.test("applyAnkiFuriganaFilter works inside stored HTML", () => {
   assertEquals(
     applyAnkiFuriganaFilter("<mark>食[た]べる</mark>"),

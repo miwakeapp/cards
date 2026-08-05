@@ -1,11 +1,12 @@
+import { createCard } from "card_creator";
 import {
   compatibleSenseNumbersForJMDictUsage,
-  createCard,
   jmdictAlternativesForCardFront,
   jmdictUsagesForSpelling,
-} from "card_creator";
+} from "card_creator/jmdict";
 import type { HintGenerationOutcome, SenseSelectionOutcome } from "card_field_generation";
 import type { JMDictWord } from "data";
+import { cardCreatorInputForAcceptedReadings } from "./card_creator_input.ts";
 import { applyDisplayTargetOverride, disambiguationHintForJMDictUsage } from "./display_target.ts";
 import { cardSourceFromResolution } from "./source.ts";
 import {
@@ -213,13 +214,49 @@ export async function applyGeneratedCardFields(
   }
 
   const selectedSenses = applicableSenses.length === 0 ? undefined : applicableSenses;
+  const additionalAcceptedReadings = (candidate.additionalAcceptedReadings ?? []).map(
+    (additional) => {
+      const additionalEntry = sameSpellingEntries.find(({ id }) => id === additional.jmdictId);
+      if (additionalEntry === undefined) {
+        throw new Error(
+          `Candidate additional accepted reading refers to missing same-spelling JMDict entry ${
+            JSON.stringify(additional.jmdictId)
+          }.`,
+        );
+      }
+      return {
+        entry: additionalEntry,
+        kanaReading: additional.kanaReading,
+        applicableSenseNumbers: additional.jmdictId === entry.id
+          ? selectedSenses ?? compatibleSenseNumbersForJMDictUsage(
+            entry,
+            candidate.keyRecognitionTarget,
+            candidate.readingKana,
+          )
+          : additional.applicableSenseNumbers,
+      };
+    },
+  );
+  const usesReadingField = entry.kanji.some(({ text }) => text === candidate.keyRecognitionTarget);
+  const cardCreatorJMDictInput = usesReadingField
+    ? cardCreatorInputForAcceptedReadings([{
+      entry,
+      kanaReading: candidate.readingKana,
+      applicableSenseNumbers: selectedSenses ?? compatibleSenseNumbersForJMDictUsage(
+        entry,
+        candidate.keyRecognitionTarget,
+        candidate.readingKana,
+      ),
+    }, ...additionalAcceptedReadings])
+    : {
+      jmdictUsages: [{
+        entry,
+        ...(selectedSenses === undefined ? {} : { applicableSenseNumbers: selectedSenses }),
+      }] as const,
+    };
   const card = await createCard({
-    jmdictEntry: entry,
+    ...cardCreatorJMDictInput,
     recognitionTarget: candidate.keyRecognitionTarget,
-    ...(entry.kanji.some(({ text }) => text === candidate.keyRecognitionTarget)
-      ? { kanaReading: candidate.readingKana }
-      : {}),
-    applicableSenseNumbers: selectedSenses,
     hint: hint || undefined,
     fullContext: candidate.target.fields["Full context"],
     minimizedContext: minimizedContext === "" ? undefined : minimizedContext,
@@ -252,9 +289,16 @@ export async function applyGeneratedCardFields(
     : card.hint ?? "";
   candidate.target.fields["Full context"] = card.fullContext;
   candidate.target.fields["Minimized context"] = card.minimizedContext ?? "";
-  candidate.target.fields["Dictionary entry"] = card.dictionaryEntry;
+  candidate.target.fields["Dictionary"] = card.dictionary;
   candidate.target.fields.Source = card.source ?? "";
   candidate.recognitionTarget = displayTarget.recognitionTarget;
+  if (candidate.additionalAcceptedReadings !== undefined) {
+    candidate.additionalAcceptedReadings = additionalAcceptedReadings.map((additional) => ({
+      jmdictId: additional.entry.id,
+      kanaReading: additional.kanaReading,
+      applicableSenseNumbers: [...additional.applicableSenseNumbers],
+    }));
+  }
   candidate.senseResolution = senseResolution;
   candidate.minimizedContextResolution = minimizedContextResolution;
 }

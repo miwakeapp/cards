@@ -61,3 +61,75 @@ export function smallKanaForFullSizeKana(character: string): string | undefined 
     ? String.fromCodePoint(smallHiragana.codePointAt(0)! + 0x60)
     : smallHiragana;
 }
+
+/** Surface text and complete pronunciation parsed from plain Anki bracket-based furigana. */
+export interface ParsedAnkiFurigana {
+  /** Visible text after removing bracket annotations and their control spaces. */
+  surface: string;
+  /** Complete pronunciation after replacing annotated bases with their readings. */
+  reading: string;
+  /** Literal and annotated parts, with Anki's control spaces removed. */
+  parts: readonly AnkiFuriganaPart[];
+}
+
+/** One literal or annotated part of plain Anki bracket-based furigana. */
+export type AnkiFuriganaPart =
+  | {
+    /** Identifies literal text. */
+    type: "plain";
+    /** Literal surface text, which is also its pronunciation. */
+    text: string;
+  }
+  | {
+    /** Identifies an annotated ruby base. */
+    type: "ruby";
+    /** Visible ruby base. This can be empty for zero-surface annotations. */
+    base: string;
+    /** Pronunciation annotating the base. */
+    reading: string;
+  };
+
+function parseAnkiFuriganaChunk(chunk: string): AnkiFuriganaPart[] | null {
+  const open = chunk.indexOf("[");
+  if (open === -1) {
+    return chunk.includes("]") ? null : [{ type: "plain", text: chunk }];
+  }
+  const close = chunk.indexOf("]", open + 1);
+  if (
+    close === -1 || close === open + 1 ||
+    chunk.indexOf("[", open + 1) !== -1 || chunk.indexOf("]", close + 1) !== -1
+  ) return null;
+
+  const base = chunk.slice(0, open);
+  const annotation = chunk.slice(open + 1, close);
+  const suffix = chunk.slice(close + 1);
+  if (base === "") {
+    return suffix === "" ? [{ type: "ruby", base: "", reading: annotation }] : null;
+  }
+  return [
+    { type: "ruby", base, reading: annotation },
+    ...(suffix === "" ? [] : [{ type: "plain" as const, text: suffix }]),
+  ];
+}
+
+function parseAnkiFuriganaParts(text: string): AnkiFuriganaPart[] | null {
+  const parts: AnkiFuriganaPart[] = [];
+  for (const chunk of text.split(" ")) {
+    if (chunk === "") return null;
+    const parsed = parseAnkiFuriganaChunk(chunk);
+    if (parsed === null) return null;
+    parts.push(...parsed);
+  }
+  return parts;
+}
+
+/** Parses one plain Anki bracket-based furigana string. */
+export function parseAnkiFurigana(text: string): ParsedAnkiFurigana | null {
+  const parts = parseAnkiFuriganaParts(text);
+  if (parts === null) return null;
+  return {
+    surface: parts.map((part) => part.type === "plain" ? part.text : part.base).join(""),
+    reading: parts.map((part) => part.type === "plain" ? part.text : part.reading).join(""),
+    parts,
+  };
+}

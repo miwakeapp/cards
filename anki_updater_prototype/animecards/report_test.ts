@@ -193,7 +193,7 @@ Deno.test("buildConversionReport shows selected and compatible senses", () => {
       target: {
         fields: {
           Source: '<span lang="en">Test</span>',
-          Key: "大小 | 1414110 | 2",
+          Key: "大小 | 1414110:2",
           Hint: "規模大小",
           "Full context": "物の<mark>大小</mark>を比べる。",
         },
@@ -206,7 +206,7 @@ Deno.test("buildConversionReport shows selected and compatible senses", () => {
   assertStringIncludes(report, "## Sense selections");
   assertStringIncludes(
     report,
-    "| 42 | `大小` | `manual-hold` | `generated` | `2 / 1,2,3` | `大小 \\| 1414110 \\| 2` | `規模大小` | gemini-3.6-flash | `物の大小を比べる。` | `前段。物の大小を比べる。後段。` |",
+    "| 42 | `大小` | `manual-hold` | `generated` | `2 / 1,2,3` | `大小 \\| 1414110:2` | `規模大小` | gemini-3.6-flash | `物の大小を比べる。` | `前段。物の大小を比べる。後段。` |",
   );
   assertStringIncludes(report, "## JMDict entry selections");
   assertStringIncludes(

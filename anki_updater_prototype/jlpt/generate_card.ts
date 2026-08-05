@@ -1,10 +1,7 @@
 import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
-import {
-  compatibleSenseNumbersForJMDictUsage,
-  createCard,
-  jmdictUsagesForSpelling,
-  type MiwakeCard,
-} from "card_creator";
+import { createCard } from "card_creator";
+import { compatibleSenseNumbersForJMDictUsage, jmdictUsagesForSpelling } from "card_creator/jmdict";
+import type { CardFields } from "card_model";
 import { markedContextHasRuby } from "card_resolution";
 import {
   generateSourceGroundedHint,
@@ -81,9 +78,9 @@ async function selectKanaReading(
     const attempts = await Promise.all(readings.map(async (reading) => {
       try {
         await createCard({
-          jmdictEntry: entry,
+          jmdictUsages: [{ entry }],
+          kanaReadings: [reading],
           recognitionTarget,
-          kanaReading: reading,
           fullContext: markedContext,
         });
         return { reading, compatible: true };
@@ -142,7 +139,7 @@ export async function generateJLPTCard(
     generateHint = generateSourceGroundedHint,
     minimize = minimizeContext,
   }: JLPTCardGenerationDependencies = {},
-): Promise<MiwakeCard> {
+): Promise<CardFields> {
   const fullContext = await markedContext(
     input.sentence,
     input.recognitionTarget,
@@ -199,10 +196,12 @@ export async function generateJLPTCard(
       ? undefined
       : resolution.senseSelection.senseNumbers;
   return await createCard({
-    jmdictEntry: input.entry,
+    jmdictUsages: [{
+      entry: input.entry,
+      ...(applicableSenseNumbers === undefined ? {} : { applicableSenseNumbers }),
+    }],
+    ...(kanaReading === undefined ? {} : { kanaReadings: [kanaReading] as const }),
     recognitionTarget: input.recognitionTarget,
-    ...(kanaReading === undefined ? {} : { kanaReading }),
-    ...(applicableSenseNumbers === undefined ? {} : { applicableSenseNumbers }),
     ...(hint === undefined ? {} : { hint }),
     fullContext,
     ...(minimizedContext === undefined ? {} : { minimizedContext }),

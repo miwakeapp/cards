@@ -6,7 +6,7 @@ import {
   type SenseSelectionInput,
   type SenseSelectionOutcome,
 } from "card_field_generation";
-import { jmdictAlternativesForCardFront, type JMDictSpellingUsage } from "card_creator";
+import { jmdictAlternativesForCardFront, type JMDictSpellingUsage } from "card_creator/jmdict";
 
 /** Complete deterministic input for selecting one usage and deciding whether its front needs a hint. */
 export interface SenseAndHintInput {

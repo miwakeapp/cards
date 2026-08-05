@@ -6,11 +6,13 @@
 
 import { parseArgs } from "@std/cli/parse-args";
 import * as path from "@std/path";
+import { fieldOrder } from "card_model";
+import { allJMDictEntries } from "data";
 import { createACInvoke, DEFAULT_ANKI_CONNECT_URL } from "../shared/anki_connect.ts";
 import { ankiSearchValue, fetchNoteInfos } from "./anki.ts";
 import { preflightCandidate } from "./apply_policy.ts";
-import { MIWAKE_FIELD_NAMES } from "./convert.ts";
 import { normalizePlainText } from "./html.ts";
+import { removeDuplicateKeys } from "./duplicate_keys.ts";
 import {
   CONVERSION_MANIFEST_VERSION,
   type ConversionCandidate,
@@ -98,7 +100,7 @@ function exactStringSet(left: string[], right: readonly string[]): boolean {
 }
 
 function targetFieldsAreValid(candidate: ConversionCandidate): boolean {
-  return exactStringSet(Object.keys(candidate.target.fields), MIWAKE_FIELD_NAMES);
+  return exactStringSet(Object.keys(candidate.target.fields), fieldOrder);
 }
 
 async function appendLog(logPath: string, value: unknown): Promise<void> {
@@ -169,7 +171,7 @@ async function main(): Promise<void> {
       } on ${manifest.targetModel}.`,
     );
   }
-  if (!exactStringSet(targetModelFields, MIWAKE_FIELD_NAMES)) {
+  if (!exactStringSet(targetModelFields, fieldOrder)) {
     throw new Error(
       `Target model ${manifest.targetModel} no longer has the expected Miwake Card fields.`,
     );
@@ -238,12 +240,39 @@ async function main(): Promise<void> {
     candidateIdsByKey.set(key, ids);
   }
 
+  console.error("Checking complete recognition units for equivalent-Key conflicts...");
+  const entries = await allJMDictEntries();
+  const recognitionUnitConflicts = new Map(
+    removeDuplicateKeys(
+      candidates,
+      targetNotes.flatMap((note) => {
+        const key = normalizePlainText(note.fields["Key"]?.value ?? "");
+        return key === "" ? [] : [{
+          noteId: note.noteId,
+          key,
+        }];
+      }),
+      manifest.sourceFields.word,
+      entries,
+    ).skipped.map((item) => [item.noteId, item]),
+  );
+
   const ready: ConversionCandidate[] = [];
   const alreadyAppliedCandidates: ConversionCandidate[] = [];
   let alreadyApplied = 0;
   let rejected = 0;
   for (const candidate of candidates) {
     const key = candidate.target.fields["Key"];
+    const recognitionUnitConflict = recognitionUnitConflicts.get(candidate.noteId);
+    if (recognitionUnitConflict !== undefined) {
+      ++rejected;
+      console.error(
+        `  Rejected: ${candidate.noteId} ${key}: ${recognitionUnitConflict.reason}; ${
+          recognitionUnitConflict.detail ?? "equivalent recognition unit"
+        }`,
+      );
+      continue;
+    }
     const targetTags = [...new Set([...candidate.original.tags, ...options.tags])];
     const result = await preflightCandidate(
       candidate,

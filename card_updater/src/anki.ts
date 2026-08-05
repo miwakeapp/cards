@@ -3,6 +3,8 @@
  * reviewed field updates.
  */
 
+import { fieldNames } from "card_model";
+
 export type ACInvoke = <T = unknown>(
   action: string,
   params?: Record<string, unknown>,
@@ -48,7 +50,7 @@ export interface MiwakeNoteFields {
   hint: string;
   fullContext: string;
   minimizedContext: string;
-  dictionaryEntry: string;
+  dictionary: string;
   source: string;
 }
 
@@ -67,17 +69,6 @@ interface AnkiNoteInfo {
   fields: Record<string, { value: string; order: number }>;
 }
 
-const FIELD_NAMES = {
-  key: "Key",
-  recognitionTarget: "Recognition target",
-  reading: "Reading",
-  hint: "Hint",
-  fullContext: "Full context",
-  minimizedContext: "Minimized context",
-  dictionaryEntry: "Dictionary entry",
-  source: "Source",
-} as const;
-
 /** Strips incidental markup Anki may have added to a plain-text field. */
 export function normalizeAnkiPlainText(html: string): string {
   return decodeBasicEntities(html.replace(/<[^>]+>/g, " "))
@@ -86,9 +77,14 @@ export function normalizeAnkiPlainText(html: string): string {
     .trim();
 }
 
+/** Decodes entities without concealing noncanonical Key whitespace or markup. */
+export function ankiKeyText(html: string): string {
+  return decodeBasicEntities(html);
+}
+
 function decodeBasicEntities(text: string): string {
   return text
-    .replace(/&nbsp;/g, " ")
+    .replace(/&nbsp;/g, " ")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
@@ -103,14 +99,14 @@ function snapshotFromNoteInfo(info: AnkiNoteInfo): MiwakeNoteSnapshot {
     tags: info.tags,
     cards: info.cards,
     fields: {
-      key: normalizeAnkiPlainText(value(FIELD_NAMES.key)),
-      recognitionTarget: normalizeAnkiPlainText(value(FIELD_NAMES.recognitionTarget)),
-      reading: value(FIELD_NAMES.reading),
-      hint: normalizeAnkiPlainText(value(FIELD_NAMES.hint)),
-      fullContext: value(FIELD_NAMES.fullContext),
-      minimizedContext: value(FIELD_NAMES.minimizedContext),
-      dictionaryEntry: value(FIELD_NAMES.dictionaryEntry),
-      source: value(FIELD_NAMES.source),
+      key: ankiKeyText(value(fieldNames.key)),
+      recognitionTarget: normalizeAnkiPlainText(value(fieldNames.recognitionTarget)),
+      reading: value(fieldNames.reading),
+      hint: normalizeAnkiPlainText(value(fieldNames.hint)),
+      fullContext: value(fieldNames.fullContext),
+      minimizedContext: value(fieldNames.minimizedContext),
+      dictionary: value(fieldNames.dictionary),
+      source: value(fieldNames.source),
     },
   };
 }
@@ -147,16 +143,21 @@ export interface NoteFieldUpdate {
     key: string;
     recognitionTarget: string;
     reading: string;
-    dictionaryEntry: string;
+    dictionary: string;
     hint: string;
   };
   /** New field values; only present keys are written. Recognition target is never updated. */
-  set: { key?: string; reading?: string; dictionaryEntry?: string; hint?: string };
+  set: {
+    key?: string;
+    reading?: string;
+    dictionary?: string;
+    hint?: string;
+  };
 }
 
 export type AppliedFieldValues = Pick<
   MiwakeNoteFields,
-  "key" | "reading" | "dictionaryEntry" | "hint"
+  "key" | "reading" | "dictionary" | "hint"
 >;
 
 export type ApplyResult =
@@ -202,8 +203,8 @@ export async function applyNoteUpdate(
   if (snapshot.fields.reading !== update.expect.reading) {
     mismatches.push("Reading");
   }
-  if (snapshot.fields.dictionaryEntry.trim() !== update.expect.dictionaryEntry.trim()) {
-    mismatches.push("Dictionary entry");
+  if (snapshot.fields.dictionary.trim() !== update.expect.dictionary.trim()) {
+    mismatches.push("Dictionary");
   }
   if (snapshot.fields.hint !== update.expect.hint) {
     mismatches.push("Hint");
@@ -220,31 +221,31 @@ export async function applyNoteUpdate(
   const before = {
     key: snapshot.fields.key,
     reading: snapshot.fields.reading,
-    dictionaryEntry: snapshot.fields.dictionaryEntry,
+    dictionary: snapshot.fields.dictionary,
     hint: snapshot.fields.hint,
   };
   const after = {
     key: update.set.key ?? before.key,
     reading: update.set.reading ?? before.reading,
-    dictionaryEntry: update.set.dictionaryEntry ?? before.dictionaryEntry,
+    dictionary: update.set.dictionary ?? before.dictionary,
     hint: update.set.hint ?? before.hint,
   };
 
   const fields: Record<string, string> = {};
   if (update.set.key !== undefined && update.set.key !== snapshot.fields.key) {
-    fields[FIELD_NAMES.key] = update.set.key;
+    fields[fieldNames.key] = update.set.key;
   }
   if (update.set.reading !== undefined && update.set.reading !== snapshot.fields.reading) {
-    fields[FIELD_NAMES.reading] = update.set.reading;
+    fields[fieldNames.reading] = update.set.reading;
   }
   if (
-    update.set.dictionaryEntry !== undefined &&
-    update.set.dictionaryEntry !== snapshot.fields.dictionaryEntry
+    update.set.dictionary !== undefined &&
+    update.set.dictionary !== snapshot.fields.dictionary
   ) {
-    fields[FIELD_NAMES.dictionaryEntry] = update.set.dictionaryEntry;
+    fields[fieldNames.dictionary] = update.set.dictionary;
   }
   if (update.set.hint !== undefined && update.set.hint !== snapshot.fields.hint) {
-    fields[FIELD_NAMES.hint] = update.set.hint;
+    fields[fieldNames.hint] = update.set.hint;
   }
 
   if (Object.keys(fields).length === 0) {

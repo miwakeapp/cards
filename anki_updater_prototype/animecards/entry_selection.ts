@@ -1,5 +1,5 @@
 import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
-import { jmdictAlternativesForCardFront, jmdictUsagesForSpelling } from "card_creator";
+import { jmdictAlternativesForCardFront, jmdictUsagesForSpelling } from "card_creator/jmdict";
 import {
   generateSourceGroundedHint,
   type GenerationOptions,
@@ -7,7 +7,7 @@ import {
 } from "card_field_generation";
 import { markResolvedContextTargetWithinAnchor } from "../shared/anchored_context.ts";
 import { kanaScriptsMatch } from "./html.ts";
-import type { ConversionCandidate } from "./types.ts";
+import type { AdditionalAcceptedReadingResolution, ConversionCandidate } from "./types.ts";
 
 export interface UnresolvedJMDictEntry {
   /** Plain-text source evidence used to distinguish the competing entries. */
@@ -36,6 +36,8 @@ export interface JMDictEntrySelectionOverride {
   generatedAt: string;
   candidateJMDictIds: string[];
   allowedJMDictIds: string[];
+  /** Reviewed alternative pronunciations, including their equivalent-entry provenance. */
+  additionalAcceptedReadings?: AdditionalAcceptedReadingResolution[];
 }
 
 /** Reconstructs the complete entry-selection decision for deterministic pipeline replay. */
@@ -53,6 +55,9 @@ export function entrySelectionOverride(
     generatedAt: resolution.generatedAt,
     candidateJMDictIds: resolution.candidateJMDictIds,
     allowedJMDictIds: resolution.allowedJMDictIds,
+    ...(candidate.additionalAcceptedReadings === undefined ? {} : {
+      additionalAcceptedReadings: candidate.additionalAcceptedReadings,
+    }),
   };
 }
 
@@ -133,6 +138,32 @@ function structurallyApplicableSenseNumbers(
 
 function uniqueForms<T>(forms: T[]): T[] {
   return [...new Map(forms.map((form) => [JSON.stringify(form), form])).values()];
+}
+
+function acceptedReadingsForUsage(
+  entry: JMdictWord,
+  recognitionTarget: string,
+  applicableSenseNumbers: readonly number[],
+): AdditionalAcceptedReadingResolution[] {
+  if (!entry.kanji.some(({ text }) => text === recognitionTarget)) return [];
+
+  const forms = entry.kana.filter(({ text, appliesToKanji }) =>
+    (appliesToKanji.includes("*") || appliesToKanji.includes(recognitionTarget)) &&
+    applicableSenseNumbers.every((senseNumber) =>
+      structurallyApplicableSenseNumbers(entry, recognitionTarget, text).includes(senseNumber)
+    )
+  );
+  const canonicalForms = forms.filter((form) =>
+    !form.tags.includes("sk") ||
+    !forms.some((candidate) =>
+      !candidate.tags.includes("sk") && kanaScriptsMatch(candidate.text, form.text)
+    )
+  );
+  return canonicalForms.map(({ text }) => ({
+    jmdictId: entry.id,
+    kanaReading: text,
+    applicableSenseNumbers: [...applicableSenseNumbers],
+  }));
 }
 
 export interface EntrySelectionDependencies {
@@ -302,25 +333,57 @@ export async function selectJMDictEntry(
     }
 
     const selectedSenses = generated.value.senseNumbers.map((number) => senses[number - 1]);
-    const selectedJMDictIds = [
-      ...new Set(selectedSenses.map(({ jmdictId }) => jmdictId)),
-    ].toSorted();
-    if (selectedJMDictIds.length !== 1) {
+    const selectedUsages = [
+      ...Map.groupBy(selectedSenses, ({ jmdictId }) => jmdictId),
+    ].map(([jmdictId, senses]) => ({
+      entry: candidateEntries.find(({ id }) => id === jmdictId)!,
+      senseNumbers: senses.map(({ senseNumber }) => senseNumber),
+    })).toSorted((left, right) => left.entry.id.localeCompare(right.entry.id));
+    const selectedJMDictIds = selectedUsages.map(({ entry }) => entry.id);
+    if (selectedUsages.length === 1) {
+      const selectedJMDictId = selectedUsages[0].entry.id;
+      if (!request.allowedJMDictIds.includes(selectedJMDictId)) {
+        return { status: "disallowed", selectedJMDictId, modelConfigurationIds };
+      }
+      const readingConflict = readingConflictForJMDictEntrySelection(
+        request,
+        selectedJMDictId,
+      );
+      if (readingConflict !== null) return { ...readingConflict, modelConfigurationIds };
+    }
+
+    const leadCandidates = selectedUsages.filter(({ entry }) =>
+      request.allowedJMDictIds.includes(entry.id) &&
+      readingConflictForJMDictEntrySelection(request, entry.id) === null
+    );
+    if (leadCandidates.length !== 1) {
       return {
         status: "ambiguous",
         possibleJMDictIds: selectedJMDictIds,
         modelConfigurationIds,
       };
     }
-
-    const jmdictId = selectedJMDictIds[0];
-    if (!request.allowedJMDictIds.includes(jmdictId)) {
-      return { status: "disallowed", selectedJMDictId: jmdictId, modelConfigurationIds };
-    }
-    const readingConflict = readingConflictForJMDictEntrySelection(request, jmdictId);
-    if (readingConflict !== null) return { ...readingConflict, modelConfigurationIds };
-    const applicableSenseNumbers = selectedSenses.map(({ senseNumber }) => senseNumber);
-    const selectedEntry = candidateEntries.find(({ id }) => id === jmdictId)!;
+    const leadUsage = leadCandidates[0];
+    const jmdictId = leadUsage.entry.id;
+    const applicableSenseNumbers = leadUsage.senseNumbers;
+    const selectedEntry = leadUsage.entry;
+    const additionalAcceptedReadings = selectedUsages.flatMap(({ entry, senseNumbers }) =>
+      acceptedReadingsForUsage(entry, request.recognitionTarget, senseNumbers)
+    ).filter(({ jmdictId, kanaReading }) =>
+      jmdictId !== leadUsage.entry.id || !kanaScriptsMatch(kanaReading, request.kanaReading)
+    );
+    const distinctAdditionalAcceptedReadings = [
+      ...new Map(
+        additionalAcceptedReadings.map((reading) => [
+          JSON.stringify([
+            reading.jmdictId,
+            reading.kanaReading,
+            reading.applicableSenseNumbers,
+          ]),
+          reading,
+        ]),
+      ).values(),
+    ];
     // Reading is shown only on the back, so every sense reachable through the exact front-side
     // spelling remains a contrast even when it uses another reading. The same rule applies across
     // entries. Automatic `～` notation also removes only competitors with a different affix
@@ -334,10 +397,19 @@ export async function selectJMDictEntry(
       ],
       request.recognitionTarget,
     );
+    const selectedSenseNumbersByEntry = new Map(
+      selectedUsages.map(({ entry, senseNumbers }) => [entry.id, new Set(senseNumbers)]),
+    );
     const contrastingUsages = jmdictAlternativesForCardFront(
       { entry: selectedEntry, senseNumbers: applicableSenseNumbers },
       frontSideUsages,
-    );
+    ).flatMap((usage) => {
+      const equivalentSenseNumbers = selectedSenseNumbersByEntry.get(usage.entry.id);
+      const senseNumbers = equivalentSenseNumbers === undefined
+        ? usage.senseNumbers
+        : usage.senseNumbers.filter((senseNumber) => !equivalentSenseNumbers.has(senseNumber));
+      return senseNumbers.length === 0 ? [] : [{ entry: usage.entry, senseNumbers }];
+    });
     let hint: string | null = null;
     if (contrastingUsages.length > 0) {
       const hintResult = await generateHint({
@@ -363,6 +435,9 @@ export async function selectJMDictEntry(
       generatedAt: new Date().toISOString(),
       candidateJMDictIds: request.candidateEntries.map(({ id }) => id).toSorted(),
       allowedJMDictIds: [...request.allowedJMDictIds].toSorted(),
+      ...(distinctAdditionalAcceptedReadings.length === 0 ? {} : {
+        additionalAcceptedReadings: distinctAdditionalAcceptedReadings,
+      }),
       modelConfigurationIds: distinctModelConfigurationIds,
     };
   }

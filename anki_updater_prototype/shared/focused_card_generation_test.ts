@@ -5,7 +5,7 @@ import type {
   HintGenerationInput,
   SenseSelectionInput,
 } from "card_field_generation";
-import type { JMDictSpellingUsage } from "card_creator";
+import type { JMDictSpellingUsage } from "card_creator/jmdict";
 import { selectSensesAndMaybeGenerateHint } from "./focused_card_generation.ts";
 
 function entry(): JMdictWord {

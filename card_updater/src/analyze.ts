@@ -4,9 +4,9 @@
  */
 
 import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
+import { renderDictionaryField, splitDictionaryField } from "card_model/dictionary";
 import { renderEntry } from "jmdict_to_html";
 import type { MiwakeNoteSnapshot } from "./anki.ts";
-import { recomputeAnkiReading } from "./anki_reading.ts";
 import {
   alignSenses,
   canonicalEntryHTML,
@@ -17,8 +17,8 @@ import {
   parseRenderedEntry,
   type SenseAlignment,
 } from "./entry_text.ts";
-import { formatMiwakeKey, type MiwakeKey, parseMiwakeKey } from "card_creator/keys";
-import { splitAffixNotation } from "./affix_notation.ts";
+import { formatKey, type Key, parseKey } from "card_model/keys";
+import { validateCardReading } from "./reading_validation.ts";
 
 /**
  * How much attention a card needs, from none to human-required:
@@ -65,7 +65,7 @@ export interface SenseView {
 
 export interface AnalyzedCard {
   note: MiwakeNoteSnapshot;
-  parsedKey: MiwakeKey | null;
+  parsedKey: Key | null;
   verdict: Verdict;
   /** Machine-readable subcase, for grouping. */
   reason: string;
@@ -94,9 +94,9 @@ export interface AnalyzedCard {
 
 export async function analyzeCard(
   note: MiwakeNoteSnapshot,
-  latestWord: JMdictWord | undefined,
+  latestEntries: ReadonlyMap<string, JMdictWord>,
 ): Promise<AnalyzedCard> {
-  const parsedKey = parseMiwakeKey(note.fields.key);
+  const parsedKey = parseKey(note.fields.key);
   if (parsedKey === null) {
     return exceptional(note, null, {
       reason: "invalid-key",
@@ -104,39 +104,66 @@ export async function analyzeCard(
     });
   }
 
+  const anchorUsage = parsedKey.usages[0];
+
+  const latestWord = latestEntries.get(anchorUsage.jmdictId);
   if (latestWord === undefined) {
     return exceptional(note, parsedKey, {
       reason: "entry-deleted",
-      detail: `JMDict no longer contains entry ${parsedKey.jmdictId}.`,
+      detail: `JMDict no longer contains anchor entry ${anchorUsage.jmdictId}.`,
     });
   }
 
-  const latestEntryHTML = renderEntry(latestWord);
-  const storedEntryHTML = note.fields.dictionaryEntry.trim();
+  for (const usage of parsedKey.usages.slice(1)) {
+    if (!latestEntries.has(usage.jmdictId)) {
+      return exceptional(note, parsedKey, {
+        reason: "entry-deleted",
+        detail: `JMDict no longer contains supplemental entry ${usage.jmdictId}.`,
+        latestWord,
+      });
+    }
+  }
+  const latestEntryHTML = renderDictionaryField(
+    parsedKey.usages.map(({ jmdictId }) => latestEntries.get(jmdictId)!),
+  );
+  const storedEntryHTML = note.fields.dictionary.trim();
 
   if (storedEntryHTML === "") {
     return exceptional(note, parsedKey, {
       reason: "stored-entry-missing",
-      detail: "The card has no stored Dictionary entry to compare against.",
+      detail: "The card has no stored Dictionary value to compare against.",
       latestWord,
       latestEntryHTML,
     });
   }
 
-  const oldParsed = parseRenderedEntry(storedEntryHTML);
-  const newParsed = parseRenderedEntry(latestEntryHTML);
+  const storedEntryParts = splitDictionaryField(storedEntryHTML, parsedKey);
+  if (storedEntryParts === null) {
+    return exceptional(note, parsedKey, {
+      reason: "stored-entry-unparseable",
+      detail: parsedKey.usages.length === 1
+        ? "The stored Dictionary value does not contain one rendered JMDict entry."
+        : "The stored Dictionary value does not contain one rendered entry for every Key usage.",
+      latestWord,
+      latestEntryHTML,
+    });
+  }
+  const storedAnchorEntryHTML = storedEntryParts.get(anchorUsage.jmdictId)!;
+  const latestAnchorEntryHTML = renderEntry(latestWord);
+  const oldParsed = parseRenderedEntry(storedAnchorEntryHTML);
+  const newParsed = parseRenderedEntry(latestAnchorEntryHTML);
 
   if (oldParsed.senses.length === 0) {
     return exceptional(note, parsedKey, {
       reason: "stored-entry-unparseable",
       detail:
-        "The stored Dictionary entry does not look like JMDict HTML rendered by Miwake Cards.",
+        "The stored Dictionary value does not look like JMDict HTML rendered by Miwake Cards.",
       latestWord,
       latestEntryHTML,
     });
   }
 
-  const targetSenseNumbers = parsedKey.senseNumbers ??
+  const targetSenseNumbers = anchorUsage.senseNumbers ??
     oldParsed.senses.map((sense) => sense.number);
   if (targetSenseNumbers.some((senseNumber) => senseNumber > oldParsed.senses.length)) {
     return exceptional(note, parsedKey, {
@@ -149,16 +176,70 @@ export async function analyzeCard(
 
   const spellingInLatest = latestWord.kanji.some((form) => form.text === parsedKey.spelling) ||
     latestWord.kana.some((form) => form.text === parsedKey.spelling);
+  if (!spellingInLatest) {
+    return exceptional(note, parsedKey, {
+      reason: "spelling-removed",
+      detail: `The spelling "${parsedKey.spelling}" is no longer a form of this entry.`,
+      latestWord,
+      latestEntryHTML,
+    });
+  }
 
   const alignment = alignSenses(oldParsed.senses, newParsed.senses);
-  const proposedReading = await analyzeReading(note, parsedKey, latestWord);
+  const mappedTargetSenses = mappedTargets(alignment, targetSenseNumbers);
+  const supplementalAnalysis = analyzeSupplementalEntries(
+    parsedKey,
+    storedEntryParts,
+    latestEntries,
+  );
+  if (supplementalAnalysis.error !== null) {
+    return exceptional(note, parsedKey, {
+      reason: supplementalAnalysis.reason,
+      detail: supplementalAnalysis.error,
+      latestWord,
+      latestEntryHTML,
+    });
+  }
+  const readingSenseOverrides = new Map(supplementalAnalysis.senseOverrides);
+  readingSenseOverrides.set(
+    anchorUsage.jmdictId,
+    mappedTargetSenses.length === targetSenseNumbers.length ? mappedTargetSenses : [],
+  );
+  const readingAnalysis = await validateCardReading({
+    key: parsedKey,
+    recognitionTarget: note.fields.recognitionTarget,
+    reading: note.fields.reading,
+    entries: latestEntries,
+    senseOverrides: readingSenseOverrides,
+  });
+  if (readingAnalysis.error !== null) {
+    return exceptional(note, parsedKey, {
+      reason: "invalid-reading",
+      detail: readingAnalysis.error,
+      latestWord,
+      latestEntryHTML,
+    });
+  }
+  const proposedReading = readingAnalysis.proposedReading;
   const changeChips = buildChangeChips(oldParsed, newParsed, alignment);
+  if (supplementalAnalysis.changed) {
+    changeChips.push({
+      kind: "entry-info",
+      label: "equivalent",
+      text: "an equivalent JMDict entry changed",
+    });
+  }
   if (changeChips.length === 0 && storedEntryHTML !== latestEntryHTML.trim()) {
     changeChips.push({ kind: "formatting", label: "", text: "formatting-only difference" });
   }
   if (proposedReading !== null) {
     changeChips.push({ kind: "reading", label: "reading", text: proposedReading });
   }
+  const supplementalProposedKey = formatKeyWithSenseOverrides(
+    parsedKey,
+    supplementalAnalysis.senseOverrides,
+    latestEntries,
+  );
   const base = {
     note,
     parsedKey,
@@ -168,8 +249,8 @@ export async function analyzeCard(
     newParsed,
     alignment,
     targetSenseNumbers,
-    mappedTargetSenses: mappedTargets(alignment, targetSenseNumbers),
-    proposedKey: null as string | null,
+    mappedTargetSenses,
+    proposedKey: supplementalProposedKey === note.fields.key ? null : supplementalProposedKey,
     proposedReading,
     senseViews: buildSenseViews(alignment, newParsed, targetSenseNumbers),
     removedTargetedSenses: alignment.removedSenses
@@ -186,6 +267,14 @@ export async function analyzeCard(
         verdict: "routine",
         reason: "furigana-placement",
         detail: "The pronunciation is unchanged; only its furigana boundaries were updated.",
+      };
+    }
+    if (base.proposedKey !== null) {
+      return {
+        ...base,
+        verdict: "normalize",
+        reason: "key-format",
+        detail: "The Key's sense selection now has a more compact canonical representation.",
       };
     }
     return {
@@ -214,16 +303,34 @@ export async function analyzeCard(
     };
   }
 
-  if (!spellingInLatest) {
+  if (
+    canonicalEntryHTML(storedAnchorEntryHTML) === canonicalEntryHTML(latestAnchorEntryHTML) &&
+    supplementalAnalysis.changed
+  ) {
     return {
       ...base,
-      verdict: "exception",
-      reason: "spelling-removed",
-      detail: `The spelling "${parsedKey.spelling}" is no longer a form of this entry.`,
+      verdict: "routine",
+      reason: supplementalAnalysis.senseOverrides.size === 0
+        ? "supplemental-entry"
+        : "supplemental-targets-renumbered",
+      detail: supplementalAnalysis.senseOverrides.size === 0
+        ? "An equivalent entry changed without altering its targeted senses."
+        : "Targeted senses in an equivalent entry kept their text but moved to new numbers.",
     };
   }
 
-  if (oldParsed.senses.length === 1 && newParsed.senses.length === 1) {
+  const multiEntry = parsedKey.usages.length > 1;
+  if (multiEntry && oldParsed.sharedText !== newParsed.sharedText) {
+    return {
+      ...base,
+      verdict: "exception",
+      reason: "equivalent-target-changed",
+      detail:
+        "Shared metadata for the anchor entry changed, so this card's cross-entry equivalence needs renewed review.",
+    };
+  }
+
+  if (!multiEntry && oldParsed.senses.length === 1 && newParsed.senses.length === 1) {
     return {
       ...base,
       verdict: "routine",
@@ -234,7 +341,7 @@ export async function analyzeCard(
 
   // An all-senses key implicitly targets any newly added sense too, so "the targeted senses
   // are intact" can only hold for it when the sense count is unchanged.
-  const allSensesKeyGrewOrShrank = parsedKey.senseNumbers === null &&
+  const allSensesKeyGrewOrShrank = anchorUsage.senseNumbers === null &&
     oldParsed.senses.length !== newParsed.senses.length;
 
   const targetsIntactInPlace = !allSensesKeyGrewOrShrank &&
@@ -257,21 +364,31 @@ export async function analyzeCard(
     alignment.pairs.find((pair) => pair.old.number === senseNumber && !pair.changed)
   );
   if (
-    parsedKey.senseNumbers !== null &&
+    anchorUsage.senseNumbers !== null &&
     renumberedTargets.every((pair) => pair !== undefined)
   ) {
-    const proposedKey = formatMiwakeKey(
-      parsedKey.spelling,
-      parsedKey.jmdictId,
+    const senseOverrides = new Map(supplementalAnalysis.senseOverrides);
+    senseOverrides.set(
+      anchorUsage.jmdictId,
       renumberedTargets.map((pair) => pair!.new.number),
-      newParsed.senses.length,
     );
+    const proposedKey = formatKeyWithSenseOverrides(parsedKey, senseOverrides, latestEntries);
     return {
       ...base,
       verdict: "routine",
       reason: "targets-renumbered",
       detail: "The targeted sense text is unchanged but moved to a different number.",
       proposedKey: proposedKey === note.fields.key ? null : proposedKey,
+    };
+  }
+
+  if (multiEntry) {
+    return {
+      ...base,
+      verdict: "exception",
+      reason: "equivalent-target-changed",
+      detail:
+        "A selected sense in the anchor entry changed, so this card's cross-entry equivalence needs renewed review.",
     };
   }
 
@@ -305,8 +422,8 @@ export async function analyzeCard(
   return {
     ...base,
     verdict: "retarget",
-    reason: parsedKey.senseNumbers === null ? "all-senses-reshaped" : "target-changed",
-    detail: parsedKey.senseNumbers === null
+    reason: anchorUsage.senseNumbers === null ? "all-senses-reshaped" : "target-changed",
+    detail: anchorUsage.senseNumbers === null
       ? "The card targeted all senses and the sense list changed shape."
       : "The text of a targeted sense changed.",
     needsAI: true,
@@ -315,7 +432,7 @@ export async function analyzeCard(
 
 function exceptional(
   note: MiwakeNoteSnapshot,
-  parsedKey: MiwakeKey | null,
+  parsedKey: Key | null,
   options: {
     reason: string;
     detail: string;
@@ -345,51 +462,116 @@ function exceptional(
   };
 }
 
-async function analyzeReading(
-  note: MiwakeNoteSnapshot,
-  parsedKey: MiwakeKey,
-  latestWord: JMdictWord,
-): Promise<string | null> {
-  const recognitionTarget = note.fields.recognitionTarget || parsedKey.spelling;
-  let lookupSpelling = recognitionTarget;
-  let readingPrefix = "";
-  let readingSuffix = "";
-  let reading = note.fields.reading;
-  const targetAffix = splitAffixNotation(recognitionTarget);
-  const readingAffix = splitAffixNotation(reading);
-  if (
-    targetAffix.notation === "leading" &&
-    targetAffix.content === parsedKey.spelling
-  ) {
-    lookupSpelling = parsedKey.spelling;
-    if (readingAffix.notation === "leading") {
-      readingPrefix = readingAffix.decoration;
-      reading = readingAffix.content;
+interface SupplementalEntryAnalysis {
+  changed: boolean;
+  senseOverrides: Map<string, readonly number[]>;
+  reason: string;
+  error: string | null;
+}
+
+function analyzeSupplementalEntries(
+  parsedKey: Key,
+  storedEntryParts: ReadonlyMap<string, string>,
+  latestEntries: ReadonlyMap<string, JMdictWord>,
+): SupplementalEntryAnalysis {
+  let changed = false;
+  const senseOverrides = new Map<string, readonly number[]>();
+
+  for (const usage of parsedKey.usages.slice(1)) {
+    const storedHTML = storedEntryParts.get(usage.jmdictId)!;
+    const latestEntry = latestEntries.get(usage.jmdictId)!;
+    const latestHTML = renderEntry(latestEntry);
+    if (storedHTML !== latestHTML.trim()) changed = true;
+
+    const oldParsed = parseRenderedEntry(storedHTML);
+    const newParsed = parseRenderedEntry(latestHTML);
+    if (oldParsed.senses.length === 0) {
+      return {
+        changed,
+        senseOverrides,
+        reason: "stored-entry-unparseable",
+        error: `The stored block for supplemental JMDict entry ${usage.jmdictId} is unparseable.`,
+      };
     }
-  } else if (
-    targetAffix.notation === "trailing" &&
-    targetAffix.content === parsedKey.spelling
-  ) {
-    lookupSpelling = parsedKey.spelling;
-    if (readingAffix.notation === "trailing") {
-      readingSuffix = readingAffix.decoration;
-      reading = readingAffix.content;
+    const targetSenseNumbers = usage.senseNumbers ??
+      oldParsed.senses.map((sense) => sense.number);
+    if (targetSenseNumbers.some((senseNumber) => senseNumber > oldParsed.senses.length)) {
+      return {
+        changed,
+        senseOverrides,
+        reason: "target-out-of-range",
+        error:
+          `The Key targets a sense the stored block for supplemental JMDict entry ${usage.jmdictId} does not have.`,
+      };
     }
-  }
-  if (
-    reading === "" || !/\p{Script=Han}/v.test(lookupSpelling)
-  ) {
-    return null;
+    if (canonicalEntryHTML(storedHTML) === canonicalEntryHTML(latestHTML)) continue;
+    if (oldParsed.sharedText !== newParsed.sharedText) {
+      return {
+        changed,
+        senseOverrides,
+        reason: "supplemental-target-changed",
+        error:
+          `Shared metadata changed in supplemental JMDict entry ${usage.jmdictId}; its equivalence with the anchor entry needs renewed review.`,
+      };
+    }
+
+    const alignment = alignSenses(oldParsed.senses, newParsed.senses);
+    if (usage.senseNumbers === null && oldParsed.senses.length !== newParsed.senses.length) {
+      return {
+        changed,
+        senseOverrides,
+        reason: "supplemental-target-changed",
+        error:
+          `All senses were selected in supplemental JMDict entry ${usage.jmdictId}, but its sense list changed shape.`,
+      };
+    }
+
+    const targetsIntactInPlace = targetSenseNumbers.every((senseNumber) => {
+      const oldSense = oldParsed.senses[senseNumber - 1];
+      const newSense = newParsed.senses[senseNumber - 1];
+      return newSense !== undefined && oldSense.text === newSense.text;
+    });
+    if (targetsIntactInPlace) continue;
+
+    const renumberedTargets = targetSenseNumbers.map((senseNumber) =>
+      alignment.pairs.find((pair) => pair.old.number === senseNumber && !pair.changed)
+    );
+    if (usage.senseNumbers !== null && renumberedTargets.every((pair) => pair !== undefined)) {
+      senseOverrides.set(
+        usage.jmdictId,
+        renumberedTargets.map((pair) => pair!.new.number),
+      );
+      continue;
+    }
+
+    return {
+      changed,
+      senseOverrides,
+      reason: "supplemental-target-changed",
+      error:
+        `A targeted sense changed or disappeared in supplemental JMDict entry ${usage.jmdictId}; the anchor-entry retargeting flow cannot safely decide it.`,
+    };
   }
 
-  const result = await recomputeAnkiReading(
-    reading,
-    lookupSpelling,
-    latestWord,
+  return { changed, senseOverrides, reason: "", error: null };
+}
+
+function formatKeyWithSenseOverrides(
+  parsedKey: Key,
+  senseOverrides: ReadonlyMap<string, readonly number[]>,
+  latestEntries: ReadonlyMap<string, JMdictWord>,
+): string {
+  return formatKey(
+    parsedKey.spelling,
+    parsedKey.usages.map((usage) => {
+      const entry = latestEntries.get(usage.jmdictId)!;
+      return {
+        jmdictId: usage.jmdictId,
+        senseNumbers: senseOverrides.get(usage.jmdictId) ?? usage.senseNumbers ?? [],
+        totalSenses: entry.sense.length,
+      };
+    }),
   );
-  if (result === null) return null;
-  const decoratedResult = `${readingPrefix}${result}${readingSuffix}`;
-  return decoratedResult === note.fields.reading ? null : decoratedResult;
 }
 
 function mappedTargets(alignment: SenseAlignment, targetSenseNumbers: number[]): number[] {

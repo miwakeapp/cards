@@ -11,6 +11,7 @@ import type {
   ReviewPayload,
 } from "../review_api.ts";
 import type { Suggestion, SuggestionConfidence } from "../suggest.ts";
+import { formatKey, parseKey } from "card_model/keys";
 import { furiganaToRuby } from "../anki_furigana.ts";
 import { applyRestrictionReason } from "./apply_policy.ts";
 
@@ -50,22 +51,52 @@ const REASON_LABELS: Record<string, { title: string; explain?: string }> = {
     title: "Furigana boundaries updated",
     explain: "The pronunciation is unchanged; only which characters carry each reading changed.",
   },
+  "supplemental-entry": {
+    title: "Changes outside selected equivalent-entry senses",
+    explain: "An additional entry changed, but the senses represented by this card are unchanged.",
+  },
+  "supplemental-targets-renumbered": {
+    title: "Equivalent-entry senses moved to new numbers",
+    explain: "Selected sense text is unchanged; the Key is rewritten to follow its new numbers.",
+  },
   "target-changed": { title: "Targeted sense text changed" },
   "target-gone": { title: "Targeted sense no longer exists" },
   "all-senses-reshaped": { title: "Card tests all senses; the entry changed shape" },
+  "equivalent-target-changed": {
+    title: "Equivalent entry usage needs renewed review",
+    explain: "Selected anchor content changed on a multi-entry recognition card.",
+  },
+  "supplemental-target-changed": {
+    title: "Equivalent entry usage needs renewed review",
+    explain: "Selected content changed in a supplemental entry.",
+  },
   "entry-deleted": { title: "JMDict entry no longer exists" },
   "invalid-key": { title: "Key is not a valid Miwake Card key" },
   "spelling-removed": { title: "Spelling removed from the entry" },
   "stored-entry-missing": { title: "Card has no stored dictionary entry" },
   "stored-entry-unparseable": { title: "Stored dictionary entry is unparseable" },
   "target-out-of-range": { title: "Key targets a sense the stored entry lacks" },
+  "invalid-reading": { title: "Reading is incompatible with the Key" },
+  "duplicate-recognition-unit": { title: "Card overlaps another recognition unit" },
+  "encoding-only": {
+    title: "Dictionary encoding normalized",
+    explain:
+      "The stored Dictionary differs only in entity encoding or whitespace, so nothing visible changes.",
+  },
+  "key-format": {
+    title: "Redundant all-senses list removed from Key",
+    explain:
+      "The Key explicitly lists every sense in an entry; the redundant list will be omitted without changing what the card represents.",
+  },
 };
 
 const ROUTINE_GROUP_ORDER: string[] = [
   "single-sense",
   "targets-intact",
+  "supplemental-entry",
   "target-metadata",
   "targets-renumbered",
+  "supplemental-targets-renumbered",
   "furigana-placement",
 ];
 
@@ -145,24 +176,59 @@ function renderContextHTML(raw: string): string {
   return walk(doc.body);
 }
 
+function readingListItems(raw: string): string[] | null {
+  const doc = new DOMParser().parseFromString(raw || "", "text/html");
+  const topLevelNodes = [...doc.body.childNodes].filter((node) =>
+    node.nodeType !== Node.TEXT_NODE || (node.textContent ?? "").trim() !== ""
+  );
+  if (topLevelNodes.length !== 1 || !(topLevelNodes[0] instanceof Element)) return null;
+
+  const list = topLevelNodes[0];
+  if (list.tagName !== "UL") return null;
+  const items = [...list.childNodes].filter((node) =>
+    node.nodeType !== Node.TEXT_NODE || (node.textContent ?? "").trim() !== ""
+  );
+  if (
+    items.length < 2 || items.some((node) => !(node instanceof Element && node.tagName === "LI"))
+  ) {
+    return null;
+  }
+  return items.map((item) => item.textContent ?? "");
+}
+
+function renderReadingHTML(raw: string, asList: boolean): string {
+  const items = readingListItems(raw);
+  if (items === null) return renderContextHTML(raw);
+
+  const renderedItems = items.map((item) => furiganaToRuby(escapeHTML(item)));
+  if (!asList) return renderedItems.join('<span class="reading-separator">・</span>');
+  return `<ul>${renderedItems.map((item) => `<li>${item}</li>`).join("")}</ul>`;
+}
+
 function readingTransitionHTML(item: ReviewItem): string {
   if (item.proposedReading === null) return "";
   return `
     <div class="reading-transition">
       <span class="reading-label">Reading</span>
-      <span lang="ja">${renderContextHTML(item.currentReading)}</span>
+      <div class="reading-value" lang="ja">${renderReadingHTML(item.currentReading, true)}</div>
       <span class="key-arrow">→</span>
-      <span lang="ja" class="reading-new">${renderContextHTML(item.proposedReading)}</span>
+      <div class="reading-value reading-new" lang="ja">${
+    renderReadingHTML(item.proposedReading, true)
+  }</div>
     </div>`;
 }
 
-/** Client-side mirror of card_creator's `formatMiwakeKey`, for live key previews. */
 function computeKey(item: ReviewItem, senses: Iterable<number>): string {
-  const sorted = [...senses].sort((a, b) => a - b);
-  if (sorted.length === 0 || sorted.length === item.totalNewSenses) {
-    return `${item.recognitionTarget} | ${item.jmdictId}`;
+  const parsedKey = parseKey(item.key);
+  if (parsedKey === null || parsedKey.usages.length !== 1) {
+    throw new Error("Only a valid single-entry Key can be retargeted.");
   }
-  return `${item.recognitionTarget} | ${item.jmdictId} | ${sorted.join(",")}`;
+  const sorted = [...senses].sort((a, b) => a - b);
+  return formatKey(parsedKey.spelling, [{
+    jmdictId: parsedKey.usages[0].jmdictId,
+    senseNumbers: sorted,
+    totalSenses: item.senseViews.length,
+  }]);
 }
 
 /** Character-level diff used only for the key transition line. */
@@ -487,7 +553,7 @@ function renderFocusCard(): void {
   const work = getWorking(item);
   const selection = [...work.senses].sort((a, b) => a - b);
   const newKey = computeKey(item, selection);
-  const allOrNone = selection.length === 0 || selection.length === item.totalNewSenses;
+  const allOrNone = selection.length === 0 || selection.length === item.senseViews.length;
   const suggestion = item.suggestion;
   const matchesAI = suggestion !== null &&
     JSON.stringify(selection) === JSON.stringify([...suggestion.senses].sort((a, b) => a - b)) &&
@@ -568,7 +634,7 @@ function renderFocusCard(): void {
         <h3 class="focus-word" lang="ja">${escapeHTML(item.word)}</h3>
         <div class="focus-chips">
           <span class="chip">${escapeHTML(reasonTitle(item.reason))}</span>
-          <span class="chip">${item.oldSenseCount} → ${item.newSenseCount} senses</span>
+          <span class="chip">${item.oldSenseCount} → ${item.senseViews.length} senses</span>
           ${
     suggestion
       ? `<span class="chip chip-ai"><span class="conf-dot ${suggestion.confidence}"></span>✨ ${suggestion.confidence} confidence</span>`
@@ -732,7 +798,7 @@ function acceptFocus(): void {
   if (!item || item.applied) return;
   const work = getWorking(item);
   const selection = [...work.senses].sort((a, b) => a - b);
-  const allOrNone = selection.length === 0 || selection.length === item.totalNewSenses;
+  const allOrNone = selection.length === 0 || selection.length === item.senseViews.length;
   const hint = work.hint.trim() || null;
   const suggestion = item.suggestion;
   const matchesAI = suggestion !== null &&
@@ -783,7 +849,7 @@ function renderRetargetQueue(): void {
       <span class="q-summary">${escapeHTML(summary)}</span>
       <span class="q-side">${
       item.suggestion ? `<span class="conf-dot ${item.suggestion.confidence}"></span>` : ""
-    }<span class="senses-pill">${item.oldSenseCount}→${item.newSenseCount}</span></span>`;
+    }<span class="senses-pill">${item.oldSenseCount}→${item.senseViews.length}</span></span>`;
     row.addEventListener("click", () => {
       focusNoteId = item.noteId;
       renderAll();
@@ -895,7 +961,7 @@ function chipHTML(chip: ChangeChip): string {
   } else if (chip.kind === "form-added" || chip.kind === "form-removed") {
     body = `${chip.label} <span lang="ja">${escapeHTML(chip.text)}</span>`;
   } else if (chip.kind === "reading") {
-    body = `<b>reading</b> <span lang="ja">${renderContextHTML(chip.text ?? "")}</span>`;
+    body = `<b>reading</b> <span lang="ja">${renderReadingHTML(chip.text ?? "", false)}</span>`;
   } else if (chip.label) {
     body = `<b>${escapeHTML(chip.label)}</b> ${escapeHTML(truncate(chip.text ?? "", 42))}`;
   } else {
@@ -910,10 +976,11 @@ function routineRow(item: ReviewItem): HTMLDivElement {
   row.className = `row ${held ? "held" : ""}`;
   row.dataset.noteId = String(item.noteId);
 
-  const keyParts = item.key.split("|").map((part) => part.trim());
+  const anchorUsage = item.key.split("|")[1]?.trim().split(";")[0];
+  const senseSuffix = anchorUsage?.split(":")[1];
   const keySuffix = item.proposedKey
     ? "key updated"
-    : (keyParts.length === 3 ? `#${keyParts[2]}` : "");
+    : (senseSuffix === undefined ? "" : `#${senseSuffix}`);
   const chips = item.changeChips.slice(0, 2).map(chipHTML).join("");
   const more = item.changeChips.length > 2
     ? `<span class="more-chip">+${item.changeChips.length - 2} more</span>`
@@ -933,7 +1000,7 @@ function routineRow(item: ReviewItem): HTMLDivElement {
     escapeHTML(keySuffix)
   }</span></span>
       <span class="row-changes">${chips}${more}</span>
-      <span class="senses-pill">${item.oldSenseCount}→${item.newSenseCount}</span>
+      <span class="senses-pill">${item.oldSenseCount}→${item.senseViews.length}</span>
       <button class="disclose">${expanded ? "▲ close" : "▼ diff"}</button>
     </div>
     ${expanded ? routineDetail(item) : ""}`;
@@ -979,21 +1046,32 @@ function routineDetail(item: ReviewItem): string {
         <summary>Show full entries (targeted senses highlighted)</summary>
         <div class="entries-compare">
           <div class="entry-pane"><div class="pane-title">On card now</div>${
-    markTargets(item.currentEntryHTML, item.targetSenseNumbers)
+    markTargets(item.currentEntryHTML, item.key)
   }</div>
           <div class="entry-pane"><div class="pane-title">New JMDict</div>${
-    markTargets(item.latestEntryHTML, item.mappedTargetSenses)
+    markTargets(item.latestEntryHTML, item.proposedKey ?? item.key)
   }</div>
         </div>
       </details>
     </div>`;
 }
 
-function markTargets(entryHTML: string | null, targetNumbers: number[]): string {
+function markTargets(entryHTML: string | null, key: string): string {
   const doc = new DOMParser().parseFromString(entryHTML || "", "text/html");
-  const targets = new Set(targetNumbers);
-  for (const [index, li] of [...doc.querySelectorAll("ol.senses > li")].entries()) {
-    if (targets.has(index + 1)) li.classList.add("is-target");
+  const parsedKey = parseKey(key);
+  if (parsedKey === null) return doc.body.innerHTML;
+
+  const entries = [...doc.querySelectorAll(".miwake-dictionary-entry")];
+  if (entries.length !== parsedKey.usages.length) return doc.body.innerHTML;
+  for (const [entryIndex, entry] of entries.entries()) {
+    const senseNumbers = parsedKey.usages[entryIndex].senseNumbers;
+    for (
+      const [senseIndex, sense] of [...entry.querySelectorAll(":scope > .senses > li")].entries()
+    ) {
+      if (senseNumbers === null || senseNumbers.includes(senseIndex + 1)) {
+        sense.classList.add("is-target");
+      }
+    }
   }
   return doc.body.innerHTML;
 }
@@ -1004,25 +1082,41 @@ function renderNormalize(): void {
   const container = element("normalizeBody");
   const list = normalizeItems();
   if (list.length === 0) {
-    container.innerHTML =
-      '<div class="normalize-strip">No encoding-only differences this run.</div>';
+    container.innerHTML = '<div class="normalize-strip">No normalization updates this run.</div>';
     return;
   }
-  const applied = list.filter((item) => item.applied).length;
-  container.innerHTML = `
-    <div class="normalize-strip">
-      <strong>${list.length} cards</strong> differ from the latest rendering only in entity encoding or whitespace
-      — for example <del>it&amp;#39;s</del> → <ins>it's</ins> in the stored HTML.
-      They'll be quietly brought in line when you apply${
-    applied ? ` (${applied} already applied)` : ""
-  }.
-      <details>
-        <summary>Show the ${list.length} words</summary>
-        <div class="normalize-words">${
-    list.map((item) => `<span lang="ja">${escapeHTML(item.word)}</span>`).join("")
-  }</div>
-      </details>
-    </div>`;
+  const byReason = new Map<string, ReviewItem[]>();
+  for (const item of list) {
+    const group = byReason.get(item.reason) ?? [];
+    group.push(item);
+    byReason.set(item.reason, group);
+  }
+  const orderedReasons = [
+    "encoding-only",
+    "key-format",
+    ...[...byReason.keys()].filter((reason) =>
+      reason !== "encoding-only" && reason !== "key-format"
+    ),
+  ];
+  container.innerHTML = orderedReasons.flatMap((reason) => {
+    const group = byReason.get(reason);
+    if (group === undefined) return [];
+    const applied = group.filter((item) => item.applied).length;
+    const explanation = REASON_LABELS[reason]?.explain ?? group[0].detail;
+    return [`
+      <div class="normalize-strip">
+        <strong>${escapeHTML(reasonTitle(reason))}: ${group.length} card${
+      group.length === 1 ? "" : "s"
+    }</strong>
+        ${escapeHTML(explanation)}${applied ? ` (${applied} already applied.)` : ""}
+        <details>
+          <summary>Show the ${group.length} word${group.length === 1 ? "" : "s"}</summary>
+          <div class="normalize-words">${
+      group.map((item) => `<span lang="ja">${escapeHTML(item.word)}</span>`).join("")
+    }</div>
+        </details>
+      </div>`];
+  }).join("");
 }
 
 function renderExceptions(): void {
@@ -1248,7 +1342,7 @@ document.addEventListener("keydown", (event) => {
   }
   if (/^[1-9]$/.test(event.key)) {
     const senseNumber = Number(event.key);
-    if (senseNumber <= focusItem.totalNewSenses) toggleSense(focusItem, senseNumber);
+    if (senseNumber <= focusItem.senseViews.length) toggleSense(focusItem, senseNumber);
   }
 });
 

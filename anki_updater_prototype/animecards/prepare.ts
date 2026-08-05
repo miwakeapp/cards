@@ -6,13 +6,15 @@
 
 import { parseArgs } from "@std/cli/parse-args";
 import * as path from "@std/path";
+import { fieldOrder } from "card_model";
 import { allJMDictEntries, type JMDictWord } from "data";
 import { createACInvoke, DEFAULT_ANKI_CONNECT_URL } from "../shared/anki_connect.ts";
 import { buildSpellingIndex } from "card_resolution";
 import { ankiSearchValue, fetchNoteInfos } from "./anki.ts";
 import { isAIQuotaError, MODEL_IDS, type ModelId } from "card_field_generation";
 import { JSONLGenerationCache } from "card_field_generation/file-cache";
-import { convertAnimecardsNote, MIWAKE_FIELD_NAMES } from "./convert.ts";
+import { convertAnimecardsNote } from "./convert.ts";
+import { type ExistingMiwakeCard, removeDuplicateKeys } from "./duplicate_keys.ts";
 import { readingConflictForJMDictEntrySelection, selectJMDictEntry } from "./entry_selection.ts";
 import { resolveSourceFields } from "./fields.ts";
 import { normalizePlainText } from "./html.ts";
@@ -22,7 +24,6 @@ import {
   CONVERSION_MANIFEST_VERSION,
   type ConversionCandidate,
   type ConversionManifest,
-  senseResolutionIsComplete,
   type SkippedNote,
 } from "./types.ts";
 
@@ -145,46 +146,6 @@ function describeEntry(entry: JMDictWord): string {
   }).join(" | ");
 }
 
-function removeDuplicateKeys(
-  candidates: ConversionCandidate[],
-  existingKeys: Map<string, number[]>,
-  sourceWordField: string,
-): { candidates: ConversionCandidate[]; skipped: SkippedNote[] } {
-  const byKey = new Map<string, ConversionCandidate[]>();
-  for (const candidate of candidates) {
-    if (!senseResolutionIsComplete(candidate.senseResolution)) {
-      continue;
-    }
-    const key = candidate.target.fields["Key"];
-    const values = byKey.get(key) ?? [];
-    values.push(candidate);
-    byKey.set(key, values);
-  }
-
-  const kept: ConversionCandidate[] = [];
-  const skipped: SkippedNote[] = [];
-  for (const [key, values] of byKey) {
-    const existing = existingKeys.get(key) ?? [];
-    const conflicts = [...values.map((candidate) => candidate.noteId), ...existing];
-    if (conflicts.length > 1 || existing.length > 0) {
-      for (const candidate of values) {
-        skipped.push({
-          noteId: candidate.noteId,
-          word: normalizePlainText(candidate.original.fields[sourceWordField] ?? ""),
-          reason: "duplicate-miwake-key",
-          detail: `${key}; note IDs: ${conflicts.join(", ")}`,
-        });
-      }
-    } else {
-      kept.push(values[0]);
-    }
-  }
-  kept.push(
-    ...candidates.filter((candidate) => !senseResolutionIsComplete(candidate.senseResolution)),
-  );
-  return { candidates: kept, skipped };
-}
-
 async function loadJMDictOverrides(filePath: string | undefined): Promise<Map<number, string>> {
   if (filePath === undefined) return new Map();
   const value = JSON.parse(await Deno.readTextFile(filePath)) as unknown;
@@ -227,11 +188,9 @@ async function main(): Promise<void> {
   ]);
   console.error(`Connected to Anki profile "${profile}".`);
 
-  const missingTargetFields = MIWAKE_FIELD_NAMES.filter((name) =>
-    !targetModelFields.includes(name)
-  );
+  const missingTargetFields = fieldOrder.filter((name) => !targetModelFields.includes(name));
   const unexpectedTargetFields = targetModelFields.filter(
-    (name) => !(MIWAKE_FIELD_NAMES as readonly string[]).includes(name),
+    (name) => !(fieldOrder as readonly string[]).includes(name),
   );
   if (missingTargetFields.length > 0 || unexpectedTargetFields.length > 0) {
     throw new Error(
@@ -416,15 +375,16 @@ async function main(): Promise<void> {
     query: `note:${ankiSearchValue(options.targetModel)}`,
   });
   const targetNotes = await fetchNoteInfos(targetNoteIds, invoke);
-  const existingKeys = new Map<string, number[]>();
+  const existingCards: ExistingMiwakeCard[] = [];
   for (const note of targetNotes) {
     const key = normalizePlainText(note.fields["Key"]?.value ?? "");
     if (!key) continue;
-    const noteIdsForKey = existingKeys.get(key) ?? [];
-    noteIdsForKey.push(note.noteId);
-    existingKeys.set(key, noteIdsForKey);
+    existingCards.push({
+      noteId: note.noteId,
+      key,
+    });
   }
-  const deduplicated = removeDuplicateKeys(candidates, existingKeys, sourceFields.word);
+  const deduplicated = removeDuplicateKeys(candidates, existingCards, sourceFields.word, entries);
   skipped.push(...deduplicated.skipped);
 
   const manifest: ConversionManifest = {

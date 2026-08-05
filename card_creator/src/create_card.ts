@@ -3,13 +3,14 @@
  */
 
 import { escape } from "@std/html/entities";
-import { renderEntry } from "jmdict_to_html";
+import { renderDictionaryField } from "card_model/dictionary";
+import { formatKey } from "card_model/keys";
+import { formatReading } from "card_model/reading";
+import type { CardFields } from "card_model";
+import { formatResolvedReadingsForAnki, resolveAcceptedContent } from "./accepted_content.ts";
 import { processContextHTML } from "./context.ts";
-import { formatReadingForAnki } from "./format_reading_for_anki.ts";
-import { resolveJMDictUsage } from "./jmdict_usage.ts";
-import { formatMiwakeKey } from "./keys.ts";
 import { formatSourceHTML } from "./source.ts";
-import type { CreateCardInput, MiwakeCard } from "./types.ts";
+import type { CreateCardInput } from "./types.ts";
 
 function assertNonemptyTrimmedText(value: string, fieldName: string): void {
   if (value === "") {
@@ -29,11 +30,11 @@ async function processContextField(
   fieldName: "fullContext" | "minimizedContext",
   html: string,
   spelling: string,
-  reading: string,
-  formattedTargetReading: string | undefined,
+  readings: readonly string[],
+  formattedTargetReadings: ReadonlyMap<string, string> | undefined,
 ): Promise<string> {
   try {
-    return await processContextHTML(html, spelling, reading, { formattedTargetReading });
+    return await processContextHTML(html, spelling, readings, { formattedTargetReadings });
   } catch (cause) {
     if (!(cause instanceof Error)) throw cause;
     throw new Error(`${fieldName}: ${cause.message}`, { cause });
@@ -48,60 +49,82 @@ async function processContextField(
  * choose a kana reading, generate a hint, minimize context, or clean source metadata. Callers must
  * resolve those decisions first.
  */
-export async function createCard(input: CreateCardInput): Promise<MiwakeCard> {
+export async function createCard(
+  input: CreateCardInput,
+): Promise<CardFields> {
   assertNonemptyTrimmedText(input.recognitionTarget, "recognitionTarget");
   if (input.hint !== undefined) assertNonemptyTrimmedText(input.hint, "hint");
 
-  const usage = resolveJMDictUsage(
-    input.jmdictEntry,
-    input.recognitionTarget,
-    input.kanaReading,
-    input.applicableSenseNumbers,
-  );
-  const formattedReading = usage.usesReadingField
-    ? await formatReadingForAnki(input.jmdictEntry, usage.spelling, usage.kanaReading)
-    : null;
-  if (usage.usesReadingField && formattedReading === null) {
-    throw new Error(
-      `No furigana placement data exists for recognitionTarget ${
-        JSON.stringify(usage.spelling)
-      } with kanaReading ${JSON.stringify(usage.kanaReading)} in jmdictEntry with id ` +
-        `${JSON.stringify(input.jmdictEntry.id)}`,
+  if (input.kanaReadings !== undefined) {
+    for (const [index, kanaReading] of input.kanaReadings.entries()) {
+      assertNonemptyTrimmedText(kanaReading, `kanaReadings[${index}]`);
+    }
+  }
+
+  const resolved = resolveAcceptedContent(input);
+  const contextReadings = resolved.kanaReadings ?? [resolved.spelling];
+  let reading: string | null = null;
+  let formattedTargetReadings: ReadonlyMap<string, string> | undefined;
+  if (resolved.usesReadingField) {
+    const formatting = await formatResolvedReadingsForAnki(resolved);
+    if (formatting.formattedReadings === null) {
+      const entryDescription = formatting.supportingEntryIds.length === 1
+        ? `in jmdictEntry with id ${JSON.stringify(formatting.supportingEntryIds[0])}`
+        : `in supporting jmdictEntries ${JSON.stringify(formatting.supportingEntryIds)}`;
+      throw new Error(
+        `No furigana placement data exists for recognitionTarget ${
+          JSON.stringify(resolved.spelling)
+        } with kanaReading ${
+          JSON.stringify(formatting.unavailableKanaReading)
+        } ${entryDescription}`,
+      );
+    }
+    formattedTargetReadings = new Map(
+      resolved.kanaReadings!.map((kanaReading, index) => [
+        kanaReading,
+        formatting.formattedReadings![index],
+      ]),
+    );
+    const referenceUsage = resolved.usages[0].usage;
+    reading = formatReading(
+      formatting.formattedReadings.map((formatted) =>
+        `${referenceUsage.readingPrefix}${formatted}${referenceUsage.readingSuffix}`
+      ),
     );
   }
+
   const fullContext = await processContextField(
     "fullContext",
     input.fullContext,
-    usage.spelling,
-    usage.kanaReading,
-    formattedReading ?? undefined,
+    resolved.spelling,
+    contextReadings,
+    formattedTargetReadings,
   );
   const minimizedContext = input.minimizedContext === undefined ? null : await processContextField(
     "minimizedContext",
     input.minimizedContext,
-    usage.spelling,
-    usage.kanaReading,
-    formattedReading ?? undefined,
+    resolved.spelling,
+    contextReadings,
+    formattedTargetReadings,
   );
 
-  let reading: string | null = null;
-  if (usage.usesReadingField) {
-    reading = `${usage.readingPrefix}${formattedReading}${usage.readingSuffix}`;
-  }
-
   return {
-    key: formatMiwakeKey(
-      usage.spelling,
-      input.jmdictEntry.id,
-      usage.senseNumbers,
-      input.jmdictEntry.sense.length,
+    key: formatKey(
+      resolved.spelling,
+      resolved.usages.map((candidate) => ({
+        jmdictId: candidate.entry.id,
+        senseNumbers: candidate.usage.senseNumbers,
+        totalSenses: candidate.entry.sense.length,
+      })),
     ),
-    recognitionTarget: escape(usage.recognitionTarget),
-    reading: reading === null ? null : escape(reading),
+    recognitionTarget: escape(resolved.recognitionTarget),
+    reading,
     hint: input.hint === undefined ? null : escape(input.hint),
     fullContext,
     minimizedContext,
-    dictionaryEntry: renderEntry(input.jmdictEntry),
+    dictionary: renderDictionaryField(
+      resolved.usages.map(({ entry }) => entry),
+    ),
     source: formatSourceHTML(input.source),
   };
 }

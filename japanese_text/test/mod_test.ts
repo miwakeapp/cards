@@ -1,5 +1,11 @@
 import { assertEquals, assertThrows } from "@std/assert";
-import { containsKanji, isKanji, smallKanaForFullSizeKana, toHiragana } from "japanese_text";
+import {
+  containsKanji,
+  isKanji,
+  parseAnkiFurigana,
+  smallKanaForFullSizeKana,
+  toHiragana,
+} from "japanese_text";
 
 Deno.test("toHiragana converts katakana without changing the original orthography otherwise", () => {
   assertEquals(toHiragana("面子メンツ・ゲームー"), "面子めんつ・げーむー");
@@ -82,4 +88,32 @@ Deno.test("smallKanaForFullSizeKana returns undefined for other characters", () 
   assertEquals(smallKanaForFullSizeKana("a"), undefined);
   assertEquals(smallKanaForFullSizeKana("1"), undefined);
   assertEquals(smallKanaForFullSizeKana("🙂"), undefined);
+});
+
+Deno.test("parseAnkiFurigana recovers surface text and reading", () => {
+  assertEquals(parseAnkiFurigana("その 異[い] 名[みょう]"), {
+    surface: "その異名",
+    reading: "そのいみょう",
+    parts: [
+      { type: "plain", text: "その" },
+      { type: "ruby", base: "異", reading: "い" },
+      { type: "ruby", base: "名", reading: "みょう" },
+    ],
+  });
+  assertEquals(parseAnkiFurigana("気[き] [っ] 風[ぷ]"), {
+    surface: "気風",
+    reading: "きっぷ",
+    parts: [
+      { type: "ruby", base: "気", reading: "き" },
+      { type: "ruby", base: "", reading: "っ" },
+      { type: "ruby", base: "風", reading: "ぷ" },
+    ],
+  });
+});
+
+Deno.test("parseAnkiFurigana rejects malformed bracket syntax", () => {
+  assertEquals(parseAnkiFurigana(""), null);
+  assertEquals(parseAnkiFurigana("食[]べる"), null);
+  assertEquals(parseAnkiFurigana("食[たべる"), null);
+  assertEquals(parseAnkiFurigana("食[た[べ]る"), null);
 });

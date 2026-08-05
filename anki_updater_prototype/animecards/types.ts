@@ -1,4 +1,4 @@
-export const CONVERSION_MANIFEST_VERSION = 14;
+export const CONVERSION_MANIFEST_VERSION = 15;
 
 export interface AnkiFieldValue {
   value: string;
@@ -135,6 +135,13 @@ export interface JMDictEntryResolution {
   allowedJMDictIds: string[];
 }
 
+/** An additional reviewed pronunciation and the equivalent JMDict usage which validates it. */
+export interface AdditionalAcceptedReadingResolution {
+  jmdictId: string;
+  kanaReading: string;
+  applicableSenseNumbers: number[];
+}
+
 export interface ConversionCandidate {
   noteId: number;
   /** False for an automatic deferral or a manual hold; omitted by `apply`. */
@@ -146,7 +153,10 @@ export interface ConversionCandidate {
   keyRecognitionTarget: string;
   /** Explicit notation retained from the source Animecard, if any. */
   recognitionTargetOverride?: string;
+  /** Pronunciation identified by the acquisition evidence; final Reading order is independent. */
   readingKana: string;
+  /** Other reviewed pronunciations and their direct JMDict grounding. */
+  additionalAcceptedReadings?: AdditionalAcceptedReadingResolution[];
   /**
    * Plain-text evidence supplied to sense-selection AI.
    *
