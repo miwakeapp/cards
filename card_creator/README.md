@@ -39,7 +39,7 @@ The renderer validates the resolved input and then:
 
 The package root intentionally contains only `createCard()` and its input/output types: `CreateCardInput`, `AcceptedJMDictUsage`, `CardSource`, and the type-only `CardFields` re-export. `card_model` remains the canonical owner of `CardFields` and the persisted Key, Reading, and Dictionary codecs.
 
-`card_creator/accepted-reading` exposes one updater-facing operation, `formatAcceptedReadingsForAnki()`. It applies the same entry/reading/sense validation and canonical reading order as `createCard()`, then returns undecorated Anki-furigana alternatives. It returns `null` for kana targets or when precise placement data is unavailable, allowing maintenance to preserve an existing Reading instead of choosing a replacement. The internal resolved-content graph is not public.
+`card_creator/accepted-reading` exposes one updater-facing operation, `resolveAcceptedReadingsForAnki()`. It applies the same entry/reading/sense validation and canonical reading order as `createCard()`, then returns both the ordered exact JMDict readings and their undecorated Anki-furigana alternatives. Formatted readings are `null` for kana targets or when precise placement data is unavailable, allowing maintenance to preserve an existing Reading instead of choosing a replacement. The internal resolved-content graph is not public.
 
 The JMDict preparation helpers live under `card_creator/jmdict` instead of expanding the root API:
 

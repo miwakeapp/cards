@@ -149,6 +149,80 @@ Deno.test("analyzeCard: validates multiple readings against one Key usage", asyn
   const card = await analyzeCard(note, entriesById(word));
   assertEquals(card.verdict, "unchanged");
   assertEquals(card.proposedReading, null);
+  assertEquals(card.acceptedKanaReadings, ["いみょう", "いめい"]);
+});
+
+Deno.test("analyzeCard: recovers exact JMDict readings from mixed-script displays", async () => {
+  const word = await preextractedJMDictEntry("1427810");
+  const note = makeNote({
+    key: "張子のトラ | 1427810:1",
+    reading: "張[はり] 子[こ]のトラ",
+    dictionary: renderDictionary(word),
+  });
+
+  const card = await analyzeCard(note, entriesById(word));
+  assertEquals(card.verdict, "unchanged");
+  assertEquals(card.proposedReading, null);
+  assertEquals(card.acceptedKanaReadings, ["はりこのとら"]);
+});
+
+Deno.test("analyzeCard: rejects an exact reading restricted away from the Key spelling", async () => {
+  const word = makeWord({
+    kanji: ["糞"],
+    kana: ["ふん", "フン"],
+    senses: [{ glosses: ["dung"] }],
+  });
+  word.kana[1].appliesToKanji = [];
+  const note = makeNote({
+    key: "糞 | 1000000",
+    reading: "糞[フン]",
+    dictionary: renderDictionary(word),
+  });
+
+  const card = await analyzeCard(note, entriesById(word));
+  assertEquals(card.verdict, "exception");
+  assertEquals(card.reason, "invalid-reading");
+  assertEquals(card.proposedReading, null);
+});
+
+Deno.test("analyzeCard: does not normalize nonexact ruby to an applicable reading", async () => {
+  const word = makeWord({
+    kanji: ["糞"],
+    kana: ["ふん", "フン"],
+    senses: [{ glosses: ["dung"] }],
+  });
+  word.kana[1].appliesToKanji = [];
+  const note = makeNote({
+    key: "糞 | 1000000",
+    reading: "糞[ふン]",
+    dictionary: renderDictionary(word),
+  });
+
+  const card = await analyzeCard(note, entriesById(word));
+  assertEquals(card.verdict, "exception");
+  assertEquals(card.reason, "invalid-reading");
+  assertEquals(card.proposedReading, null);
+});
+
+Deno.test("analyzeCard: rejects ambiguous readings implied only by literal Key text", async () => {
+  const word = makeWord({
+    kanji: ["張子のトら"],
+    kana: ["はりこのとら", "はりこのトラ"],
+    senses: [{ glosses: ["papier-mâché tiger"] }],
+  });
+  const note = makeNote({
+    key: "張子のトら | 1000000",
+    reading: "張[はり] 子[こ]のトら",
+    dictionary: renderDictionary(word),
+  });
+
+  const card = await analyzeCard(note, entriesById(word));
+  assertEquals(card.verdict, "exception");
+  assertEquals(card.reason, "invalid-reading");
+  assertEquals(
+    card.detail,
+    'Reading alternative "張[はり] 子[こ]のトら" is ambiguous between exact JMDict readings ["はりこのとら","はりこのトラ"].',
+  );
 });
 
 Deno.test("analyzeCard: preserves a custom single-reading display", async () => {

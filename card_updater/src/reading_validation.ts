@@ -1,6 +1,6 @@
 import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
 import type { AcceptedJMDictUsage } from "card_creator";
-import { formatAcceptedReadingsForAnki } from "card_creator/accepted-reading";
+import { resolveAcceptedReadingsForAnki } from "card_creator/accepted-reading";
 import type { Key } from "card_model/keys";
 import {
   decorateReadingAlternative,
@@ -8,7 +8,7 @@ import {
   type ParsedReadingAlternative,
   parseReading,
 } from "card_model/reading";
-import { parseAnkiFurigana } from "japanese_text";
+import { parseAnkiFurigana, toHiragana } from "japanese_text";
 import { splitAffixNotation } from "./affix_notation.ts";
 
 interface ReadingValidationInput {
@@ -23,12 +23,61 @@ interface ReadingValidationInput {
 interface ReadingValidation {
   proposedReading: string | null;
   error: string | null;
+  acceptedKanaReadings: readonly string[];
 }
 
-function readingForAnkiFuriganaSurfaceSubstring(
+interface ReadingFragment {
+  text: string;
+  /** Literal Key text is orthography, so its hiragana/katakana choice is not reading evidence. */
+  literal: boolean;
+}
+
+interface ParsedCardReadingAlternative extends ParsedReadingAlternative {
+  fragments: readonly ReadingFragment[];
+}
+
+function matchesReadingFragments(
+  candidate: string,
+  fragments: readonly ReadingFragment[],
+): boolean {
+  let offset = 0;
+  for (const fragment of fragments) {
+    const candidateFragment = candidate.slice(offset, offset + fragment.text.length);
+    const matches = fragment.literal
+      ? toHiragana(candidateFragment) === toHiragana(fragment.text)
+      : candidateFragment === fragment.text;
+    if (!matches) return false;
+    offset += fragment.text.length;
+  }
+  return offset === candidate.length;
+}
+
+function jmdictReadingForDisplay(
+  alternative: ParsedCardReadingAlternative,
+  readings: ReadonlySet<string>,
+): string {
+  if (readings.has(alternative.kanaReading)) return alternative.kanaReading;
+
+  const candidates = [...readings].filter((reading) =>
+    matchesReadingFragments(reading, alternative.fragments)
+  );
+  if (candidates.length === 1) return candidates[0];
+  if (candidates.length === 0) {
+    throw new Error(
+      `Reading alternative ${JSON.stringify(alternative.formatted)} does not identify an exact ` +
+        "JMDict reading.",
+    );
+  }
+  throw new Error(
+    `Reading alternative ${JSON.stringify(alternative.formatted)} is ambiguous between exact ` +
+      `JMDict readings ${JSON.stringify(candidates)}.`,
+  );
+}
+
+function readingFragmentsForAnkiFuriganaSurfaceSubstring(
   text: string,
   surfaceSubstring: string,
-): string | null {
+): ReadingFragment[] | null {
   const parsed = parseAnkiFurigana(text);
   if (parsed === null || surfaceSubstring === "") return null;
 
@@ -40,13 +89,13 @@ function readingForAnkiFuriganaSurfaceSubstring(
   const substringEnd = substringStart + surfaceSubstring.length;
 
   let surfaceOffset = 0;
-  let reading = "";
+  const fragments: ReadingFragment[] = [];
   for (const part of parsed.parts) {
     const surface = part.type === "plain" ? part.text : part.base;
     const partReading = part.type === "plain" ? part.text : part.reading;
     if (surface === "") {
       if (surfaceOffset > substringStart && surfaceOffset < substringEnd) {
-        reading += partReading;
+        fragments.push({ text: partReading, literal: false });
       } else if (surfaceOffset === substringStart || surfaceOffset === substringEnd) {
         return null;
       }
@@ -61,14 +110,17 @@ function readingForAnkiFuriganaSurfaceSubstring(
     if (overlapStart >= overlapEnd) continue;
 
     if (overlapStart === partStart && overlapEnd === partEnd) {
-      reading += partReading;
+      fragments.push({ text: partReading, literal: part.type === "plain" });
     } else if (part.type === "plain") {
-      reading += part.text.slice(overlapStart - partStart, overlapEnd - partStart);
+      fragments.push({
+        text: part.text.slice(overlapStart - partStart, overlapEnd - partStart),
+        literal: true,
+      });
     } else {
       return null;
     }
   }
-  return reading || null;
+  return fragments.length === 0 ? null : fragments;
 }
 
 /** Validates a card's Reading against its complete latest-JMDict recognition unit. */
@@ -84,6 +136,7 @@ export async function validateCardReading(
       return {
         proposedReading: null,
         error: `The Key refers to missing JMDict entry ${usage.jmdictId}.`,
+        acceptedKanaReadings: [],
       };
     }
     resolvedEntries.push(entry);
@@ -99,6 +152,7 @@ export async function validateCardReading(
         proposedReading: null,
         error: `JMDict entry ${key.usages[index].jmdictId} puts the Key spelling in a ` +
           "different reading-field category from the other entries.",
+        acceptedKanaReadings: [],
       };
     }
   }
@@ -109,26 +163,28 @@ export async function validateCardReading(
       return {
         proposedReading: null,
         error: "Reading must be empty when the Key spelling is a kana form.",
+        acceptedKanaReadings: [],
       };
     }
     try {
-      await formatAcceptedReadingsForAnki({
+      await resolveAcceptedReadingsForAnki({
         recognitionTarget: key.spelling,
         jmdictUsages: acceptedUsages,
       });
     } catch (error) {
       return validationError(error);
     }
-    return { proposedReading: null, error: null };
+    return { proposedReading: null, error: null, acceptedKanaReadings: [key.spelling] };
   }
 
   if (input.reading === "") {
     return {
       proposedReading: null,
       error: "Reading is required for a non-kana Key spelling.",
+      acceptedKanaReadings: [],
     };
   }
-  const parsedReadings = parseCardReadingAlternatives(
+  const parsedReadings = parseCardReadingAlternativesWithFragments(
     input.reading,
     recognitionTarget,
     key.spelling,
@@ -138,23 +194,36 @@ export async function validateCardReading(
       proposedReading: null,
       error:
         "Reading alternatives must use canonical Miwake syntax and contain the Key spelling exactly once at independently readable boundaries.",
+      acceptedKanaReadings: [],
     };
   }
 
+  let requestedKanaReadings: readonly [string, ...string[]];
+  let acceptedKanaReadings: readonly string[];
   let formattedVariants: readonly string[] | null;
   try {
-    formattedVariants = await formatAcceptedReadingsForAnki({
+    const jmdictReadings = new Set(
+      resolvedEntries.flatMap((entry) => entry.kana.map(({ text }) => text)),
+    );
+    requestedKanaReadings = parsedReadings.map((alternative) =>
+      jmdictReadingForDisplay(alternative, jmdictReadings)
+    ) as [string, ...string[]];
+    const resolved = await resolveAcceptedReadingsForAnki({
       recognitionTarget: key.spelling,
-      kanaReadings: parsedReadings.map(({ kanaReading }) => kanaReading) as [
-        string,
-        ...string[],
-      ],
+      kanaReadings: requestedKanaReadings,
       jmdictUsages: acceptedUsages,
     });
+    if (resolved.kanaReadings === null) {
+      throw new Error("A non-kana Key spelling unexpectedly resolved without kana readings.");
+    }
+    acceptedKanaReadings = resolved.kanaReadings;
+    formattedVariants = resolved.formattedReadings;
   } catch (error) {
     return validationError(error);
   }
-  if (formattedVariants === null) return { proposedReading: null, error: null };
+  if (formattedVariants === null) {
+    return { proposedReading: null, error: null, acceptedKanaReadings };
+  }
 
   const targetAffix = splitAffixNotation(recognitionTarget);
   let canonicalAlternatives: readonly string[];
@@ -165,11 +234,10 @@ export async function validateCardReading(
       decorateReadingAlternative(formatted, prefix, suffix)
     );
   } else {
-    const canonicalReadings = parseReading(formatReading(formattedVariants), key.spelling)!;
     const alternativesByKanaReading = new Map(
-      parsedReadings.map(({ formatted, kanaReading }) => [kanaReading, formatted]),
+      parsedReadings.map(({ formatted }, index) => [requestedKanaReadings[index], formatted]),
     );
-    canonicalAlternatives = canonicalReadings.map(({ kanaReading }) =>
+    canonicalAlternatives = acceptedKanaReadings.map((kanaReading) =>
       alternativesByKanaReading.get(kanaReading)!
     );
   }
@@ -178,7 +246,39 @@ export async function validateCardReading(
   return {
     proposedReading: formattedReading === input.reading ? null : formattedReading,
     error: null,
+    acceptedKanaReadings,
   };
+}
+
+function parseCardReadingAlternativesWithFragments(
+  reading: string,
+  recognitionTarget: string,
+  keySpelling: string,
+): ParsedCardReadingAlternative[] | null {
+  const targetAffix = splitAffixNotation(recognitionTarget);
+  const displayedAlternatives = parseReading(reading, recognitionTarget);
+  if (displayedAlternatives === null) return null;
+
+  const parsed: ParsedCardReadingAlternative[] = [];
+  for (const { formatted } of displayedAlternatives) {
+    let projectedReading = formatted;
+    if (targetAffix.content === keySpelling && targetAffix.notation !== "none") {
+      const readingAffix = splitAffixNotation(formatted);
+      if (readingAffix.notation !== targetAffix.notation) return null;
+      projectedReading = readingAffix.content;
+    }
+    const fragments = readingFragmentsForAnkiFuriganaSurfaceSubstring(
+      projectedReading,
+      keySpelling,
+    );
+    if (fragments === null) return null;
+    parsed.push({
+      formatted,
+      kanaReading: fragments.map(({ text }) => text).join(""),
+      fragments,
+    });
+  }
+  return parsed;
 }
 
 /** Recovers Key-spelling pronunciations while preserving each complete displayed alternative. */
@@ -187,41 +287,16 @@ export function parseCardReadingAlternatives(
   recognitionTarget: string,
   keySpelling: string,
 ): ParsedReadingAlternative[] | null {
-  const targetAffix = splitAffixNotation(recognitionTarget);
-  const displayedAlternatives = parseReading(reading, recognitionTarget);
-  if (displayedAlternatives === null) return null;
-  if (targetAffix.content !== keySpelling) {
-    const projected: ParsedReadingAlternative[] = [];
-    for (const { formatted } of displayedAlternatives) {
-      const kanaReading = readingForAnkiFuriganaSurfaceSubstring(formatted, keySpelling);
-      if (kanaReading === null) return null;
-      projected.push({ formatted, kanaReading });
-    }
-    return projected;
-  }
-
-  const undecoratedAlternatives: string[] = [];
-  for (const { formatted } of displayedAlternatives) {
-    if (targetAffix.notation === "none") {
-      undecoratedAlternatives.push(formatted);
-      continue;
-    }
-    const readingAffix = splitAffixNotation(formatted);
-    if (readingAffix.notation !== targetAffix.notation) return null;
-    undecoratedAlternatives.push(readingAffix.content);
-  }
-  const keyAlternatives = parseReading(formatReading(undecoratedAlternatives), keySpelling);
-  if (keyAlternatives === null) return null;
-  return keyAlternatives.map(({ kanaReading }, index) => ({
-    formatted: displayedAlternatives[index].formatted,
-    kanaReading,
-  }));
+  return parseCardReadingAlternativesWithFragments(reading, recognitionTarget, keySpelling)?.map(
+    ({ formatted, kanaReading }) => ({ formatted, kanaReading }),
+  ) ?? null;
 }
 
 function validationError(error: unknown): ReadingValidation {
   return {
     proposedReading: null,
     error: error instanceof Error ? error.message : String(error),
+    acceptedKanaReadings: [],
   };
 }
 
