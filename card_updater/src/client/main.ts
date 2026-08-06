@@ -31,6 +31,11 @@ const expandedRows = new Set<number>();
 const undoStack: Array<Array<{ noteId: number; previous: DecisionDraft | null }>> = [];
 
 const REASON_LABELS: Record<string, { title: string; explain?: string }> = {
+  "redundant-british-glosses": {
+    title: "Redundant British English glosses removed",
+    explain:
+      "British spellings were removed only where the same sense already includes an otherwise-identical American English gloss.",
+  },
   "single-sense": {
     title: "Single-sense entries, wording updated",
     explain: "One sense before and after — the card can't point at the wrong sense.",
@@ -92,6 +97,7 @@ const REASON_LABELS: Record<string, { title: string; explain?: string }> = {
 };
 
 const ROUTINE_GROUP_ORDER: string[] = [
+  "redundant-british-glosses",
   "single-sense",
   "targets-intact",
   "supplemental-entry",
