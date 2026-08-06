@@ -223,19 +223,17 @@ export async function formatResolvedReadingsForAnki(resolved: ResolvedAcceptedCo
   };
 }
 
-/**
- * Validates and canonically orders accepted readings, then formats their undecorated Anki
- * furigana alternatives.
- *
- * Returns `null` when the recognition target is kana or precise placement data is unavailable for
- * any accepted reading. Invalid entry, spelling, reading, or sense relationships throw.
- */
-export async function formatAcceptedReadingsForAnki(
+/** Validates, orders, and formats exact accepted readings for updater maintenance. */
+export async function resolveAcceptedReadingsForAnki(
   input: Pick<
     import("./types.ts").CreateCardInput,
     "jmdictUsages" | "kanaReadings" | "recognitionTarget"
   >,
-): Promise<string[] | null> {
-  const result = await formatResolvedReadingsForAnki(resolveAcceptedContent(input));
-  return result.formattedReadings;
+): Promise<{
+  readonly kanaReadings: readonly string[] | null;
+  readonly formattedReadings: readonly string[] | null;
+}> {
+  const resolved = resolveAcceptedContent(input);
+  const { formattedReadings } = await formatResolvedReadingsForAnki(resolved);
+  return { kanaReadings: resolved.kanaReadings, formattedReadings };
 }

@@ -85,6 +85,8 @@ export interface AnalyzedCard {
   proposedKey: string | null;
   /** Furigana-boundary rewrite that preserves the stored pronunciation, or `null`. */
   proposedReading: string | null;
+  /** Exact canonical JMDict readings accepted by the stored Reading field. */
+  acceptedKanaReadings: readonly string[];
   /** Sense list for the review UI (new senses annotated, removed ones appended). */
   senseViews: SenseView[];
   removedTargetedSenses: number[];
@@ -256,6 +258,7 @@ export async function analyzeCard(
     mappedTargetSenses,
     proposedKey: supplementalProposedKey === note.fields.key ? null : supplementalProposedKey,
     proposedReading,
+    acceptedKanaReadings: readingAnalysis.acceptedKanaReadings,
     senseViews: buildSenseViews(alignment, newParsed, targetSenseNumbers),
     removedTargetedSenses: alignment.removedSenses
       .filter((sense) => targetSenseNumbers.includes(sense.number))
@@ -459,6 +462,7 @@ function exceptional(
     mappedTargetSenses: [],
     proposedKey: null,
     proposedReading: null,
+    acceptedKanaReadings: [],
     senseViews: [],
     removedTargetedSenses: [],
     changeChips: [],

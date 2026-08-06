@@ -24,7 +24,6 @@ import { ankiFuriganaToSurface, verifyMarkedContextTarget } from "card_resolutio
 import type { JMDictWord } from "data";
 import type { AnalyzedCard } from "./analyze.ts";
 import { splitAffixNotation } from "./affix_notation.ts";
-import { parseCardReadingAlternatives } from "./reading_validation.ts";
 
 export type SuggestionConfidence = "high" | "medium";
 
@@ -96,7 +95,7 @@ export async function suggestForCard(
 
   let aiHint: string | null;
   const focusedResults: GenerationResult<unknown>[] = [];
-  const kanaReadings = acceptedKanaReadings(card);
+  const kanaReadings = card.acceptedKanaReadings;
   const compatibleSenseNumbers = [
     ...new Set(kanaReadings.flatMap((kanaReading) => {
       try {
@@ -240,27 +239,6 @@ function displayedAffixNotation(
   recognitionTarget: string,
 ): "leading" | "none" | "trailing" {
   return splitAffixNotation(recognitionTarget).notation;
-}
-
-function acceptedKanaReadings(card: AnalyzedCard): string[] {
-  const spelling = card.parsedKey!.spelling;
-  if (card.latestWord!.kana.some(({ text }) => text === spelling)) return [spelling];
-
-  const recognitionTarget = card.note.fields.recognitionTarget || spelling;
-  const readings = parseCardReadingAlternatives(
-    card.note.fields.reading,
-    recognitionTarget,
-    spelling,
-  );
-  if (readings === null) {
-    throw new Error(
-      `Card ${card.note.noteId} must have parseable kana readings for recognition target ` +
-        `${JSON.stringify(spelling)} before sense selection; found ${
-          JSON.stringify(card.note.fields.reading)
-        }`,
-    );
-  }
-  return readings.map(({ kanaReading }) => kanaReading);
 }
 
 /**
