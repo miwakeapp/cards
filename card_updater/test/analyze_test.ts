@@ -21,6 +21,13 @@ function renderDictionary(word: JMdictWord): string {
   return renderDictionaryField([word]);
 }
 
+function renderDictionaryBeforeBritishFiltering(word: JMdictWord): string {
+  return renderDictionary(word).replace(
+    "<li>behavior</li>",
+    "<li>behaviour</li>\n<li>behavior</li>",
+  );
+}
+
 Deno.test("analyzeCard: unchanged when stored HTML matches the latest rendering", async () => {
   const note = makeNote({ key: "掬う | 1226200:1", dictionary: renderDictionary(TWO_SENSES) });
   const card = await analyzeCard(note, entriesById(TWO_SENSES));
@@ -463,6 +470,106 @@ Deno.test("analyzeCard: routine when only targeted-sense metadata changed", asyn
   const card = await analyzeCard(note, entriesById(tagged));
   assertEquals(card.verdict, "routine");
   assertEquals(card.reason, "target-metadata");
+});
+
+Deno.test("analyzeCard: routine when redundant British target glosses are filtered", async () => {
+  const word = makeWord({
+    id: "1226200",
+    kanji: ["掬う"],
+    kana: ["すくう"],
+    senses: [
+      { glosses: ["behaviour", "behavior"] },
+      { glosses: ["to dip up"] },
+    ],
+  });
+  const storedDictionary = renderDictionaryBeforeBritishFiltering(word);
+  const note = makeNote({ key: "掬う | 1226200:1", dictionary: storedDictionary });
+  const card = await analyzeCard(note, entriesById(word));
+
+  assertEquals(card.verdict, "routine");
+  assertEquals(card.reason, "redundant-british-glosses");
+  assertEquals(card.needsAI, false);
+});
+
+Deno.test("analyzeCard: classifies British gloss cleanup before single-sense updates", async () => {
+  const word = makeWord({ senses: [{ glosses: ["behaviour", "behavior"] }] });
+  const note = makeNote({
+    key: "言葉 | 1000000",
+    dictionary: renderDictionaryBeforeBritishFiltering(word),
+  });
+  const card = await analyzeCard(note, entriesById(word));
+
+  assertEquals(card.verdict, "routine");
+  assertEquals(card.reason, "redundant-british-glosses");
+  assertEquals(card.needsAI, false);
+});
+
+Deno.test("analyzeCard: classifies British gloss cleanup outside targeted senses", async () => {
+  const word = makeWord({
+    id: "1226200",
+    kanji: ["掬う"],
+    kana: ["すくう"],
+    senses: [
+      { glosses: ["to scoop"] },
+      { glosses: ["behaviour", "behavior"] },
+    ],
+  });
+  const note = makeNote({
+    key: "掬う | 1226200:1",
+    dictionary: renderDictionaryBeforeBritishFiltering(word),
+  });
+  const card = await analyzeCard(note, entriesById(word));
+
+  assertEquals(card.verdict, "routine");
+  assertEquals(card.reason, "redundant-british-glosses");
+  assertEquals(card.needsAI, false);
+});
+
+Deno.test("analyzeCard: routine for an all-senses British gloss cleanup", async () => {
+  const word = makeWord({
+    id: "1226200",
+    kanji: ["掬う"],
+    kana: ["すくう"],
+    senses: [
+      { glosses: ["behaviour", "behavior"] },
+      { glosses: ["to dip up"] },
+    ],
+  });
+  const storedDictionary = renderDictionaryBeforeBritishFiltering(word);
+  const note = makeNote({ key: "掬う | 1226200", dictionary: storedDictionary });
+  const card = await analyzeCard(note, entriesById(word));
+
+  assertEquals(card.verdict, "routine");
+  assertEquals(card.reason, "redundant-british-glosses");
+  assertEquals(card.needsAI, false);
+});
+
+Deno.test("analyzeCard: retarget when a British gloss cleanup accompanies a text change", async () => {
+  const before = makeWord({
+    id: "1226200",
+    kanji: ["掬う"],
+    kana: ["すくう"],
+    senses: [
+      { glosses: ["behaviour", "behavior", "conduct"] },
+      { glosses: ["to dip up"] },
+    ],
+  });
+  const after = makeWord({
+    id: "1226200",
+    kanji: ["掬う"],
+    kana: ["すくう"],
+    senses: [
+      { glosses: ["behaviour", "behavior", "demeanor"] },
+      { glosses: ["to dip up"] },
+    ],
+  });
+  const storedDictionary = renderDictionaryBeforeBritishFiltering(before);
+  const note = makeNote({ key: "掬う | 1226200:1", dictionary: storedDictionary });
+  const card = await analyzeCard(note, entriesById(after));
+
+  assertEquals(card.verdict, "retarget");
+  assertEquals(card.reason, "target-changed");
+  assertEquals(card.needsAI, true);
 });
 
 Deno.test("analyzeCard: retarget when a targeted sense's text changed", async () => {

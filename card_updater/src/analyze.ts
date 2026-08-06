@@ -3,9 +3,10 @@
  * attention its update needs.
  */
 
-import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
+import type { JMdictGloss, JMdictWord } from "@scriptin/jmdict-simplified-types";
 import { renderDictionaryField, splitDictionaryField } from "card_model/dictionary";
 import { renderEntry } from "jmdict_to_html";
+import { translate } from "translate-american-british-english";
 import type { MiwakeNoteSnapshot } from "./anki.ts";
 import {
   alignSenses,
@@ -14,6 +15,7 @@ import {
   diffSegments,
   diffSenseSegments,
   type ParsedEntry,
+  type ParsedSense,
   parseRenderedEntry,
   type SenseAlignment,
 } from "./entry_text.ts";
@@ -337,6 +339,18 @@ export async function analyzeCard(
     };
   }
 
+  if (
+    !multiEntry &&
+    isOnlyRedundantBritishEnglishGlossRemoval(oldParsed, newParsed, latestWord)
+  ) {
+    return {
+      ...base,
+      verdict: "routine",
+      reason: "redundant-british-glosses",
+      detail: "Only redundant British English spellings were removed from the dictionary entry.",
+    };
+  }
+
   if (!multiEntry && oldParsed.senses.length === 1 && newParsed.senses.length === 1) {
     return {
       ...base,
@@ -435,6 +449,84 @@ export async function analyzeCard(
       : "The text of a targeted sense changed.",
     needsAI: true,
   };
+}
+
+function isOnlyRedundantBritishEnglishGlossRemoval(
+  before: ParsedEntry,
+  after: ParsedEntry,
+  currentWord: JMdictWord,
+): boolean {
+  if (
+    !sameStrings(before.kanjiForms, after.kanjiForms) ||
+    !sameStrings(before.kanaForms, after.kanaForms) ||
+    before.sharedText !== after.sharedText ||
+    before.senses.length !== after.senses.length ||
+    after.senses.length !== currentWord.sense.length
+  ) {
+    return false;
+  }
+
+  let removed = false;
+  for (let i = 0; i < before.senses.length; ++i) {
+    const beforeSense = before.senses[i];
+    const afterSense = after.senses[i];
+    if (beforeSense.text === afterSense.text) {
+      continue;
+    }
+    if (
+      senseTextWithGlosses(beforeSense, afterSense.glosses) !== afterSense.text ||
+      !areOnlyRedundantBritishEnglishGlossesRemoved(
+        beforeSense.glosses,
+        afterSense.glosses,
+        currentWord.sense[i].gloss,
+      )
+    ) {
+      return false;
+    }
+    removed = true;
+  }
+  return removed;
+}
+
+function senseTextWithGlosses(sense: ParsedSense, glosses: readonly string[]) {
+  const oldGlossText = sense.glosses.join("; ");
+  const glossStart = sense.text.indexOf(oldGlossText);
+  if (glossStart === -1) {
+    return null;
+  }
+  return sense.text.slice(0, glossStart) + glosses.join("; ") +
+    sense.text.slice(glossStart + oldGlossText.length);
+}
+
+function areOnlyRedundantBritishEnglishGlossesRemoved(
+  before: readonly string[],
+  after: readonly string[],
+  currentGlosses: JMdictGloss[],
+): boolean {
+  const americanized = currentGlosses.map((gloss) => americanize(gloss.text));
+  const unchangedEnglishGlosses = new Set(
+    currentGlosses.flatMap((gloss, index) =>
+      gloss.lang === "eng" && gloss.text === americanized[index] ? [gloss.text] : []
+    ),
+  );
+  const filtered = currentGlosses.filter((gloss, index) =>
+    gloss.lang !== "eng" ||
+    gloss.text === americanized[index] ||
+    !unchangedEnglishGlosses.has(americanized[index])
+  ).map((gloss) => gloss.text);
+  const unfiltered = currentGlosses.map((gloss) => gloss.text);
+
+  return sameStrings(before, unfiltered) &&
+    !sameStrings(before, after) &&
+    sameStrings(after, filtered);
+}
+
+function americanize(text: string): string {
+  return translate(text, { american: true });
+}
+
+function sameStrings(first: readonly string[], second: readonly string[]): boolean {
+  return first.length === second.length && first.every((value, index) => value === second[index]);
 }
 
 function exceptional(
