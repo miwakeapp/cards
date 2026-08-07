@@ -1,3 +1,5 @@
+import { readingAppliesToKanji } from "./jmdict_reading.ts";
+
 /** Kana readings indexed by their applicable JMDict kanji spelling. */
 export type JMDictReadings = Record<string, string[]>;
 
@@ -13,10 +15,7 @@ export function buildJMDictReadings(
   for (const entry of entries) {
     for (const kanji of entry.kanji) {
       for (const kana of entry.kana) {
-        if (
-          kana.appliesToKanji.includes("*") ||
-          kana.appliesToKanji.includes(kanji.text)
-        ) {
+        if (readingAppliesToKanji(kana, kanji.text)) {
           let readings = index.get(kanji.text);
           if (readings === undefined) {
             readings = new Set();

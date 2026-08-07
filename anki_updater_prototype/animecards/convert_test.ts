@@ -94,6 +94,33 @@ Deno.test("convertAnimecardsNote deterministically converts and highlights an in
   assertEquals(result.candidate.senseSelectionContext, "たべている。");
 });
 
+Deno.test("convertAnimecardsNote accepts a nokanji reading for a kanji spelling", async () => {
+  const entry = makeWord({
+    kanji: ["糞"],
+    kana: [{ text: "フン", common: true, tags: [], appliesToKanji: [] }],
+    partOfSpeech: ["n"],
+  });
+  const entries = new Map([[entry.id, entry]]);
+  const result = await convertAnimecardsNote(
+    makeNote({
+      Word: "糞",
+      Sentence: "犬の糞を片づける。",
+      Reading: "フン",
+    }),
+    {
+      sourceModel: "Animecards",
+      targetModel: "Miwake",
+      sourceFields: SOURCE_FIELDS,
+      entries,
+      spellingIndex: buildSpellingIndex(entries.values()),
+    },
+  );
+
+  assert(result.candidate, JSON.stringify(result.skipped));
+  assertEquals(result.candidate.target.fields.Key, "糞 | 1234567");
+  assertEquals(result.candidate.target.fields.Reading, "糞[フン]");
+});
+
 Deno.test("convertAnimecardsNote marks only the resolved lexical occurrence in HTML", async () => {
   const entry = makeWord({ kana: ["なる"], partOfSpeech: ["v5r"] });
   const entries = new Map([[entry.id, entry]]);

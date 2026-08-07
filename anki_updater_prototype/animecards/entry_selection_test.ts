@@ -412,6 +412,25 @@ Deno.test("selectJMDictEntry rejects a selected entry incompatible with the Anim
   });
 });
 
+Deno.test("selectJMDictEntry does not treat nokanji as a reading conflict", async () => {
+  const candidate = entry("1111111", ["karma"]);
+  candidate.kana[0].appliesToKanji = [];
+  const result = await selectJMDictEntry(
+    request({
+      allowedJMDictIds: ["1111111"],
+      candidateEntries: [candidate],
+    }),
+    MODEL_OPTIONS,
+    dependencies(() => ({ outcome: "selected", senseNumbers: [1] })),
+  );
+
+  assertEquals(result.status, "selected");
+  if (result.status === "selected") {
+    assertEquals(result.jmdictId, "1111111");
+    assertEquals(result.applicableSenseNumbers, [1]);
+  }
+});
+
 Deno.test("selectJMDictEntry rechecks a linked entry after a reading-incompatible choice", async () => {
   let calls = 0;
   const result = await selectJMDictEntry(

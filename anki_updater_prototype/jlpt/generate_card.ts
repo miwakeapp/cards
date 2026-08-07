@@ -2,6 +2,7 @@ import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
 import { createCard } from "card_creator";
 import { compatibleSenseNumbersForJMDictUsage, jmdictUsagesForSpelling } from "card_creator/jmdict";
 import type { CardFields } from "card_model";
+import { readingAppliesToKanji } from "data";
 import { markedContextHasRuby } from "card_resolution";
 import {
   generateSourceGroundedHint,
@@ -35,9 +36,7 @@ function applicableReadings(entry: JMdictWord, recognitionTarget: string): strin
   return [
     ...new Set(
       entry.kana
-        .filter(({ appliesToKanji }) =>
-          appliesToKanji.includes("*") || appliesToKanji.includes(recognitionTarget)
-        )
+        .filter((reading) => readingAppliesToKanji(reading, recognitionTarget))
         .map(({ text }) => text),
     ),
   ];

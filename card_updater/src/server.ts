@@ -8,7 +8,7 @@ import * as path from "@std/path";
 import { parseKey } from "card_model/keys";
 import type { GenerationCache } from "card_field_generation";
 import { findAllEntriesBySpelling, type SpellingIndex } from "card_resolution";
-import type { JMDictWord } from "data";
+import { type JMDictWord, readingAppliesToKanji } from "data";
 import { ac, type ACInvoke, applyNoteUpdate, openNotesInAnki } from "./anki.ts";
 import { applyRestrictionReason } from "./client/apply_policy.ts";
 import { RecognitionUnitIndex } from "./duplicate_keys.ts";
@@ -69,7 +69,7 @@ export function invalidReadingExceptionContext(
       };
     }
     const appliesToKeySpelling = exactMatches.some(({ form }) =>
-      form.appliesToKanji.includes("*") || form.appliesToKanji.includes(card.parsedKey!.spelling)
+      readingAppliesToKanji(form, card.parsedKey!.spelling)
     );
     if (!appliesToKeySpelling) {
       return {

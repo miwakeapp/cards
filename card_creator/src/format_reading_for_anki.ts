@@ -1,4 +1,4 @@
-import { jmdictFuriganaFor, type JMDictWord } from "data";
+import { jmdictFuriganaFor, type JMDictWord, readingAppliesToKanji } from "data";
 import { isKanji } from "japanese_text";
 
 /**
@@ -29,9 +29,8 @@ export async function formatReadingForAnki(
   }
 
   const kanjiForm = jmdictEntry.kanji.find(({ text }) => text === spelling);
-  const applicableReading = jmdictEntry.kana.find(({ text, appliesToKanji }) =>
-    text === kanaReading &&
-    (appliesToKanji.includes("*") || appliesToKanji.includes(spelling))
+  const applicableReading = jmdictEntry.kana.find((reading) =>
+    reading.text === kanaReading && readingAppliesToKanji(reading, spelling)
   );
   if (kanjiForm === undefined || applicableReading === undefined) {
     return null;

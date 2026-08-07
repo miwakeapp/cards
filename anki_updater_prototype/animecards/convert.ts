@@ -2,6 +2,7 @@ import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
 import { createCard } from "card_creator";
 import { compatibleSenseNumbersForJMDictUsage } from "card_creator/jmdict";
 import type { CardFields } from "card_model";
+import { readingAppliesToKanji } from "data";
 import { toHiragana } from "japanese_text";
 import {
   deriveLookupSpellings,
@@ -271,11 +272,8 @@ function applicableReadings(entry: JMdictWord, recognitionTarget: string): strin
   }
 
   const readings = entry.kana
-    .filter((item) =>
-      item.appliesToKanji.includes("*") ||
-      item.appliesToKanji.includes(recognitionTarget)
-    )
-    .map((item) => item.text);
+    .filter((reading) => readingAppliesToKanji(reading, recognitionTarget))
+    .map((reading) => reading.text);
   return [...new Set(readings)];
 }
 
