@@ -6,6 +6,8 @@ import type {
   ApplyResultPayload,
   DecisionDraft,
   DecisionUpdate,
+  DuplicateEntryContext,
+  DuplicateNoteContext,
   ReviewItem,
   ReviewMeta,
   ReviewPayload,
@@ -50,7 +52,7 @@ const REASON_LABELS: Record<string, { title: string; explain?: string }> = {
   },
   "targets-renumbered": {
     title: "Same senses, new numbers",
-    explain: "The targeted sense text is unchanged but moved; the key is rewritten to follow it.",
+    explain: "The targeted sense text is unchanged but moved; the Key is rewritten to follow it.",
   },
   "furigana-placement": {
     title: "Furigana boundaries updated",
@@ -69,21 +71,59 @@ const REASON_LABELS: Record<string, { title: string; explain?: string }> = {
   "all-senses-reshaped": { title: "Card tests all senses; the entry changed shape" },
   "equivalent-target-changed": {
     title: "Equivalent entry usage needs renewed review",
-    explain: "Selected anchor content changed on a multi-entry recognition card.",
+    explain:
+      "Selected content or shared metadata changed on the anchor entry of a multi-entry card. Review whether its JMDict entries still represent equivalent usages and adjust the Key in Anki.",
   },
   "supplemental-target-changed": {
     title: "Equivalent entry usage needs renewed review",
-    explain: "Selected content changed in a supplemental entry.",
+    explain:
+      "Selected content or shared metadata changed on a supplemental entry of a multi-entry card. Review whether its JMDict entries still represent equivalent usages and adjust the Key in Anki.",
   },
-  "entry-deleted": { title: "JMDict entry no longer exists" },
-  "invalid-key": { title: "Key is not a valid Miwake Card key" },
-  "spelling-removed": { title: "Spelling removed from the entry" },
-  "spelling-not-in-entry": { title: "Key spelling is not in its JMDict entry" },
-  "stored-entry-missing": { title: "Card has no stored dictionary entry" },
-  "stored-entry-unparseable": { title: "Stored dictionary entry is unparseable" },
-  "target-out-of-range": { title: "Key targets a sense the stored entry lacks" },
-  "invalid-reading": { title: "Reading is incompatible with the Key" },
-  "duplicate-recognition-unit": { title: "Card overlaps another recognition unit" },
+  "entry-deleted": {
+    title: "JMDict entry no longer exists",
+    explain:
+      "A JMDict entry named by the Key is absent from the latest dictionary. Choose a replacement entry or remove the obsolete card in Anki.",
+  },
+  "invalid-key": {
+    title: "Key is not a valid Miwake Card key",
+    explain:
+      "The Key does not use the canonical spelling, JMDict entry, and optional sense-list syntax. Correct it directly in Anki.",
+  },
+  "spelling-removed": {
+    title: "Spelling removed from the entry",
+    explain:
+      "The Key uses a spelling that was present on the stored entry but is no longer a form of the latest JMDict entry. Choose the intended current spelling or entry in Anki.",
+  },
+  "spelling-not-in-entry": {
+    title: "Key spelling is not in its JMDict entry",
+    explain:
+      "The Key uses a spelling that belongs to neither the stored nor the latest JMDict entry. Correct the spelling or fix the entry pointer in Anki, or submit a correction to JMDict.",
+  },
+  "stored-entry-missing": {
+    title: "Card has no stored dictionary entry",
+    explain:
+      "The Dictionary field is empty, so the updater has no previous JMDict snapshot to compare with the latest entry. Rebuild or repair the card in Anki.",
+  },
+  "stored-entry-unparseable": {
+    title: "Stored dictionary entry is unparseable",
+    explain:
+      "The Dictionary field does not contain the expected rendered JMDict entry structure, so the updater cannot compare it safely. Rebuild or repair the card in Anki.",
+  },
+  "target-out-of-range": {
+    title: "Key targets a sense the stored entry lacks",
+    explain:
+      "The Key names a sense number that is absent from the card's stored JMDict snapshot. Correct the Key or rebuild the card in Anki.",
+  },
+  "invalid-reading": {
+    title: "Reading is incompatible with the Key",
+    explain:
+      "The Reading does not identify an exact JMDict reading compatible with the card's Key and Recognition target. Correct the Reading or Key + Recognition target in Anki, or submit a correction to JMDict.",
+  },
+  "duplicate-recognition-unit": {
+    title: "Cards overlap the same recognition unit",
+    explain:
+      "Two or more scanned cards select overlapping JMDict senses. Blue cells belong to that note; green cells link to cards with a different Recognition target. Empty cells mean only that the row does not select that sense. Remove the duplicate or adjust each card's Key.",
+  },
   "encoding-only": {
     title: "Dictionary encoding normalized",
     explain:
@@ -107,6 +147,20 @@ const ROUTINE_GROUP_ORDER: string[] = [
   "furigana-placement",
 ];
 
+const EXCEPTION_GROUP_ORDER: string[] = [
+  "invalid-key",
+  "entry-deleted",
+  "stored-entry-missing",
+  "stored-entry-unparseable",
+  "target-out-of-range",
+  "spelling-removed",
+  "spelling-not-in-entry",
+  "invalid-reading",
+  "equivalent-target-changed",
+  "supplemental-target-changed",
+  "duplicate-recognition-unit",
+];
+
 /* ---------- helpers ---------- */
 
 function escapeHTML(value: unknown): string {
@@ -116,6 +170,27 @@ function escapeHTML(value: unknown): string {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
+}
+
+const MIWAKE_CARD_FIELD_NAMES = [
+  "Recognition target",
+  "Full context",
+  "Dictionary",
+  "Reading",
+  "Hint",
+  "Key",
+] as const;
+
+function fieldNameHTML(fieldName: typeof MIWAKE_CARD_FIELD_NAMES[number]): string {
+  return `<span class="field-name">${escapeHTML(fieldName)}</span>`;
+}
+
+function descriptionHTML(description: string): string {
+  let html = escapeHTML(description);
+  for (const fieldName of MIWAKE_CARD_FIELD_NAMES) {
+    html = html.replaceAll(fieldName, fieldNameHTML(fieldName));
+  }
+  return html;
 }
 
 function segmentsHTML(segments: DiffSegment[]): string {
@@ -162,6 +237,10 @@ function element<T extends HTMLElement = HTMLElement>(id: string): T {
 
 function ankiTargetLabel(): string {
   return `${meta.ankiProfile} @ ${new URL(meta.ankiConnectURL).host}`;
+}
+
+function ankiHeaderLabel(): string {
+  return `${meta.ankiProfile} @ ${new URL(meta.ankiConnectURL).hostname}`;
 }
 
 /** Renders a note-field's HTML safely: keeps simple inline tags, converts Anki furigana to ruby. */
@@ -273,6 +352,284 @@ async function api<T>(pathname: string, body?: unknown): Promise<T> {
   return payload;
 }
 
+async function openInAnki(link: HTMLAnchorElement): Promise<void> {
+  const response = await fetch(link.href);
+  if (!response.ok) {
+    const payload = await response.json() as { error?: string };
+    throw new Error(payload.error ?? `Request failed: ${response.status}`);
+  }
+}
+
+function wireOpenInAnkiLink(link: HTMLAnchorElement): void {
+  link.addEventListener("click", async (event) => {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    try {
+      await openInAnki(link);
+      showToast("Opened in the Anki browser");
+    } catch (error) {
+      showToast(`Could not open: ${errorMessage(error)}`);
+    }
+  });
+}
+
+function sourceDate(value: string | undefined): string {
+  if (value === undefined) return "date unknown";
+  const timestamp = Date.parse(value);
+  return Number.isNaN(timestamp) ? value : new Date(timestamp).toISOString().slice(0, 10);
+}
+
+function jmdictEntryURL(jmdictId: string): string {
+  return `https://www.edrdg.org/jmwsgi/entr.py?svc=jmdict&g=${encodeURIComponent(jmdictId)}`;
+}
+
+function jmdictActionLinksHTML(jmdictIds: readonly string[]): string {
+  const uniqueIds = [...new Set(jmdictIds)];
+  if (uniqueIds.length === 0) {
+    return '<span class="exception-action-unavailable" aria-label="No JMDict entry available">&mdash;</span>';
+  }
+  return uniqueIds.map((jmdictId) =>
+    `<a class="jmdict-action-link" href="${
+      escapeHTML(jmdictEntryURL(jmdictId))
+    }" target="_blank" rel="noopener" title="Open JMDict entry ${escapeHTML(jmdictId)}">${
+      uniqueIds.length === 1 ? "Open in JMDict" : `Open ${escapeHTML(jmdictId)} in JMDict`
+    }</a>`
+  ).join("");
+}
+
+function exceptionDetailHTML(item: ReviewItem): string {
+  const context = item.exceptionContext;
+  if (context?.kind === "reading-no-match") {
+    return `${fieldNameHTML("Reading")} is &ldquo;${
+      escapeHTML(context.reading)
+    }&rdquo;, but no JMDict reading matches &ldquo;${escapeHTML(context.kanaReading)}&rdquo;.`;
+  }
+  if (context?.kind === "reading-not-applicable") {
+    return `&ldquo;${escapeHTML(context.kanaReading)}&rdquo; exists, but is not applicable to ${
+      fieldNameHTML("Recognition target")
+    } &ldquo;${escapeHTML(context.recognitionTarget)}&rdquo; according to the JMDict entry.`;
+  }
+  if (item.reason === "spelling-not-in-entry") return "";
+  return escapeHTML(item.detail);
+}
+
+interface DuplicateGroup {
+  recognitionTarget: string;
+  notes: DuplicateNoteContext[];
+  entries: DuplicateEntryContext[];
+}
+
+function duplicateGroups(groupItems: readonly ReviewItem[]): DuplicateGroup[] {
+  const notesById = new Map<number, DuplicateNoteContext>();
+  const neighborsById = new Map<number, Set<number>>();
+  const entriesByJMDictId = new Map<string, DuplicateEntryContext>();
+  const targetsById = new Map(groupItems.map((item) => [item.noteId, item.word]));
+
+  for (const item of groupItems) {
+    const context = item.exceptionContext;
+    if (context?.kind !== "duplicate-recognition-unit") continue;
+    for (const entry of context.entries) {
+      const existing = entriesByJMDictId.get(entry.jmdictId);
+      if (existing === undefined) {
+        entriesByJMDictId.set(entry.jmdictId, entry);
+        continue;
+      }
+      const otherCards = new Map(
+        [...existing.otherCards, ...entry.otherCards].map((card) => [card.noteId, card]),
+      );
+      entriesByJMDictId.set(entry.jmdictId, {
+        jmdictId: entry.jmdictId,
+        senseCount: Math.max(existing.senseCount, entry.senseCount),
+        otherCards: [...otherCards.values()].toSorted((left, right) => left.noteId - right.noteId),
+      });
+    }
+    for (const note of context.notes) {
+      notesById.set(note.noteId, note);
+      const neighbors = neighborsById.get(note.noteId) ?? new Set<number>();
+      neighborsById.set(note.noteId, neighbors);
+      for (const other of context.notes) {
+        if (other.noteId !== note.noteId) neighbors.add(other.noteId);
+      }
+    }
+  }
+
+  const result: DuplicateGroup[] = [];
+  const visited = new Set<number>();
+  for (const startingId of [...notesById.keys()].toSorted((left, right) => left - right)) {
+    if (visited.has(startingId)) continue;
+    const componentIds: number[] = [];
+    const pending = [startingId];
+    while (pending.length > 0) {
+      const noteId = pending.pop()!;
+      if (visited.has(noteId)) continue;
+      visited.add(noteId);
+      componentIds.push(noteId);
+      pending.push(...neighborsById.get(noteId) ?? []);
+    }
+    componentIds.sort((left, right) => left - right);
+    const representativeId = componentIds.find((noteId) => targetsById.has(noteId));
+    const notes = componentIds.map((noteId) => notesById.get(noteId)!);
+    const jmdictIds = [
+      ...new Set(notes.flatMap((note) => note.usages.map(({ jmdictId }) => jmdictId))),
+    ].toSorted((left, right) => Number(left) - Number(right));
+    result.push({
+      recognitionTarget: representativeId === undefined ? "" : targetsById.get(representativeId)!,
+      notes,
+      entries: jmdictIds.map((jmdictId) => entriesByJMDictId.get(jmdictId)!),
+    });
+  }
+  return result;
+}
+
+function duplicateSenseGridsHTML(
+  note: DuplicateNoteContext,
+  entries: readonly DuplicateEntryContext[],
+): string {
+  return entries.map(({ jmdictId, senseCount }) => {
+    const selectedSenses = new Set(
+      note.usages.find((usage) => usage.jmdictId === jmdictId)?.senseNumbers ?? [],
+    );
+    const entryLabel = entries.length === 1
+      ? ""
+      : `<span class="duplicate-entry-id">${escapeHTML(jmdictId)}</span>`;
+    const cells = Array.from({ length: senseCount }, (_, index) => {
+      const senseNumber = index + 1;
+      const selected = selectedSenses.has(senseNumber);
+      const stateLabel = selected ? "selected" : "not selected";
+      return `<span class="duplicate-sense-cell${selected ? " selected" : ""}"
+        role="listitem" aria-label="Sense ${senseNumber}, ${stateLabel}"
+        title="Sense ${senseNumber}: ${stateLabel}"><span aria-hidden="true">${
+        selected ? senseNumber : ""
+      }</span></span>`;
+    }).join("");
+    return `<div class="duplicate-usage-grid">${entryLabel}
+      <span class="duplicate-sense-grid" role="list"
+        aria-label="Sense selections for JMDict entry ${escapeHTML(jmdictId)}"
+        style="--sense-count: ${senseCount}">${cells}</span>
+    </div>`;
+  }).join("");
+}
+
+interface DuplicateOtherCard {
+  noteId: number;
+  recognitionTarget: string;
+  usages: DuplicateNoteContext["usages"];
+}
+
+function duplicateOtherCards(entries: readonly DuplicateEntryContext[]): DuplicateOtherCard[] {
+  const cardsByNoteId = new Map<number, DuplicateOtherCard>();
+  for (const entry of entries) {
+    for (const card of entry.otherCards) {
+      const existing = cardsByNoteId.get(card.noteId);
+      if (existing === undefined) {
+        cardsByNoteId.set(card.noteId, {
+          noteId: card.noteId,
+          recognitionTarget: card.recognitionTarget,
+          usages: [{ jmdictId: entry.jmdictId, senseNumbers: card.senseNumbers }],
+        });
+      } else {
+        existing.usages.push({ jmdictId: entry.jmdictId, senseNumbers: card.senseNumbers });
+      }
+    }
+  }
+  return [...cardsByNoteId.values()].toSorted((left, right) => left.noteId - right.noteId);
+}
+
+function duplicateOtherTargetGridsHTML(
+  card: DuplicateOtherCard,
+  entries: readonly DuplicateEntryContext[],
+): string {
+  return entries.map(({ jmdictId, senseCount }) => {
+    const entryLabel = entries.length === 1
+      ? ""
+      : `<span class="duplicate-entry-id">${escapeHTML(jmdictId)}</span>`;
+    const selectedSenses = new Set(
+      card.usages.find((usage) => usage.jmdictId === jmdictId)?.senseNumbers ?? [],
+    );
+    const cells = Array.from({ length: senseCount }, (_, index) => {
+      const senseNumber = index + 1;
+      if (!selectedSenses.has(senseNumber)) {
+        return '<span class="duplicate-sense-cell" aria-hidden="true"></span>';
+      }
+      return `<span class="duplicate-sense-cell other-covered"
+        role="listitem" aria-label="Sense ${senseNumber}, covered by recognition target ${
+        escapeHTML(card.recognitionTarget)
+      }"
+        title="Sense ${senseNumber}: covered by ${escapeHTML(card.recognitionTarget)}">
+        <span class="duplicate-other-target" aria-hidden="true">${
+        escapeHTML(card.recognitionTarget)
+      }</span>
+      </span>`;
+    }).join("");
+    return `<div class="duplicate-usage-grid">${entryLabel}
+      <span class="duplicate-sense-grid" role="list"
+        aria-label="Other recognition targets for JMDict entry ${escapeHTML(jmdictId)}"
+        style="--sense-count: ${senseCount}">${cells}</span>
+    </div>`;
+  }).join("");
+}
+
+function renderDuplicateGroup(group: DuplicateGroup): HTMLElement {
+  const table = document.createElement("table");
+  table.className = "duplicate-table";
+  const allJMDictIds = group.entries.map(({ jmdictId }) => jmdictId);
+  const otherCards = duplicateOtherCards(group.entries);
+  const totalRowCount = group.notes.length + otherCards.length;
+  const openAllURL = new URL("/api/open-notes", location.href);
+  for (const note of group.notes) openAllURL.searchParams.append("noteId", String(note.noteId));
+
+  table.innerHTML = `<tbody>${
+    group.notes.map((note, index) => `
+    <tr>
+      ${
+      index === 0
+        ? `<th class="duplicate-target" scope="rowgroup" rowspan="${group.notes.length}" lang="ja">${
+          escapeHTML(group.recognitionTarget)
+        }</th>`
+        : ""
+    }
+      <td class="duplicate-senses">${duplicateSenseGridsHTML(note, group.entries)}</td>
+      <td class="duplicate-note-action">
+        <a class="open-anki-link" data-open href="/api/open-notes?noteId=${note.noteId}"
+          title="Open note ${note.noteId} in the Anki card browser">Open in Anki</a>
+      </td>
+      ${
+      index === 0
+        ? `<td class="duplicate-jmdict-action" rowspan="${totalRowCount}">
+          <span class="exception-action-links">${jmdictActionLinksHTML(allJMDictIds)}</span>
+        </td>
+        <td class="duplicate-all-action" rowspan="${group.notes.length}">
+          <a class="open-anki-link" data-open href="${
+          escapeHTML(openAllURL.pathname + openAllURL.search)
+        }"
+            title="Open all ${group.notes.length} notes in the Anki card browser">Open all in Anki</a>
+        </td>`
+        : ""
+    }
+    </tr>`).join("")
+  }${
+    otherCards.map((card, index) =>
+      `<tr class="duplicate-other-row">
+      ${
+        index === 0
+          ? `<th class="duplicate-other-label" scope="rowgroup" rowspan="${otherCards.length}">Other targets</th>`
+          : ""
+      }
+      <td class="duplicate-senses">${duplicateOtherTargetGridsHTML(card, group.entries)}</td>
+      <td class="duplicate-note-action">
+        <a class="open-anki-link" data-open href="/api/open-notes?noteId=${card.noteId}"
+          title="Open note ${card.noteId} in the Anki card browser">Open in Anki</a>
+      </td>
+      <td class="duplicate-other-spacer"></td>
+    </tr>`
+    ).join("")
+  }</tbody>`;
+  for (const link of table.querySelectorAll<HTMLAnchorElement>("[data-open]")) {
+    wireOpenInAnkiLink(link);
+  }
+  return table;
+}
+
 /* ---------- buckets ---------- */
 
 function bucket(verdict: Verdict): ReviewItem[] {
@@ -306,7 +663,7 @@ async function postDecisions(
     itemsByNoteId.get(noteId)!.decision = record;
   }
   renderAll();
-  if (message) showToast(message);
+  if (message) showToast(message, { undoable: true });
   try {
     await api<unknown>("/api/decisions", { entries });
   } catch (error) {
@@ -402,22 +759,23 @@ function renderHeader(): void {
     else if (decision === "reject") ++counts.reject;
   }
 
-  const jmdictVersion = meta.jmdict.current;
-  const furiganaVersion = meta.furigana.current;
-  const furiganaSummary = `furigana ${furiganaVersion.entryCount.toLocaleString()} records`;
+  const jmdictDate = meta.jmdict.current.dictDate;
+  const furiganaResource = meta.furigana.current;
+  const furiganaDate = sourceDate(furiganaResource.lastModified ?? furiganaResource.fetchedAt);
   const brandSub = element("brandSub");
   brandSub.textContent =
-    `${ankiTargetLabel()} · ${meta.scannedCount.toLocaleString()} cards scanned · ${meta.counts.unchanged.toLocaleString()} already current · ` +
-    `JMDict ${jmdictVersion?.version ?? "?"} (${jmdictVersion?.dictDate ?? "?"})` +
-    ` · ${furiganaSummary}` +
+    `${ankiHeaderLabel()} · ${meta.counts.unchanged.toLocaleString()} no updates needed · ` +
+    `JMDict ${jmdictDate} · furigana ${furiganaDate}` +
     (meta.dryRun ? " · dry run" : "") +
     (meta.limit === undefined ? "" : " · limited scan");
   brandSub.title =
     `AnkiConnect: ${meta.ankiConnectURL}\nProfile: ${meta.ankiProfile}\nQuery: ${meta.query}\n` +
-    `Furigana: ${furiganaVersion.entryCount.toLocaleString()} records, ` +
-    `format ${furiganaVersion.formatVersion} (${meta.furigana.action})` +
-    (furiganaVersion.lastModified
-      ? `\nFurigana source modified: ${furiganaVersion.lastModified}`
+    `Cards scanned: ${meta.scannedCount.toLocaleString()}\n` +
+    `JMDict date: ${jmdictDate} (${meta.jmdict.action})\n` +
+    `Furigana date: ${furiganaDate}; ${furiganaResource.entryCount.toLocaleString()} records, ` +
+    `format ${furiganaResource.formatVersion} (${meta.furigana.action})` +
+    (furiganaResource.lastModified
+      ? `\nFurigana source modified: ${furiganaResource.lastModified}`
       : "");
 
   const bar = element("progressBar");
@@ -437,12 +795,18 @@ function renderHeader(): void {
     bar.append(div);
   }
 
+  document.querySelector<HTMLElement>(".progress-cluster")!.hidden = total === 0;
+
   const toReview = retargetItems().filter((item) => !item.decision && !item.applied).length;
   element("progressCaption").textContent = counts.applied === total && total > 0
     ? `All ${total} applied 🎉`
     : `${staged} / ${total} staged` + (toReview > 0 ? ` · ${toReview} to review` : "");
 
-  element<HTMLButtonElement>("undoButton").disabled = undoStack.length === 0;
+  const undoButton = element<HTMLButtonElement>("undoButton");
+  undoButton.disabled = undoStack.length === 0;
+  undoButton.title = undoStack.length === 0
+    ? "No review decisions to undo"
+    : "Undo last review decision (z)";
 
   const applyButton = element<HTMLButtonElement>("applyButton");
   const applicable = applyableItems().length;
@@ -470,7 +834,7 @@ function renderRetargetBanner(): void {
   const list = retargetItems();
   if (list.length === 0) {
     container.innerHTML =
-      '<div class="empty-state"><div class="empty-title">Nothing to re-target 🎉</div><p>No card\'s targeted senses were affected by this dictionary update.</p></div>';
+      '<div class="empty-state"><div class="empty-title">Nothing to re-target</div><p>No card\'s targeted senses were affected by this dictionary update.</p></div>';
     return;
   }
 
@@ -697,7 +1061,8 @@ function renderFocusCard(): void {
         <button id="holdButton" ${item.applied ? "disabled" : ""}>Hold <kbd>x</kbd></button>
         <button id="skipButton">Skip <kbd>s</kbd></button>
         <div class="spacer"></div>
-        <button id="openAnkiButton" title="Open this note in the Anki card browser">Open in Anki</button>
+        <a class="open-anki-link" id="openAnkiLink" href="/api/open-notes?noteId=${item.noteId}"
+          title="Open this note in the Anki card browser">Open in Anki</a>
         <button id="rejectButton" ${
     item.applied ? "disabled" : ""
   } title="Leave this card untouched by this update">Reject</button>
@@ -781,14 +1146,7 @@ function wireFocusCard(item: ReviewItem, work: WorkingSelection): void {
       resolvedBy: "human",
       decidedAt: new Date().toISOString(),
     }));
-  container.querySelector("#openAnkiButton")!.addEventListener("click", async () => {
-    try {
-      await api<unknown>("/api/open-note", { noteId: item.noteId });
-      showToast("Opened in the Anki browser");
-    } catch (error) {
-      showToast(`Could not open: ${errorMessage(error)}`);
-    }
-  });
+  wireOpenInAnkiLink(container.querySelector<HTMLAnchorElement>("#openAnkiLink")!);
 }
 
 function toggleSense(item: ReviewItem, senseNumber: number): void {
@@ -883,7 +1241,11 @@ function renderRoutine(): void {
   banner.innerHTML = `
     <div class="banner">
       <div class="banner-text"><strong>${list.length} cards staged</strong> for a managed-field refresh.
-        The chips show the dictionary or Reading changes — skim and hold anything that looks off.
+        ${
+    descriptionHTML(
+      "The chips show the Dictionary or Reading changes — skim and hold anything that looks off.",
+    )
+  }
         ${held ? `<span class="chip chip-warn">${held} held</span>` : ""}</div>
       <button id="stageAllButton" ${held === 0 ? "disabled" : ""}>Stage all</button>
     </div>`;
@@ -916,12 +1278,12 @@ function renderRoutine(): void {
       <div class="group-head">
         <h3>${escapeHTML(labels.title ?? reason)}</h3>
         <span class="chip">${groupItems.length}</span>
-        <span class="group-explain">${escapeHTML(labels.explain ?? "")}</span>
         <div class="group-actions">
           <button data-action="hold">Hold all</button>
           <button data-action="stage" ${groupHeld === 0 ? "disabled" : ""}>Stage all</button>
         </div>
       </div>
+      <p class="group-explain">${descriptionHTML(labels.explain ?? "")}</p>
       <div class="rows"></div>`;
     const rows = groupElement.querySelector<HTMLElement>(".rows")!;
     for (const item of groupItems) rows.append(routineRow(item));
@@ -1089,7 +1451,8 @@ function renderNormalize(): void {
   const container = element("normalizeBody");
   const list = normalizeItems();
   if (list.length === 0) {
-    container.innerHTML = '<div class="normalize-strip">No normalization updates this run.</div>';
+    container.innerHTML =
+      '<div class="empty-state"><div class="empty-title">No normalization updates</div><p>No representation-only cleanup is needed this run.</p></div>';
     return;
   }
   const byReason = new Map<string, ReviewItem[]>();
@@ -1115,7 +1478,7 @@ function renderNormalize(): void {
         <strong>${escapeHTML(reasonTitle(reason))}: ${group.length} card${
       group.length === 1 ? "" : "s"
     }</strong>
-        ${escapeHTML(explanation)}${applied ? ` (${applied} already applied.)` : ""}
+        ${descriptionHTML(explanation)}${applied ? ` (${applied} already applied.)` : ""}
         <details>
           <summary>Show the ${group.length} word${group.length === 1 ? "" : "s"}</summary>
           <div class="normalize-words">${
@@ -1132,35 +1495,62 @@ function renderExceptions(): void {
   if (list.length === 0) {
     container.innerHTML = `
       <div class="empty-state">
-        <div class="empty-title">None this run 🎉</div>
+        <div class="empty-title">No exceptions</div>
         <p>Deleted entries, removed spellings, and unparseable cards land here,</p>
         <p>with the note opened in Anki for manual handling.</p>
       </div>`;
     return;
   }
   container.innerHTML = "";
+  const byReason = new Map<string, ReviewItem[]>();
   for (const item of list) {
-    const row = document.createElement("div");
-    row.className = "row";
-    row.innerHTML = `
-      <div class="row-main" style="cursor:default">
-        <span></span>
-        <span class="row-word" lang="ja">${escapeHTML(item.word)}</span>
-        <span class="row-changes"><span class="chip chip-bad">${
-      escapeHTML(reasonTitle(item.reason))
-    }</span><span class="change-chip">${escapeHTML(item.detail)}</span></span>
-        <span></span>
-        <button class="disclose" data-open>Open in Anki</button>
-      </div>`;
-    row.querySelector("[data-open]")!.addEventListener("click", async () => {
-      try {
-        await api<unknown>("/api/open-note", { noteId: item.noteId });
-        showToast("Opened in the Anki browser");
-      } catch (error) {
-        showToast(`Could not open: ${errorMessage(error)}`);
+    const group = byReason.get(item.reason) ?? [];
+    group.push(item);
+    byReason.set(item.reason, group);
+  }
+  const order = [
+    ...EXCEPTION_GROUP_ORDER,
+    ...[...byReason.keys()].filter((reason) => !EXCEPTION_GROUP_ORDER.includes(reason)),
+  ];
+  for (const reason of order) {
+    const groupItems = byReason.get(reason);
+    if (groupItems === undefined) continue;
+    const labels = REASON_LABELS[reason];
+    const groupElement = document.createElement("div");
+    groupElement.className = "group exception-group";
+    groupElement.innerHTML = `
+      <div class="group-head">
+        <h3>${escapeHTML(labels?.title ?? reason)}</h3>
+        <span class="chip chip-bad">${groupItems.length}</span>
+      </div>
+      <p class="group-explain">${descriptionHTML(labels?.explain ?? groupItems[0].detail)}</p>
+      <div class="rows"></div>`;
+    const rows = groupElement.querySelector<HTMLElement>(".rows")!;
+    if (reason === "duplicate-recognition-unit") {
+      for (const group of duplicateGroups(groupItems)) rows.append(renderDuplicateGroup(group));
+      container.append(groupElement);
+      continue;
+    }
+    for (const item of groupItems) {
+      const row = document.createElement("div");
+      const parsedKey = parseKey(item.key);
+      row.className = "row exception-row";
+      row.innerHTML = `
+        <div class="row-main">
+          <span class="row-word" lang="ja">${escapeHTML(item.word)}</span>
+          <span class="exception-detail">${exceptionDetailHTML(item)}</span>
+          <span class="exception-action-links">${
+        jmdictActionLinksHTML(parsedKey?.usages.map(({ jmdictId }) => jmdictId) ?? [])
+      }</span>
+          <a class="open-anki-link" data-open href="/api/open-notes?noteId=${item.noteId}"
+            title="Open this note in the Anki card browser">Open in Anki</a>
+        </div>`;
+      for (const link of row.querySelectorAll<HTMLAnchorElement>("[data-open]")) {
+        wireOpenInAnkiLink(link);
       }
-    });
-    container.append(row);
+      rows.append(row);
+    }
+    container.append(groupElement);
   }
 }
 
@@ -1276,9 +1666,13 @@ async function runApply(targets: ReviewItem[]): Promise<void> {
 /* ---------- toast ---------- */
 
 let toastTimer: ReturnType<typeof setTimeout> | undefined;
-function showToast(message: string): void {
+function showToast(
+  message: string,
+  { undoable = false }: { undoable?: boolean } = {},
+): void {
   const toast = element("toast");
   element("toastMessage").textContent = message;
+  element<HTMLButtonElement>("toastUndo").hidden = !undoable;
   toast.classList.add("show");
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toast.classList.remove("show"), 3200);
@@ -1410,8 +1804,8 @@ async function boot(): Promise<void> {
     () => element<HTMLDialogElement>("applyDialog").close(),
   );
   element("toastUndo").addEventListener("click", () => {
-    undo();
     element("toast").classList.remove("show");
+    undo();
   });
   for (const dialog of document.querySelectorAll("dialog")) {
     dialog.addEventListener("click", (event) => {

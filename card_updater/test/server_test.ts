@@ -4,8 +4,13 @@ import { assertEquals, assertMatch } from "@std/assert";
 import { renderDictionaryField } from "card_model/dictionary";
 import { preextractedJMDictEntry } from "data";
 import { analyzeCard } from "../src/analyze.ts";
-import { validateResultingReading } from "../src/server.ts";
-import { entriesById, makeNote } from "./fixtures.ts";
+import { flagDuplicateRecognitionUnits } from "../src/duplicate_keys.ts";
+import {
+  duplicateExceptionContext,
+  invalidReadingExceptionContext,
+  validateResultingReading,
+} from "../src/server.ts";
+import { entriesById, makeNote, makeWord } from "./fixtures.ts";
 
 async function alternateNameCard() {
   const entry = await preextractedJMDictEntry("1158110");
@@ -68,4 +73,94 @@ Deno.test("validateResultingReading rejects an invalid custom Recognition target
 
   if (!("error" in result)) throw new Error("Expected validation failure");
   assertMatch(result.error, /いみょう/u);
+});
+
+Deno.test("invalidReadingExceptionContext distinguishes missing and restricted readings", async () => {
+  const missingWord = makeWord({
+    kanji: ["円盾"],
+    kana: ["えんじゅん"],
+    senses: [{ glosses: ["round shield"] }],
+  });
+  const missingCard = await analyzeCard(
+    makeNote({
+      key: "円盾 | 1000000",
+      reading: "円盾[バックラー]",
+      dictionary: renderDictionaryField([missingWord]),
+    }),
+    entriesById(missingWord),
+  );
+  assertEquals(invalidReadingExceptionContext(missingCard, entriesById(missingWord)), {
+    kind: "reading-no-match",
+    reading: "円盾[バックラー]",
+    kanaReading: "バックラー",
+  });
+
+  const restrictedWord = makeWord({
+    kanji: ["糞"],
+    kana: ["ふん", "フン"],
+    senses: [{ glosses: ["dung"] }],
+  });
+  restrictedWord.kana[1].appliesToKanji = [];
+  const restrictedCard = await analyzeCard(
+    makeNote({
+      key: "糞 | 1000000",
+      reading: "糞[フン]",
+      dictionary: renderDictionaryField([restrictedWord]),
+    }),
+    entriesById(restrictedWord),
+  );
+  assertEquals(invalidReadingExceptionContext(restrictedCard, entriesById(restrictedWord)), {
+    kind: "reading-not-applicable",
+    kanaReading: "フン",
+    recognitionTarget: "糞",
+    jmdictId: "1000000",
+  });
+});
+
+Deno.test("duplicateExceptionContext expands each related note's sense selection", async () => {
+  const word = makeWord({
+    kanji: ["言葉", "語"],
+    kana: ["ことば"],
+    senses: [
+      { glosses: ["word"] },
+      { glosses: ["language"] },
+      { glosses: ["expression"] },
+    ],
+  });
+  const firstNote = makeNote({
+    key: "言葉 | 1000000:1",
+    dictionary: renderDictionaryField([word]),
+  });
+  firstNote.noteId = 1;
+  const secondNote = makeNote({
+    key: "言葉 | 1000000:1,2",
+    dictionary: renderDictionaryField([word]),
+  });
+  secondNote.noteId = 2;
+  const otherTargetNote = makeNote({
+    key: "語 | 1000000",
+    dictionary: renderDictionaryField([word]),
+  });
+  otherTargetNote.noteId = 3;
+  const entries = entriesById(word);
+  const cards = flagDuplicateRecognitionUnits(
+    await Promise.all(
+      [firstNote, secondNote, otherTargetNote].map((note) => analyzeCard(note, entries)),
+    ),
+    entries,
+  );
+  const cardsByNoteId = new Map(cards.map((card) => [card.note.noteId, card]));
+
+  assertEquals(duplicateExceptionContext(cards[0], [2], cardsByNoteId, entries), {
+    kind: "duplicate-recognition-unit",
+    notes: [
+      { noteId: 1, usages: [{ jmdictId: "1000000", senseNumbers: [1] }] },
+      { noteId: 2, usages: [{ jmdictId: "1000000", senseNumbers: [1, 2] }] },
+    ],
+    entries: [{
+      jmdictId: "1000000",
+      senseCount: 3,
+      otherCards: [{ noteId: 3, recognitionTarget: "語", senseNumbers: [1, 2, 3] }],
+    }],
+  });
 });

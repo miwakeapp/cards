@@ -9,12 +9,12 @@ import { parseKey } from "card_model/keys";
 import type { GenerationCache } from "card_field_generation";
 import { findAllEntriesBySpelling, type SpellingIndex } from "card_resolution";
 import type { JMDictWord } from "data";
-import { ac, type ACInvoke, applyNoteUpdate, openNoteInAnki } from "./anki.ts";
+import { ac, type ACInvoke, applyNoteUpdate, openNotesInAnki } from "./anki.ts";
 import { applyRestrictionReason } from "./client/apply_policy.ts";
 import { RecognitionUnitIndex } from "./duplicate_keys.ts";
 import type { AnalyzedCard } from "./analyze.ts";
-import { validateCardReading } from "./reading_validation.ts";
-import type { ReviewItem, ReviewMeta, ReviewPayload } from "./review_api.ts";
+import { parseCardReadingAlternatives, validateCardReading } from "./reading_validation.ts";
+import type { ExceptionContext, ReviewItem, ReviewMeta, ReviewPayload } from "./review_api.ts";
 import { suggestedKey, suggestForCard, type Suggestion } from "./suggest.ts";
 import { type DecisionRecord, type ReviewState } from "./state.ts";
 
@@ -36,6 +36,107 @@ export interface ServerOptions {
 /** The default stance when the user has recorded no decision. */
 export function impliedDecision(card: AnalyzedCard): "accept" | "none" {
   return card.verdict === "routine" || card.verdict === "normalize" ? "accept" : "none";
+}
+
+/** Builds concise structured context for an invalid Reading when its failure is unambiguous. */
+export function invalidReadingExceptionContext(
+  card: AnalyzedCard,
+  entries: ReadonlyMap<string, JMDictWord>,
+): ExceptionContext | null {
+  if (card.reason !== "invalid-reading" || card.parsedKey === null) return null;
+
+  const recognitionTarget = card.note.fields.recognitionTarget || card.parsedKey.spelling;
+  const alternatives = parseCardReadingAlternatives(
+    card.note.fields.reading,
+    recognitionTarget,
+    card.parsedKey.spelling,
+  );
+  if (alternatives === null) return null;
+
+  for (const alternative of alternatives) {
+    const exactMatches = card.parsedKey.usages.flatMap(({ jmdictId }) => {
+      const entry = entries.get(jmdictId);
+      if (entry === undefined) return [];
+      return entry.kana
+        .filter(({ text }) => text === alternative.kanaReading)
+        .map((form) => ({ entry, form }));
+    });
+    if (exactMatches.length === 0) {
+      return {
+        kind: "reading-no-match",
+        reading: alternative.formatted,
+        kanaReading: alternative.kanaReading,
+      };
+    }
+    const appliesToKeySpelling = exactMatches.some(({ form }) =>
+      form.appliesToKanji.includes("*") || form.appliesToKanji.includes(card.parsedKey!.spelling)
+    );
+    if (!appliesToKeySpelling) {
+      return {
+        kind: "reading-not-applicable",
+        kanaReading: alternative.kanaReading,
+        recognitionTarget,
+        jmdictId: exactMatches[0].entry.id,
+      };
+    }
+  }
+  return null;
+}
+
+/** Builds note and sense context for every card involved in a duplicate recognition unit. */
+export function duplicateExceptionContext(
+  card: AnalyzedCard,
+  conflictingNoteIds: readonly number[],
+  cardsByNoteId: ReadonlyMap<number, AnalyzedCard>,
+  entries: ReadonlyMap<string, JMDictWord>,
+): ExceptionContext | null {
+  if (card.reason !== "duplicate-recognition-unit") return null;
+
+  const notes = [card.note.noteId, ...conflictingNoteIds].map((noteId) => {
+    const relatedCard = cardsByNoteId.get(noteId);
+    if (relatedCard?.parsedKey === null || relatedCard?.parsedKey === undefined) return null;
+    return {
+      noteId,
+      usages: relatedCard.parsedKey.usages.map(({ jmdictId, senseNumbers }) => ({
+        jmdictId,
+        senseNumbers: senseNumbers ??
+          entries.get(jmdictId)?.sense.map((_, index) => index + 1) ?? [],
+      })),
+    };
+  });
+  if (notes.some((note) => note === null)) return null;
+  const completeNotes = notes as NonNullable<typeof notes[number]>[];
+  const noteIds = new Set(completeNotes.map(({ noteId }) => noteId));
+  const recognitionTargets = new Set([...noteIds].map((noteId) => {
+    const relatedCard = cardsByNoteId.get(noteId)!;
+    return relatedCard.note.fields.recognitionTarget || relatedCard.parsedKey!.spelling;
+  }));
+  const jmdictIds = [
+    ...new Set(completeNotes.flatMap((note) => note.usages.map(({ jmdictId }) => jmdictId))),
+  ].toSorted((left, right) => Number(left) - Number(right));
+  const entryContexts = jmdictIds.flatMap((jmdictId) => {
+    const entry = entries.get(jmdictId);
+    if (entry === undefined) return [];
+    const otherCards = [...cardsByNoteId.values()].flatMap((relatedCard) => {
+      if (noteIds.has(relatedCard.note.noteId) || relatedCard.parsedKey === null) return [];
+      const recognitionTarget = relatedCard.note.fields.recognitionTarget ||
+        relatedCard.parsedKey.spelling;
+      if (recognitionTargets.has(recognitionTarget)) return [];
+      const usage = relatedCard.parsedKey.usages.find((usage) => usage.jmdictId === jmdictId);
+      if (usage === undefined) return [];
+      return [{
+        noteId: relatedCard.note.noteId,
+        recognitionTarget,
+        senseNumbers: usage.senseNumbers ?? entry.sense.map((_, index) => index + 1),
+      }];
+    }).toSorted((left, right) => left.noteId - right.noteId);
+    return [{ jmdictId, senseCount: entry.sense.length, otherCards }];
+  });
+  return {
+    kind: "duplicate-recognition-unit",
+    notes: completeNotes,
+    entries: entryContexts,
+  };
 }
 
 /** Validates and canonically formats the Reading retained beside a proposed latest-JMDict Key. */
@@ -78,6 +179,16 @@ export function startServer(options: ServerOptions): Deno.HttpServer {
       verdict: card.verdict,
       reason: card.reason,
       detail: card.detail,
+      exceptionContext: card.reason === "invalid-reading"
+        ? invalidReadingExceptionContext(card, entries)
+        : card.reason === "duplicate-recognition-unit"
+        ? duplicateExceptionContext(
+          card,
+          recognitionUnits.conflicts(card.note.noteId, card.note.fields.key),
+          cardsByNoteId,
+          entries,
+        )
+        : null,
       word: card.note.fields.recognitionTarget ||
         card.parsedKey?.spelling || card.note.fields.key,
       key: card.note.fields.key,
@@ -167,10 +278,17 @@ export function startServer(options: ServerOptions): Deno.HttpServer {
       return json({ suggestion });
     }
 
-    if (url.pathname === "/api/open-note" && request.method === "POST") {
-      const body = await request.json() as { noteId: number };
-      await openNoteInAnki(body.noteId, invoke);
-      return json({ ok: true });
+    if (url.pathname === "/api/open-notes" && request.method === "GET") {
+      const rawNoteIds = url.searchParams.getAll("noteId");
+      const noteIds = [...new Set(rawNoteIds.map(Number))];
+      if (
+        noteIds.length === 0 ||
+        noteIds.some((noteId) => !Number.isSafeInteger(noteId) || !cardsByNoteId.has(noteId))
+      ) {
+        return json({ error: "One or more notes are unknown." }, 400);
+      }
+      await openNotesInAnki(noteIds, invoke);
+      return new Response(null, { status: 204 });
     }
 
     if (url.pathname === "/api/apply" && request.method === "POST") {
