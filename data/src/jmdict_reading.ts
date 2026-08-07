@@ -6,6 +6,10 @@
  * `re_nokanji` as inconclusive rather than as proof that an observed kanji-reading pair is invalid:
  * JMdict also uses the marker for reading-script and orthographic conventions. Explicit
  * `re_restr` lists remain strict.
+ *
+ * See the JMdict editor discussions for concrete examples:
+ * - ダメ元・ダメもと: https://www.edrdg.org/jmwsgi/entr.py?svc=jmdict&g=2127710.1~2378045
+ * - 糞・フン: https://www.edrdg.org/jmwsgi/entr.py?svc=jmdict&g=2834408.1~2378008
  */
 export function readingAppliesToKanji(
   reading: { readonly appliesToKanji: readonly string[] },
