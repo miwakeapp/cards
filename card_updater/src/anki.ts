@@ -266,7 +266,10 @@ export async function applyNoteUpdate(
   return { noteId: update.noteId, ok: true, wroteFields: Object.keys(fields), before, after };
 }
 
-/** Opens the Anki card browser focused on the given note. */
-export function openNoteInAnki(noteId: number, invoke: ACInvoke = ac): Promise<unknown> {
-  return invoke("guiBrowse", { query: `nid:${noteId}` });
+/** Opens the Anki card browser focused on the given notes. */
+export function openNotesInAnki(
+  noteIds: readonly number[],
+  invoke: ACInvoke = ac,
+): Promise<unknown> {
+  return invoke("guiBrowse", { query: noteIds.map((noteId) => `nid:${noteId}`).join(" or ") });
 }

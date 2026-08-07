@@ -21,6 +21,42 @@ export interface ReviewMeta {
   counts: Record<Verdict, number>;
 }
 
+export interface DuplicateNoteContext {
+  noteId: number;
+  usages: Array<{
+    jmdictId: string;
+    senseNumbers: number[];
+  }>;
+}
+
+export interface DuplicateEntryContext {
+  jmdictId: string;
+  senseCount: number;
+  otherCards: Array<{
+    noteId: number;
+    recognitionTarget: string;
+    senseNumbers: number[];
+  }>;
+}
+
+export type ExceptionContext =
+  | {
+    kind: "reading-no-match";
+    reading: string;
+    kanaReading: string;
+  }
+  | {
+    kind: "reading-not-applicable";
+    kanaReading: string;
+    recognitionTarget: string;
+    jmdictId: string;
+  }
+  | {
+    kind: "duplicate-recognition-unit";
+    notes: DuplicateNoteContext[];
+    entries: DuplicateEntryContext[];
+  };
+
 export type DecisionDraft = Omit<DecisionRecord, "fingerprint">;
 
 export interface ReviewItem {
@@ -28,6 +64,7 @@ export interface ReviewItem {
   verdict: Verdict;
   reason: string;
   detail: string;
+  exceptionContext: ExceptionContext | null;
   word: string;
   key: string;
   hint: string;
