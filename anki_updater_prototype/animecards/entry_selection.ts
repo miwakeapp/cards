@@ -5,6 +5,7 @@ import {
   type GenerationOptions,
   selectSensesForCard,
 } from "card_field_generation";
+import { kanjiSpellingsForReading, readingAppliesToKanji } from "data";
 import { markResolvedContextTargetWithinAnchor } from "../shared/anchored_context.ts";
 import { kanaScriptsMatch } from "./html.ts";
 import type { AdditionalAcceptedReadingResolution, ConversionCandidate } from "./types.ts";
@@ -109,9 +110,9 @@ function structurallyApplicableSenseNumbers(
   const kanjiForm = entry.kanji.find(({ text }) => text === recognitionTarget);
   const kanaForm = entry.kana.find(({ text }) => text === recognitionTarget);
   const applicableKanaForms = kanaForm === undefined
-    ? entry.kana.filter(({ text, appliesToKanji }) =>
-      allows(appliesToKanji, recognitionTarget) &&
-      (kanaReading === undefined || kanaScriptsMatch(text, kanaReading))
+    ? entry.kana.filter((reading) =>
+      readingAppliesToKanji(reading, recognitionTarget) &&
+      (kanaReading === undefined || kanaScriptsMatch(reading.text, kanaReading))
     )
     : kanaReading === undefined || kanaScriptsMatch(kanaForm.text, kanaReading)
     ? [kanaForm]
@@ -126,9 +127,7 @@ function structurallyApplicableSenseNumbers(
         return allows(sense.appliesToKanji, recognitionTarget);
       }
 
-      const compatibleKanjiSpellings = applicableKanaForm.appliesToKanji.includes("*")
-        ? new Set(entry.kanji.map(({ text }) => text))
-        : new Set(applicableKanaForm.appliesToKanji);
+      const compatibleKanjiSpellings = kanjiSpellingsForReading(entry, applicableKanaForm);
       return sense.appliesToKanji.includes("*") ||
         sense.appliesToKanji.some((spelling) => compatibleKanjiSpellings.has(spelling));
     });
@@ -147,10 +146,12 @@ function acceptedReadingsForUsage(
 ): AdditionalAcceptedReadingResolution[] {
   if (!entry.kanji.some(({ text }) => text === recognitionTarget)) return [];
 
-  const forms = entry.kana.filter(({ text, appliesToKanji }) =>
-    (appliesToKanji.includes("*") || appliesToKanji.includes(recognitionTarget)) &&
+  const forms = entry.kana.filter((reading) =>
+    readingAppliesToKanji(reading, recognitionTarget) &&
     applicableSenseNumbers.every((senseNumber) =>
-      structurallyApplicableSenseNumbers(entry, recognitionTarget, text).includes(senseNumber)
+      structurallyApplicableSenseNumbers(entry, recognitionTarget, reading.text).includes(
+        senseNumber,
+      )
     )
   );
   const canonicalForms = forms.filter((form) =>
@@ -197,9 +198,7 @@ export function readingConflictForJMDictEntrySelection(
   const compatibleReadings =
     selectedEntry.kanji.some(({ text }) => text === request.recognitionTarget)
       ? selectedEntry.kana
-        .filter(({ appliesToKanji }) =>
-          appliesToKanji.includes("*") || appliesToKanji.includes(request.recognitionTarget)
-        )
+        .filter((reading) => readingAppliesToKanji(reading, request.recognitionTarget))
         .map(({ text }) => text)
       : selectedEntry.kana
         .filter(({ text }) => text === request.recognitionTarget)

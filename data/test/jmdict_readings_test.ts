@@ -15,13 +15,14 @@ Deno.test("buildJMDictReadings respects reading-to-spelling restrictions", () =>
       { common: false, text: "こう", tags: [], appliesToKanji: ["甲"] },
       { common: false, text: "おつ", tags: [], appliesToKanji: ["乙"] },
       { common: false, text: "きのえ", tags: [], appliesToKanji: ["*"] },
+      { common: false, text: "フン", tags: [], appliesToKanji: [] },
     ],
     sense: [],
   };
 
   assertEquals(buildJMDictReadings([entry]), {
-    "甲": ["こう", "きのえ"],
-    "乙": ["おつ", "きのえ"],
+    "甲": ["こう", "きのえ", "フン"],
+    "乙": ["おつ", "きのえ", "フン"],
   });
 });
 

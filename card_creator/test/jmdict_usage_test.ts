@@ -1,6 +1,6 @@
 import "../../data/test/use_jmdict_fixtures.ts";
 
-import { assertEquals } from "@std/assert";
+import { assertEquals, assertThrows } from "@std/assert";
 import { type JMDictWord, preextractedJMDictEntry } from "data";
 import {
   compatibleSenseNumbersForJMDictUsage,
@@ -65,6 +65,26 @@ Deno.test("compatibleSenseNumbersForJMDictUsage applies spelling restrictions", 
   assertEquals(
     compatibleSenseNumbersForJMDictUsage(entry, "没する", "ぼっする"),
     [1, 2, 3, 4],
+  );
+});
+
+Deno.test("compatibleSenseNumbersForJMDictUsage ignores nokanji but preserves re_restr", () => {
+  const entry = oneSenseEntry("1000000", ["n"]);
+  entry.kanji = [
+    { common: false, text: "糞", tags: [] },
+    { common: false, text: "屎", tags: [] },
+  ];
+  entry.kana = [
+    { common: false, text: "フン", tags: [], appliesToKanji: [] },
+    { common: false, text: "ふん", tags: [], appliesToKanji: ["糞"] },
+  ];
+
+  assertEquals(compatibleSenseNumbersForJMDictUsage(entry, "糞", "フン"), [1]);
+  assertEquals(compatibleSenseNumbersForJMDictUsage(entry, "屎", "フン"), [1]);
+  assertThrows(
+    () => compatibleSenseNumbersForJMDictUsage(entry, "屎", "ふん"),
+    Error,
+    'kanaReading "ふん" is not among the jmdictEntry.kana readings applicable to recognitionTarget "屎"',
   );
 });
 

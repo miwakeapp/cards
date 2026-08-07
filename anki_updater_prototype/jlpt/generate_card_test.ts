@@ -272,6 +272,31 @@ Deno.test("generateJLPTCard uses source ruby to select an otherwise ambiguous re
   assertEquals(card.fullContext, "<mark>猫[ねこ]</mark>だ。");
 });
 
+Deno.test("generateJLPTCard lets source ruby select a nokanji reading", async () => {
+  const word = entry({
+    kanji: ["糞"],
+    kana: [{ text: "フン" }],
+    senses: 1,
+  });
+  word.kana[0].appliesToKanji = [];
+  const card = await generateJLPTCard(
+    {
+      sentence: "犬の<ruby>糞<rt>フン</rt></ruby>を片づける。",
+      source: "",
+      recognitionTarget: "糞",
+      entry: word,
+      sameSpellingEntries: [word],
+    },
+    {},
+    {
+      selectSenses: () =>
+        Promise.resolve(generated({ outcome: "selected" as const, senseNumbers: [1] })),
+    },
+  );
+
+  assertEquals(card.reading, "糞[フン]");
+});
+
 Deno.test("generateJLPTCard fails closed on an ambiguous unannotated reading", async () => {
   const word = entry({
     kanji: ["猫"],

@@ -173,13 +173,32 @@ Deno.test("analyzeCard: recovers exact JMDict readings from mixed-script display
   assertEquals(card.acceptedKanaReadings, ["はりこのとら"]);
 });
 
-Deno.test("analyzeCard: rejects an exact reading restricted away from the Key spelling", async () => {
+Deno.test("analyzeCard: accepts an exact nokanji reading for the Key spelling", async () => {
   const word = makeWord({
     kanji: ["糞"],
     kana: ["ふん", "フン"],
     senses: [{ glosses: ["dung"] }],
   });
   word.kana[1].appliesToKanji = [];
+  const note = makeNote({
+    key: "糞 | 1000000",
+    reading: "糞[フン]",
+    dictionary: renderDictionary(word),
+  });
+
+  const card = await analyzeCard(note, entriesById(word));
+  assertEquals(card.verdict, "unchanged");
+  assertEquals(card.proposedReading, null);
+  assertEquals(card.acceptedKanaReadings, ["フン"]);
+});
+
+Deno.test("analyzeCard: rejects an exact reading explicitly restricted to another spelling", async () => {
+  const word = makeWord({
+    kanji: ["糞", "屎"],
+    kana: ["ふん", "フン"],
+    senses: [{ glosses: ["dung"] }],
+  });
+  word.kana[1].appliesToKanji = ["屎"];
   const note = makeNote({
     key: "糞 | 1000000",
     reading: "糞[フン]",

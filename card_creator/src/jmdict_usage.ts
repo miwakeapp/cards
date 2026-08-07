@@ -1,4 +1,4 @@
-import type { JMDictWord } from "data";
+import { type JMDictWord, kanjiSpellingsForReading, readingAppliesToKanji } from "data";
 import { describeNumbers } from "./describe_input.ts";
 
 const PREFIX_PARTS_OF_SPEECH = new Set(["pref", "n-pref"]);
@@ -42,23 +42,13 @@ function allows(values: readonly string[], value: string): boolean {
   return values.includes("*") || values.includes(value);
 }
 
-function compatibleKanjiSpellings(
-  entry: JMDictWord,
-  appliesToKanji: readonly string[],
-): Set<string> {
-  if (appliesToKanji.includes("*")) {
-    return new Set(entry.kanji.map(({ text }) => text));
-  }
-  return new Set(appliesToKanji);
-}
-
 function senseNumbersForForm(
   entry: JMDictWord,
   recognitionTarget: string,
   usesKanjiForm: boolean,
   kanaForm: JMDictWord["kana"][number],
 ): number[] {
-  const compatibleKanji = compatibleKanjiSpellings(entry, kanaForm.appliesToKanji);
+  const compatibleKanji = kanjiSpellingsForReading(entry, kanaForm);
   return entry.sense.flatMap((sense, index) => {
     if (!allows(sense.appliesToKana, kanaForm.text)) return [];
 
@@ -185,8 +175,8 @@ export function resolveJMDictUsage(
           `is a jmdictEntry.kanji spelling in jmdictEntry with id ${JSON.stringify(entry.id)}`,
       );
     }
-    const applicableKanaForm = entry.kana.find(({ text, appliesToKanji }) =>
-      text === kanaReading && allows(appliesToKanji, recognitionTarget)
+    const applicableKanaForm = entry.kana.find((reading) =>
+      reading.text === kanaReading && readingAppliesToKanji(reading, recognitionTarget)
     );
     if (applicableKanaForm === undefined) {
       throw new Error(
@@ -294,7 +284,7 @@ function senseNumbersForJMDictSpelling(
 
   if (entry.kanji.some(({ text }) => text === spelling)) {
     for (const kanaForm of entry.kana) {
-      if (!allows(kanaForm.appliesToKanji, spelling)) continue;
+      if (!readingAppliesToKanji(kanaForm, spelling)) continue;
       for (const senseNumber of senseNumbersForForm(entry, spelling, true, kanaForm)) {
         senseNumbers.add(senseNumber);
       }

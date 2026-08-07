@@ -95,12 +95,28 @@ Deno.test("invalidReadingExceptionContext distinguishes missing and restricted r
     kanaReading: "バックラー",
   });
 
-  const restrictedWord = makeWord({
+  const nokanjiWord = makeWord({
     kanji: ["糞"],
     kana: ["ふん", "フン"],
     senses: [{ glosses: ["dung"] }],
   });
-  restrictedWord.kana[1].appliesToKanji = [];
+  nokanjiWord.kana[1].appliesToKanji = [];
+  const nokanjiCard = await analyzeCard(
+    makeNote({
+      key: "糞 | 1000000",
+      reading: "糞[フン]",
+      dictionary: renderDictionaryField([nokanjiWord]),
+    }),
+    entriesById(nokanjiWord),
+  );
+  assertEquals(invalidReadingExceptionContext(nokanjiCard, entriesById(nokanjiWord)), null);
+
+  const restrictedWord = makeWord({
+    kanji: ["糞", "屎"],
+    kana: ["ふん", "フン"],
+    senses: [{ glosses: ["dung"] }],
+  });
+  restrictedWord.kana[1].appliesToKanji = ["屎"];
   const restrictedCard = await analyzeCard(
     makeNote({
       key: "糞 | 1000000",

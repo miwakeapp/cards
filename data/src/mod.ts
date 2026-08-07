@@ -11,6 +11,7 @@ import { furiganaKey, normalizedFuriganaKey } from "./furigana_key.ts";
 import { resourcePaths } from "./resource_paths.ts";
 
 export type { JMDictWord } from "./jmdict_types.ts";
+export { kanjiSpellingsForReading, readingAppliesToKanji } from "./jmdict_reading.ts";
 
 /** JMDict tag expansions. Key: tag abbreviation, value: full description. */
 export type JMDictTags = Record<string, string>;
