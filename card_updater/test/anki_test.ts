@@ -1,5 +1,21 @@
 import { assertEquals } from "@std/assert";
-import { type ACInvoke, createACInvoke, openNotesInAnki } from "../src/anki.ts";
+import {
+  type ACInvoke,
+  createACInvoke,
+  MIWAKE_NOTE_QUERY,
+  miwakeNoteQuery,
+  openNotesInAnki,
+} from "../src/anki.ts";
+
+Deno.test("miwakeNoteQuery keeps note identity outside optional caller scope", () => {
+  assertEquals(MIWAKE_NOTE_QUERY, "note:Miwake");
+  assertEquals(miwakeNoteQuery(undefined), "note:Miwake");
+  assertEquals(miwakeNoteQuery("  "), "note:Miwake");
+  assertEquals(
+    miwakeNoteQuery(' deck:"Japanese::Vocabulary" tag:review '),
+    'note:Miwake (deck:"Japanese::Vocabulary" tag:review)',
+  );
+});
 
 Deno.test("createACInvoke: sends requests to the selected URL", async () => {
   let requestedURL: string | undefined;

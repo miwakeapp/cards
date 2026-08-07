@@ -48,6 +48,12 @@ export interface CardFields {
   source: string | null;
 }
 
+/** Canonical Anki note type name for Miwake cards. */
+export const noteTypeName = "Miwake";
+
+/** Canonical Anki card template name for Miwake cards. */
+export const cardTemplateName = "Miwake Card";
+
 /** Canonical Anki field names keyed by their programmatic field names. */
 export const fieldNames = {
   key: "Key",

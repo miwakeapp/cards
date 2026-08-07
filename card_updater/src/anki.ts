@@ -3,7 +3,7 @@
  * reviewed field updates.
  */
 
-import { fieldNames } from "card_model";
+import { fieldNames, noteTypeName } from "card_model";
 
 export type ACInvoke = <T = unknown>(
   action: string,
@@ -11,6 +11,15 @@ export type ACInvoke = <T = unknown>(
 ) => Promise<T>;
 
 export const DEFAULT_ANKI_CONNECT_URL = "http://127.0.0.1:8765";
+
+/** Complete Anki search selecting the canonical Miwake note type. */
+export const MIWAKE_NOTE_QUERY = `note:${noteTypeName}`;
+
+/** Adds an optional caller scope without allowing it to replace Miwake note identity. */
+export function miwakeNoteQuery(scope: string | undefined): string {
+  const trimmedScope = scope?.trim();
+  return trimmedScope ? `${MIWAKE_NOTE_QUERY} (${trimmedScope})` : MIWAKE_NOTE_QUERY;
+}
 
 export function createACInvoke(
   ankiConnectURL: string,
