@@ -1,4 +1,5 @@
 import { assertEquals } from "@std/assert";
+import { noteTypeName } from "card_model";
 import { type ACInvoke, ankiKeyText, applyNoteUpdate } from "../src/anki.ts";
 
 Deno.test("ankiKeyText preserves noncanonical whitespace and markup", () => {
@@ -17,7 +18,7 @@ function fakeAnki(noteFields: Record<string, string> | null) {
         Object.entries(noteFields).map(([name, value], order) => [name, { value, order }]),
       );
       return Promise.resolve(
-        [{ noteId: 42, tags: [], cards: [], modelName: "Miwake Card", fields }] as never,
+        [{ noteId: 42, tags: [], cards: [], modelName: noteTypeName, fields }] as never,
       );
     }
     if (action === "updateNoteFields") {

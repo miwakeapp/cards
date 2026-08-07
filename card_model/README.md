@@ -18,7 +18,7 @@ The setup task creates a new `Miwake` note type and stops if one already exists.
 
 The model has eight fields. Semantic JMDict usages are encoded in canonical numeric-ID order in `Key`; accepted pronunciations use a stable source-independent order in `Reading`. One accepted pronunciation remains plain text, while multiple pronunciations are stored as an HTML list. `Dictionary` always contains one rendered entry block per Key usage, divided by a subtle rule when there is more than one.
 
-The package root exports `fieldNames`, the derived `fieldOrder`, and their `FieldName` type, plus the complete `CardFields` result type. Focused subpaths own the rest of the persisted representation:
+The package root exports the canonical `noteTypeName` and `cardTemplateName`, `fieldNames`, the derived `fieldOrder`, and their `FieldName` type, plus the complete `CardFields` result type. Focused subpaths own the rest of the persisted representation:
 
 - `card_model/keys` exposes `parseKey()` and `formatKey()`, with named types for parsed Keys and resolved formatter inputs.
 - `card_model/reading` exposes `parseReading()` and `formatReading()`, with a named type for parsed alternatives.

@@ -11,10 +11,9 @@
  */
 
 import * as path from "@std/path";
-import { fieldOrder } from "card_model";
+import { cardTemplateName, fieldOrder, noteTypeName } from "card_model";
 import { YankiConnect } from "yanki-connect";
 
-const MODEL_NAME = "Miwake";
 const FIELD_FONT_FAMILY = "Noto Serif JP";
 const client = new YankiConnect();
 
@@ -34,22 +33,22 @@ const [front, back, stylesPrefix, minimalCSS] = await Promise.all([
 const combinedCSS = `${stylesPrefix}\n${minimalCSS}`;
 
 const models = await client.model.modelNames();
-const exists = models.includes(MODEL_NAME);
+const exists = models.includes(noteTypeName);
 
 if (exists) {
   throw new Error(
-    `Model ${MODEL_NAME} already exists. Delete or rename it before running this script.`,
+    `Model ${noteTypeName} already exists. Delete or rename it before running this script.`,
   );
 }
 
-console.log(`Creating model ${MODEL_NAME}...`);
+console.log(`Creating model ${noteTypeName}...`);
 await client.model.createModel({
-  modelName: MODEL_NAME,
+  modelName: noteTypeName,
   inOrderFields: [...fieldOrder],
   css: combinedCSS,
   cardTemplates: [
     {
-      Name: "Miwake Card",
+      Name: cardTemplateName,
       Front: front,
       Back: back,
     },
@@ -59,7 +58,7 @@ await client.model.createModel({
 // Ensure browser/editor font is set for core fields.
 for (const field of fieldOrder) {
   await client.model.modelFieldSetFont({
-    modelName: MODEL_NAME,
+    modelName: noteTypeName,
     fieldName: field,
     font: FIELD_FONT_FAMILY,
   });

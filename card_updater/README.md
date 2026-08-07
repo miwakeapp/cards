@@ -31,11 +31,13 @@ deno task --cwd card_updater update:cards --skip-ai      # no AI calls; re-targe
 deno task --cwd card_updater update:cards --model=gpt-5.6-sol  # override both focused operations' model
 deno task --cwd card_updater update:cards --offline      # don't check for newer dictionary or furigana data
 deno task --cwd card_updater update:cards --accept-large-furigana-change  # allow an inspected large furigana change
-deno task --cwd card_updater update:cards --query='...'  # different Anki search
+deno task --cwd card_updater update:cards --query='deck:"Japanese::Vocabulary"'  # narrow the Miwake notes analyzed
 deno task --cwd card_updater update:cards --anki-connect-url=http://surfacepro11:8765  # remote AnkiConnect
 ```
 
 AnkiConnect defaults to `http://127.0.0.1:8765`. Use `--anki-connect-url` when Anki is running on another machine reachable over the local network or Tailnet.
+
+The updater always constrains its Anki search to the `Miwake` note type. `--query` adds a narrower search within that note type instead of replacing the constraint.
 
 Runs started with `--dry-run` or `--limit` keep the Apply button disabled. Hover over the disabled button for the reason. Limited scans are review-only because duplicate-key safety requires checking the complete query result; restart without `--limit` when you are ready to apply.
 

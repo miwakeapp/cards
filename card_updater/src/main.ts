@@ -22,7 +22,12 @@ import {
 } from "card_field_generation";
 import { allJMDictEntries } from "data";
 import { buildSpellingIndex, findAllEntriesBySpelling, type SpellingIndex } from "card_resolution";
-import { createACInvoke, DEFAULT_ANKI_CONNECT_URL, fetchMiwakeNotes } from "./anki.ts";
+import {
+  createACInvoke,
+  DEFAULT_ANKI_CONNECT_URL,
+  fetchMiwakeNotes,
+  miwakeNoteQuery,
+} from "./anki.ts";
 import { analyzeCard, type AnalyzedCard } from "./analyze.ts";
 import { ensureLatestFurigana, ensureLatestJMDict } from "data/download";
 import { flagDuplicateRecognitionUnits } from "./duplicate_keys.ts";
@@ -30,7 +35,6 @@ import { startServer } from "./server.ts";
 import { createGenerationCache, ReviewState } from "./state.ts";
 import { suggestForCard, type Suggestion } from "./suggest.ts";
 
-const DEFAULT_QUERY = 'deck:Mining card:"Miwake Card"';
 const DEFAULT_PORT = 8787;
 const AI_CONCURRENCY = 4;
 
@@ -53,7 +57,6 @@ function parseArguments(args: string[]): Options {
     negatable: ["open"],
     string: ["query", "model", "limit", "port", "anki-connect-url"],
     default: {
-      query: DEFAULT_QUERY,
       port: DEFAULT_PORT,
       "anki-connect-url": DEFAULT_ANKI_CONNECT_URL,
       open: true,
@@ -65,7 +68,7 @@ function parseArguments(args: string[]): Options {
   }
 
   return {
-    query: flags.query,
+    query: miwakeNoteQuery(flags.query),
     limit: flags.limit === undefined ? undefined : positiveInteger(flags.limit, "--limit"),
     modelId: flags.model as ModelId | undefined,
     port: positiveInteger(flags.port, "--port"),
