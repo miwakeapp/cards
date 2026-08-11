@@ -1327,6 +1327,10 @@ function chipHTML(chip: ChangeChip): string {
   let body: string;
   if (chip.segments) {
     body = `<b>${escapeHTML(chip.label)}</b> ${segmentsSnippetHTML(chip.segments)}`;
+  } else if (chip.kind === "form-metadata") {
+    body = `<b>${escapeHTML(chip.label)}</b> <span lang="ja">${
+      escapeHTML(chip.form ?? "")
+    }</span> ${escapeHTML(chip.text ?? "")}`;
   } else if (chip.kind === "form-added" || chip.kind === "form-removed") {
     body = `${chip.label} <span lang="ja">${escapeHTML(chip.text)}</span>`;
   } else if (chip.kind === "reading") {
@@ -1374,6 +1378,7 @@ function routineRow(item: ReviewItem): HTMLDivElement {
     </div>
     ${expanded ? routineDetail(item) : ""}`;
 
+  addHiddenReadingExpandos(row);
   row.querySelector(".state-toggle")!.addEventListener("click", (event) => {
     event.stopPropagation();
     if (item.applied) return;
@@ -1397,11 +1402,32 @@ function routineRow(item: ReviewItem): HTMLDivElement {
   return row;
 }
 
+/** Adds the same search-only reading control as the Miwake Card back template. */
+function addHiddenReadingExpandos(parent: ParentNode): void {
+  for (const entry of parent.querySelectorAll(".miwake-dictionary-entry")) {
+    entry.classList.remove("show-hidden-readings");
+
+    const button = document.createElement("button");
+    button.className = "expando toggle-hidden-readings";
+    button.setAttribute("aria-expanded", "false");
+    button.setAttribute("aria-label", "Show hidden readings");
+    button.setAttribute("title", "Show hidden readings");
+    button.innerHTML =
+      '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4l4 4-4 4" /></svg>';
+    button.addEventListener("click", () => {
+      const expanded = button.getAttribute("aria-expanded") === "false";
+      button.setAttribute("aria-expanded", String(expanded));
+      entry.classList.toggle("show-hidden-readings", expanded);
+    });
+    entry.append(button);
+  }
+}
+
 function routineDetail(item: ReviewItem): string {
   const lines = item.changeChips.filter((chip) => chip.kind !== "reading").map((chip) => `
     <div class="detail-change-line">
       <span class="line-label">${escapeHTML(chip.label)}</span>
-      <span>${chip.segments ? segmentsHTML(chip.segments) : escapeHTML(chip.text ?? "")}</span>
+      <span>${changeChipDetailHTML(chip)}</span>
     </div>`).join("");
   const proposedKeyLine = item.proposedKey
     ? `<div class="detail-change-line"><span class="line-label">key</span><span>${
@@ -1412,7 +1438,7 @@ function routineDetail(item: ReviewItem): string {
     <div class="row-detail">
       <div class="detail-changes">${proposedKeyLine}${readingTransitionHTML(item)}${lines}</div>
       <details>
-        <summary>Show full entries (targeted senses highlighted)</summary>
+        <summary>Show full entries (untargeted senses dimmed as on cards)</summary>
         <div class="entries-compare">
           <div class="entry-pane"><div class="pane-title">On card now</div>${
     markTargets(item.currentEntryHTML, item.key)
@@ -1423,6 +1449,14 @@ function routineDetail(item: ReviewItem): string {
         </div>
       </details>
     </div>`;
+}
+
+function changeChipDetailHTML(chip: ChangeChip): string {
+  if (chip.segments) return segmentsHTML(chip.segments);
+  if (chip.kind === "form-metadata") {
+    return `<span lang="ja">${escapeHTML(chip.form ?? "")}</span> ${escapeHTML(chip.text ?? "")}`;
+  }
+  return escapeHTML(chip.text ?? "");
 }
 
 function markTargets(entryHTML: string | null, key: string): string {
@@ -1438,7 +1472,7 @@ function markTargets(entryHTML: string | null, key: string): string {
       const [senseIndex, sense] of [...entry.querySelectorAll(":scope > .senses > li")].entries()
     ) {
       if (senseNumbers === null || senseNumbers.includes(senseIndex + 1)) {
-        sense.classList.add("is-target");
+        sense.classList.add("relevant");
       }
     }
   }

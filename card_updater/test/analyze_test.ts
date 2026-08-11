@@ -96,6 +96,27 @@ Deno.test("analyzeCard: routine for single-sense entries even when the gloss cha
   assertEquals(card.changeChips.some((chip) => chip.kind === "sense-edited"), true);
 });
 
+Deno.test("analyzeCard: describes form metadata changes", async () => {
+  const before = makeWord({
+    kanji: ["言葉", "言の葉"],
+    senses: [{ glosses: ["word"] }],
+  });
+  before.kanji[1].common = false;
+  const after = structuredClone(before);
+  after.kanji[1].tags = ["rK"];
+  const note = makeNote({ key: "言葉 | 1000000", dictionary: renderDictionary(before) });
+
+  const card = await analyzeCard(note, entriesById(after));
+
+  assertEquals(card.verdict, "routine");
+  assertEquals(card.changeChips, [{
+    kind: "form-metadata",
+    label: "form",
+    form: "言の葉",
+    text: "now marked rare",
+  }]);
+});
+
 Deno.test("analyzeCard: routine when only non-targeted senses changed", async () => {
   const after = makeWord({
     id: "1226200",
@@ -764,6 +785,7 @@ Deno.test("analyzeCard: surfaces Reading changes alongside HTML normalization", 
   assertEquals(card.verdict, "routine");
   assertEquals(card.reason, "furigana-placement");
   assertEquals(card.changeChips.map((chip) => chip.kind), ["formatting", "reading"]);
+  assertEquals(card.changeChips[0].text, "dictionary HTML normalized");
 });
 
 Deno.test("analyzeCard: preserves precise readings that have no current lookup", async () => {

@@ -15,8 +15,10 @@ import {
   diffSegments,
   diffSenseSegments,
   type ParsedEntry,
+  type ParsedForm,
   type ParsedSense,
   parseRenderedEntry,
+  parseRenderedForms,
   type SenseAlignment,
 } from "./entry_text.ts";
 import { formatKey, type Key, parseKey } from "card_model/keys";
@@ -35,6 +37,7 @@ export type Verdict = "unchanged" | "normalize" | "routine" | "retarget" | "exce
 export type ChangeChipKind =
   | "form-added"
   | "form-removed"
+  | "form-metadata"
   | "entry-info"
   | "sense-edited"
   | "sense-moved"
@@ -51,6 +54,8 @@ export interface ChangeChip {
   segments?: DiffSegment[];
   /** Plain text for chips without a diff (added/removed senses and forms). */
   text?: string;
+  /** Japanese form affected by a `form-metadata` chip. */
+  form?: string;
 }
 
 export interface SenseView {
@@ -230,6 +235,7 @@ export async function analyzeCard(
   }
   const proposedReading = readingAnalysis.proposedReading;
   const changeChips = buildChangeChips(oldParsed, newParsed, alignment);
+  changeChips.push(...buildFormMetadataChangeChips(storedAnchorEntryHTML, latestAnchorEntryHTML));
   if (supplementalAnalysis.changed) {
     changeChips.push({
       kind: "entry-info",
@@ -238,7 +244,13 @@ export async function analyzeCard(
     });
   }
   if (changeChips.length === 0 && storedEntryHTML !== latestEntryHTML.trim()) {
-    changeChips.push({ kind: "formatting", label: "", text: "formatting-only difference" });
+    changeChips.push({
+      kind: "formatting",
+      label: "",
+      text: canonicalEntryHTML(storedEntryHTML) === canonicalEntryHTML(latestEntryHTML)
+        ? "dictionary HTML normalized"
+        : "other entry markup changed",
+    });
   }
   if (proposedReading !== null) {
     changeChips.push({ kind: "reading", label: "reading", text: proposedReading });
@@ -765,4 +777,31 @@ function buildChangeChips(
   }
 
   return chips;
+}
+
+function buildFormMetadataChangeChips(beforeHTML: string, afterHTML: string): ChangeChip[] {
+  const beforeByForm = new Map(
+    parseRenderedForms(beforeHTML).map((form) => [formIdentity(form), form]),
+  );
+
+  return parseRenderedForms(afterHTML).flatMap((after) => {
+    const before = beforeByForm.get(formIdentity(after));
+    if (before === undefined || sameStrings(before.metadata, after.metadata)) return [];
+    return [{
+      kind: "form-metadata" as const,
+      label: "form",
+      form: after.text,
+      text: describeFormMetadataChange(before.metadata, after.metadata),
+    }];
+  });
+}
+
+function formIdentity(form: ParsedForm): string {
+  return `${form.kind}\u0000${form.text}`;
+}
+
+function describeFormMetadataChange(before: readonly string[], after: readonly string[]): string {
+  if (before.length === 0 && after.length > 0) return `now marked ${after.join(", ")}`;
+  if (before.length > 0 && after.length === 0) return `no longer marked ${before.join(", ")}`;
+  return `${before.join(", ")} → ${after.join(", ")}`;
 }
