@@ -1,3 +1,9 @@
+@font-face {
+  font-family: "Noto Serif JP";
+  src: url("/model/_NotoSerifJP-VariableFont_wght.ttf");
+  font-display: swap;
+}
+
 :root {
   color-scheme: light;
   --bg: #f6f4f0;
@@ -60,13 +66,13 @@ body {
   font-family: var(--serif-ja);
 }
 
-button,
+:where(button:not(.expando)),
 input {
   font: inherit;
   color: inherit;
 }
 
-button {
+:where(button:not(.expando)) {
   border: 1px solid var(--line-strong);
   border-radius: 7px;
   background: var(--panel);
@@ -1030,8 +1036,6 @@ section[id] {
     background: var(--panel);
     border: 1px solid var(--line);
     border-radius: 8px;
-    padding: 10px 12px;
-    font-size: 12.5px;
     max-height: 340px;
     overflow: auto;
 
@@ -1041,43 +1045,7 @@ section[id] {
       text-transform: uppercase;
       letter-spacing: 0.05em;
       color: var(--faint);
-      margin-bottom: 6px;
-    }
-
-    & ul,
-    & ol {
-      margin: 0 0 6px;
-      padding-left: 20px;
-    }
-
-    & .forms {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-      padding: 0;
-      list-style: none;
-
-      & > li {
-        border: 1px solid var(--line);
-        border-radius: 999px;
-        padding: 1px 7px;
-        background: var(--panel-soft);
-      }
-    }
-
-    & .senses > li {
-      margin-bottom: 7px;
-
-      &.is-target {
-        background: #fdf6e2;
-        outline: 2px solid #f0d48a;
-        outline-offset: 3px;
-        border-radius: 3px;
-      }
-    }
-
-    & .glosses {
-      padding-left: 16px;
+      padding: 10px 12px 0;
     }
   }
 }

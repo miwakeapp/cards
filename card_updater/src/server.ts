@@ -20,6 +20,7 @@ import { type DecisionRecord, type ReviewState } from "./state.ts";
 
 const CLIENT_DIRECTORY = path.resolve(import.meta.dirname!, "client");
 const BUILD_DIRECTORY = path.resolve(import.meta.dirname!, "../build");
+const MODEL_DIRECTORY = path.resolve(import.meta.dirname!, "../../card_model/assets");
 
 export interface ServerOptions {
   cards: AnalyzedCard[];
@@ -429,6 +430,15 @@ export function startServer(options: ServerOptions): Deno.HttpServer {
       if (url.pathname.startsWith("/api/")) {
         return await handleAPI(request, url);
       }
+      if (url.pathname === "/model/card-preview.css") {
+        return await serveScopedModelCSS("styles_prefix.css");
+      }
+      if (url.pathname === "/model/minimal.css") {
+        return await serveModelFile("minimal.css", "text/css; charset=utf-8");
+      }
+      if (url.pathname === "/model/_NotoSerifJP-VariableFont_wght.ttf") {
+        return await serveModelFile("NotoSerifJP-VariableFont_wght.ttf", "font/ttf");
+      }
       return await serveDir(request, {
         fsRoot: url.pathname === "/main.js" ? BUILD_DIRECTORY : CLIENT_DIRECTORY,
         quiet: true,
@@ -438,6 +448,26 @@ export function startServer(options: ServerOptions): Deno.HttpServer {
       console.error(error);
       return json({ error: error instanceof Error ? error.message : String(error) }, 500);
     }
+  });
+}
+
+async function serveModelFile(filename: string, contentType: string): Promise<Response> {
+  const contents = await Deno.readFile(path.join(MODEL_DIRECTORY, filename));
+  return new Response(contents, {
+    headers: {
+      "cache-control": "no-store",
+      "content-type": contentType,
+    },
+  });
+}
+
+async function serveScopedModelCSS(filename: string): Promise<Response> {
+  const contents = await Deno.readTextFile(path.join(MODEL_DIRECTORY, filename));
+  return new Response(`@scope (.entries-compare) {\n${contents}\n}\n`, {
+    headers: {
+      "cache-control": "no-store",
+      "content-type": "text/css; charset=utf-8",
+    },
   });
 }
 

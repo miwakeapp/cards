@@ -15,6 +15,13 @@ export interface ParsedSense {
   glosses: string[];
 }
 
+export interface ParsedForm {
+  kind: "kanji" | "kana";
+  text: string;
+  /** Rendered JMDict form annotations, including `common` and tags such as `rare`. */
+  metadata: string[];
+}
+
 export interface ParsedEntry {
   kanjiForms: string[];
   kanaForms: string[];
@@ -81,26 +88,42 @@ export function canonicalEntryHTML(html: string): string {
 /* ---------- rendered-entry parsing ---------- */
 
 export function parseRenderedEntry(html: string): ParsedEntry {
-  const kanjiForms = extractForms(html, "kanji");
-  const kanaForms = extractForms(html, "kana");
+  const forms = parseRenderedForms(html);
+  const kanjiForms = forms.filter(({ kind }) => kind === "kanji").map(({ text }) => text);
+  const kanaForms = forms.filter(({ kind }) => kind === "kana").map(({ text }) => text);
   const senses = extractSenses(html);
   const sharedText = extractSharedText(html);
 
   return { kanjiForms, kanaForms, sharedText, senses };
 }
 
-function extractForms(html: string, kind: "kanji" | "kana"): string[] {
+/** Parses the visible form text and the metadata that controls how each form is presented. */
+export function parseRenderedForms(html: string): ParsedForm[] {
+  return [
+    ...extractForms(html, "kanji"),
+    ...extractForms(html, "kana"),
+  ];
+}
+
+function extractForms(html: string, kind: "kanji" | "kana"): ParsedForm[] {
   const section = extractElementInner(html, "ul", `forms ${kind}`);
   if (section === null) {
     return [];
   }
 
-  const forms: string[] = [];
-  for (const match of section.matchAll(/<span\s+lang="ja">([\s\S]*?)<\/span>/gi)) {
-    const text = textContent(match[1]);
-    if (text && !forms.includes(text)) {
-      forms.push(text);
-    }
+  const forms: ParsedForm[] = [];
+  for (const block of extractTopLevelBlocks(section, "li")) {
+    const textMatch = block.match(/<span\s+lang="ja">([\s\S]*?)<\/span>/i);
+    const text = textMatch === null ? "" : textContent(textMatch[1]);
+    if (text === "" || forms.some((form) => form.text === text)) continue;
+
+    const startTag = block.match(/^<li\b[^>]*>/i)?.[0] ?? "";
+    const tagsSection = extractElementInner(block, "ul", "tags");
+    const metadata = [
+      ...(startTagHasClasses(startTag, "common") ? ["common"] : []),
+      ...(tagsSection === null ? [] : extractTopLevelBlocks(tagsSection, "li").map(textContent)),
+    ];
+    forms.push({ kind, text, metadata });
   }
   return forms;
 }

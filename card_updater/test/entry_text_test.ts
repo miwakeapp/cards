@@ -7,6 +7,7 @@ import {
   diffSegments,
   diffSenseSegments,
   parseRenderedEntry,
+  parseRenderedForms,
 } from "../src/entry_text.ts";
 import { makeWord } from "./fixtures.ts";
 
@@ -49,6 +50,25 @@ Deno.test("parseRenderedEntry: forms, gloss separators, shared metadata", () => 
   assertEquals(parsed.senses[1].text.includes("·"), true);
   // Part of speech is shared by both senses, so it is entry-level text.
   assertEquals(parsed.sharedText, "noun");
+});
+
+Deno.test("parseRenderedForms: captures common and tagged form metadata", () => {
+  const word = makeWord({
+    kanji: ["稟議", "禀議"],
+    kana: ["りんぎ", "ひんぎ"],
+    senses: [{ glosses: ["reaching a decision via a circulated document"] }],
+  });
+  word.kanji[1].common = false;
+  word.kanji[1].tags = ["rK"];
+  word.kana[1].common = false;
+  word.kana[1].tags = ["sK"];
+
+  assertEquals(parseRenderedForms(renderEntry(word)), [
+    { kind: "kanji", text: "稟議", metadata: ["common"] },
+    { kind: "kanji", text: "禀議", metadata: ["rare"] },
+    { kind: "kana", text: "りんぎ", metadata: ["common"] },
+    { kind: "kana", text: "ひんぎ", metadata: ["search-only"] },
+  ]);
 });
 
 Deno.test("parseRenderedEntry: tolerates entity-encoded stored HTML", () => {
