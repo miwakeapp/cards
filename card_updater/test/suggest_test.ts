@@ -68,7 +68,14 @@ function suggestForTest(
   options: Parameters<typeof suggestForCard>[1],
 ) {
   return suggestForCard(card, {
-    verifyContext: () => Promise.resolve(),
+    resolveContext: (context, lookupSpelling) =>
+      Promise.resolve({
+        lookupSpelling,
+        renderedText: context,
+        occurrences: [],
+        surfaces: [],
+        markedHTML: context,
+      }),
     ...options,
   });
 }
@@ -155,14 +162,20 @@ Deno.test("suggestForCard supplies marked context to focused sense and hint oper
   let senseInput: SenseSelectionInput | undefined;
   let hintInput: HintGenerationInput | undefined;
   let receivedModelId: ModelId | undefined;
-  let verifiedContext: unknown;
+  let resolvedContextInput: unknown;
 
   const suggestion = await suggestForTest(card, {
     sameSpellingEntries: [card.latestWord!],
     modelId: "gpt-5.6-sol",
-    verifyContext: (context, lookupSpelling, options) => {
-      verifiedContext = { context, lookupSpelling, options };
-      return Promise.resolve();
+    resolveContext: (context, lookupSpelling, options) => {
+      resolvedContextInput = { context, lookupSpelling, options };
+      return Promise.resolve({
+        lookupSpelling,
+        renderedText: "これは言葉のテストです。",
+        occurrences: [{ start: 3, end: 5, surface: "言葉" }],
+        surfaces: ["言葉"],
+        markedHTML: "これは<mark>言葉</mark><br>のテストです。",
+      });
     },
     selectSenses: (input, options) => {
       senseInput = input;
@@ -197,7 +210,7 @@ Deno.test("suggestForCard supplies marked context to focused sense and hint oper
     contrastingUsages: [{ entry: card.latestWord!, senseNumbers: [1] }],
   });
   assertEquals(receivedModelId, "gpt-5.6-sol");
-  assertEquals(verifiedContext, {
+  assertEquals(resolvedContextInput, {
     context: "これは<mark>言葉</mark><br>のテストです。",
     lookupSpelling: "言葉",
     options: { partOfSpeech: ["n"] },
@@ -220,7 +233,7 @@ Deno.test("suggestForCard rejects stale target marks before invoking AI", async 
     () =>
       suggestForTest(card, {
         sameSpellingEntries: [card.latestWord!],
-        verifyContext: () => Promise.reject(new Error("unsupported marked occurrence")),
+        resolveContext: () => Promise.resolve(null),
         selectSenses: () => {
           senseSelectionWasRequested = true;
           return Promise.resolve(generated(selected([1])));

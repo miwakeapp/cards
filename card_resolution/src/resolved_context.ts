@@ -1,4 +1,8 @@
-import { contextRenderedText, markContextTargetOccurrences } from "./context.ts";
+import {
+  contextRenderedText,
+  markContextTargetOccurrences,
+  projectMarkedContext,
+} from "./context.ts";
 import { markedContextTextTemplate } from "./minimization.ts";
 import {
   findSurfaceFormOccurrencesForLookupSpelling,
@@ -132,6 +136,55 @@ export async function resolveContextTarget(
     occurrences: resolved.occurrences,
     surfaces: resolved.surfaces,
     markedHTML: markContextTargetOccurrences(contextHTML, resolved.occurrences),
+  };
+}
+
+function oneRangeContainsTheOther(
+  left: RenderedTextOccurrence,
+  right: RenderedTextOccurrence,
+): boolean {
+  return (left.start <= right.start && right.end <= left.end) ||
+    (right.start <= left.start && left.end <= right.end);
+}
+
+/**
+ * Resolves the lexical target identified by historical, potentially inexact target marks.
+ *
+ * Existing cards sometimes mark an entire multiple-choice answer around a shorter lexical target,
+ * or only the answer fragment within a longer inflected form. A supported occurrence is anchored
+ * only when its range contains, or is contained by, an existing mark. The returned HTML removes
+ * the historical marks and wraps the complete supported occurrences instead, for prompt use only;
+ * callers can preserve the stored HTML unchanged. Returns `null` when no mark anchors the supplied
+ * spelling. The input's rendered text must already represent any display-only Anki furigana as its
+ * visible surface.
+ */
+export async function resolveMarkedContextTarget(
+  markedContextHTML: string,
+  lookupSpelling: string,
+  options: SurfaceFormLookupOptions = {},
+): Promise<ResolvedContextTarget | null> {
+  const projected = projectMarkedContext(markedContextHTML);
+  const supported = await resolveRenderedTextTarget(
+    projected.renderedText,
+    lookupSpelling,
+    { ...options, requireExactKanaScript: true },
+  );
+  const anchoredOccurrences = supported.occurrences.filter((occurrence) =>
+    projected.targetOccurrences.some((target) => oneRangeContainsTheOther(occurrence, target))
+  );
+  if (anchoredOccurrences.length === 0) return null;
+
+  const unmarkedRenderedText = contextRenderedText(projected.unmarkedHTML);
+  if (unmarkedRenderedText !== projected.renderedText) {
+    throw new Error("Removing context target marks unexpectedly changed the rendered text");
+  }
+
+  return {
+    lookupSpelling,
+    renderedText: projected.renderedText,
+    occurrences: anchoredOccurrences,
+    surfaces: [...new Set(anchoredOccurrences.map(({ surface }) => surface))],
+    markedHTML: markContextTargetOccurrences(projected.unmarkedHTML, anchoredOccurrences),
   };
 }
 

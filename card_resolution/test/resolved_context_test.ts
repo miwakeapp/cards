@@ -1,5 +1,9 @@
 import { assertEquals, assertRejects } from "@std/assert";
-import { resolveContextTarget, verifyMarkedContextTarget } from "card_resolution";
+import {
+  resolveContextTarget,
+  resolveMarkedContextTarget,
+  verifyMarkedContextTarget,
+} from "card_resolution";
 
 Deno.test("resolveContextTarget preserves occurrence identity across structured HTML", async () => {
   const contextHTML =
@@ -39,6 +43,43 @@ Deno.test("verifyMarkedContextTarget accepts stored markup resolved from lexical
   await verifyMarkedContextTarget("昨日は<mark>サボった</mark>。", "サボる", {
     partOfSpeech: ["v5r"],
   });
+});
+
+Deno.test("resolveMarkedContextTarget narrows a historical mark around the lexical target", async () => {
+  assertEquals(
+    await resolveMarkedContextTarget(
+      "カメラは〈あどけない＝<mark>無邪気な</mark>〉表情を捉えた。",
+      "無邪気",
+      { partOfSpeech: ["adj-na", "n"] },
+    ),
+    {
+      lookupSpelling: "無邪気",
+      renderedText: "カメラは〈あどけない＝無邪気な〉表情を捉えた。",
+      occurrences: [{ start: 11, end: 14, surface: "無邪気" }],
+      surfaces: ["無邪気"],
+      markedHTML: "カメラは〈あどけない＝<mark>無邪気</mark>な〉表情を捉えた。",
+    },
+  );
+});
+
+Deno.test("resolveMarkedContextTarget expands a marked answer fragment to its lexical form", async () => {
+  assertEquals(
+    (await resolveMarkedContextTarget(
+      "まわりの<mark>とげとげし</mark>さも薄らいだ。",
+      "とげとげしい",
+      { partOfSpeech: ["adj-i"] },
+    ))?.markedHTML,
+    "まわりの<mark>とげとげしさ</mark>も薄らいだ。",
+  );
+});
+
+Deno.test("resolveMarkedContextTarget rejects an unmarked occurrence elsewhere in context", async () => {
+  assertEquals(
+    await resolveMarkedContextTarget("<mark>会社</mark>で言葉を選ぶ。", "言葉", {
+      partOfSpeech: ["n"],
+    }),
+    null,
+  );
 });
 
 Deno.test("verifyMarkedContextTarget rejects unsupported and exact-script mismatches", async () => {

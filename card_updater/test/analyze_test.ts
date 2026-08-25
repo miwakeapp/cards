@@ -665,6 +665,23 @@ Deno.test("analyzeCard: retarget when a targeted sense disappeared", async () =>
   assertEquals(card.removedTargetedSenses, [1]);
 });
 
+Deno.test("analyzeCard: retarget when the highest-numbered targeted sense disappeared", async () => {
+  const shrunk = makeWord({
+    id: "1226200",
+    kanji: ["掬う"],
+    kana: ["すくう"],
+    senses: [{ glosses: ["to scoop", "to ladle out"] }],
+  });
+  const note = makeNote({ key: "掬う | 1226200:2", dictionary: renderDictionary(TWO_SENSES) });
+
+  const card = await analyzeCard(note, entriesById(shrunk));
+
+  assertEquals(card.verdict, "retarget");
+  assertEquals(card.reason, "target-gone");
+  assertEquals(card.removedTargetedSenses, [2]);
+  assertEquals(card.proposedKey, null);
+});
+
 Deno.test("analyzeCard: sense views annotate diffs, origins, and targeting", async () => {
   const reshuffled = makeWord({
     id: "1226200",

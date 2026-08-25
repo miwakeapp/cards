@@ -417,7 +417,7 @@ function containsElement(
   return false;
 }
 
-function parseUnmarkedContext(html: string): DefaultTreeAdapterTypes.DocumentFragment {
+function parseContext(html: string): DefaultTreeAdapterTypes.DocumentFragment {
   const parseErrors: ParserError[] = [];
   const fragment = parseFragment(html, {
     onParseError(error) {
@@ -428,10 +428,82 @@ function parseUnmarkedContext(html: string): DefaultTreeAdapterTypes.DocumentFra
     const codes = [...new Set(parseErrors.map((error) => error.code))].join(", ");
     throw new Error(`Context HTML could not be parsed safely: ${codes}`);
   }
+  return fragment;
+}
+
+function parseUnmarkedContext(html: string): DefaultTreeAdapterTypes.DocumentFragment {
+  const fragment = parseContext(html);
   if (containsElement(fragment, "mark")) {
     throw new Error("Context HTML must not already contain <mark> elements");
   }
   return fragment;
+}
+
+export interface ProjectedMarkedContext {
+  readonly renderedText: string;
+  readonly targetOccurrences: readonly RenderedTextOccurrence[];
+  readonly unmarkedHTML: string;
+}
+
+/**
+ * Projects existing target marks onto rendered-text ranges and removes only the mark elements.
+ *
+ * This package-internal bridge lets stored-card workflows compare historical mark boundaries with
+ * canonical lexical occurrences before rebuilding prompt-only markup. It deliberately preserves
+ * every child and all non-`mark` HTML.
+ */
+export function projectMarkedContext(html: string): ProjectedMarkedContext {
+  const fragment = parseContext(html);
+  const { renderedText, ranges } = indexFragment(fragment);
+  const targetOccurrences: RenderedTextOccurrence[] = [];
+
+  function collect(parent: ParentNode, insideMark = false): void {
+    for (const child of parent.childNodes) {
+      if (!isElement(child)) continue;
+      const isMark = child.tagName === "mark";
+      if (isMark && insideMark) {
+        throw new Error("Context HTML must not contain nested <mark> elements");
+      }
+      if (isMark) {
+        const range = ranges.get(child)!;
+        const surface = renderedText.slice(range.start, range.end);
+        if (surface.trim() === "") {
+          throw new Error("Context HTML <mark> elements must contain substantive visible text");
+        }
+        targetOccurrences.push({ ...range, surface });
+      }
+      collect(child, insideMark || isMark);
+    }
+  }
+  collect(fragment);
+  if (targetOccurrences.length === 0) {
+    throw new Error("Context HTML must contain at least one <mark> element");
+  }
+
+  function unwrap(parent: ParentNode): void {
+    for (let index = 0; index < parent.childNodes.length;) {
+      const child = parent.childNodes[index];
+      if (!isElement(child)) {
+        ++index;
+        continue;
+      }
+      if (child.tagName !== "mark") {
+        unwrap(child);
+        ++index;
+        continue;
+      }
+
+      const children = [...child.childNodes];
+      for (const grandchild of children) grandchild.parentNode = parent;
+      child.childNodes.length = 0;
+      child.parentNode = null;
+      parent.childNodes.splice(index, 1, ...children);
+      index += children.length;
+    }
+  }
+  unwrap(fragment);
+
+  return { renderedText, targetOccurrences, unmarkedHTML: serialize(fragment) };
 }
 
 /**
