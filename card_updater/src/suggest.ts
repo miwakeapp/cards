@@ -20,7 +20,7 @@ import {
   jmdictUsagesForSpelling,
 } from "card_creator/jmdict";
 import { formatKey } from "card_model/keys";
-import { ankiFuriganaToSurface, verifyMarkedContextTarget } from "card_resolution";
+import { ankiFuriganaToSurface, resolveMarkedContextTarget } from "card_resolution";
 import type { JMDictWord } from "data";
 import type { AnalyzedCard } from "./analyze.ts";
 import { splitAffixNotation } from "./affix_notation.ts";
@@ -70,7 +70,7 @@ export async function suggestForCard(
     force = false,
     selectSenses = selectSensesForCard,
     generateHint = generateSourceGroundedHint,
-    verifyContext = verifyMarkedContextTarget,
+    resolveContext = resolveMarkedContextTarget,
   }: {
     /** Every JMDict entry containing the card's exact undecorated front-side spelling. */
     sameSpellingEntries: readonly JMDictWord[];
@@ -79,8 +79,8 @@ export async function suggestForCard(
     force?: boolean;
     selectSenses?: typeof selectSensesForCard;
     generateHint?: typeof generateSourceGroundedHint;
-    /** Verifies that the stored marks still resolve to the card's current JMDict spelling. */
-    verifyContext?: typeof verifyMarkedContextTarget;
+    /** Resolves the lexical target anchored by the stored context marks for focused generation. */
+    resolveContext?: typeof resolveMarkedContextTarget;
   },
 ): Promise<Suggestion> {
   if (card.latestWord === null || card.newParsed === null || card.parsedKey === null) {
@@ -126,7 +126,7 @@ export async function suggestForCard(
         `with exact spelling ${JSON.stringify(parsedKey.spelling)} for card ${card.note.noteId}.`,
     );
   }
-  const context = contextForPrompt(card.note.fields.fullContext);
+  const storedContext = contextForPrompt(card.note.fields.fullContext);
   const partOfSpeech = [
     ...new Set(
       compatibleSenseNumbers.flatMap((senseNumber) =>
@@ -134,8 +134,15 @@ export async function suggestForCard(
       ),
     ),
   ];
+  let context: string;
   try {
-    await verifyContext(context, parsedKey.spelling, { partOfSpeech });
+    const resolvedContext = await resolveContext(storedContext, parsedKey.spelling, {
+      partOfSpeech,
+    });
+    if (resolvedContext === null) {
+      throw new Error("No stored target mark anchors a supported occurrence");
+    }
+    context = resolvedContext.markedHTML;
   } catch (error) {
     throw new Error(
       `Card ${card.note.noteId} Full context does not mark a supported occurrence of key spelling ${

@@ -255,11 +255,18 @@ export async function analyzeCard(
   if (proposedReading !== null) {
     changeChips.push({ kind: "reading", label: "reading", text: proposedReading });
   }
-  const supplementalProposedKey = formatKeyWithSenseOverrides(
-    parsedKey,
-    supplementalAnalysis.senseOverrides,
-    latestEntries,
-  );
+  // A removed anchor sense can leave the current Key temporarily invalid against the latest
+  // entry. Retargeting below will propose a valid replacement; do not try to canonicalize the
+  // stale Key before that decision has been made.
+  const anchorSenseNumbersFitLatestEntry = anchorUsage.senseNumbers === null ||
+    anchorUsage.senseNumbers.every((senseNumber) => senseNumber <= newParsed.senses.length);
+  const supplementalProposedKey = anchorSenseNumbersFitLatestEntry
+    ? formatKeyWithSenseOverrides(
+      parsedKey,
+      supplementalAnalysis.senseOverrides,
+      latestEntries,
+    )
+    : note.fields.key;
   const base = {
     note,
     parsedKey,
