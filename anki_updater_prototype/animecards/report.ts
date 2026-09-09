@@ -149,7 +149,8 @@ export function buildConversionReport(manifest: ConversionManifest): string {
     (candidate.additionalAcceptedReadings?.length ?? 0) > 0
   );
   const readingSelections = manifest.candidates.filter((candidate) =>
-    candidate.readingResolution.status !== "not-needed"
+    candidate.readingResolution.status !== "not-needed" ||
+    (candidate.jmdictEntryResolution?.readingDecisions?.length ?? 0) > 0
   );
   const entrySelectionDeferrals = manifest.skipped.filter((skipped) =>
     skipped.entrySelection !== undefined
@@ -303,10 +304,17 @@ export function buildConversionReport(manifest: ConversionManifest): string {
     for (const candidate of readingSelections) {
       const resolution = candidate.readingResolution;
       lines.push(
-        `- Note ${candidate.noteId} · ${
-          inlineCode(candidate.keyRecognitionTarget)
-        } · ${resolution.status}`,
+        `- Note ${candidate.noteId} · ${inlineCode(candidate.keyRecognitionTarget)} · ${
+          resolution.status === "not-needed" ? "judged during entry selection" : resolution.status
+        }`,
       );
+      for (const decision of candidate.jmdictEntryResolution?.readingDecisions ?? []) {
+        lines.push(
+          `  - Entry ${decision.jmdictId} · ${
+            inlineCode(decision.kanaReading)
+          }: ${decision.decision} — ${decision.rationale}`,
+        );
+      }
       if (resolution.status === "generated") {
         for (const decision of resolution.decisions) {
           lines.push(

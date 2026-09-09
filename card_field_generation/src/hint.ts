@@ -6,10 +6,10 @@ import {
   isGeneratedSurfaceFormForLookupSpelling,
   markedContextTextTemplate,
 } from "card_resolution";
-import type { JMDictWord } from "data";
 import { HINT_FEW_SHOTS } from "./hint_few_shots.ts";
 import {
   assertJMDictEntryContainsSpelling,
+  type JMDictUsageReference,
   promptJMDictEntry,
   validatedJMDictSenseNumbers,
 } from "./jmdict_prompt.ts";
@@ -20,15 +20,6 @@ import {
 import { type GenerationOptions, type GenerationResult, runGeneration } from "./runner.ts";
 
 export { HINT_PROMPT_FIXTURE_IDS, HINT_PROMPT_FIXTURE_LINKS } from "./hint_few_shots.ts";
-
-/** One selected or contrasting JMDict entry/sense combination. */
-export interface JMDictUsageReference {
-  /** JMDict entry containing the referenced usage. */
-  entry: JMDictWord;
-
-  /** Nonempty 1-indexed senses belonging to this usage. */
-  senseNumbers: readonly number[];
-}
 
 /** Evidence for deciding whether and how to distinguish one resolved usage from alternatives. */
 export interface HintGenerationInput {

@@ -57,10 +57,16 @@ export async function senseSelectionInput(
 export async function readingSelectionInput(
   fixture: ReadingSelectionFixture,
 ): Promise<ReadingSelectionInput> {
-  const { jmdictId, ...input } = fixture.input;
+  const { jmdictId, alternativeUsage, ...input } = fixture.input;
   return {
     ...input,
     jmdictEntry: await preextractedJMDictEntry(jmdictId),
+    ...(alternativeUsage === undefined ? {} : {
+      alternativeUsage: {
+        entry: await preextractedJMDictEntry(alternativeUsage.jmdictId),
+        senseNumbers: alternativeUsage.senseNumbers,
+      },
+    }),
   };
 }
 
@@ -95,9 +101,15 @@ export async function evalFixtureHashContent(
 
   if (fixture.operation === "reading-selection") {
     const entry = await loadJMDictEntry(fixture.input.jmdictId);
+    const alternativeUsage = fixture.input.alternativeUsage;
+    const alternativeEntry = alternativeUsage === undefined
+      ? entry
+      : await loadJMDictEntry(alternativeUsage.jmdictId);
     const promptReadings = [fixture.input.encountered, ...fixture.input.alternatives].map(
-      ({ kanaReading }) => {
-        const form = entry.kana.find(({ text }) => text === kanaReading);
+      ({ kanaReading }, index) => {
+        const form = (index === 0 ? entry : alternativeEntry).kana.find(({ text }) =>
+          text === kanaReading
+        );
         return form === undefined
           ? { kanaReading, missing: true }
           : { kanaReading, common: form.common, tags: form.tags };
@@ -111,6 +123,11 @@ export async function evalFixtureHashContent(
         ),
       },
       promptReadings,
+      ...(alternativeUsage === undefined ? {} : {
+        alternativeUsageSignature: promptJMDictProjectionSignature(
+          await promptJMDictEntry(alternativeEntry, alternativeUsage.senseNumbers),
+        ),
+      }),
     };
   }
 

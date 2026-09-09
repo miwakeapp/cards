@@ -91,6 +91,7 @@ export interface ReadingSelectionFixture {
       kanaReading: string;
       bccwjFrequencyPerMillion: number | null;
     }>;
+    alternativeUsage?: FixtureJMDictUsage;
   };
   expected: {
     decisions: Array<{
@@ -102,7 +103,7 @@ export interface ReadingSelectionFixture {
   evaluation: EvalFixtureEvaluation;
 }
 
-/** An explicit selected or contrasting JMDict usage in a hint fixture. */
+/** An explicit JMDict usage in a hint or reading-selection fixture. */
 export interface FixtureJMDictUsage {
   jmdictId: string;
   senseNumbers: number[];

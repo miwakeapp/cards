@@ -167,6 +167,15 @@ export interface JMDictEntryResolution {
   candidateJMDictIds: string[];
   /** Entries that the Animecard's glossary permitted the model to select. */
   allowedJMDictIds: string[];
+  /** Reading-suitability decisions made after comparing equivalent entries. */
+  readingDecisions?: EntryReadingDecision[];
+}
+
+export interface EntryReadingDecision {
+  jmdictId: string;
+  kanaReading: string;
+  decision: "include" | "omit";
+  rationale: string;
 }
 
 /** An additional reviewed pronunciation and the equivalent JMDict usage which validates it. */

@@ -193,6 +193,12 @@ Deno.test("buildConversionReport shows selected and compatible senses", () => {
         hint: "規模大小",
         candidateJMDictIds: ["1414110", "2999999"],
         allowedJMDictIds: ["1414110"],
+        readingDecisions: [{
+          jmdictId: "2999999",
+          kanaReading: "おおこ",
+          decision: "omit",
+          rationale: "Not suitable for this usage.",
+        }],
       },
       original: { fields: {} },
       target: {
@@ -214,6 +220,11 @@ Deno.test("buildConversionReport shows selected and compatible senses", () => {
     "| 42 | `大小` | `manual-hold` | `generated` | `2 / 1,2,3` | `大小 \\| 1414110:2` | `規模大小` | gemini-3.6-flash | `物の大小を比べる。` | `前段。物の大小を比べる。後段。` |",
   );
   assertStringIncludes(report, "## JMDict entry selections");
+  assertStringIncludes(report, "judged during entry selection");
+  assertStringIncludes(
+    report,
+    "Entry 2999999 · `おおこ`: omit — Not suitable for this usage.",
+  );
   assertStringIncludes(
     report,
     "| 42 | `大小` | 1414110 | `1414110` | `1414110, 2999999` | `規模大小` | gemini-3.6-flash | `前段。物の大小を比べる。後段。` |",

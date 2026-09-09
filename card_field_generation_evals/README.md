@@ -69,7 +69,7 @@ A separate preference worksheet was adjudicated outside the repository on 2026-0
 ## Fixture files
 
 - `cases/sense_selection.json` contains 114 tracked decisions: the focused Animecards batch, focused known-failure and no-applicable-sense controls, agent-adjudicated cases retained from the predecessor evaluator, the normative three-compatible-sense 見込み example from `DESIGN.md`, three additional controls for pedagogical sense grouping, three user-reviewed worksheet cases, and 19 final-Key decisions recovered from manual SurfacePro11 edits.
-- `cases/reading_selection.json` contains five user-reviewed decisions: the three live-collection corrections that motivated the operation plus positive `日本` and mixed casual-`明日` controls from the card design policy.
+- `cases/reading_selection.json` contains five user-reviewed same-entry decisions: the three live-collection corrections that motivated the operation plus positive `日本` and mixed casual-`明日` controls from the card design policy. Two agent-reviewed cross-entry controls cover omitting `あとつぎ` for political-party `後継` and retaining both readings of `後々`.
 - `cases/hint.json` contains 103 decisions: 60 failures carried forward from the predecessor card-generation review log, 26 agent-adjudicated cases from a read-only sample of accepted SurfacePro11 cards, four earlier controls where no semantic hint is needed, two deliberately underspecified controls where a hint is needed but the source cannot support one, two exposed user-preference cases, and nine new preferences recovered from manual SurfacePro11 hint edits.
 - `cases/minimization.json` contains 55 decisions: 40 contexts that benefit from shortening and 15 contexts where the correct output is `null`.
 

@@ -9,7 +9,6 @@ import * as path from "@std/path";
 import { compatibleSenseNumbersForJMDictUsage, jmdictUsagesForSpelling } from "card_creator/jmdict";
 import { buildSpellingIndex, findAllEntriesBySpelling } from "card_resolution";
 import { allJMDictEntries, type JMDictWord } from "data";
-import { bccwjLUW2LemmaReadingHit } from "data/rarity";
 import {
   isAIQuotaError,
   minimizeContext,
@@ -19,6 +18,7 @@ import {
 } from "card_field_generation";
 export { isAIQuotaError } from "card_field_generation";
 import { JSONLGenerationCache } from "card_field_generation/file-cache";
+import { readingEvidence } from "../shared/reading_evidence.ts";
 import {
   markAuditedContextTargetWithinAnchor,
   markResolvedContextTargetWithinAnchor,
@@ -108,14 +108,6 @@ function concreteSelectedSenseNumbers(
   throw new Error(
     `Cannot select additional readings before sense resolution for note ${candidate.noteId}.`,
   );
-}
-
-async function readingEvidence(recognitionTarget: string, kanaReading: string) {
-  return {
-    kanaReading,
-    bccwjFrequencyPerMillion:
-      (await bccwjLUW2LemmaReadingHit(recognitionTarget, kanaReading))?.totalPMW ?? null,
-  };
 }
 
 /**

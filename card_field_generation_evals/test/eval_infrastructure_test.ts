@@ -304,7 +304,7 @@ Deno.test("CLI spending guard always permits dry runs and explicit approval", ()
 
 Deno.test("tracked eval fixtures are complete and prompt overlaps are explicit", async () => {
   const fixtures = await loadEvalFixtures();
-  assertEquals(fixtures.length, 277);
+  assertEquals(fixtures.length, 279);
   assertEquals(
     fixtures.filter(({ operation }) => operation === "context-minimization").length,
     55,
@@ -315,7 +315,7 @@ Deno.test("tracked eval fixtures are complete and prompt overlaps are explicit",
   );
   assertEquals(
     fixtures.filter(({ operation }) => operation === "reading-selection").length,
-    5,
+    7,
   );
   assertEquals(
     fixtures.filter(({ operation }) => operation === "sense-selection").length,

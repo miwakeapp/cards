@@ -1,0 +1,95 @@
+{
+  "id": "1383690",
+  "kanji": [
+    {
+      "common": true,
+      "text": "跡継ぎ",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "後継ぎ",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "跡継",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "後継",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": true,
+      "text": "あとつぎ",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "heir"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "inheritor"
+        }
+      ]
+    },
+    {
+      "partOfSpeech": [
+        "n"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "successor"
+        }
+      ]
+    }
+  ]
+}

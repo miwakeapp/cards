@@ -87,6 +87,10 @@ const readingSelectionFileSchema = z.strictObject({
       senseNumbers: positiveSenseNumbersSchema.min(1),
       encountered: readingEvidenceSchema,
       alternatives: z.array(readingEvidenceSchema).min(1),
+      alternativeUsage: z.strictObject({
+        jmdictId: z.string().min(1),
+        senseNumbers: positiveSenseNumbersSchema.min(1),
+      }).optional(),
     }),
     expected: z.strictObject({
       decisions: z.array(z.strictObject({
@@ -181,6 +185,12 @@ function validateSenseFixture(fixture: SenseSelectionFixture): void {
 
 function validateReadingFixture(fixture: ReadingSelectionFixture): void {
   assertUniqueSenseNumbers(fixture.input.senseNumbers, `${fixture.id}.input.senseNumbers`);
+  if (fixture.input.alternativeUsage !== undefined) {
+    assertUniqueSenseNumbers(
+      fixture.input.alternativeUsage.senseNumbers,
+      `${fixture.id}.input.alternativeUsage.senseNumbers`,
+    );
+  }
   const alternatives = fixture.input.alternatives.map(({ kanaReading }) => kanaReading);
   const decisions = fixture.expected.decisions.map(({ kanaReading }) => kanaReading);
   if (JSON.stringify(decisions) !== JSON.stringify(alternatives)) {
@@ -503,6 +513,9 @@ export function jmdictEntryIdsForEvalFixtures(fixtures: readonly EvalFixture[]):
       ids.add(fixture.input.jmdictId);
     } else if (fixture.operation === "reading-selection") {
       ids.add(fixture.input.jmdictId);
+      if (fixture.input.alternativeUsage !== undefined) {
+        ids.add(fixture.input.alternativeUsage.jmdictId);
+      }
     } else if (fixture.operation === "hint") {
       ids.add(fixture.input.selectedUsage.jmdictId);
       for (const usage of fixture.input.contrastingUsages) ids.add(usage.jmdictId);

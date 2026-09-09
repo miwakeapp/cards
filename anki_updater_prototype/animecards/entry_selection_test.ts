@@ -1,4 +1,9 @@
-import { assertEquals } from "@std/assert";
+import "../../data/test/use_jmdict_fixtures.ts";
+import { assert, assertEquals, assertRejects } from "@std/assert";
+import { preextractedJMDictEntry } from "data";
+import { buildSpellingIndex } from "card_resolution";
+import { assertReadingSelectionInput } from "card_field_generation/eval-metadata";
+import { convertAnimecardsNote } from "./convert.ts";
 import type { JMdictWord } from "@scriptin/jmdict-simplified-types";
 import type {
   GenerationResult,
@@ -10,9 +15,50 @@ import type {
 } from "card_field_generation";
 import {
   type EntrySelectionDependencies,
+  entrySelectionOverride,
+  type JMDictEntrySelectionOverride,
   selectJMDictEntry,
   type UnresolvedJMDictEntry,
 } from "./entry_selection.ts";
+
+async function renderSelection(
+  input: UnresolvedJMDictEntry,
+  selection: JMDictEntrySelectionOverride,
+) {
+  const values = {
+    Word: input.recognitionTarget,
+    Reading: input.kanaReading,
+    Sentence: input.fullContext,
+    Glossary: `<a href="https://jitendex.org/?q=${selection.jmdictId}">definition</a>`,
+    Source: "Test Book",
+  };
+  const entries = new Map(input.candidateEntries.map((entry) => [entry.id, entry]));
+  const result = await convertAnimecardsNote({
+    noteId: 42,
+    modelName: "Animecards",
+    tags: [],
+    cards: [99],
+    fields: Object.fromEntries(
+      Object.entries(values).map(([name, value], order) => [name, { value, order }]),
+    ),
+  }, {
+    sourceModel: "Animecards",
+    targetModel: "Miwake",
+    sourceFields: {
+      word: "Word",
+      sentence: "Sentence",
+      glossary: "Glossary",
+      reading: "Reading",
+      source: "Source",
+      sourceURL: null,
+    },
+    entries,
+    spellingIndex: buildSpellingIndex(entries.values()),
+    jmdictEntrySelectionOverride: selection,
+  });
+  assert(result.candidate, JSON.stringify(result.skipped));
+  return result.candidate;
+}
 
 const MODEL_OPTIONS = { modelId: "gemini-3.6-flash" as const };
 
@@ -57,6 +103,18 @@ function dependencies(
   return {
     selectSenses: (input) => Promise.resolve(generated(select(input))),
     generateHint: (input) => Promise.resolve(generated(hint(input))),
+    selectReadings: (input) =>
+      Promise.resolve(
+        generated({
+          decisions: input.alternatives.map(({ kanaReading }) => ({
+            kanaReading,
+            decision: "include" as const,
+            rationale: "Suitable alternative.",
+          })),
+        }),
+      ),
+    getReadingEvidence: (_spelling, kanaReading) =>
+      Promise.resolve({ kanaReading, bccwjFrequencyPerMillion: null }),
   };
 }
 
@@ -359,8 +417,233 @@ Deno.test("selectJMDictEntry accepts equivalent senses with a unique reading anc
       kanaReading: "わざ",
       applicableSenseNumbers: [1, 2],
     }],
+    readingDecisions: [{
+      jmdictId: "2222222",
+      kanaReading: "わざ",
+      decision: "include",
+      rationale: "Suitable alternative.",
+    }],
     modelConfigurationIds: ["test"],
   });
+});
+
+Deno.test("後継 can omit an unsuitable cross-entry reading from all rendered fields", async () => {
+  const input: UnresolvedJMDictEntry = {
+    context:
+      "桂太郎が組織を準備していた立憲同志会、その後継政党である憲政会、そのまた後継である民政党に属して、政党を支えた政治家でもあった。",
+    fullContext:
+      "桂太郎が組織を準備していた立憲同志会、その後継政党である憲政会、そのまた後継である民政党に属して、政党を支えた政治家でもあった。",
+    recognitionTarget: "後継",
+    kanaReading: "こうけい",
+    kanaReadingEvidence: "animecard",
+    candidateEntries: [
+      await preextractedJMDictEntry("1269590"),
+      await preextractedJMDictEntry("1383690"),
+    ],
+    allowedJMDictIds: ["1269590"],
+  };
+  const result = await selectJMDictEntry(input, {}, {
+    ...dependencies(() => ({ outcome: "selected", senseNumbers: [1, 2, 3, 4] }), () => {
+      throw new Error("Equivalent meanings do not require a fabricated hint");
+    }),
+    selectReadings: (readingInput, options) => {
+      assertEquals(options, {});
+      assertEquals(readingInput.jmdictEntry.id, "1269590");
+      assertEquals(readingInput.encountered.kanaReading, "こうけい");
+      assertEquals(readingInput.alternativeUsage?.entry.id, "1383690");
+      assertEquals(readingInput.alternativeUsage?.senseNumbers, [1, 2]);
+      assertEquals(readingInput.alternatives, [{
+        kanaReading: "あとつぎ",
+        bccwjFrequencyPerMillion: null,
+      }]);
+      return Promise.resolve(
+        generated({
+          decisions: [{
+            kanaReading: "あとつぎ",
+            decision: "omit",
+            rationale: "Not suitable for 後継政党.",
+          }],
+        }, "reading-model@medium"),
+      );
+    },
+  });
+  assert(result.status === "selected");
+  assertEquals(result.additionalAcceptedReadings, undefined);
+  assertEquals(result.modelConfigurationIds, ["test", "reading-model@medium"]);
+  const card = await renderSelection(input, result);
+  assertEquals(card.target.fields.Key, "後継 | 1269590");
+  assertEquals(card.target.fields.Reading, "後[こう] 継[けい]");
+  assertEquals((card.target.fields.Dictionary.match(/miwake-dictionary-entry/g) ?? []).length, 1);
+  assertEquals(card.target.fields.Dictionary.includes("inheritor"), false);
+  assertEquals(entrySelectionOverride(card)?.readingDecisions, result.readingDecisions);
+});
+
+Deno.test("後々 retains useful cross-entry readings and both dictionaries", async () => {
+  const input: UnresolvedJMDictEntry = {
+    context: "後々困ることになる。",
+    fullContext: "後々困ることになる。",
+    recognitionTarget: "後々",
+    kanaReading: "あとあと",
+    kanaReadingEvidence: "animecard",
+    candidateEntries: [
+      await preextractedJMDictEntry("1578610"),
+      await preextractedJMDictEntry("2841372"),
+    ],
+    allowedJMDictIds: ["1578610"],
+  };
+  const result = await selectJMDictEntry(input, {}, {
+    ...dependencies(() => ({ outcome: "selected", senseNumbers: [1, 2] })),
+    selectReadings: (readingInput) => {
+      assertEquals(readingInput.alternativeUsage?.entry.id, "2841372");
+      assertEquals(readingInput.alternatives[0].kanaReading, "のちのち");
+      return Promise.resolve(
+        generated({
+          decisions: [{
+            kanaReading: "のちのち",
+            decision: "include",
+            rationale: "Ordinary equivalent pronunciation.",
+          }],
+        }),
+      );
+    },
+  });
+  assert(result.status === "selected");
+  const card = await renderSelection(input, result);
+  assertEquals(card.target.fields.Key, "後々 | 1578610;2841372");
+  assertEquals(
+    card.target.fields.Reading,
+    "<ul><li>後[あと] 々[あと]</li><li>後[のち] 々[のち]</li></ul>",
+  );
+  assertEquals((card.target.fields.Dictionary.match(/miwake-dictionary-entry/g) ?? []).length, 2);
+});
+
+Deno.test("樺 sends かば/カバ to reading selection as one pronunciation", async () => {
+  const entry = await preextractedJMDictEntry("1208890");
+  let calls = 0;
+  const result = await selectJMDictEntry(
+    {
+      context: "樺の木。",
+      fullContext: "樺の木。",
+      recognitionTarget: "樺",
+      kanaReading: "かんば",
+      kanaReadingEvidence: "animecard",
+      candidateEntries: [entry],
+      allowedJMDictIds: [entry.id],
+    },
+    {},
+    {
+      ...dependencies(() => ({ outcome: "selected", senseNumbers: [1] })),
+      selectReadings: async (input) => {
+        ++calls;
+        // The dictionary entry is unmodified: both かば and カバ are eligible for 樺.
+        // Exercise the real validator, which rejects script-equivalent duplicate alternatives.
+        await assertReadingSelectionInput(input);
+        assertEquals(input.encountered.kanaReading, "かんば");
+        assertEquals(input.alternatives, [{ kanaReading: "かば", bccwjFrequencyPerMillion: null }]);
+        return generated({
+          decisions: [{
+            kanaReading: "かば",
+            decision: "include",
+            rationale: "Useful alternative.",
+          }],
+        });
+      },
+    },
+  );
+  assertEquals(calls, 1);
+  assert(result.status === "selected");
+  assertEquals(result.additionalAcceptedReadings, [{
+    jmdictId: "1208890",
+    kanaReading: "かば",
+    applicableSenseNumbers: [1],
+  }]);
+});
+
+Deno.test("entry selection fails closed when reading selection fails", async () => {
+  await assertRejects(
+    () =>
+      selectJMDictEntry(request(), {}, {
+        ...dependencies(() => ({ outcome: "selected", senseNumbers: [1, 2, 3] })),
+        selectReadings: () => Promise.reject(new Error("reading judgment failed")),
+      }),
+    Error,
+    "reading judgment failed",
+  );
+});
+
+Deno.test("an omitted same-entry reading is not rescheduled during conversion replay", async () => {
+  const first = entry("1111111", ["karma"]);
+  first.kana.push({ common: false, text: "ぎょう", tags: [], appliesToKanji: ["*"] });
+  const input = request({ candidateEntries: [first, entry("2222222", ["work"])] });
+  const result = await selectJMDictEntry(input, {}, {
+    ...dependencies(() => ({ outcome: "selected", senseNumbers: [1] })),
+    selectReadings: () =>
+      Promise.resolve(
+        generated({
+          decisions: [{ kanaReading: "ぎょう", decision: "omit", rationale: "Not useful here." }],
+        }),
+      ),
+  });
+  assert(result.status === "selected");
+  const card = await renderSelection(input, result);
+  assertEquals(card.readingResolution, { status: "not-needed" });
+  assertEquals(card.target.fields.Reading, "業[ごう]");
+  const replay = entrySelectionOverride(card);
+  assert(replay);
+  const replayedCard = await renderSelection(input, replay);
+  assertEquals(replayedCard.readingResolution, { status: "not-needed" });
+  assertEquals(replayedCard.target.fields.Reading, "業[ごう]");
+});
+
+Deno.test("rare cross-entry alternatives are rejected before paid reading selection", async () => {
+  const second = entry("2222222", ["karma"]);
+  second.kana[0].tags = ["rk"];
+  const result = await selectJMDictEntry(
+    request({ candidateEntries: [entry("1111111", ["karma"]), second] }),
+    {},
+    {
+      ...dependencies(() => ({ outcome: "selected", senseNumbers: [1, 2] })),
+      selectReadings: () => {
+        throw new Error("Rare alternatives must be filtered first");
+      },
+    },
+  );
+  assert(result.status === "selected");
+  assertEquals(result.additionalAcceptedReadings, undefined);
+  assertEquals(result.readingDecisions, [{
+    jmdictId: "2222222",
+    kanaReading: "わざ",
+    decision: "omit",
+    rationale: "JMDict reading tags: rk.",
+  }]);
+});
+
+Deno.test("source-supported rare readings survive in every equivalent entry", async () => {
+  const first = entry("1111111", ["karma"]);
+  const second = entry("2222222", ["karma"]);
+  first.kana[0].tags = ["rk"];
+  second.kana[0].text = "ごう";
+  second.kana[0].tags = ["rk"];
+  const result = await selectJMDictEntry(
+    request({
+      candidateEntries: [first, second],
+      allowedJMDictIds: [first.id],
+      kanaReadingEvidence: "source-ruby",
+    }),
+    {},
+    {
+      ...dependencies(() => ({ outcome: "selected", senseNumbers: [1, 2] })),
+      selectReadings: () => {
+        throw new Error("The source-supported pronunciation must not be judged");
+      },
+    },
+  );
+  assert(result.status === "selected");
+  assertEquals(result.additionalAcceptedReadings, [{
+    jmdictId: second.id,
+    kanaReading: "ごう",
+    applicableSenseNumbers: [1],
+  }]);
 });
 
 Deno.test("selectJMDictEntry does not override a same-reading unlinked choice", async () => {
