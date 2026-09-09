@@ -192,6 +192,36 @@ Deno.test("applyGeneratedCardFields omits a rejected additional reading", async 
   assertEquals(value.readingResolution.status, "generated");
 });
 
+Deno.test("enrichment can proceed directly to reading selection", async () => {
+  const value = additionalReadingCandidate();
+  const before = structuredClone(value);
+  assertEquals(needsCardFieldEnrichment(value), true);
+  assertEquals(
+    await applySettledCandidateEnrichment(
+      value,
+      alternateNamesEntry,
+      [alternateNamesEntry],
+      {},
+      "2026-09-08T00:00:00.000Z",
+    ),
+    [],
+  );
+  assertEquals(value, before);
+  await applyGeneratedCardFields(
+    value,
+    alternateNamesEntry,
+    [alternateNamesEntry],
+    {
+      readingSelection: {
+        decisions: [{ kanaReading: "いめい", decision: "omit", rationale: "Uncommon here." }],
+      },
+    },
+    { readingSelection: "gpt-5.6-sol@medium" },
+    "2026-09-08T00:00:00.000Z",
+  );
+  assertEquals(needsCardFieldEnrichment(value), false);
+});
+
 Deno.test("enrichment preserves successful minimization when sense generation fails", async () => {
   const value = candidate();
   const failures = await applySettledCandidateEnrichment(
