@@ -124,6 +124,7 @@ async function readingEvidence(recognitionTarget: string, kanaReading: string) {
  * Sense selection and hinting form one sequential operation, while context minimization is
  * independent and runs in parallel. Each fulfilled operation is validated and applied on its own;
  * only the operation that rejects or fails application is recorded as failed and retried later.
+ * Both may be absent when only the subsequent reading-selection stage needs work.
  */
 export async function applySettledCandidateEnrichment(
   candidate: ConversionCandidate,
@@ -132,9 +133,6 @@ export async function applySettledCandidateEnrichment(
   work: PendingCandidateEnrichment,
   attemptedAt: string,
 ): Promise<CandidateEnrichmentFailure[]> {
-  if (work.sense === undefined && work.minimizedContext === undefined) {
-    throw new Error("Candidate was scheduled without any pending AI-owned fields.");
-  }
   const [senseResult, minimizedContextResult] = await Promise.allSettled(
     [
       work.sense?.promise,
