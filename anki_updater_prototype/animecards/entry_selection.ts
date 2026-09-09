@@ -3,12 +3,18 @@ import { jmdictAlternativesForCardFront, jmdictUsagesForSpelling } from "card_cr
 import {
   generateSourceGroundedHint,
   type GenerationOptions,
+  selectAdditionalReadingsForCard,
   selectSensesForCard,
 } from "card_field_generation";
 import { kanjiSpellingsForReading, readingAppliesToKanji } from "data";
 import { markResolvedContextTargetWithinAnchor } from "../shared/anchored_context.ts";
+import { hasRejectedReadingTag, readingEvidence } from "../shared/reading_evidence.ts";
 import { kanaScriptsMatch } from "./html.ts";
-import type { AdditionalAcceptedReadingResolution, ConversionCandidate } from "./types.ts";
+import type {
+  AdditionalAcceptedReadingResolution,
+  ConversionCandidate,
+  EntryReadingDecision,
+} from "./types.ts";
 
 export interface UnresolvedJMDictEntry {
   /** Plain-text source evidence used to distinguish the competing entries. */
@@ -39,6 +45,8 @@ export interface JMDictEntrySelectionOverride {
   allowedJMDictIds: string[];
   /** Reviewed alternative pronunciations, including their equivalent-entry provenance. */
   additionalAcceptedReadings?: AdditionalAcceptedReadingResolution[];
+  /** Includes omissions so replay cannot silently reintroduce rejected alternatives. */
+  readingDecisions?: EntryReadingDecision[];
 }
 
 /** Reconstructs the complete entry-selection decision for deterministic pipeline replay. */
@@ -56,6 +64,9 @@ export function entrySelectionOverride(
     generatedAt: resolution.generatedAt,
     candidateJMDictIds: resolution.candidateJMDictIds,
     allowedJMDictIds: resolution.allowedJMDictIds,
+    ...(resolution.readingDecisions === undefined
+      ? {}
+      : { readingDecisions: resolution.readingDecisions }),
     ...(candidate.additionalAcceptedReadings === undefined ? {} : {
       additionalAcceptedReadings: candidate.additionalAcceptedReadings,
     }),
@@ -170,6 +181,8 @@ function acceptedReadingsForUsage(
 export interface EntrySelectionDependencies {
   selectSenses?: typeof selectSensesForCard;
   generateHint?: typeof generateSourceGroundedHint;
+  selectReadings?: typeof selectAdditionalReadingsForCard;
+  getReadingEvidence?: typeof readingEvidence;
 }
 
 type EntrySelectionGenerationOptions = GenerationOptions;
@@ -278,6 +291,8 @@ export async function selectJMDictEntry(
   {
     selectSenses = selectSensesForCard,
     generateHint = generateSourceGroundedHint,
+    selectReadings = selectAdditionalReadingsForCard,
+    getReadingEvidence = readingEvidence,
   }: EntrySelectionDependencies = {},
 ): Promise<GeneratedJMDictEntrySelection> {
   const context = await markedSelectionContext(request);
@@ -366,23 +381,75 @@ export async function selectJMDictEntry(
     const jmdictId = leadUsage.entry.id;
     const applicableSenseNumbers = leadUsage.senseNumbers;
     const selectedEntry = leadUsage.entry;
-    const additionalAcceptedReadings = selectedUsages.flatMap(({ entry, senseNumbers }) =>
-      acceptedReadingsForUsage(entry, request.recognitionTarget, senseNumbers)
-    ).filter(({ jmdictId, kanaReading }) =>
-      jmdictId !== leadUsage.entry.id || !kanaScriptsMatch(kanaReading, request.kanaReading)
-    );
-    const distinctAdditionalAcceptedReadings = [
-      ...new Map(
-        additionalAcceptedReadings.map((reading) => [
-          JSON.stringify([
-            reading.jmdictId,
-            reading.kanaReading,
-            reading.applicableSenseNumbers,
-          ]),
-          reading,
-        ]),
-      ).values(),
-    ];
+    const encounteredReading = acceptedReadingsForUsage(
+      selectedEntry,
+      request.recognitionTarget,
+      applicableSenseNumbers,
+    ).find(({ kanaReading }) => kanaScriptsMatch(kanaReading, request.kanaReading));
+    const acceptedReadings: AdditionalAcceptedReadingResolution[] = [];
+    const readingDecisions: EntryReadingDecision[] = [];
+    for (const usage of selectedUsages) {
+      const alternatives = acceptedReadingsForUsage(
+        usage.entry,
+        request.recognitionTarget,
+        usage.senseNumbers,
+      );
+      const toJudge: AdditionalAcceptedReadingResolution[] = [];
+      for (const alternative of alternatives) {
+        // Equivalent entries may share the encountered pronunciation. Retain its entry/sense
+        // provenance without asking AI to reject a reading established by the source/acquisition.
+        if (kanaScriptsMatch(alternative.kanaReading, request.kanaReading)) {
+          if (usage.entry.id !== selectedEntry.id) acceptedReadings.push(alternative);
+          continue;
+        }
+        const form = usage.entry.kana.find(({ text }) => text === alternative.kanaReading)!;
+        if (hasRejectedReadingTag(form.tags)) {
+          readingDecisions.push({
+            jmdictId: usage.entry.id,
+            kanaReading: alternative.kanaReading,
+            decision: "omit",
+            rationale: `JMDict reading tags: ${form.tags.join(", ")}.`,
+          });
+        } else if (
+          !toJudge.some(({ kanaReading }) => kanaScriptsMatch(kanaReading, alternative.kanaReading))
+        ) {
+          // JMDict may list both scripts (e.g. 樺: かば/カバ). Judge the pronunciation once,
+          // choosing the first eligible form in JMDict order after tag exclusions.
+          toJudge.push(alternative);
+        }
+      }
+      if (toJudge.length === 0) continue;
+      if (encounteredReading === undefined) {
+        throw new Error(
+          `Selected senses in entry ${selectedEntry.id} do not all support encountered reading ${request.kanaReading}`,
+        );
+      }
+      const result = await selectReadings({
+        context,
+        recognitionTarget: request.recognitionTarget,
+        jmdictEntry: selectedEntry,
+        senseNumbers: applicableSenseNumbers,
+        encountered: await getReadingEvidence(
+          request.recognitionTarget,
+          encounteredReading.kanaReading,
+        ),
+        alternatives: await Promise.all(
+          toJudge.map(({ kanaReading }) =>
+            getReadingEvidence(request.recognitionTarget, kanaReading)
+          ),
+        ),
+        ...(usage.entry.id === selectedEntry.id ? {} : { alternativeUsage: usage }),
+      }, options);
+      modelConfigurationIds.push(result.metadata.modelConfigurationId);
+      for (const decision of result.value.decisions) {
+        readingDecisions.push({ ...decision, jmdictId: usage.entry.id });
+        if (decision.decision === "include") {
+          acceptedReadings.push(
+            toJudge.find(({ kanaReading }) => kanaReading === decision.kanaReading)!,
+          );
+        }
+      }
+    }
     // Reading is shown only on the back, so every sense reachable through the exact front-side
     // spelling remains a contrast even when it uses another reading. The same rule applies across
     // entries. Automatic `～` notation also removes only competitors with a different affix
@@ -434,9 +501,10 @@ export async function selectJMDictEntry(
       generatedAt: new Date().toISOString(),
       candidateJMDictIds: request.candidateEntries.map(({ id }) => id).toSorted(),
       allowedJMDictIds: [...request.allowedJMDictIds].toSorted(),
-      ...(distinctAdditionalAcceptedReadings.length === 0 ? {} : {
-        additionalAcceptedReadings: distinctAdditionalAcceptedReadings,
+      ...(acceptedReadings.length === 0 ? {} : {
+        additionalAcceptedReadings: acceptedReadings,
       }),
+      ...(readingDecisions.length === 0 ? {} : { readingDecisions }),
       modelConfigurationIds: distinctModelConfigurationIds,
     };
   }

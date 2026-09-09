@@ -1,7 +1,68 @@
 {
   "schemaVersion": 1,
-  "description": "Tracked judgments about whether otherwise valid same-entry readings are useful enough to accept on one recognition card. The encountered reading is always retained and is therefore absent from expected decisions.",
+  "description": "Tracked judgments about whether otherwise valid readings are useful enough to accept on one recognition card. The encountered reading is always retained and is therefore absent from expected decisions.",
   "cases": [
+    {
+      "id": "animecards-reading-cross-entry-後継",
+      "provenance": {
+        "corpus": "Animecards conversion audit — それでも、日本人は「戦争」を選んだ",
+        "sourceNoteId": 1788226601148,
+        "artifact": "anki_updater_prototype/generated/surfacepro11-live-2026-09-08.context.enriched.json"
+      },
+      "input": {
+        "context": "桂太郎が組織を準備していた立憲同志会、その<mark>後継</mark>政党である憲政会、そのまた<mark>後継</mark>である民政党に属して、政党を支えた政治家でもあった。",
+        "recognitionTarget": "後継",
+        "jmdictId": "1269590",
+        "senseNumbers": [1, 2],
+        "encountered": { "kanaReading": "こうけい", "bccwjFrequencyPerMillion": null },
+        "alternatives": [{ "kanaReading": "あとつぎ", "bccwjFrequencyPerMillion": null }],
+        "alternativeUsage": { "jmdictId": "1383690", "senseNumbers": [1, 2] }
+      },
+      "expected": {
+        "decisions": [
+          {
+            "kanaReading": "あとつぎ",
+            "decision": "omit",
+            "rationale": "こうけい is the conventional reading for successor political parties and 後継政党. The heir/successor reading あとつぎ is not interchangeable in this construction."
+          }
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Isolates reading suitability after the broad semantic grouping proposed by entry selection; does not endorse the grouping of every heir sense."
+      }
+    },
+    {
+      "id": "design-reading-cross-entry-後々",
+      "provenance": {
+        "corpus": "Design-policy control with constructed context",
+        "artifact": "DESIGN.md#equivalent-senses-split-across-entries"
+      },
+      "input": {
+        "context": "<mark>後々</mark>困ることになる。",
+        "recognitionTarget": "後々",
+        "jmdictId": "1578610",
+        "senseNumbers": [1],
+        "encountered": { "kanaReading": "あとあと", "bccwjFrequencyPerMillion": null },
+        "alternatives": [{ "kanaReading": "のちのち", "bccwjFrequencyPerMillion": null }],
+        "alternativeUsage": { "jmdictId": "2841372", "senseNumbers": [1] }
+      },
+      "expected": {
+        "decisions": [
+          {
+            "kanaReading": "のちのち",
+            "decision": "include",
+            "rationale": "Both ordinary pronunciations express the same future/later association in this context."
+          }
+        ]
+      },
+      "evaluation": {
+        "promptOverlap": false,
+        "referenceBasis": "agent-reviewed",
+        "reviewNote": "Positive cross-entry control derived from the documented product policy, not a newly user-reviewed corpus sentence."
+      }
+    },
     {
       "id": "animecards-reading-1285830-刻々",
       "provenance": {

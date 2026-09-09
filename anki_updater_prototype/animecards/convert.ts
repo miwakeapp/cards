@@ -4,6 +4,7 @@ import { compatibleSenseNumbersForJMDictUsage } from "card_creator/jmdict";
 import type { CardFields } from "card_model";
 import { readingAppliesToKanji } from "data";
 import { toHiragana } from "japanese_text";
+import { hasRejectedReadingTag } from "../shared/reading_evidence.ts";
 import {
   deriveLookupSpellings,
   findAllEntriesBySpelling,
@@ -314,13 +315,11 @@ function distinctAdditionalReadings(
   }));
 }
 
-const AUTOMATICALLY_REJECTED_READING_TAGS = new Set(["ok", "rk", "sk"]);
-
 /**
  * Rejects readings that JMDict explicitly marks as unsuitable automatic alternatives.
  *
  * The lead reading has already been selected from source ruby or the Animecard and is deliberately
- * exempt: encounter evidence outranks these form tags. A future focused operation can judge the
+ * exempt: encounter evidence outranks these form tags. Focused reading selection judges the
  * remaining alternatives using frequency, dictionary commonness, register, and collocation.
  */
 function automaticallyAcceptedReadings(
@@ -336,9 +335,7 @@ function automaticallyAcceptedReadings(
   return canonicalApplicableReadings(entry, recognitionTarget).filter((reading) =>
     reading !== leadReading &&
     !kanaScriptsMatch(reading, leadReading) &&
-    entry.kana.some(({ tags, text }) =>
-      text === reading && !tags.some((tag) => AUTOMATICALLY_REJECTED_READING_TAGS.has(tag))
-    ) &&
+    entry.kana.some(({ tags, text }) => text === reading && !hasRejectedReadingTag(tags)) &&
     arraysEqual(
       compatibleSenseNumbersForJMDictUsage(entry, recognitionTarget, reading),
       leadSenses,
@@ -1059,6 +1056,10 @@ export async function convertAnimecardsNote(
         entry.id,
         selectedReading,
       ).filter((candidate) =>
+        !entrySelectionOverride?.readingDecisions?.some((decision) =>
+          decision.jmdictId === candidate.jmdictId &&
+          kanaScriptsMatch(decision.kanaReading, candidate.kanaReading)
+        ) &&
         !reviewedAdditionalReadings.some((reviewed) =>
           reviewed.jmdictId === candidate.jmdictId &&
           kanaScriptsMatch(reviewed.kanaReading, candidate.kanaReading)
@@ -1115,6 +1116,9 @@ export async function convertAnimecardsNote(
             ) ?? null,
             candidateJMDictIds: entrySelectionOverride.candidateJMDictIds,
             allowedJMDictIds: entrySelectionOverride.allowedJMDictIds,
+            ...(entrySelectionOverride.readingDecisions === undefined ? {} : {
+              readingDecisions: entrySelectionOverride.readingDecisions,
+            }),
           },
         }),
         original: await snapshotNote(note),

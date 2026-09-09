@@ -71,11 +71,15 @@ export const CARD_CREATOR_TEST_IDS: ReadonlySet<string> = new Set([
  * belong in the furigana fixture just as the direct `card_creator` test records do.
  */
 export const ANIMECARDS_CONVERTER_TEST_IDS: ReadonlySet<string> = new Set([
+  "1269590", // 後継, こうけい
   "1313600", // 事もなげに
+  "1383690", // 後継, あとつぎ
   "1565480", // 嗅ぐ
+  "1578610", // 後々, あとあと
   "1597200", // 頼る
   "2188630", // 見当もつかない
   "2548280", // のしのしと歩く
+  "2841372", // 後々, のちのち
 ]);
 
 /** Entry IDs whose placement records are copied into `test/fixtures/jmdict_furigana.json`. */

@@ -9,10 +9,10 @@ export type {
   HintGenerationInput,
   HintGenerationOutcome,
   InsufficientHintEvidence,
-  JMDictUsageReference,
   NoHintNeeded,
   SourceGroundedHint,
 } from "./hint.ts";
+export type { JMDictUsageReference } from "./jmdict_prompt.ts";
 export {
   effectiveReasoningEffort,
   FIELD_GENERATION_OPERATIONS,

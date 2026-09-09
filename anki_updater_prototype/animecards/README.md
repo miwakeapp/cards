@@ -21,7 +21,9 @@ Pass `--include-sourceless` to convert notes for which neither the Animecard nor
 
 Anki must be running with the Animecards and Miwake note types installed. Both note types must have one card template, because that lets Anki retain the existing card ID and review history during the model change. The installed AnkiConnect must provide `updateNoteModel`; version 25.11.9.0 is known to provide it.
 
-Additional-reading enrichment uses the local BCCWJ index. Run `deno task --cwd data update:rarity` once to download and build it, or `deno task --cwd data build:rarity` when the ignored raw inputs already exist.
+Equivalent meanings across entries do not automatically justify teaching all their pronunciations. Entry selection applies the same reading-tag exclusions and focused reading-selection operation as same-entry enrichment, supplying each alternative's own entry and selected senses. The encountered reading is protected. Omitted alternatives contribute neither a Reading item nor an extra Key/Dictionary entry; the report retains each decision and rationale. A failed reading judgment defers conversion.
+
+Additional-reading enrichment and entry selection use the local BCCWJ index. Run `deno task --cwd data update:rarity` once to download and build it, or `deno task --cwd data build:rarity` when the ignored raw inputs already exist.
 
 From `anki_updater_prototype/`:
 

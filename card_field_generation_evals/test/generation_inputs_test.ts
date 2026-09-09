@@ -2,6 +2,7 @@ import { assertEquals, assertNotEquals } from "@std/assert";
 import { generationCacheKey } from "card_field_generation";
 import { type JMDictWord, preextractedJMDictEntry } from "data";
 import { evalFixtureHashContent, evalFixtureSetHashContent } from "../src/generation_inputs.ts";
+import { loadEvalFixtures } from "../src/fixtures.ts";
 import type { HintFixture, SenseSelectionFixture } from "../src/types.ts";
 
 const PROVENANCE = {
@@ -95,4 +96,23 @@ Deno.test("hint and selected-set hashes track contrasting JMDict prompt semantic
     ),
     baselineSetHash,
   );
+});
+
+Deno.test("cross-entry reading hashes track the alternative entry's senses and reading metadata", async () => {
+  const fixture = (await loadEvalFixtures()).find(({ id }) =>
+    id === "animecards-reading-cross-entry-後継"
+  )!;
+  const alternative = await preextractedJMDictEntry("1383690");
+  const baseline = await generationCacheKey(await evalFixtureHashContent(fixture));
+  const withAlternative = (entry: JMDictWord) =>
+    evalFixtureHashContent(
+      fixture,
+      (id) => id === entry.id ? Promise.resolve(entry) : preextractedJMDictEntry(id),
+    );
+  const changedGloss = structuredClone(alternative);
+  changedGloss.sense[1].gloss[0].text = "A different meaning";
+  assertNotEquals(await generationCacheKey(await withAlternative(changedGloss)), baseline);
+  const changedCommonness = structuredClone(alternative);
+  changedCommonness.kana[0].common = !changedCommonness.kana[0].common;
+  assertNotEquals(await generationCacheKey(await withAlternative(changedCommonness)), baseline);
 });

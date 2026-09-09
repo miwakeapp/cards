@@ -53,6 +53,85 @@ Deno.test("readingSelectionMessages expands JMDict reading tags", async () => {
   );
 });
 
+Deno.test("reading selection supplies each cross-entry reading's own senses and metadata", async () => {
+  const input = {
+    context: "その<mark>後継</mark>政党である憲政会。",
+    recognitionTarget: "後継",
+    jmdictEntry: await preextractedJMDictEntry("1269590"),
+    senseNumbers: [1],
+    encountered: { kanaReading: "こうけい", bccwjFrequencyPerMillion: 1.5 },
+    alternatives: [{ kanaReading: "あとつぎ", bccwjFrequencyPerMillion: 0.5 }],
+    alternativeUsage: { entry: await preextractedJMDictEntry("1383690"), senseNumbers: [2] },
+  };
+  const [message] = await readingSelectionMessages(input);
+  if (message.role !== "user" || typeof message.content !== "string") {
+    throw new Error("Expected user text");
+  }
+  assertEquals(message.content.includes('"id": "1269590"'), true);
+  const alternativeSection =
+    message.content.split("Equivalent JMDict usage supporting the alternatives:\n")[1];
+  assertEquals(alternativeSection.includes('"id": "1383690"'), true);
+  assertEquals(alternativeSection.includes('"number": 2'), true);
+  assertEquals(alternativeSection.includes('"inheritor"'), false);
+  assertEquals(JSON.parse(alternativeSection.split("Alternative readings to judge:\n")[1]), [{
+    kanaReading: "あとつぎ",
+    bccwjFrequencyPerMillion: 0.5,
+    common: true,
+  }]);
+  const decision = {
+    kanaReading: "あとつぎ",
+    decision: "omit" as const,
+    rationale: "Not the conventional reading in this construction.",
+  };
+  assertEquals(validateReadingSelection(input, { decisions: [decision] }), {
+    decisions: [decision],
+  });
+});
+
+Deno.test("reading selection validates the alternative usage independently", async (t) => {
+  const input = {
+    context: "<mark>後継</mark>政党。",
+    recognitionTarget: "後継",
+    jmdictEntry: await preextractedJMDictEntry("1269590"),
+    senseNumbers: [1],
+    encountered: { kanaReading: "こうけい", bccwjFrequencyPerMillion: null },
+    alternatives: [{ kanaReading: "あとつぎ", bccwjFrequencyPerMillion: null }],
+  };
+  await t.step("wrong spelling", async () => {
+    await assertRejects(
+      async () =>
+        readingSelectionMessages({
+          ...input,
+          alternativeUsage: { entry: await preextractedJMDictEntry("1584660"), senseNumbers: [1] },
+        }),
+      Error,
+      'recognitionTarget "後継" is not one of the exact spellings in alternativeUsage.entry',
+    );
+  });
+  await t.step("invalid senses", async () => {
+    await assertRejects(
+      async () =>
+        readingSelectionMessages({
+          ...input,
+          alternativeUsage: { entry: await preextractedJMDictEntry("1383690"), senseNumbers: [3] },
+        }),
+      Error,
+      "alternativeUsage.senseNumbers",
+    );
+  });
+  await t.step("reading must belong to the alternative entry", async () => {
+    await assertRejects(
+      async () =>
+        readingSelectionMessages({
+          ...input,
+          alternativeUsage: { entry: await preextractedJMDictEntry("1269590"), senseNumbers: [1] },
+        }),
+      Error,
+      'alternatives[0].kanaReading "あとつぎ" is not one of the exact alternativeUsage.entry.kana readings',
+    );
+  });
+});
+
 Deno.test("validateReadingSelection preserves ordered auditable decisions", async () => {
   assertEquals(
     validateReadingSelection(

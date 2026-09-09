@@ -1,5 +1,14 @@
 import { type JMDictTags, jmdictTags, type JMDictWord } from "data";
 
+/** One selected, equivalent, or contrasting JMDict entry/sense combination. */
+export interface JMDictUsageReference {
+  /** JMDict entry containing the referenced usage. */
+  entry: JMDictWord;
+
+  /** Nonempty 1-indexed senses belonging to this usage. */
+  senseNumbers: readonly number[];
+}
+
 /** The semantic JMDict data that models need after deterministic form restrictions are applied. */
 export interface PromptJMDictEntry {
   /** Stable JMDict sequence identifier. */

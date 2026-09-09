@@ -1,0 +1,70 @@
+{
+  "id": "1578610",
+  "kanji": [
+    {
+      "common": false,
+      "text": "後々",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "後後",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "跡々",
+      "tags": []
+    },
+    {
+      "common": false,
+      "text": "跡跡",
+      "tags": []
+    }
+  ],
+  "kana": [
+    {
+      "common": false,
+      "text": "あとあと",
+      "tags": [],
+      "appliesToKanji": [
+        "*"
+      ]
+    }
+  ],
+  "sense": [
+    {
+      "partOfSpeech": [
+        "n",
+        "adv"
+      ],
+      "appliesToKanji": [
+        "*"
+      ],
+      "appliesToKana": [
+        "*"
+      ],
+      "related": [],
+      "antonym": [],
+      "field": [],
+      "dialect": [],
+      "misc": [],
+      "info": [],
+      "languageSource": [],
+      "gloss": [
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "future"
+        },
+        {
+          "lang": "eng",
+          "gender": null,
+          "type": null,
+          "text": "distant future"
+        }
+      ]
+    }
+  ]
+}
