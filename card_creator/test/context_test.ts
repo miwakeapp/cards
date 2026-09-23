@@ -17,6 +17,54 @@ Deno.test("processContextHTML corrects unmarked full-size kana using JMDict read
   );
 });
 
+Deno.test("processContextHTML uses unannotated okurigana to correct incidental ruby", async () => {
+  const readings = new Map<string, readonly string[]>([
+    ["則る", ["のっとる"]],
+    ["突く", ["つつく"]],
+  ]);
+  const options = {
+    resolveRubyReadings: (spelling: string) => Promise.resolve(readings.get(spelling) ?? []),
+  };
+  // 『辞書を編む』 uses full-size kana in partial ruby; the following particle is not
+  // part of the spelling. Correct only what dictionary evidence supports.
+  assertEquals(
+    await processContextHTML(
+      "ルールに<ruby>則<rt>のつと</rt></ruby>ることはもちろんだし、<mark>にこやか</mark>に接する。",
+      "にこやか",
+      ["にこやか"],
+      options,
+    ),
+    "ルールに 則[のっと]ることはもちろんだし、<mark>にこやか</mark>に接する。",
+  );
+  assertEquals(
+    await processContextHTML(
+      "<ruby>則<rt>のつと</rt>る</ruby>ことはもちろんだし、<mark>にこやか</mark>に接する。",
+      "にこやか",
+      ["にこやか"],
+      options,
+    ),
+    "則[のっと]ることはもちろんだし、<mark>にこやか</mark>に接する。",
+  );
+  assertEquals(
+    await processContextHTML(
+      "<ruby>則<rt>のつと</rt></ruby>った。<mark>にこやか</mark>。",
+      "にこやか",
+      ["にこやか"],
+      options,
+    ),
+    "則[のつと]った。<mark>にこやか</mark>。",
+  );
+  assertEquals(
+    await processContextHTML(
+      "<ruby>突<rt>つつ</rt></ruby>く。<mark>にこやか</mark>。",
+      "にこやか",
+      ["にこやか"],
+      options,
+    ),
+    "突[つつ]く。<mark>にこやか</mark>。",
+  );
+});
+
 Deno.test("processContextHTML accepts marked ruby matching any accepted reading", async () => {
   assertEquals(
     await processContextHTML(

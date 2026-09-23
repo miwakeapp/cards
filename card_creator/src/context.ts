@@ -416,12 +416,24 @@ function normalizeForeignRubyReading(base: string, reading: string): string {
 async function canonicalUnmarkedRubyReading(
   component: RubyComponent,
   resolveRubyReadings: RubyReadingResolver,
+  followingKana: string,
 ): Promise<string> {
   if (!hasPotentialFullSizeKanaArtifact(component.reading)) {
     return component.reading;
   }
 
-  const dictionaryReadings = await resolveRubyReadings(component.base);
+  const dictionaryReadings = [...await resolveRubyReadings(component.base)];
+  // Partial ruby often omits okurigana: `則[のつと]る` needs the entry for `則る`, not
+  // `則`. Try each kana prefix so following particles do not hide a dictionary form.
+  // Only strip a suffix when the dictionary reading actually contains that same suffix.
+  for (let end = 1; end <= followingKana.length; ++end) {
+    const suffix = followingKana.slice(0, end);
+    for (const reading of await resolveRubyReadings(component.base + suffix)) {
+      if (toHiragana(reading).endsWith(toHiragana(suffix))) {
+        dictionaryReadings.push(reading.slice(0, -suffix.length));
+      }
+    }
+  }
   const exact = dictionaryReadings.find((reading) =>
     toHiragana(reading) === toHiragana(component.reading)
   );
@@ -614,7 +626,10 @@ export async function processContextHTML(
     }
   }
 
-  for (const analysis of analyses.values()) {
+  for (const [ruby, analysis] of analyses) {
+    const next = ruby.nextSibling;
+    const followingKana = (analysis.trailingBase + (next !== null && isText(next) ? next.data : ""))
+      .match(/^[ぁ-ゖァ-ヺー]+/u)?.[0] ?? "";
     if (
       analysis.components.every(({ readingElement }) => !canonicalReadings.has(readingElement))
     ) {
@@ -631,6 +646,7 @@ export async function processContextHTML(
       const canonicalReading = await canonicalUnmarkedRubyReading(
         component,
         resolveRubyReadings,
+        component === analysis.components.at(-1) ? followingKana : "",
       );
       if (canonicalReading !== component.reading) {
         canonicalReadings.set(component.readingElement, canonicalReading);
