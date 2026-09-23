@@ -248,25 +248,26 @@ function findEPUBContexts(
         const paragraphs = paragraphSpanAt(documentParagraphs, start, start + context.length);
         const firstIndex = paragraphs[0].index;
         const lastIndex = paragraphs.at(-1)!.index;
-        const dialogueSpan = dialogueExpansionSpan(
-          documentText,
-          start,
-          start + context.length,
+        let window = documentParagraphs.filter((paragraph) =>
+          paragraph.index >= firstIndex - 3 && paragraph.index <= lastIndex + 3
         );
-        const dialogueParagraphs = dialogueSpan === null
-          ? []
-          : paragraphSpanAt(documentParagraphs, dialogueSpan.start, dialogueSpan.end);
-        const windowFirstIndex = Math.min(
-          firstIndex - 3,
-          dialogueParagraphs[0]?.index ?? firstIndex,
-        );
-        const windowLastIndex = Math.max(
-          lastIndex + 3,
-          dialogueParagraphs.at(-1)?.index ?? lastIndex,
-        );
-        const window = documentParagraphs.filter((paragraph) =>
-          paragraph.index >= windowFirstIndex && paragraph.index <= windowLastIndex
-        );
+        // The surrounding window must not cut an unrelated quotation either: an unmatched
+        // closing quote before the target would poison its boundary validation. Expanding to
+        // whole paragraphs can expose another quotation, so continue until the bounds stabilize.
+        const offsets = paragraphOffsets(documentParagraphs);
+        while (true) {
+          const windowStart = offsets.find(({ paragraph }) => paragraph === window[0])!.start;
+          const windowEnd = offsets.find(({ paragraph }) => paragraph === window.at(-1))!.end;
+          const dialogueSpan = dialogueExpansionSpan(documentText, windowStart, windowEnd);
+          if (dialogueSpan === null) break;
+          const expanded = paragraphSpanAt(
+            documentParagraphs,
+            dialogueSpan.start,
+            dialogueSpan.end,
+          );
+          if (expanded.length === window.length) break;
+          window = expanded;
+        }
         const windowDocumentStart = documentParagraphs
           .filter((paragraph) => paragraph.index < window[0].index)
           .reduce((sum, paragraph) => sum + paragraph.plainText.length, 0);

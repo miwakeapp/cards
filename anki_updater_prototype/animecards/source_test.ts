@@ -332,6 +332,41 @@ Deno.test("EPUB context analysis retains positions through identical sentence ex
   );
 });
 
+Deno.test("EPUB context windows retain the opening of an earlier cross-paragraph quotation", () => {
+  // 『辞書を編む』, cSN.xhtml: the three-paragraph lookbehind starts at the closing
+  // paragraph of an unrelated conversation. The later 収斂 sentence is complete as-is.
+  const sentence =
+    "ともあれ、食事時の私たちの話題は、こんなふうに、必ずことばの話に収斂していきます。";
+  const paragraphs = [
+    "「今日、ここへ来る前に、新宿に寄ったんですがね、そこでこんな看板を見かけました。",
+    "許可なく小田急百貨店の敷地内において次の行為を禁止します。",
+    "•寝そべり・すわり・ダンボール等を敷き、かこい込むこと",
+    "『寝そべり』『座り』という名詞があるんですね。『寝そべる』『座る』の名詞形と考えていいでしょうか」",
+    "「さあ、どうでしょう。まだ一般化してはいないように思いますけど」",
+    "左右の席から、またしても遠慮がちな否定の意見が出ます。どうも、あまり役に立つ話ができません。",
+    sentence,
+  ].map((text, index) => ({ html: text, plainText: text, index, document: "cSN.xhtml" }));
+  const analysis = analyzeEPUBContext(
+    {
+      sources: [{
+        name: "辞書を編む",
+        documents: [paragraphs.map((p) => p.plainText).join("")],
+        paragraphs,
+      }],
+    },
+    sentence,
+    "辞書を編む",
+  );
+  assertEquals(analysis.status, "complete");
+  if (analysis.status !== "complete") throw new Error("Expected complete source context");
+  assertEquals(analysis.match.window, paragraphs);
+  assertEquals(validateEPUBContextSelection(analysis.match, sentence, sentence), sentence);
+  assertEquals(
+    validateEPUBContextSelection(analysis.match, "必ずことばの話に収斂していきます。", sentence),
+    null,
+  );
+});
+
 Deno.test("EPUB context analysis expands a good sentence to its full dialogue", () => {
   const paragraph = {
     html:
