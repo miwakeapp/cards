@@ -36,7 +36,7 @@ const REASON_LABELS: Record<string, { title: string; explain?: string }> = {
   "redundant-british-glosses": {
     title: "Redundant British English glosses removed",
     explain:
-      "British spellings were removed only where the same sense already includes an otherwise-identical American English gloss.",
+      "British spellings were removed only where they duplicate an American English gloss in the same sense, another item in a parenthetical list, or the word or phrase immediately before parentheses.",
   },
   "single-sense": {
     title: "Single-sense entries, wording updated",

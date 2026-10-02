@@ -5,8 +5,7 @@
 
 import type { JMdictGloss, JMdictWord } from "@scriptin/jmdict-simplified-types";
 import { renderDictionaryField, splitDictionaryField } from "card_model/dictionary";
-import { renderEntry } from "jmdict_to_html";
-import { translate } from "translate-american-british-english";
+import { filterRedundantBritishEnglishGlosses, renderEntry } from "jmdict_to_html";
 import type { MiwakeNoteSnapshot } from "./anki.ts";
 import {
   alignSenses,
@@ -522,26 +521,17 @@ function areOnlyRedundantBritishEnglishGlossesRemoved(
   after: readonly string[],
   currentGlosses: JMdictGloss[],
 ): boolean {
-  const americanized = currentGlosses.map((gloss) => americanize(gloss.text));
-  const unchangedEnglishGlosses = new Set(
-    currentGlosses.flatMap((gloss, index) =>
-      gloss.lang === "eng" && gloss.text === americanized[index] ? [gloss.text] : []
-    ),
-  );
-  const filtered = currentGlosses.filter((gloss, index) =>
-    gloss.lang !== "eng" ||
-    gloss.text === americanized[index] ||
-    !unchangedEnglishGlosses.has(americanized[index])
-  ).map((gloss) => gloss.text);
-  const unfiltered = currentGlosses.map((gloss) => gloss.text);
-
-  return sameStrings(before, unfiltered) &&
-    !sameStrings(before, after) &&
-    sameStrings(after, filtered);
-}
-
-function americanize(text: string): string {
-  return translate(text, { american: true });
+  // Stored cards may already omit separate British glosses from an earlier rendering.
+  const storedGlosses: JMdictGloss[] = [];
+  for (const text of before) {
+    const gloss = currentGlosses.find((candidate) => candidate.text === text);
+    if (gloss === undefined) {
+      return false;
+    }
+    storedGlosses.push(gloss);
+  }
+  const filtered = filterRedundantBritishEnglishGlosses(storedGlosses).map((gloss) => gloss.text);
+  return !sameStrings(before, after) && sameStrings(after, filtered);
 }
 
 function sameStrings(first: readonly string[], second: readonly string[]): boolean {

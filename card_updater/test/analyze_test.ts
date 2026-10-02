@@ -612,6 +612,46 @@ Deno.test("analyzeCard: retarget when a British gloss cleanup accompanies a text
   assertEquals(card.needsAI, true);
 });
 
+Deno.test("analyzeCard: groups parenthetical cleanup on cards with earlier British filtering", async () => {
+  const word = makeWord({
+    senses: [
+      { glosses: ["behavior", "behaviour", "casual laborer (labourer)"] },
+      { glosses: ["worker"] },
+    ],
+  });
+  const dictionary = renderDictionary(word).replace(
+    "<li>casual laborer</li>",
+    "<li>casual laborer (labourer)</li>",
+  );
+  const note = makeNote({ key: "言葉 | 1000000:1", dictionary });
+  const card = await analyzeCard(note, entriesById(word));
+  assertEquals(card.verdict, "routine");
+  assertEquals(card.reason, "redundant-british-glosses");
+  assertEquals(card.needsAI, false);
+});
+
+Deno.test("analyzeCard: does not hide other changes behind parenthetical cleanup", async () => {
+  const before = makeWord({
+    senses: [{ glosses: ["casual laborer (labourer)", "worker"] }, { glosses: ["person"] }],
+  });
+  const dictionary = renderDictionary(before).replace(
+    "<li>casual laborer</li>",
+    "<li>casual laborer (labourer)</li>",
+  );
+  const note = makeNote({ key: "言葉 | 1000000:1", dictionary });
+  for (
+    const senses of [
+      [{ glosses: ["casual laborer (labourer)"] }, { glosses: ["person"] }],
+      [{ glosses: ["casual laborer (labourer)", "worker", "employee"] }, { glosses: ["person"] }],
+      [{ glosses: ["casual laborer (labourer)", "worker"], misc: ["uk"] }, { glosses: ["person"] }],
+    ]
+  ) {
+    const card = await analyzeCard(note, entriesById(makeWord({ senses })));
+    assertEquals(card.verdict, "retarget");
+    assertEquals(card.reason, "target-changed");
+  }
+});
+
 Deno.test("analyzeCard: retarget when a targeted sense's text changed", async () => {
   const reworded = makeWord({
     id: "1226200",
