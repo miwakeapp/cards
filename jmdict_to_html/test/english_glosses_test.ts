@@ -43,6 +43,86 @@ Deno.test("filterRedundantBritishEnglishGlosses requires an exact same-language 
   assertEquals(filterRedundantBritishEnglishGlosses(glosses), glosses);
 });
 
+Deno.test("filterRedundantBritishEnglishGlosses removes adjacent parenthetical spelling aliases", () => {
+  const cases = [
+    ["laborer (labourer)", "laborer"],
+    ["casual laborer (labourer)", "casual laborer"],
+    ["inner center (centre)", "inner center"],
+    ["imprisonment with hard labor (hard labour)", "imprisonment with hard labor"],
+    ["to grow dull in color (colour)", "to grow dull in color"],
+    ["to apologize (apologise) to someone", "to apologize to someone"],
+    ["color (colour), flavor (flavour)", "color, flavor"],
+    ["color (colour) (colour)", "color"],
+    ["paint (a bright color (colour))", "paint (a bright color)"],
+  ];
+  const input = cases.map(([before]) => gloss(before));
+  const snapshot = structuredClone(input);
+  const result = filterRedundantBritishEnglishGlosses(input);
+  assertEquals(result.map(({ text }) => text), cases.map(([, after]) => after));
+  assertEquals(input, snapshot);
+  assertEquals(filterRedundantBritishEnglishGlosses(result), result);
+});
+
+Deno.test("filterRedundantBritishEnglishGlosses preserves explanations and nonadjacent variants", () => {
+  const input = [
+    "bright (colour)",
+    "to harbor (suspicion, doubt, etc.)",
+    "color (colour of the sea)",
+    "orange (colour, color of the peel)",
+    "to lower one's center of gravity (centre)",
+    "discolor (colour)",
+    "watercolor (colour)",
+    "color (colour)ful",
+    "colour (colour)",
+    "colour (color)",
+    "color (color)",
+  ].map((text) => gloss(text));
+  input.push({ ...gloss("laborer (labourer)", "ger"), type: "literal" });
+  for (const candidate of input) {
+    assertEquals(filterRedundantBritishEnglishGlosses([candidate]), [candidate]);
+  }
+});
+
+Deno.test("filterRedundantBritishEnglishGlosses removes exact duplicates in parenthetical lists", () => {
+  const cases = [
+    ["orange (color, colour)", "orange (color)"],
+    ["orange (colour, color)", "orange (color)"],
+    ["orange (color,colour)", "orange (color)"],
+    ["orange(color,colour)", "orange(color)"],
+    ["(color, colour) gradation", "(color) gradation"],
+    [
+      "to become confused (disconcerted, disorganized, disorganised)",
+      "to become confused (disconcerted, disorganized)",
+    ],
+    ["paint (color, colour, flavor, flavour)", "paint (color, flavor)"],
+    ["paint (color, colour, etc.)", "paint (color, etc.)"],
+    ["paint (bright colour, bright color)", "paint (bright color)"],
+    ["shade (of colour, color)", "shade (of colour, color)"],
+    ["program (e.g. theatre, theater)", "program (e.g. theatre, theater)"],
+    ["colour (color, color)", "colour (color, color)"],
+  ];
+  for (const [before, after] of cases) {
+    const input = [gloss(before)];
+    const output = filterRedundantBritishEnglishGlosses(input);
+    assertEquals(output, [gloss(after)]);
+    assertEquals(filterRedundantBritishEnglishGlosses(output), output);
+    assertEquals(input, [gloss(before)]);
+    const nonEnglish = [gloss(before, "ger")];
+    assertEquals(filterRedundantBritishEnglishGlosses(nonEnglish), nonEnglish);
+  }
+});
+
+Deno.test("filterRedundantBritishEnglishGlosses compares separate glosses after parentheses", () => {
+  const input: JMdictGloss[] = [
+    gloss("casual labourer"),
+    { ...gloss("casual laborer (labourer)"), type: "literal" },
+  ];
+  assertEquals(filterRedundantBritishEnglishGlosses(input), [{
+    ...input[1],
+    text: "casual laborer",
+  }]);
+});
+
 Deno.test("renderEntry compares British and American spellings within each sense", () => {
   const word = {
     id: "9999999",
