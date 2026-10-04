@@ -94,9 +94,11 @@ After that setup is complete, the unobtrusive indicator changes color. From now 
 
 - **Hint** (optional): a sparingly-used disambiguation field for when the recognition target alone does not make the intended meaning clear. It is a short Japanese phrase or fragment drawn from the original encounter. A hint is omitted when there is nothing meaningful to distinguish or when the source does not support a fair short clue. AI can generate it initially ✨, but users can edit it, and maintenance never replaces an existing hint without explicit review. See the [generated hint policy](#generated-hint-policy) for details.
 
-- **Full context**: the original complete passage in which the term was encountered. Uses `<mark>` for the term in question.
+- **Full context**: normally, the full original sentence in which the term was encountered. Uses `<mark>` for the term in question.
 
-  - This is extracted from the content being read ✨ automatically. It contains at least one complete sentence or natural complete utterance. When that is not understandable by itself, the extractor adds the smallest useful amount of adjacent context, normally stopping after two or three sentences. (See [expanding unhelpful context](#expanding-unhelpful-context).)
+  - This is extracted from the content being read ✨ automatically to provide a natural example of the word's use. Usually the containing sentence is sufficient. Occasionally, a brief reaction or fragmentary dialogue reply benefits from adjacent text that makes its use clear. (See [expanding unhelpful context](#expanding-unhelpful-context).)
+
+  - Full context preserves the complete source sentence even when it is long; Minimized context provides a shorter version for routine review.
 
   - Dialogue should normally include its opening and closing quotation marks. Exceptionally long dialogue can be elided at paragraph boundaries: keep the target paragraph, add one adjacent paragraph when the target paragraph is too short to stand alone, and use the Japanese ellipsis `……` to make omitted text explicit while retaining balanced quotation marks.
 
@@ -484,15 +486,25 @@ Tightly bound material that completes the encountered verb form belongs inside t
 
 ### Expanding unhelpful context
 
+The containing sentence is the starting point for Full context. Most sentences already provide a useful vocabulary example; occasionally, adjacent text supplies an important part of the usage, particularly for interjections, brief reactions, and fragmentary dialogue replies.
+
 Consider [途方にくれる](https://takoboto.jp/?w=1854560) in the sentence:
 
 > 途方にくれた。
 
-This contains too little information to remind the learner what prompted the reaction. A representative surrounding passage might instead look like:
+Here, a nearby description of the predicament can give the expression a concrete setting:
 
 > 終電はもう出た後で、タクシーに乗るお金もなかった。途方にくれた。
 
-The context extractor should start with the containing sentence, then pull in adjacent sentences until pronouns, omitted subjects, reactions, and causal links are understandable, normally stopping after two or three sentences. The expanded passage belongs in **Full context**. The minimizer can then produce a compact, self-contained version such as 終電はもう出た後でタクシー代もなく、途方にくれた。 for routine review. It must not invent facts that are absent from the available source. If the available surrounding text still does not resolve the ambiguity, acquisition should defer with an "insufficient source context" reason; a later dictionary update cannot restore context that was never captured.
+The expanded passage illustrates being at a loss about what to do. A dialogue reply can similarly benefit from the question it answers. When expansion is useful, retain the smallest contiguous source passage that supplies that setting, usually one adjacent sentence or turn.
+
+Other short sentences already show the word in a natural, intelligible use:
+
+> 吉報は突然にもたらされました。
+
+This is sufficient for 吉報 without explaining what the news was. Likewise, a sentence describing 南米 as an animal's habitat can illustrate 南米 or 生息地 without identifying the animal. The criterion is whether the passage works as a usage example, rather than whether it explains every reference or establishes the word's definition.
+
+Expansion and minimization serve different purposes. Full context preserves the selected source passage, while Minimized context can shorten a long sentence or expanded passage for routine review. For the 途方にくれる example, a minimized version could be 終電はもう出た後でタクシー代もなく、途方にくれた。 Broader evidence used to select a dictionary entry or sense can remain separate from these displayed contexts.
 
 ## Appendix: AI-generated field policy
 
