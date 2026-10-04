@@ -1,0 +1,629 @@
+{
+  "date": "2026-10-04",
+  "repositoryCommit": "7df47ce",
+  "origin": "surfacepro11-weekly-2026-10-04.context.enriched.json",
+  "cases": [
+    {
+      "noteId": 1790137845221,
+      "recognitionTarget": "南米",
+      "key": "南米 | 1460570",
+      "category": "overexpansion-negative-example",
+      "source": "飯間浩明『辞書を編む』",
+      "originalExcerpt": "その後、南米が主な生息地であること、成長すると体長１メートル、体重50キロに達することなどを、新聞記事その他によって知りました。",
+      "priorSemanticEvidence": "（ＮＨＫ「ニュース７」２００８年９月12日放送）\n\n映像では犬ぐらいはある大きさなのに、ネズミの仲間なのか、とおもしろく思い、用例データに加えました。その後、南米が主な生息地であること、成長すると体長１メートル、体重50キロに達することなどを、新聞記事その他によって知りました。こうしたカピバラの情報はすべて用例データとして保存しておきます。\n\n集まった用例だけでも、語釈を書くための材料にはなります。それでも、総合的な知識を得るためには、専門の事典類を確認することが欠かせません。",
+      "rationale": "The sentence naturally uses South America as a habitat. The following sentence identifying the animal adds no necessary context. Keep the full original sentence and minimize its long list of facts.",
+      "sourceParagraphs": [
+        {
+          "file": "c1SD.xhtml",
+          "index": 5,
+          "html": "映像では犬ぐらいはある大きさなのに、ネズミの仲間なのか、とおもしろく思い、用例データに加えました。その後、南米が主な生息地であること、成長すると体長１メートル、体重50キロに達することなどを、新聞記事その他によって知りました。こうしたカピバラの情報はすべて用例データとして保存しておきます。",
+          "selectedHTML": "その後、南米が主な生息地であること、成長すると体長１メートル、体重50キロに達することなどを、新聞記事その他によって知りました。"
+        }
+      ],
+      "acceptedFullContext": "その後、<mark>南米</mark>が主な生息地であること、成長すると体長１メートル、体重50キロに達することなどを、新聞記事その他によって知りました。",
+      "acceptedMinimizedContext": "<mark>南米</mark>が主な生息地であることを知りました。",
+      "createCardInput": {
+        "recognitionTarget": "南米",
+        "jmdictUsages": [
+          {
+            "jmdictId": "1460570",
+            "applicableSenseNumbers": null
+          }
+        ],
+        "kanaReadings": [
+          "なんべい"
+        ],
+        "fullContext": "その後、<mark>南米</mark>が主な生息地であること、成長すると体長１メートル、体重50キロに達することなどを、新聞記事その他によって知りました。",
+        "minimizedContext": "<mark>南米</mark>が主な生息地であることを知りました。",
+        "source": {
+          "text": "『辞書を編む』",
+          "lang": "ja"
+        }
+      },
+      "pipelineFullContext": "その後、<mark>南米</mark>が主な生息地であること、成長すると体長１メートル、体重50キロに達することなどを、新聞記事その他によって知りました。",
+      "pipelineMinimizedContext": "<mark>南米</mark>が主な生息地であることを、新聞記事によって知りました。",
+      "overexpansionReview": {
+        "date": "2026-10-04",
+        "disposition": "single-source-sentence",
+        "rationale": "The sentence naturally uses South America as a habitat. The following sentence identifying the animal adds no necessary context. Keep the full original sentence and minimize its long list of facts."
+      },
+      "overexpandedManualFullContext": "その後、<mark>南米</mark>が主な生息地であること、成長すると体長１メートル、体重50キロに達することなどを、新聞記事その他によって知りました。こうしたカピバラの情報はすべて用例データとして保存しておきます。",
+      "previousManualMinimizedContext": "カピバラの主な生息地は<mark>南米</mark>です。"
+    },
+    {
+      "noteId": 1790137853885,
+      "recognitionTarget": "生息地",
+      "key": "生息地 | 1940310",
+      "category": "overexpansion-negative-example",
+      "source": "飯間浩明『辞書を編む』",
+      "originalExcerpt": "その後、南米が主な生息地であること、成長すると体長１メートル、体重50キロに達することなどを、新聞記事その他によって知りました。",
+      "priorSemanticEvidence": "（ＮＨＫ「ニュース７」２００８年９月12日放送）\n\n映像では犬ぐらいはある大きさなのに、ネズミの仲間なのか、とおもしろく思い、用例データに加えました。その後、南米が主な生息地であること、成長すると体長１メートル、体重50キロに達することなどを、新聞記事その他によって知りました。こうしたカピバラの情報はすべて用例データとして保存しておきます。\n\n集まった用例だけでも、語釈を書くための材料にはなります。それでも、総合的な知識を得るためには、専門の事典類を確認することが欠かせません。",
+      "rationale": "The sentence naturally describes an animal's habitat. Identifying the animal is unnecessary to understand 生息地. Keep the full original sentence and minimize its long list of facts.",
+      "sourceParagraphs": [
+        {
+          "file": "c1SD.xhtml",
+          "index": 5,
+          "html": "映像では犬ぐらいはある大きさなのに、ネズミの仲間なのか、とおもしろく思い、用例データに加えました。その後、南米が主な生息地であること、成長すると体長１メートル、体重50キロに達することなどを、新聞記事その他によって知りました。こうしたカピバラの情報はすべて用例データとして保存しておきます。",
+          "selectedHTML": "その後、南米が主な生息地であること、成長すると体長１メートル、体重50キロに達することなどを、新聞記事その他によって知りました。"
+        }
+      ],
+      "acceptedFullContext": "その後、南米が主な<mark>生息地</mark>であること、成長すると体長１メートル、体重50キロに達することなどを、新聞記事その他によって知りました。",
+      "acceptedMinimizedContext": "南米が主な<mark>生息地</mark>であることを知りました。",
+      "createCardInput": {
+        "recognitionTarget": "生息地",
+        "jmdictUsages": [
+          {
+            "jmdictId": "1940310",
+            "applicableSenseNumbers": null
+          }
+        ],
+        "kanaReadings": [
+          "せいそくち"
+        ],
+        "fullContext": "その後、南米が主な<mark>生息地</mark>であること、成長すると体長１メートル、体重50キロに達することなどを、新聞記事その他によって知りました。",
+        "minimizedContext": "南米が主な<mark>生息地</mark>であることを知りました。",
+        "source": {
+          "text": "『辞書を編む』",
+          "lang": "ja"
+        }
+      },
+      "pipelineFullContext": "その後、南米が主な<mark>生息地</mark>であること、成長すると体長１メートル、体重50キロに達することなどを、新聞記事その他によって知りました。",
+      "pipelineMinimizedContext": "南米が主な<mark>生息地</mark>であることを、新聞記事によって知りました。",
+      "overexpansionReview": {
+        "date": "2026-10-04",
+        "disposition": "single-source-sentence",
+        "rationale": "The sentence naturally describes an animal's habitat. Identifying the animal is unnecessary to understand 生息地. Keep the full original sentence and minimize its long list of facts."
+      },
+      "overexpandedManualFullContext": "その後、南米が主な<mark>生息地</mark>であること、成長すると体長１メートル、体重50キロに達することなどを、新聞記事その他によって知りました。こうしたカピバラの情報はすべて用例データとして保存しておきます。",
+      "previousManualMinimizedContext": "カピバラの主な<mark>生息地</mark>は南米です。"
+    },
+    {
+      "noteId": 1790139373440,
+      "recognitionTarget": "粉末",
+      "key": "粉末 | 1504880",
+      "category": "overexpansion-negative-example",
+      "source": "飯間浩明『辞書を編む』",
+      "originalExcerpt": "どうも生で輸入するのがむずかしいらしく、粉末などでしか売っていないようなのです。",
+      "priorSemanticEvidence": "たとえば、「アサイー」という、南米産の丸くて赤黒い果物。私は、ジュースやソフトクリームなどの種類にこの名前があることから、存在に気づきました。『三国』の新規項目として提案した結果、承認されました。\n\n「アサイー」は、事典類で説明されているので、だいたいのところは分かります。でも、現物が手に入りません。どうも生で輸入するのがむずかしいらしく、粉末などでしか売っていないようなのです。これでは、実感に基づいた語釈が書けません。\n\nそこで、次善の策として、インターネットのブログなどで、アサイーを食べた人の記述を集めて回ります。刑事で言えば、聞きこみのようなものです。海外に行って、アサイーを実際に食べたという人が、けっこういます。彼らの生の声を集めるのです。",
+      "rationale": "The contrast between importing something fresh and buying it in powdered form already explains the usage. Its precise identity as acai is incidental, so the original sentence is sufficient.",
+      "sourceParagraphs": [
+        {
+          "file": "c1UP.xhtml",
+          "index": 5,
+          "html": "「アサイー」は、事典類で説明されているので、だいたいのところは分かります。でも、現物が手に入りません。どうも生で輸入するのがむずかしいらしく、粉末などでしか売っていないようなのです。これでは、実感に基づいた語釈が書けません。",
+          "selectedHTML": "どうも生で輸入するのがむずかしいらしく、粉末などでしか売っていないようなのです。"
+        }
+      ],
+      "acceptedFullContext": "どうも生で輸入するのがむずかしいらしく、<mark>粉末</mark>などでしか売っていないようなのです。",
+      "acceptedMinimizedContext": null,
+      "createCardInput": {
+        "recognitionTarget": "粉末",
+        "jmdictUsages": [
+          {
+            "jmdictId": "1504880",
+            "applicableSenseNumbers": null
+          }
+        ],
+        "kanaReadings": [
+          "ふんまつ"
+        ],
+        "fullContext": "どうも生で輸入するのがむずかしいらしく、<mark>粉末</mark>などでしか売っていないようなのです。",
+        "source": {
+          "text": "『辞書を編む』",
+          "lang": "ja"
+        }
+      },
+      "pipelineFullContext": "どうも生で輸入するのがむずかしいらしく、<mark>粉末</mark>などでしか売っていないようなのです。",
+      "pipelineMinimizedContext": "",
+      "overexpandedManualFullContext": "「アサイー」は、事典類で説明されているので、だいたいのところは分かります。でも、現物が手に入りません。どうも生で輸入するのがむずかしいらしく、<mark>粉末</mark>などでしか売っていないようなのです。",
+      "previousManualMinimizedContext": "アサイーは、生で輸入するのがむずかしいらしく、<mark>粉末</mark>などでしか売っていないようです。",
+      "overexpansionReview": {
+        "date": "2026-10-04",
+        "disposition": "single-source-sentence",
+        "rationale": "The contrast between importing something fresh and buying it in powdered form already explains the usage. Its precise identity as acai is incidental, so the original sentence is sufficient."
+      }
+    },
+    {
+      "noteId": 1790221043088,
+      "recognitionTarget": "人相学",
+      "key": "人相学 | 1730830",
+      "category": "overexpansion-negative-example",
+      "source": "飯間浩明『辞書を編む』",
+      "originalExcerpt": "つまり、人相学の用語であることまでは突き止めたが、なぜ「法令」と言うかは分からない、ということでしょう。",
+      "priorSemanticEvidence": "ほうれい‐せん【法令線】ハフレイ―人相学（観相学）で鼻唇溝（びしんこう）のこと。補説語源未詳。中国の面相学では法令紋という。また、長寿のしるしとして豊齢線、豊麗線とも書く。\n\n漢字は「法令線」だそうです。ただし、「語源未詳」とあるのは残念です。つまり、人相学の用語であることまでは突き止めたが、なぜ「法令」と言うかは分からない、ということでしょう。\n\nでは、調べてみましょうか。人相学関係ということまでは分かったのだから、あとは文献を探せばいいわけです。",
+      "rationale": "The original sentence naturally refers to a term in physiognomy. The preceding explanation of which term is incidental; it need not be included to illustrate 人相学.",
+      "sourceParagraphs": [
+        {
+          "file": "c20U.xhtml",
+          "index": 7,
+          "html": "漢字は「法令線」だそうです。ただし、「語源未詳」とあるのは残念です。つまり、人相学の用語であることまでは突き止めたが、なぜ「法令」と言うかは分からない、ということでしょう。",
+          "selectedHTML": "つまり、人相学の用語であることまでは突き止めたが、なぜ「法令」と言うかは分からない、ということでしょう。"
+        }
+      ],
+      "acceptedFullContext": "つまり、<mark>人相学</mark>の用語であることまでは突き止めたが、なぜ「法令」と言うかは分からない、ということでしょう。",
+      "acceptedMinimizedContext": null,
+      "createCardInput": {
+        "recognitionTarget": "人相学",
+        "jmdictUsages": [
+          {
+            "jmdictId": "1730830",
+            "applicableSenseNumbers": null
+          }
+        ],
+        "kanaReadings": [
+          "にんそうがく"
+        ],
+        "fullContext": "つまり、<mark>人相学</mark>の用語であることまでは突き止めたが、なぜ「法令」と言うかは分からない、ということでしょう。",
+        "source": {
+          "text": "『辞書を編む』",
+          "lang": "ja"
+        }
+      },
+      "pipelineFullContext": "つまり、<mark>人相学</mark>の用語であることまでは突き止めたが、なぜ「法令」と言うかは分からない、ということでしょう。",
+      "pipelineMinimizedContext": "<mark>人相学</mark>の用語であることまでは突き止めたが、なぜ「法令」と言うかは分からない。",
+      "overexpansionReview": {
+        "date": "2026-10-04",
+        "disposition": "single-source-sentence",
+        "rationale": "The original sentence naturally refers to a term in physiognomy. The preceding explanation of which term is incidental; it need not be included to illustrate 人相学."
+      },
+      "overexpandedManualFullContext": "漢字は「法令線」だそうです。ただし、「語源未詳」とあるのは残念です。つまり、<mark>人相学</mark>の用語であることまでは突き止めたが、なぜ「法令」と言うかは分からない、ということでしょう。",
+      "previousManualMinimizedContext": "「法令線」は<mark>人相学</mark>の用語だが、なぜ「法令」と言うかは分からない。"
+    },
+    {
+      "noteId": 1790221033054,
+      "recognitionTarget": "未詳",
+      "key": "未詳 | 1527620",
+      "category": "ambiguous-source-location",
+      "source": "飯間浩明『辞書を編む』",
+      "originalExcerpt": "語源未詳",
+      "priorSemanticEvidence": "語源未詳",
+      "rationale": "The complete sentence commenting on 語源未詳 is a natural example of 未詳. Identifying the term whose etymology is unknown is unnecessary. Keep the chosen source occurrence, not the surrounding explanation.",
+      "sourceParagraphs": [
+        {
+          "file": "c20U.xhtml",
+          "index": 7,
+          "html": "漢字は「法令線」だそうです。ただし、「語源未詳」とあるのは残念です。つまり、人相学の用語であることまでは突き止めたが、なぜ「法令」と言うかは分からない、ということでしょう。",
+          "selectedHTML": "ただし、「語源未詳」とあるのは残念です。"
+        }
+      ],
+      "acceptedFullContext": "ただし、「語源<mark>未詳</mark>」とあるのは残念です。",
+      "acceptedMinimizedContext": null,
+      "createCardInput": {
+        "recognitionTarget": "未詳",
+        "jmdictUsages": [
+          {
+            "jmdictId": "1527620",
+            "applicableSenseNumbers": null
+          }
+        ],
+        "kanaReadings": [
+          "みしょう"
+        ],
+        "fullContext": "ただし、「語源<mark>未詳</mark>」とあるのは残念です。",
+        "source": {
+          "text": "『辞書を編む』",
+          "lang": "ja"
+        }
+      },
+      "pipelineFullContext": "語源<mark>未詳</mark>",
+      "pipelineMinimizedContext": "",
+      "overexpandedManualFullContext": "漢字は「法令線」だそうです。ただし、「語源<mark>未詳</mark>」とあるのは残念です。つまり、人相学の用語であることまでは突き止めたが、なぜ「法令」と言うかは分からない、ということでしょう。",
+      "previousManualMinimizedContext": "「法令線」は語源<mark>未詳</mark>です。",
+      "overexpansionReview": {
+        "date": "2026-10-04",
+        "disposition": "single-source-sentence",
+        "rationale": "The complete sentence commenting on 語源未詳 is a natural example of 未詳. Identifying the term whose etymology is unknown is unnecessary. Keep the chosen source occurrence, not the surrounding explanation."
+      }
+    },
+    {
+      "noteId": 1790221241757,
+      "recognitionTarget": "法令遵守",
+      "key": "法令遵守 | 2114590",
+      "category": "overexpansion-negative-example",
+      "source": "飯間浩明『辞書を編む』",
+      "originalExcerpt": "つまり、法令遵守の精神に富んでいる、または、その人の行動そのものが法令のようである、ということでしょう。",
+      "priorSemanticEvidence": "（１９８ページ。原文総ルビ）\n\n石龍子は由緒正しい観相家なので、説明は一応信頼していいでしょう。これによれば、「ほうれい線」が正しい人は、何ごとにも規則正しく、権威があるというのです。つまり、法令遵守の精神に富んでいる、または、その人の行動そのものが法令のようである、ということでしょう。法令に関係する線だから「法令線」と言うと考えられます。「豊麗線」などは当て字ですね。\n\n『大辞泉』の記述を手がかりに、古い文献を確かめて、「ほうれい線」の語源に見当がつきました。私の長い間の疑問もようやく解消されました。",
+      "rationale": "The original sentence already describes a person's law-abiding spirit. The preceding physiognomic claim identifies that person but is unnecessary for understanding 法令遵守.",
+      "sourceParagraphs": [
+        {
+          "file": "c20U.xhtml",
+          "index": 13,
+          "html": "石龍子は由緒正しい観相家なので、説明は一応信頼していいでしょう。これによれば、「ほうれい線」が正しい人は、何ごとにも規則正しく、権威があるというのです。つまり、法令遵守の精神に富んでいる、または、その人の行動そのものが法令のようである、ということでしょう。法令に関係する線だから「法令線」と言うと考えられます。「豊麗線」などは当て字ですね。",
+          "selectedHTML": "つまり、法令遵守の精神に富んでいる、または、その人の行動そのものが法令のようである、ということでしょう。"
+        }
+      ],
+      "acceptedFullContext": "つまり、<mark>法令遵守</mark>の精神に富んでいる、または、その人の行動そのものが法令のようである、ということでしょう。",
+      "acceptedMinimizedContext": null,
+      "createCardInput": {
+        "recognitionTarget": "法令遵守",
+        "jmdictUsages": [
+          {
+            "jmdictId": "2114590",
+            "applicableSenseNumbers": null
+          }
+        ],
+        "kanaReadings": [
+          "ほうれいじゅんしゅ"
+        ],
+        "fullContext": "つまり、<mark>法令遵守</mark>の精神に富んでいる、または、その人の行動そのものが法令のようである、ということでしょう。",
+        "source": {
+          "text": "『辞書を編む』",
+          "lang": "ja"
+        }
+      },
+      "pipelineFullContext": "つまり、<mark>法令遵守</mark>の精神に富んでいる、または、その人の行動そのものが法令のようである、ということでしょう。",
+      "pipelineMinimizedContext": "<mark>法令遵守</mark>の精神に富んでいる、ということでしょう。",
+      "overexpandedManualFullContext": "これによれば、「ほうれい線」が正しい人は、何ごとにも規則正しく、権威があるというのです。つまり、<mark>法令遵守</mark>の精神に富んでいる、または、その人の行動そのものが法令のようである、ということでしょう。",
+      "previousManualMinimizedContext": "「ほうれい線」が正しい人は、<mark>法令遵守</mark>の精神に富んでいるということでしょう。",
+      "overexpansionReview": {
+        "date": "2026-10-04",
+        "disposition": "single-source-sentence",
+        "rationale": "The original sentence already describes a person's law-abiding spirit. The preceding physiognomic claim identifies that person but is unnecessary for understanding 法令遵守."
+      }
+    },
+    {
+      "noteId": 1790749766703,
+      "recognitionTarget": "愚直",
+      "key": "愚直 | 1245180",
+      "category": "overexpansion-negative-example",
+      "source": "飯間浩明『辞書を編む』",
+      "originalExcerpt": "とすれば、愚直に手入れを続けるのは割に合わないとも言えます。",
+      "priorSemanticEvidence": "「ならば、あまり手入れするのはやめよう。面倒くさいじゃないか」\n\n編纂者が、そんな誘惑に駆られたとしても不思議はありません。そして、手入れを怠けたとしても、それが表立って知られることはないでしょう。とすれば、愚直に手入れを続けるのは割に合わないとも言えます。\n\nもちろん、実際の編纂者の姿勢は、これとは正反対で、ごく真面目です。私のように作業が遅れて周囲に迷惑をかけることはあっても、「手入れは、ほどほどでやめておこう」とは決して考えません。どうして手を抜かないかと言えば、それは結局、「自分たちの辞書」を、少しでもいい辞書にしたいから、という一言に尽きます。",
+      "rationale": "The original sentence naturally describes doggedly continuing maintenance despite its poor return. とすれば does not require the preceding causal premise to appear on this vocabulary card.",
+      "sourceParagraphs": [
+        {
+          "file": "c2HR.xhtml",
+          "index": 11,
+          "html": "編纂者が、そんな誘惑に駆られたとしても不思議はありません。そして、手入れを怠けたとしても、それが表立って知られることはないでしょう。とすれば、愚直に手入れを続けるのは割に合わないとも言えます。",
+          "selectedHTML": "とすれば、愚直に手入れを続けるのは割に合わないとも言えます。"
+        }
+      ],
+      "acceptedFullContext": "とすれば、<mark>愚直</mark>に手入れを続けるのは割に合わないとも言えます。",
+      "acceptedMinimizedContext": null,
+      "createCardInput": {
+        "recognitionTarget": "愚直",
+        "jmdictUsages": [
+          {
+            "jmdictId": "1245180",
+            "applicableSenseNumbers": null
+          }
+        ],
+        "kanaReadings": [
+          "ぐちょく"
+        ],
+        "fullContext": "とすれば、<mark>愚直</mark>に手入れを続けるのは割に合わないとも言えます。",
+        "source": {
+          "text": "『辞書を編む』",
+          "lang": "ja"
+        }
+      },
+      "pipelineFullContext": "とすれば、<mark>愚直</mark>に手入れを続けるのは割に合わないとも言えます。",
+      "pipelineMinimizedContext": "",
+      "overexpansionReview": {
+        "date": "2026-10-04",
+        "disposition": "single-source-sentence",
+        "rationale": "The original sentence naturally describes doggedly continuing maintenance despite its poor return. とすれば does not require the preceding causal premise to appear on this vocabulary card."
+      },
+      "overexpandedManualFullContext": "そして、手入れを怠けたとしても、それが表立って知られることはないでしょう。とすれば、<mark>愚直</mark>に手入れを続けるのは割に合わないとも言えます。",
+      "previousManualMinimizedContext": "手入れを怠けても表立って知られないなら、<mark>愚直</mark>に手入れを続けるのは割に合わないとも言えます。"
+    },
+    {
+      "noteId": 1790823004089,
+      "recognitionTarget": "吉報",
+      "key": "吉報 | 1226320",
+      "category": "overexpansion-negative-example",
+      "source": "飯間浩明『辞書を編む』",
+      "originalExcerpt": "吉報は突然にもたらされました。",
+      "priorSemanticEvidence": "私は、ちらっと不安になりました。一方で、それはありえない、と楽観してもいました。今日の国語辞典の水準は、多くの辞書が、お互いに競い合って実現したものです。もし、電子化された二、三の国語辞典だけが生き残ったとしても、やがてその辞書の水準は落ちていくに違いない。長い目で見れば、いずれは他の辞書も電子化が求められるようになるでしょう。それまで５年かかるか、10年になるか分からないけれど、待っていればいい。\n\n私は外野で勝手なことを思っていただけですが、三省堂の関係者は、開発会社と共に地道な努力を続けていました。吉報は突然にもたらされました。",
+      "rationale": "吉報は突然にもたらされました。 is sufficient natural usage. Explaining the news or retrieving the next chapter was unnecessary. This was manual over-expansion, not a missing source window.",
+      "sourceParagraphs": [
+        {
+          "file": "c2PD.xhtml",
+          "index": 14,
+          "html": "私は外野で勝手なことを思っていただけですが、三省堂の関係者は、開発会社と共に地道な努力を続けていました。吉報は突然にもたらされました。",
+          "selectedHTML": "吉報は突然にもたらされました。"
+        },
+        {
+          "file": "c2R5.xhtml",
+          "index": 0,
+          "html": "『三国』、待望の電子版"
+        },
+        {
+          "file": "c2R5.xhtml",
+          "index": 1,
+          "html": "２０１２年７月、『三国』第６版が、スマートフォンのアンドロイド版として発売されました。続いて、９月にiPhone版が出て、その後、12月にバージョンアップしてiPadにも対応しました。しかも、すこぶる評判がいいということです。"
+        }
+      ],
+      "acceptedFullContext": "<mark>吉報</mark>は突然にもたらされました。",
+      "acceptedMinimizedContext": null,
+      "createCardInput": {
+        "recognitionTarget": "吉報",
+        "jmdictUsages": [
+          {
+            "jmdictId": "1226320",
+            "applicableSenseNumbers": null
+          }
+        ],
+        "kanaReadings": [
+          "きっぽう"
+        ],
+        "fullContext": "<mark>吉報</mark>は突然にもたらされました。",
+        "source": {
+          "text": "『辞書を編む』",
+          "lang": "ja"
+        }
+      },
+      "pipelineFullContext": "<mark>吉報</mark>は突然にもたらされました。",
+      "pipelineMinimizedContext": "",
+      "overexpansionReview": {
+        "date": "2026-10-04",
+        "disposition": "single-source-sentence",
+        "rationale": "吉報は突然にもたらされました。 is sufficient natural usage. Explaining the news or retrieving the next chapter was unnecessary. This was manual over-expansion, not a missing source window."
+      },
+      "overexpandedManualFullContext": "<p><mark>吉報</mark>は突然にもたらされました。</p>\n\n<p>『三国』、待望の電子版</p>\n\n<p>２０１２年７月、『三国』第６版が、スマートフォンのアンドロイド版として発売されました。</p>",
+      "previousManualMinimizedContext": "『三国』第６版がスマートフォンのアンドロイド版として発売されたという<mark>吉報</mark>がもたらされました。"
+    },
+    {
+      "noteId": 1790919256132,
+      "recognitionTarget": "固有名詞",
+      "key": "固有名詞 | 1266750",
+      "category": "overexpansion-negative-example",
+      "source": "飯間浩明『辞書を編む』",
+      "originalExcerpt": "察するに、専門用語や外来語、固有名詞の類いではないでしょうか。",
+      "priorSemanticEvidence": "現在の約８万語という数字は、すでに小型辞典としては多いほうです。ところが、アプリの利用者のコメントを読むと、「載っていないことばが多い」「いかんせん語数が少ない」と不満を持つ人がいます。紙の辞書では、これまであまりなかった反応です。\n\n私としては、「その載っていないことばとは何でしょう。教えてください」と、切実に知りたいのですが、コメントではそこまで書いてくれていません。察するに、専門用語や外来語、固有名詞の類いではないでしょうか。\n\n辞書は、語数が多ければいいというものではないことは、第１章で述べました（第１章編集方針のいろいろな対立軸）。小型辞典の役割は、まれにしか必要でないことばに紙幅を割くのではなく、誰もが使う可能性のあることばを、丁寧に拾って説明することにあります。小型辞典の編纂者が誰しも思うであろうことは、収録語数だけを見ないで、ぜひ内容を見てほしい、ということです。",
+      "rationale": "The original sentence naturally groups proper nouns with technical and borrowed vocabulary. It does not need the preceding question about missing dictionary entries.",
+      "sourceParagraphs": [
+        {
+          "file": "c2V5.xhtml",
+          "index": 11,
+          "html": "私としては、「その載っていないことばとは何でしょう。教えてください」と、切実に知りたいのですが、コメントではそこまで書いてくれていません。察するに、専門用語や外来語、固有名詞の類いではないでしょうか。",
+          "selectedHTML": "察するに、専門用語や外来語、固有名詞の類いではないでしょうか。"
+        }
+      ],
+      "acceptedFullContext": "察するに、専門用語や外来語、<mark>固有名詞</mark>の類いではないでしょうか。",
+      "acceptedMinimizedContext": null,
+      "createCardInput": {
+        "recognitionTarget": "固有名詞",
+        "jmdictUsages": [
+          {
+            "jmdictId": "1266750",
+            "applicableSenseNumbers": null
+          }
+        ],
+        "kanaReadings": [
+          "こゆうめいし"
+        ],
+        "fullContext": "察するに、専門用語や外来語、<mark>固有名詞</mark>の類いではないでしょうか。",
+        "source": {
+          "text": "『辞書を編む』",
+          "lang": "ja"
+        }
+      },
+      "pipelineFullContext": "察するに、専門用語や外来語、<mark>固有名詞</mark>の類いではないでしょうか。",
+      "pipelineMinimizedContext": "",
+      "overexpansionReview": {
+        "date": "2026-10-04",
+        "disposition": "single-source-sentence",
+        "rationale": "The original sentence naturally groups proper nouns with technical and borrowed vocabulary. It does not need the preceding question about missing dictionary entries."
+      },
+      "overexpandedManualFullContext": "私としては、「その載っていないことばとは何でしょう。教えてください」と、切実に知りたいのですが、コメントではそこまで書いてくれていません。察するに、専門用語や外来語、<mark>固有名詞</mark>の類いではないでしょうか。",
+      "previousManualMinimizedContext": "辞書に載っていないことばとは、専門用語や外来語、<mark>固有名詞</mark>の類いではないでしょうか。"
+    },
+    {
+      "noteId": 1790751084162,
+      "recognitionTarget": "徹底",
+      "key": "徹底 | 1437670",
+      "category": "overexpansion-negative-example",
+      "source": "飯間浩明『辞書を編む』",
+      "originalExcerpt": "ただ、『岩波』『明鏡』のような方針を徹底するのも、ひとつの見識です。",
+      "priorSemanticEvidence": "まず、「そのことばが正しいか間違いか、判断を求めたい人」にとっては、『岩波国語辞典』『明鏡国語辞典』が向いています。『岩波』では、たとえば「何気に」という言い方は〈一九八五年ごろからの誤用〉と記しています。『明鏡』では、「違う」を「違く」と言うのは〈誤り〉として、〈×実力はそんなに違くない→○そんなに違わない〉と、正誤を○×で示しています。\n\n私個人としては、どんなことばであれ、×と決めつけていいのか、辞書にその権利はあるのか、という疑問は持ちます。『三国』の場合、漢字の誤読など、限られた場合を除いては、「誤り」とはしていません（俗用の〔俗〕の表示はつけています）。ただ、『岩波』『明鏡』のような方針を徹底するのも、ひとつの見識です。\n\nまた、「そのことばが、いつ頃から使われているかを知りたい人」にとっては、『新潮現代国語辞典』が向いています。明治以来の文献が豊富に引用されています。たとえば、「微苦笑」の項目を見ると、芥川龍之介「侏儒の言葉」（１９２７年）から、「『微苦笑』は久米正雄が作ったことばだ」という意味の文章が引かれています。",
+      "rationale": "The original sentence already demonstrates consistently following a policy. Identifying the exact policy adds no necessary information about 徹底; the manual expansion was unnecessary.",
+      "sourceParagraphs": [
+        {
+          "file": "c2KR.xhtml",
+          "index": 12,
+          "html": "まず、「そのことばが正しいか間違いか、判断を求めたい人」にとっては、『岩波国語辞典』『明鏡国語辞典』が向いています。『岩波』では、たとえば「<ruby><rb>何</rb><rt>なに</rt></ruby><ruby><rb>気</rb><rt>げ</rt></ruby>に」という言い方は〈一九八五年ごろからの誤用〉と記しています。『明鏡』では、「違う」を「違く」と言うのは〈誤り〉として、〈×実力はそんなに違くない→○そんなに違わない〉と、正誤を○×で示しています。"
+        },
+        {
+          "file": "c2KR.xhtml",
+          "index": 13,
+          "html": "私個人としては、どんなことばであれ、×と決めつけていいのか、辞書にその権利はあるのか、という疑問は持ちます。『三国』の場合、漢字の誤読など、限られた場合を除いては、「誤り」とはしていません（俗用の〔俗〕の表示はつけています）。ただ、『岩波』『明鏡』のような方針を徹底するのも、ひとつの見識です。",
+          "selectedHTML": "ただ、『岩波』『明鏡』のような方針を徹底するのも、ひとつの見識です。"
+        }
+      ],
+      "acceptedFullContext": "ただ、『岩波』『明鏡』のような方針を<mark>徹底</mark>するのも、ひとつの見識です。",
+      "acceptedMinimizedContext": null,
+      "createCardInput": {
+        "recognitionTarget": "徹底",
+        "jmdictUsages": [
+          {
+            "jmdictId": "1437670",
+            "applicableSenseNumbers": null
+          }
+        ],
+        "kanaReadings": [
+          "てってい"
+        ],
+        "fullContext": "ただ、『岩波』『明鏡』のような方針を<mark>徹底</mark>するのも、ひとつの見識です。",
+        "source": {
+          "text": "『辞書を編む』",
+          "lang": "ja"
+        }
+      },
+      "pipelineFullContext": "ただ、『岩波』『明鏡』のような方針を<mark>徹底</mark>するのも、ひとつの見識です。",
+      "pipelineMinimizedContext": "",
+      "overexpandedManualFullContext": "<p>『明鏡』では、「違う」を「違く」と言うのは〈誤り〉として、〈×実力はそんなに違くない→○そんなに違わない〉と、正誤を○×で示しています。</p>\n\n<p>私個人としては、どんなことばであれ、×と決めつけていいのか、辞書にその権利はあるのか、という疑問は持ちます。『三国』の場合、漢字の誤読など、限られた場合を除いては、「誤り」とはしていません（俗用の〔俗〕の表示はつけています）。ただ、『岩波』『明鏡』のような方針を<mark>徹底</mark>するのも、ひとつの見識です。</p>",
+      "previousManualMinimizedContext": "ことばの正誤を示す方針を<mark>徹底</mark>するのも、ひとつの見識です。",
+      "overexpansionReview": {
+        "date": "2026-10-04",
+        "disposition": "single-source-sentence",
+        "rationale": "The original sentence already demonstrates consistently following a policy. Identifying the exact policy adds no necessary information about 徹底; the manual expansion was unnecessary."
+      }
+    },
+    {
+      "noteId": 1790751086005,
+      "recognitionTarget": "見識",
+      "key": "見識 | 1259630:1",
+      "category": "overexpansion-negative-example",
+      "source": "飯間浩明『辞書を編む』",
+      "originalExcerpt": "ただ、『岩波』『明鏡』のような方針を徹底するのも、ひとつの見識です。",
+      "priorSemanticEvidence": "まず、「そのことばが正しいか間違いか、判断を求めたい人」にとっては、『岩波国語辞典』『明鏡国語辞典』が向いています。『岩波』では、たとえば「何気に」という言い方は〈一九八五年ごろからの誤用〉と記しています。『明鏡』では、「違う」を「違く」と言うのは〈誤り〉として、〈×実力はそんなに違くない→○そんなに違わない〉と、正誤を○×で示しています。\n\n私個人としては、どんなことばであれ、×と決めつけていいのか、辞書にその権利はあるのか、という疑問は持ちます。『三国』の場合、漢字の誤読など、限られた場合を除いては、「誤り」とはしていません（俗用の〔俗〕の表示はつけています）。ただ、『岩波』『明鏡』のような方針を徹底するのも、ひとつの見識です。\n\nまた、「そのことばが、いつ頃から使われているかを知りたい人」にとっては、『新潮現代国語辞典』が向いています。明治以来の文献が豊富に引用されています。たとえば、「微苦笑」の項目を見ると、芥川龍之介「侏儒の言葉」（１９２７年）から、「『微苦笑』は久米正雄が作ったことばだ」という意味の文章が引かれています。",
+      "rationale": "The original sentence presents pursuing a policy as a defensible position. The exact policy is incidental to understanding 見識; the manual expansion was unnecessary.",
+      "sourceParagraphs": [
+        {
+          "file": "c2KR.xhtml",
+          "index": 12,
+          "html": "まず、「そのことばが正しいか間違いか、判断を求めたい人」にとっては、『岩波国語辞典』『明鏡国語辞典』が向いています。『岩波』では、たとえば「<ruby><rb>何</rb><rt>なに</rt></ruby><ruby><rb>気</rb><rt>げ</rt></ruby>に」という言い方は〈一九八五年ごろからの誤用〉と記しています。『明鏡』では、「違う」を「違く」と言うのは〈誤り〉として、〈×実力はそんなに違くない→○そんなに違わない〉と、正誤を○×で示しています。"
+        },
+        {
+          "file": "c2KR.xhtml",
+          "index": 13,
+          "html": "私個人としては、どんなことばであれ、×と決めつけていいのか、辞書にその権利はあるのか、という疑問は持ちます。『三国』の場合、漢字の誤読など、限られた場合を除いては、「誤り」とはしていません（俗用の〔俗〕の表示はつけています）。ただ、『岩波』『明鏡』のような方針を徹底するのも、ひとつの見識です。",
+          "selectedHTML": "ただ、『岩波』『明鏡』のような方針を徹底するのも、ひとつの見識です。"
+        }
+      ],
+      "acceptedFullContext": "ただ、『岩波』『明鏡』のような方針を徹底するのも、ひとつの<mark>見識</mark>です。",
+      "acceptedMinimizedContext": null,
+      "createCardInput": {
+        "recognitionTarget": "見識",
+        "jmdictUsages": [
+          {
+            "jmdictId": "1259630",
+            "applicableSenseNumbers": [
+              1
+            ]
+          }
+        ],
+        "kanaReadings": [
+          "けんしき"
+        ],
+        "fullContext": "ただ、『岩波』『明鏡』のような方針を徹底するのも、ひとつの<mark>見識</mark>です。",
+        "hint": "ひとつの見識だ",
+        "source": {
+          "text": "『辞書を編む』",
+          "lang": "ja"
+        }
+      },
+      "pipelineFullContext": "ただ、『岩波』『明鏡』のような方針を徹底するのも、ひとつの<mark>見識</mark>です。",
+      "pipelineMinimizedContext": "",
+      "overexpandedManualFullContext": "<p>『明鏡』では、「違う」を「違く」と言うのは〈誤り〉として、〈×実力はそんなに違くない→○そんなに違わない〉と、正誤を○×で示しています。</p>\n\n<p>私個人としては、どんなことばであれ、×と決めつけていいのか、辞書にその権利はあるのか、という疑問は持ちます。『三国』の場合、漢字の誤読など、限られた場合を除いては、「誤り」とはしていません（俗用の〔俗〕の表示はつけています）。ただ、『岩波』『明鏡』のような方針を徹底するのも、ひとつの<mark>見識</mark>です。</p>",
+      "previousManualMinimizedContext": "ことばの正誤を示す方針を徹底するのも、ひとつの<mark>見識</mark>です。",
+      "overexpansionReview": {
+        "date": "2026-10-04",
+        "disposition": "single-source-sentence",
+        "rationale": "The original sentence presents pursuing a policy as a defensible position. The exact policy is incidental to understanding 見識; the manual expansion was unnecessary."
+      }
+    },
+    {
+      "noteId": 1790921774442,
+      "recognitionTarget": "できばえ",
+      "key": "できばえ | 1340490",
+      "category": "overexpansion-negative-example",
+      "source": "飯間浩明『辞書を編む』",
+      "originalExcerpt": "限られた条件の中で最高のできばえにするため、市川先生・飛田先生のご指導をなおも仰ぎつつ、山崎さんと塩田さん、奥川さんと協力して、もう少しがんばることにします。",
+      "priorSemanticEvidence": "私たちの辞書が完成するのは、まだ何か月も先ですが、本文の加筆訂正のために許されている時間は、もうほとんど残っていません。今回の改訂では、版面をすべて新しく組み直すので、校正者による校正の期間を長く取らなければならないのです。\n\n状況は切羽詰まってきました。限られた条件の中で最高のできばえにするため、市川先生・飛田先生のご指導をなおも仰ぎつつ、山崎さんと塩田さん、奥川さんと協力して、もう少しがんばることにします。\n\n『三省堂国語辞典』第７版は、２０１３年末に刊行予定です。",
+      "rationale": "Working with others toward the best possible result already demonstrates できばえ. The following publication announcement is incidental; retain the original sentence and its concise minimization without importing 辞書 from the removed paragraph.",
+      "sourceParagraphs": [
+        {
+          "file": "c2XM.xhtml",
+          "index": 21,
+          "html": "状況は切羽詰まってきました。限られた条件の中で最高のできばえにするため、市川先生・飛田先生のご指導をなおも仰ぎつつ、山崎さんと塩田さん、奥川さんと協力して、もう少しがんばることにします。",
+          "selectedHTML": "限られた条件の中で最高のできばえにするため、市川先生・飛田先生のご指導をなおも仰ぎつつ、山崎さんと塩田さん、奥川さんと協力して、もう少しがんばることにします。"
+        },
+        {
+          "file": "c2XM.xhtml",
+          "index": 22,
+          "html": "『三省堂国語辞典』第７版は、２０１３年末に刊行予定です。"
+        }
+      ],
+      "acceptedFullContext": "限られた条件の中で最高の<mark>できばえ</mark>にするため、市川先生・飛田先生のご指導をなおも仰ぎつつ、山崎さんと塩田さん、奥川さんと協力して、もう少しがんばることにします。",
+      "acceptedMinimizedContext": "限られた条件の中で最高の<mark>できばえ</mark>にするため、もう少しがんばることにします。",
+      "createCardInput": {
+        "recognitionTarget": "できばえ",
+        "jmdictUsages": [
+          {
+            "jmdictId": "1340490",
+            "applicableSenseNumbers": null
+          }
+        ],
+        "fullContext": "限られた条件の中で最高の<mark>できばえ</mark>にするため、市川先生・飛田先生のご指導をなおも仰ぎつつ、山崎さんと塩田さん、奥川さんと協力して、もう少しがんばることにします。",
+        "minimizedContext": "限られた条件の中で最高の<mark>できばえ</mark>にするため、もう少しがんばることにします。",
+        "source": {
+          "text": "『辞書を編む』",
+          "lang": "ja"
+        }
+      },
+      "pipelineFullContext": "限られた条件の中で最高の<mark>できばえ</mark>にするため、市川先生・飛田先生のご指導をなおも仰ぎつつ、山崎さんと塩田さん、奥川さんと協力して、もう少しがんばることにします。",
+      "pipelineMinimizedContext": "限られた条件の中で最高の<mark>できばえ</mark>にするため、もう少しがんばることにします。",
+      "overexpandedManualFullContext": "<p>限られた条件の中で最高の<mark>できばえ</mark>にするため、市川先生・飛田先生のご指導をなおも仰ぎつつ、山崎さんと塩田さん、奥川さんと協力して、もう少しがんばることにします。</p>\n\n<p>『三省堂国語辞典』第７版は、２０１３年末に刊行予定です。</p>",
+      "previousManualMinimizedContext": "辞書を最高の<mark>できばえ</mark>にするため、もう少しがんばることにします。",
+      "overexpansionReview": {
+        "date": "2026-10-04",
+        "disposition": "single-source-sentence",
+        "rationale": "Working with others toward the best possible result already demonstrates できばえ. The following publication announcement is incidental; retain the original sentence and its concise minimization without importing 辞書 from the removed paragraph."
+      }
+    },
+    {
+      "noteId": 1790220549864,
+      "recognitionTarget": "見出だす",
+      "key": "見出だす | 1259130:1",
+      "category": "overexpansion-negative-example",
+      "source": "飯間浩明『辞書を編む』",
+      "originalExcerpt": "この要素は、他のことばにも見出だされます。",
+      "priorSemanticEvidence": "すがお［素顔］‐ガホ（名）①けしょうや変装（ヘンソウ）などをしない、もとのままの顔。「―の美しさ」②手をくわえない、ありのままの状態。「日本の―」\n\nここで必要なのは①のほうです。「特別なものをつけない、もとのままの」という要素が肝心です。この要素は、他のことばにも見出だされます。「素肌」は「白粉などをつけない生地の肌」です。「素足」は「靴下や足袋などをはいていない足」です。「素手」は――これはちょっと趣が違って、「（武器などを）何も持たない手」ですが、参考にはなります。\n\n「素髪」も、これらと同じで、「特別なものをつけない、もとのままの髪」という部分は動かないでしょう。その「特別なもの」とは何かというと、リボンやかつらではありませんから、まあ、広く「薬剤など」と考えておけばいいでしょう。そこで、語釈はこうなります。",
+      "rationale": "この要素は、他のことばにも見出だされます。 naturally illustrates finding an element in other words. Defining この要素 is unnecessary for the vocabulary example.",
+      "acceptedFullContext": "この要素は、他のことばにも<mark>見出だされます</mark>。",
+      "acceptedMinimizedContext": null,
+      "createCardInput": {
+        "recognitionTarget": "見出だす",
+        "jmdictUsages": [
+          {
+            "jmdictId": "1259130",
+            "applicableSenseNumbers": [
+              1
+            ]
+          }
+        ],
+        "kanaReadings": [
+          "みいだす"
+        ],
+        "fullContext": "この要素は、他のことばにも<mark>見出だされます</mark>。",
+        "hint": "他のことばにも見出だされる",
+        "source": {
+          "text": "『辞書を編む』",
+          "lang": "ja"
+        }
+      },
+      "pipelineFullContext": "「特別なものをつけない、もとのままの」という要素が肝心です。この要素は、他のことばにも<mark>見出だされます</mark>。",
+      "pipelineMinimizedContext": "この要素は、他のことばにも<mark>見出だされます</mark>。",
+      "overexpansionReview": {
+        "date": "2026-10-04",
+        "disposition": "single-source-sentence",
+        "rationale": "この要素は、他のことばにも見出だされます。 naturally illustrates finding an element in other words. Defining この要素 is unnecessary for the vocabulary example."
+      },
+      "overexpandedManualFullContext": "「特別なものをつけない、もとのままの」という要素が肝心です。この要素は、他のことばにも<mark>見出だされます</mark>。",
+      "previousManualMinimizedContext": null
+    }
+  ],
+  "reviewPolicy": "Full context normally preserves the full sentence containing the word as a natural usage example for a learner who knows its meaning. It need not explain a definition, identify every referent, or reconstruct a narrative. Expansion is rare, e.g. an interjection or fragmentary dialogue reply needing the preceding exchange. Long sentences are shortened separately in Minimized context. All 13 cases here work as single-sentence Full contexts; earlier claims that additional referents, causes, or a cross-chapter window were required are withdrawn."
+}
