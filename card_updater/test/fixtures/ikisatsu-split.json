@@ -1,0 +1,232 @@
+{
+  "source": "JMDict 2026-09-28; stored card snapshot before entry split",
+  "note": {
+    "key": "いきさつ | 1251120:1",
+    "dictionary": "<div class=\"miwake-dictionary-entry\">\n  <ul class=\"forms kanji\">\n    <li class=\"common\"><span lang=\"ja\">経緯</span></li>\n  </ul>\n  <ul class=\"forms kana\">\n    <li class=\"common\"><span lang=\"ja\">けいい</span></li>\n    <li class=\"tag-gikun\">\n      <span lang=\"ja\">いきさつ</span>\n      <ul class=\"tags\">\n        <li class=\"gikun\"><span lang=\"ja\">義訓・熟字訓</span></li>\n      </ul>\n    </li>\n  </ul>\n  <ul class=\"part-of-speech\">\n    <li class=\"n\">noun</li>\n  </ul>\n  <ol class=\"senses\">\n    <li>\n      <ul class=\"glosses\">\n        <li>details</li>\n        <li>particulars</li>\n        <li>sequence of events</li>\n        <li>circumstances</li>\n        <li>situation</li>\n        <li>how things got this way</li>\n      </ul>\n    </li>\n    <li>\n      <ul class=\"glosses\">\n        <li>longitude and latitude</li>\n      </ul>\n      <ul class=\"applies-to kana\">\n        <li><span lang=\"ja\">けいい</span></li>\n      </ul>\n    </li>\n    <li>\n      <ul class=\"glosses\">\n        <li>warp and weft</li>\n        <li>warp and woof</li>\n      </ul>\n      <ul class=\"applies-to kana\">\n        <li><span lang=\"ja\">けいい</span></li>\n      </ul>\n    </li>\n  </ol>\n</div>",
+    "fullContext": "「彼女には第三の男がいました。細かい<mark>いきさつ</mark>はわかりませんが、どうやら年下の男のようです。あくまで個人的な意見ですが、あまり褒められた種類の男ではないだろうという気配があります。その男と駆け落ちするように、彼女は家を出ていったのです。渡会先生はいわば便利な、踏み石的な存在に過ぎなかったみたいですね。そして都合良く利用もされたようです。先生がその女性にけっこうなお金を注ぎ込んでおられた形跡があります。銀行預金やクレジットカードの決済を調べると、かなり不自然な、多額のお金の動きがあったことがわかりました。おそらく高価な贈り物とかにお金を使われたのではないでしょうか。あるいは借金を申し込まれていたかもしれません。そのへんの使途については明確な証拠も残されていませんし、詳細は不明ですが、とにかくその短期間に引き出されたお金はまとまった額になります」"
+  },
+  "entries": [
+    {
+      "id": "1251120",
+      "kanji": [
+        {
+          "common": true,
+          "text": "経緯",
+          "tags": []
+        }
+      ],
+      "kana": [
+        {
+          "common": true,
+          "text": "けいい",
+          "tags": [],
+          "appliesToKanji": [
+            "*"
+          ]
+        }
+      ],
+      "sense": [
+        {
+          "partOfSpeech": [
+            "n"
+          ],
+          "appliesToKanji": [
+            "*"
+          ],
+          "appliesToKana": [
+            "*"
+          ],
+          "related": [
+            [
+              "いきさつ"
+            ]
+          ],
+          "antonym": [],
+          "field": [],
+          "dialect": [],
+          "misc": [],
+          "info": [],
+          "languageSource": [],
+          "gloss": [
+            {
+              "lang": "eng",
+              "gender": null,
+              "type": null,
+              "text": "details"
+            },
+            {
+              "lang": "eng",
+              "gender": null,
+              "type": null,
+              "text": "particulars"
+            },
+            {
+              "lang": "eng",
+              "gender": null,
+              "type": null,
+              "text": "sequence of events"
+            },
+            {
+              "lang": "eng",
+              "gender": null,
+              "type": null,
+              "text": "circumstances"
+            },
+            {
+              "lang": "eng",
+              "gender": null,
+              "type": null,
+              "text": "situation"
+            },
+            {
+              "lang": "eng",
+              "gender": null,
+              "type": null,
+              "text": "how things got this way"
+            }
+          ]
+        },
+        {
+          "partOfSpeech": [
+            "n"
+          ],
+          "appliesToKanji": [
+            "*"
+          ],
+          "appliesToKana": [
+            "*"
+          ],
+          "related": [],
+          "antonym": [],
+          "field": [],
+          "dialect": [],
+          "misc": [],
+          "info": [],
+          "languageSource": [],
+          "gloss": [
+            {
+              "lang": "eng",
+              "gender": null,
+              "type": null,
+              "text": "longitude and latitude"
+            }
+          ]
+        },
+        {
+          "partOfSpeech": [
+            "n"
+          ],
+          "appliesToKanji": [
+            "*"
+          ],
+          "appliesToKana": [
+            "*"
+          ],
+          "related": [],
+          "antonym": [],
+          "field": [],
+          "dialect": [],
+          "misc": [],
+          "info": [],
+          "languageSource": [],
+          "gloss": [
+            {
+              "lang": "eng",
+              "gender": null,
+              "type": null,
+              "text": "warp and weft"
+            },
+            {
+              "lang": "eng",
+              "gender": null,
+              "type": null,
+              "text": "warp and woof"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2873066",
+      "kanji": [
+        {
+          "common": false,
+          "text": "経緯",
+          "tags": []
+        }
+      ],
+      "kana": [
+        {
+          "common": false,
+          "text": "いきさつ",
+          "tags": [
+            "gikun"
+          ],
+          "appliesToKanji": [
+            "*"
+          ]
+        }
+      ],
+      "sense": [
+        {
+          "partOfSpeech": [
+            "n"
+          ],
+          "appliesToKanji": [
+            "*"
+          ],
+          "appliesToKana": [
+            "*"
+          ],
+          "related": [
+            [
+              "経緯",
+              "けいい・1",
+              1
+            ]
+          ],
+          "antonym": [],
+          "field": [],
+          "dialect": [],
+          "misc": [
+            "uk"
+          ],
+          "info": [],
+          "languageSource": [],
+          "gloss": [
+            {
+              "lang": "eng",
+              "gender": null,
+              "type": null,
+              "text": "circumstances"
+            },
+            {
+              "lang": "eng",
+              "gender": null,
+              "type": null,
+              "text": "sequence of events"
+            },
+            {
+              "lang": "eng",
+              "gender": null,
+              "type": null,
+              "text": "how things got this way"
+            },
+            {
+              "lang": "eng",
+              "gender": null,
+              "type": null,
+              "text": "details"
+            },
+            {
+              "lang": "eng",
+              "gender": null,
+              "type": null,
+              "text": "particulars"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -275,8 +275,9 @@ function buildSuggestion(
   const defaultHint = currentHint || aiHint;
 
   const expected = card.mappedTargetSenses;
+  const selected = allApply ? card.newParsed!.senses.map((sense) => sense.number) : senses;
   const sensesMatchExpectation = expected.length > 0 &&
-    JSON.stringify(senses) === JSON.stringify(expected);
+    JSON.stringify(selected) === JSON.stringify(expected);
   let confidence: SuggestionConfidence;
   if (sensesMatchExpectation) {
     confidence = "high";
@@ -304,17 +305,24 @@ function buildExplanation(
   sensesMatchExpectation: boolean,
 ): string {
   const parts: string[] = [];
+  if (card.reason === "entry-migration") {
+    parts.push(
+      `Move from JMDict entry ${card.parsedKey!.usages[0].jmdictId} to ${card.latestWord!.id}.`,
+    );
+  }
   const oldCount = card.oldParsed!.senses.length;
   const newCount = card.newParsed!.senses.length;
 
-  if (oldCount !== newCount) {
+  if (card.reason === "entry-migration") {
+    parts.push(`The old entry has ${oldCount} senses; the successor has ${newCount}.`);
+  } else if (oldCount !== newCount) {
     parts.push(`The entry went from ${oldCount} to ${newCount} senses.`);
   } else {
     parts.push("The sense list changed.");
   }
 
   if (senses.length === 0) {
-    parts.push("The AI judges all senses still apply to the mined context.");
+    parts.push("The AI judges all senses apply to the mined context.");
   } else {
     parts.push(
       `The AI picks sense${senses.length > 1 ? "s" : ""} ${
@@ -342,7 +350,7 @@ export function suggestedKey(card: AnalyzedCard, senses: number[]): string {
     throw new Error("Multi-entry recognition cards require manual semantic review.");
   }
   return formatKey(parsedKey.spelling, [{
-    jmdictId: parsedKey.usages[0].jmdictId,
+    jmdictId: card.latestWord!.id,
     senseNumbers: senses,
     totalSenses: card.newParsed!.senses.length,
   }]);

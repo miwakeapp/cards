@@ -39,6 +39,55 @@ export function impliedDecision(card: AnalyzedCard): "accept" | "none" {
   return card.verdict === "routine" || card.verdict === "normalize" ? "accept" : "none";
 }
 
+/** Resolves only explicitly reviewed retargets or routine updates into managed field changes. */
+export function resolveApply(
+  card: AnalyzedCard,
+  record: DecisionRecord | null,
+):
+  | {
+    set: {
+      key?: string;
+      reading?: string;
+      dictionary?: string;
+      hint?: string;
+    };
+  }
+  | { error: string } {
+  const effective = record?.decision ?? impliedDecision(card);
+  if (effective !== "accept") {
+    return { error: `Not accepted (${effective === "none" ? "undecided" : effective}).` };
+  }
+  if (card.latestEntryHTML === null) {
+    return { error: "No latest entry to apply." };
+  }
+
+  if (card.verdict === "retarget") {
+    if (record === null || record.senses === null) {
+      return { error: "Re-target cards need an explicit reviewed decision." };
+    }
+    return {
+      set: {
+        dictionary: card.latestEntryHTML,
+        key: suggestedKey(card, record.senses),
+        hint: record.hint ?? "",
+        ...(card.proposedReading === null ? {} : { reading: card.proposedReading }),
+      },
+    };
+  }
+
+  if (card.verdict === "routine" || card.verdict === "normalize") {
+    return {
+      set: {
+        dictionary: card.latestEntryHTML,
+        ...(card.proposedKey === null ? {} : { key: card.proposedKey }),
+        ...(card.proposedReading === null ? {} : { reading: card.proposedReading }),
+      },
+    };
+  }
+
+  return { error: "Exceptions must be handled manually in Anki." };
+}
+
 /** Builds concise structured context for an invalid Reading when its failure is unambiguous. */
 export function invalidReadingExceptionContext(
   card: AnalyzedCard,
@@ -370,54 +419,6 @@ export function startServer(options: ServerOptions): Deno.HttpServer {
       });
     }
     return { noteId, ok: result.ok, error: result.error, wroteFields: result.wroteFields };
-  }
-
-  function resolveApply(
-    card: AnalyzedCard,
-    record: DecisionRecord | null,
-  ):
-    | {
-      set: {
-        key?: string;
-        reading?: string;
-        dictionary?: string;
-        hint?: string;
-      };
-    }
-    | { error: string } {
-    const effective = record?.decision ?? impliedDecision(card);
-    if (effective !== "accept") {
-      return { error: `Not accepted (${effective === "none" ? "undecided" : effective}).` };
-    }
-    if (card.latestEntryHTML === null) {
-      return { error: "No latest entry to apply." };
-    }
-
-    if (card.verdict === "retarget") {
-      if (record === null || record.senses === null) {
-        return { error: "Re-target cards need an explicit reviewed decision." };
-      }
-      return {
-        set: {
-          dictionary: card.latestEntryHTML,
-          key: suggestedKey(card, record.senses),
-          hint: record.hint ?? "",
-          ...(card.proposedReading === null ? {} : { reading: card.proposedReading }),
-        },
-      };
-    }
-
-    if (card.verdict === "routine" || card.verdict === "normalize") {
-      return {
-        set: {
-          dictionary: card.latestEntryHTML,
-          ...(card.proposedKey === null ? {} : { key: card.proposedKey }),
-          ...(card.proposedReading === null ? {} : { reading: card.proposedReading }),
-        },
-      };
-    }
-
-    return { error: "Exceptions must be handled manually in Anki." };
   }
 
   return Deno.serve({
