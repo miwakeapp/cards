@@ -14,6 +14,7 @@ import { preextractedJMDictEntry } from "data";
 import { analyzeCard, type AnalyzedCard } from "../src/analyze.ts";
 import { contextForPrompt, suggestedKey, suggestForCard } from "../src/suggest.ts";
 import { entriesById, makeNote, makeWord } from "./fixtures.ts";
+import migrationFixture from "./fixtures/ikisatsu-split.json" with { type: "json" };
 
 function renderDictionary(word: JMdictWord): string {
   return renderDictionaryField([word]);
@@ -101,6 +102,42 @@ async function retargetingCard(): Promise<AnalyzedCard> {
   });
   return await analyzeCard(note, entriesById(currentEntry));
 }
+
+Deno.test("suggestForCard verifies a successor entry against the stored context and preserves the hint", async () => {
+  const entries = migrationFixture.entries as unknown as JMdictWord[];
+  const card = await analyzeCard(
+    makeNote({ ...migrationFixture.note, hint: "細かいいきさつ" }),
+    entriesById(...entries),
+  );
+  const suggestion = await suggestForTest(card, {
+    sameSpellingEntries: entries.filter((e) => e.kana.some((k) => k.text === "いきさつ")),
+    selectSenses: (input) => {
+      assertEquals(input.jmdictEntry.id, "2873066");
+      assertEquals(input.compatibleSenseNumbers, [1]);
+      assertEquals(input.context, contextForPrompt(migrationFixture.note.fullContext));
+      return Promise.resolve(generated(selected([1])));
+    },
+    generateHint: () => {
+      throw new Error("The unique successor sense needs no new hint");
+    },
+  });
+  assertEquals(suggestion.senses, []);
+  assertEquals(suggestedKey(card, suggestion.senses), "いきさつ | 2873066");
+  assertEquals(suggestion.defaultHint, "細かいいきさつ");
+  assertEquals(suggestion.confidence, "high");
+  assertEquals(suggestion.explanation.includes("2873066"), true);
+  assertEquals(suggestion.explanation.includes("This matches where"), true);
+
+  await assertRejects(
+    () =>
+      suggestForTest(card, {
+        sameSpellingEntries: entries,
+        selectSenses: () => Promise.resolve(generated({ outcome: "no-match" })),
+      }),
+    Error,
+    "Focused sense selection found no sense",
+  );
+});
 
 Deno.test("suggestForCard considers every accepted reading for the anchor entry", async () => {
   const previousAnchor = await preextractedJMDictEntry("1158110");

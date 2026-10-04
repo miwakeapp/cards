@@ -72,6 +72,20 @@ export function flagDuplicateRecognitionUnits(
   );
   return cards.map((card) => {
     const conflicts = index.conflicts(card.note.noteId, card.note.fields.key);
+    if (conflicts.length === 0 && card.reason === "entry-migration" && card.proposedKey !== null) {
+      const destinationConflicts = index.conflicts(card.note.noteId, card.proposedKey);
+      if (destinationConflicts.length > 0) {
+        return {
+          ...card,
+          verdict: "exception",
+          reason: "migration-conflict",
+          detail: `The proposed successor ${card.proposedKey} is already represented by note(s) ${
+            destinationConflicts.join(", ")
+          }. Resolve the duplicate before migrating this card.`,
+          needsAI: false,
+        };
+      }
+    }
     if (conflicts.length === 0 || card.verdict === "exception") return card;
     const noteIds = [card.note.noteId, ...conflicts]
       .toSorted((a, b) => a - b);

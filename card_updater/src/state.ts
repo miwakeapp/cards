@@ -49,6 +49,7 @@ export function cardFingerprint(card: AnalyzedCard): Promise<string> {
     card.latestEntryHTML,
     card.proposedReading,
     card.note.fields.fullContext,
+    ...(card.reason === "entry-migration" ? [card.proposedKey] : []),
   ]);
 }
 

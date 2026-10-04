@@ -67,6 +67,8 @@ const REASON_LABELS: Record<string, { title: string; explain?: string }> = {
     explain: "Selected sense text is unchanged; the Key is rewritten to follow its new numbers.",
   },
   "target-changed": { title: "Targeted sense text changed" },
+  "entry-migration": { title: "Spelling or reading moved to another entry" },
+  "migration-conflict": { title: "Successor entry already has a card" },
   "target-gone": { title: "Targeted sense no longer exists" },
   "all-senses-reshaped": { title: "Card tests all senses; the entry changed shape" },
   "equivalent-target-changed": {
@@ -305,7 +307,7 @@ function readingTransitionHTML(item: ReviewItem): string {
 }
 
 function computeKey(item: ReviewItem, senses: Iterable<number>): string {
-  const parsedKey = parseKey(item.key);
+  const parsedKey = parseKey(item.proposedKey ?? item.key);
   if (parsedKey === null || parsedKey.usages.length !== 1) {
     throw new Error("Only a valid single-entry Key can be retargeted.");
   }

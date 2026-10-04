@@ -22,6 +22,7 @@ import {
 } from "./entry_text.ts";
 import { formatKey, type Key, parseKey } from "card_model/keys";
 import { validateCardReading } from "./reading_validation.ts";
+import { proposeEntryMigration } from "./entry_migration.ts";
 
 /**
  * How much attention a card needs, from none to human-required:
@@ -87,7 +88,7 @@ export interface AnalyzedCard {
   targetSenseNumbers: number[];
   /** Where those targets land in the new entry, via alignment. */
   mappedTargetSenses: number[];
-  /** Key rewrite that preserves targeting (renumber case), or `null`. */
+  /** Proposed sense renumbering or entry migration, or `null`. Migrations require review. */
   proposedKey: string | null;
   /** Furigana-boundary rewrite that preserves the stored pronunciation, or `null`. */
   proposedReading: string | null;
@@ -101,6 +102,14 @@ export interface AnalyzedCard {
 }
 
 export async function analyzeCard(
+  note: MiwakeNoteSnapshot,
+  latestEntries: ReadonlyMap<string, JMdictWord>,
+): Promise<AnalyzedCard> {
+  const card = await analyzeCurrentEntry(note, latestEntries);
+  return await proposeEntryMigration(card, latestEntries) ?? card;
+}
+
+async function analyzeCurrentEntry(
   note: MiwakeNoteSnapshot,
   latestEntries: ReadonlyMap<string, JMdictWord>,
 ): Promise<AnalyzedCard> {
