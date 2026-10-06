@@ -138,6 +138,8 @@ export function partOfSpeech(partOfSpeech: Tag): string {
       return "expression";
     case "int":
       return "interjection";
+    case "num":
+      return "numeral";
 
     default:
       assert(partOfSpeech in tags, `Unknown part of speech: ${partOfSpeech}`);
@@ -162,10 +164,14 @@ export function misc(misc: Tag): string {
       return "familiar";
     case "vulg":
       return "vulgar";
+    case "X":
+      return "rude or X-rated";
     case "dated":
       return "dated";
     case "obs":
       return "obsolete";
+    case "hist":
+      return "historical";
     case "rare":
       return "rare";
     case "joc":
@@ -205,7 +211,7 @@ export function field(field: Tag): string {
   }
 }
 
-// The tags property of a JMdictKana or JMdictKanji.
+// The `tags` property of a `JMdictKana` or `JMdictKanji`, or `dialect` of a `JMdictSense`.
 export function tag(tag: Tag): string {
   // http://www.edrdg.org/wiki/index.php/Kanji_and_Reading_Information_Fields
   switch (tag) {
@@ -227,6 +233,20 @@ export function tag(tag: Tag): string {
       return "当て字";
     case "gikun":
       return "義訓・熟字訓";
+    case "hob":
+      return "Hokkaidō-ben";
+    case "kyb":
+      return "Kyōto-ben";
+    case "osb":
+      return "Ōsaka-ben";
+    case "ktb":
+      return "Kantō-ben";
+    case "thb":
+      return "Tōhoku-ben";
+    case "kyu":
+      return "Kyūshū-ben";
+    case "rkb":
+      return "Ryūkyū-ben";
     default:
       assert(tag in tags, `Unknown tag: ${tag}`);
       return tags[tag];

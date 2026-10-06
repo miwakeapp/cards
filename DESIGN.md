@@ -245,6 +245,8 @@ Some specific design decisions in our output:
 
 - Use lists for things that are lists in the JMDict data. The case where this is a bit controversial is the glosses within a sense. Most dictionary displays output each gloss as one string, with senses delimited by semicolons or commas. We intend to reproduce this display using CSS generated content, e.g., `.glosses > li::after { content: "; " }`. However, this has the notable drawback that CSS generated content is not selectable, so copying and pasting from the back side of these Anki cards will give unhelpful results.
 
+- Separate glosses within a sense with semicolons to reduce ambiguity with punctuation inside glosses. JMDict glosses contain commas about 40× more often than they do semicolons. For example, 一喝 reads “sharp, loud rebuke; bark; roar”, and あいにく reads “unfortunately; sorry, but ...”.
+
 - Nicely indent and format the HTML. This makes writing the CSS a bit trickier, as it introduces inter-element whitespace. But, it helps avoid the feeling that one's Anki deck contains unintelligible blobs. (This might be revisited in the future, as the dictionary entry field is intended to be read-only anyway...)
 
 TODO Discuss ✨ removal of en-GB redundancy
