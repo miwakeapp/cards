@@ -456,10 +456,10 @@ async function canonicalUnmarkedRubyReading(
 async function canonicalUnmarkedCompoundReadings(
   analysis: RubyAnalysis,
   resolveRubyReadings: RubyReadingResolver,
+  followingText: string,
 ): Promise<ReadonlyMap<Element, string>> {
   if (
-    analysis.components.length < 2 ||
-    analysis.trailingBase !== "" ||
+    analysis.components.length === 0 ||
     !hasPotentialFullSizeKanaArtifact(
       analysis.components.map(({ reading }) => reading).join(""),
     )
@@ -469,7 +469,24 @@ async function canonicalUnmarkedCompoundReadings(
 
   const spelling = analysis.components.map(({ base }) => base).join("");
   const sourceReading = analysis.components.map(({ reading }) => reading).join("");
-  const dictionaryReadings = await resolveRubyReadings(spelling);
+  const dictionaryReadings = [...await resolveRubyReadings(spelling)];
+  // Some compounds have ruby only on their difficult beginning: `棘[きよく]皮[ひ]動物`
+  // needs `棘皮動物`, since JMdict has neither `棘皮` nor a `きょく` reading for `棘`.
+  // Try contiguous Japanese suffixes, aligning their unannotated reading separately so only
+  // the annotated prefix is corrected. Do not cross whitespace, punctuation, or HTML elements.
+  const suffixText = (analysis.trailingBase + followingText)
+    .match(/^[\p{Script=Han}ぁ-ゖァ-ヺー々]+/u)?.[0] ?? "";
+  for (let end = 1; end <= suffixText.length; ++end) {
+    const suffix = suffixText.slice(0, end);
+    const pattern = new RegExp(
+      `^(${sourceReadingPattern(sourceReading)})${unannotatedReadingPattern(suffix)}$`,
+      "u",
+    );
+    for (const reading of await resolveRubyReadings(spelling + suffix)) {
+      const match = pattern.exec(toHiragana(reading));
+      if (match !== null) dictionaryReadings.push(match[1]);
+    }
+  }
   if (
     dictionaryReadings.some((reading) => toHiragana(reading) === toHiragana(sourceReading))
   ) {
@@ -636,6 +653,7 @@ export async function processContextHTML(
       const compoundReadings = await canonicalUnmarkedCompoundReadings(
         analysis,
         resolveRubyReadings,
+        next !== null && isText(next) ? next.data : "",
       );
       for (const [readingElement, reading] of compoundReadings) {
         canonicalReadings.set(readingElement, reading);

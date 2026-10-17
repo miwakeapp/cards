@@ -120,6 +120,54 @@ Deno.test("processContextHTML corrects split compound ruby using the compound's 
   );
 });
 
+Deno.test("processContextHTML uses an unannotated compound ending to correct incidental ruby", async () => {
+  // 『ゾウの時間 ネズミの時間』 annotates only 棘皮. These are the actual JMdict readings:
+  // 棘皮 has no entry, and 棘's standalone readings do not include きょく.
+  const readings = new Map<string, readonly string[]>([
+    ["棘", ["いばら", "イバラ", "おどろ", "とげ", "トゲ"]],
+    ["棘皮動物", ["きょくひどうぶつ"]],
+  ]);
+  const options = {
+    resolveRubyReadings: (spelling: string) => Promise.resolve(readings.get(spelling) ?? []),
+  };
+  assertEquals(
+    await processContextHTML(
+      "<mark>サンゴ</mark>、<ruby><rb>棘</rb><rt>きよく</rt><rb>皮</rb><rt>ひ</rt></ruby>動物、腕足類。",
+      "サンゴ",
+      ["サンゴ"],
+      options,
+    ),
+    "<mark>サンゴ</mark>、 棘[きょく] 皮[ひ]動物、腕足類。",
+  );
+  assertEquals(
+    await processContextHTML(
+      "<mark>サンゴ</mark>、<ruby>棘<rt>キヨク</rt>皮動物</ruby>、腕足類。",
+      "サンゴ",
+      ["サンゴ"],
+      options,
+    ),
+    "<mark>サンゴ</mark>、 棘[キョク]皮動物、腕足類。",
+  );
+  assertEquals(
+    await processContextHTML(
+      "<mark>サンゴ</mark>、<ruby>棘<rt>きよく</rt>皮<rt>ひ</rt></ruby>。動物。",
+      "サンゴ",
+      ["サンゴ"],
+      options,
+    ),
+    "<mark>サンゴ</mark>、 棘[きよく] 皮[ひ]。動物。",
+  );
+  assertEquals(
+    await processContextHTML(
+      "<mark>サンゴ</mark>、<ruby>棘<rt>きよく</rt>皮<rt>ひ</rt></ruby><p>動物。</p>",
+      "サンゴ",
+      ["サンゴ"],
+      options,
+    ),
+    "<mark>サンゴ</mark>、 棘[きよく] 皮[ひ]<p>動物。</p>",
+  );
+});
+
 Deno.test("processContextHTML preserves dictionary readings with genuine full-size kana", async () => {
   const readings = new Map<string, readonly string[]>([
     ["貸家", ["かしや", "かしいえ"]],
